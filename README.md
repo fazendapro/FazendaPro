@@ -1,141 +1,67 @@
-# Project Concepts
+# Capa
 
-This documentation serves as the central hub for all repositories and components involved in the Project Concepts ecosystem. Here you'll find comprehensive information about each repository, their relationships, and how they work together.
+- **Título do Projeto**: [Título claro e conciso que reflete a essência do produto ou ferramenta].
+- **Nome do Estudante**: [Nome completo do estudante].
+- **Curso**: Engenharia de Software.
+- **Data de Entrega**: [Data].
 
-## Repository Structure
+# Resumo
 
-### Frontend Application
+Breve descrição do conteúdo do documento, incluindo o propósito do projeto e os principais pontos de discussão.
 
-- **Repository**: [project-concepts-frontend](https://github.com/organization/project-concepts-frontend)
-- **Tech Stack**: React, TypeScript
-- **Purpose**: Main user interface for the application
-- **Key Features**:
-  - Component library implementation
-  - State management system
-  - API integration layer
-  - Unit and integration testing suite
+## 1. Introdução
 
-### Backend API
+- **Contexto**: Breve descrição do contexto que envolve o projeto.
+- **Justificativa**: Explicação da relevância do projeto para o campo da engenharia de software.
+- **Objetivos**: Descrição do objetivo principal do projeto e de quaisquer objetivos secundários.
 
-- **Repository**: [project-concepts-api](https://github.com/organization/project-concepts-api)
-- **Tech Stack**: Ruby on Rails, PostgreSQL
-- **Purpose**: Core business logic and data management
-- **Key Features**:
-  - RESTful API endpoints
-  - Authentication and authorization
-  - Database management
-  - Background job processing
+## 2. Descrição do Projeto
 
-### Shared Components Library
+- **Tema do Projeto**: Detalhes do tema, incluindo o produto ou ferramenta a ser desenvolvido.
+- **Problemas a Resolver**: Lista dos principais problemas que o projeto visa resolver.
+- **Limitações**: Delimitação dos problemas que o projeto não abordará.
 
-- **Repository**: [project-concepts-components](https://github.com/organization/project-concepts-components)
-- **Tech Stack**: React, TypeScript, Storybook
-- **Purpose**: Reusable UI components and design system
-- **Key Features**:
-  - Core UI components
-  - Design tokens
-  - Documentation
-  - Visual regression testing
+## 3. Especificação Técnica
 
-## Architecture Overview
+Descrição detalhada da proposta, incluindo requisitos de software, protocolos, algoritmos, procedimentos, formatos de dados, etc.
 
-```mermaid
-graph TD
-    A[Frontend Application] -->|API Calls| B[Backend API]
-    A -->|Imports| C[Shared Components]
-    B -->|Database Operations| D[(PostgreSQL)]
-    B -->|Background Jobs| E[Sidekiq]
-    C -->|Publishing| F[NPM Package]
-```
+### 3.1. Requisitos de Software
+- Apresentar os requisitos do tema proposto.
+- **Lista de Requisitos:** Apresentar uma lista contendo os Requisitos Funcionais (RF) e Não-Funcionais (RNF).
+- **Representação dos Requisitos:** Representar os RFs por meio de um Diagrama de Casos de Uso (UML).
 
-## Development Setup
+### 3.2. Considerações de Design
 
-### Prerequisites
+- Discussão sobre as escolhas de design, incluindo alternativas consideradas e justificativas para as decisões tomadas.
+- **Visão Inicial da Arquitetura**: Descrição dos componentes principais e suas interconexões.
+- **Padrões de Arquitetura**: Indicação de padrões específicos utilizados (ex.: MVC, Microserviços).
+- **Modelos C4**: Detalhamento da arquitetura em níveis: Contexto, Contêineres, Componentes, Código.
 
-- Node.js 18+
-- Ruby 3.2+
-- PostgreSQL 14+
-- Yarn or npm
-- Redis (for background jobs)
+### 3.3. Stack Tecnológica
 
-### Local Development
+- **Linguagens de Programação**: Justificativa para a escolha de linguagens específicas.
+- **Frameworks e Bibliotecas**: Frameworks e bibliotecas a serem utilizados.
+- **Ferramentas de Desenvolvimento e Gestão de Projeto**: Ferramentas para desenvolvimento e gestão do projeto.
+... qualquer outra informação referente a stack tecnológica ...
 
-1. **Clone all repositories**
+### 3.4. Considerações de Segurança
 
-```bash
-git clone git@github.com:organization/project-concepts-frontend.git
-git clone git@github.com:organization/project-concepts-api.git
-git clone git@github.com:organization/project-concepts-components.git
-```
+Análise de possíveis questões de segurança e como mitigá-las.
 
-2. **Set up environment variables**
-   Copy the example environment files in each repository:
+## 4. Próximos Passos
 
-```bash
-cp .env.example .env
-```
+Descrição dos passos seguintes após a conclusão do documento, com uma visão geral do cronograma para Portfólio I e II.
 
-3. **Install dependencies**
+## 5. Referências
 
-```bash
-# Frontend
-cd project-concepts-frontend
-yarn install
+Listagem de todas as fontes de pesquisa, frameworks, bibliotecas e ferramentas que serão utilizadas.
 
-# Backend
-cd project-concepts-api
-bundle install
+## 6. Apêndices (Opcionais)
 
-# Components
-cd project-concepts-components
-yarn install
-```
+Informações complementares, dados de suporte ou discussões detalhadas fora do corpo principal.
+## 7. Avaliações de Professores
 
-4. **Start the development servers**
-
-```bash
-# Frontend
-yarn dev
-
-# Backend
-rails server
-
-# Components
-yarn storybook
-```
-
-## CI/CD Pipeline
-
-Each repository has its own CI/CD pipeline implemented with GitHub Actions:
-
-- **Frontend**: Build, test, and deploy to staging/production
-- **Backend**: Test, security scan, and deploy to staging/production
-- **Components**: Build, test, and publish to NPM
-
-## Contributing
-
-Please refer to the individual repository's CONTRIBUTING.md file for specific guidelines. General workflow:
-
-1. Create a feature branch from `main`
-2. Implement changes following our coding standards
-3. Write/update tests
-4. Submit a pull request
-5. Code review process
-6. Merge after approval
-
-## Documentation
-
-- [API Documentation](./api-docs/README.md)
-- [Frontend Architecture](./frontend/ARCHITECTURE.md)
-- [Component Library](./components/README.md)
-- [Deployment Guide](./deployment/README.md)
-
-## Contact
-
-- **Tech Lead**: [tech-lead@organization.com](mailto:tech-lead@organization.com)
-- **Project Manager**: [pm@organization.com](mailto:pm@organization.com)
-- **Slack Channel**: #project-concepts
-
-## License
-
-All repositories are licensed under the MIT License. See the LICENSE file in each repository for details.
+Adicionar três páginas no final do RFC para que os Professores escolhidos possam fazer suas considerações e assinatura:
+- Considerações Professor/a:
+- Considerações Professor/a:
+- Considerações Professor/a:
