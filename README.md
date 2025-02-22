@@ -52,40 +52,6 @@ Descrição detalhada da proposta, incluindo requisitos de software, protocolos,
 - **Padrões de Arquitetura**: Indicação de padrões específicos utilizados (ex.: MVC, Microserviços).
 - **Modelos C4**: Detalhamento da arquitetura em níveis: Contexto, Contêineres, Componentes, Código.
 
-### 3.3. Stack Tecnológica
-
-- **Linguagens de Programação**:
-  - TypeScript
-- **Frameworks e Bibliotecas**:
-  - React
-  - Node.js
-  - Express
-  - Sequelize
-  - Styled Components
-  - React Router
-  - React Hook Form
-  - React Query
-  - React Toastify
-  - React Icons
-  - React Select
-  - Yup
-  - Jest
-  - Cypress
-  - Docker
-  - PostgreSQL
-  - Docker
-  - Docker Compose
-- **Ferramentas de Desenvolvimento e Gestão de Projeto**:
-  - Git
-  - GitHub
-  - Github Actions
-  - Github Projects
-  - Github Wiki
-  - Cursor
-  - Docker
-  - Docker Compose
-  - MySQL
-
 ### 3.4. Considerações de Segurança
 
 Análise de possíveis questões de segurança e como mitigá-las.
