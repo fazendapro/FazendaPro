@@ -16,19 +16,19 @@ O projeto CowTech é uma solução agropecuária que visa facilitar a gestão de
 >
 > [O que é o software e para que serve?](https://github.com/fazendapro/cowtech/wiki/Introduction-&-Description)
 >   
-> [O software é gratuito?](https://github.com/usuario/agrogest/wiki/Planos-e-Precos)
+> [O software é gratuito?](https://github.com/fazendapro/cowtech/wiki/Planos-e-Precos)
 > 
 > [Onde está o código fonte?](https://github.com/fazendapro/cowtech/projects)
 > 
 > [Onde está a documentação completa?](https://github.com/fazendapro/cowtech/wiki)
 > 
-> [Qual a arquitetura do sistema?](https://github.com/usuario/agrogest/wiki/Arquitetura)
+> [Qual a arquitetura do sistema?](https://github.com/fazendapro/cowtech/wiki/Arquitetura)
 > 
-> [Como é feito o deploy?](https://github.com/usuario/agrogest/actions)
+> [Como é feito o deploy?](https://github.com/fazendapro/cowtech/actions)
 > 
-> [Quais tecnologias são usadas?](https://github.com/usuario/agrogest/wiki/Stack-Tecnológica)
+> [Quais tecnologias são usadas?](https://github.com/fazendapro/cowtech/wiki/Stack-Tecnológica)
 > 
-> [Onde está o roadmap do projeto?](https://github.com/users/usuario/projects/1)
+> [Onde está o roadmap do projeto?](https://github.com/fazendapro/cowtech/projects/1)
 > 
 > [Onde vejo o design da interface?](https://www.figma.com/design/exemplo-agrogest)
 
