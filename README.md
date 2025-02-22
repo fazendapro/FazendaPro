@@ -1,6 +1,5 @@
-# Capa
+# FazendaPro - Soluções Agropecuárias
 
-- **Título do Projeto**: FazendaPro - Soluções Agropecuárias
 - **Nome do Estudante**: Gustavo Henrique Dias
 - **Curso**: Engenharia de Software.
 - **Data de Entrega**: [Data].
