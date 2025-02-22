@@ -13,21 +13,32 @@ O projeto CowTech é uma solução agropecuária que visa facilitar a gestão de
 
 > [!NOTE]
 >
-> ## FAQ - Software de Gerenciamento Agropecuário
+> ## FAQ - FazendaPro
 >
 > [O que é o software e para que serve?](https://github.com/fazendapro/cowtech/wiki/Introduction-&-Description)
+> 
 > [Quais são os requisitos para instalar?](https://github.com/usuario/agrogest/wiki/Requisitos-de-Instalacao)  
+>
 > [Como faço para começar a usar?](https://github.com/usuario/agrogest/wiki/Guia-de-Inicio-Rapido)  
+>
 > [Posso usar o software offline?](https://github.com/usuario/agrogest/wiki/Modo-Offline)  
-> [Como entro em contato com o suporte?](https://github.com/usuario/agrogest/wiki/Suporte-e-Contato)  
-> [O software é gratuito?](https://github.com/usuario/agrogest/wiki/Planos-e-Precos)  
-> [Onde está o código fonte?](https://github.com/usuario/agrogest)  
-> [Como rodar na minha máquina?](https://github.com/usuario/agrogest/wiki/Instalacao-Local)  
-> [Onde está a documentação completa?](https://github.com/usuario/agrogest/wiki)  
-> [Qual a arquitetura do sistema?](https://github.com/usuario/agrogest/wiki/Arquitetura)  
-> [Como é feito o deploy?](https://github.com/usuario/agrogest/actions)  
-> [Quais tecnologias são usadas?](https://github.com/usuario/agrogest/wiki/Stack-Tecnologica)  
-> [Onde está o roadmap do projeto?](https://github.com/users/usuario/projects/1)  
+>
+> [Como entro em contato com o suporte?](https://github.com/usuario/agrogest/wiki/Suporte-e-Contato)
+>   
+> [O software é gratuito?](https://github.com/usuario/agrogest/wiki/Planos-e-Precos)
+> 
+> [Onde está o código fonte?](https://github.com/fazendapro/cowtech/projects)
+> 
+> [Onde está a documentação completa?](https://github.com/fazendapro/cowtech/wiki)
+> 
+> [Qual a arquitetura do sistema?](https://github.com/usuario/agrogest/wiki/Arquitetura)
+> 
+> [Como é feito o deploy?](https://github.com/usuario/agrogest/actions)
+> 
+> [Quais tecnologias são usadas?](https://github.com/usuario/agrogest/wiki/Stack-Tecnologica)
+> 
+> [Onde está o roadmap do projeto?](https://github.com/users/usuario/projects/1)
+> 
 > [Onde vejo o design da interface?](https://www.figma.com/design/exemplo-agrogest)
 
 ---
