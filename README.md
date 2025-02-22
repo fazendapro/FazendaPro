@@ -1,6 +1,6 @@
 # Capa
 
-- **Título do Projeto**: CowTech - Soluções Agropecuárias
+- **Título do Projeto**: FazendaPro - Soluções Agropecuárias
 - **Nome do Estudante**: Gustavo Henrique Dias
 - **Curso**: Engenharia de Software.
 - **Data de Entrega**: [Data].
@@ -8,6 +8,29 @@
 # Resumo
 
 O projeto CowTech é uma solução agropecuária que visa facilitar a gestão de fazendas e a produção de leite. O sistema oferece uma interface intuitiva para gerenciar animais, pastagens e produção de leite, além de fornecer insights para tomada de decisão. Uma das principais funcionalidades é a monitoração de vacas em lactação, permitindo acompanhar a produção de leite e identificar possíveis problemas, assim como manter seu histórico, como genitora, filho, etc.
+
+---
+
+> [!NOTE]
+>
+> ## FAQ - Software de Gerenciamento Agropecuário
+>
+> [O que é o software e para que serve?](https://github.com/usuario/agrogest/wiki/Introducao-ao-Software)  
+> [Quais são os requisitos para instalar?](https://github.com/usuario/agrogest/wiki/Requisitos-de-Instalacao)  
+> [Como faço para começar a usar?](https://github.com/usuario/agrogest/wiki/Guia-de-Inicio-Rapido)  
+> [Posso usar o software offline?](https://github.com/usuario/agrogest/wiki/Modo-Offline)  
+> [Como entro em contato com o suporte?](https://github.com/usuario/agrogest/wiki/Suporte-e-Contato)  
+> [O software é gratuito?](https://github.com/usuario/agrogest/wiki/Planos-e-Precos)  
+> [Onde está o código fonte?](https://github.com/usuario/agrogest)  
+> [Como rodar na minha máquina?](https://github.com/usuario/agrogest/wiki/Instalacao-Local)  
+> [Onde está a documentação completa?](https://github.com/usuario/agrogest/wiki)  
+> [Qual a arquitetura do sistema?](https://github.com/usuario/agrogest/wiki/Arquitetura)  
+> [Como é feito o deploy?](https://github.com/usuario/agrogest/actions)  
+> [Quais tecnologias são usadas?](https://github.com/usuario/agrogest/wiki/Stack-Tecnologica)  
+> [Onde está o roadmap do projeto?](https://github.com/users/usuario/projects/1)  
+> [Onde vejo o design da interface?](https://www.figma.com/design/exemplo-agrogest)
+
+---
 
 
 ## 3. Especificação Técnica
