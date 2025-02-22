@@ -15,7 +15,7 @@ O projeto CowTech é uma solução agropecuária que visa facilitar a gestão de
 >
 > ## FAQ - Software de Gerenciamento Agropecuário
 >
-> [O que é o software e para que serve?](https://github.com/usuario/agrogest/wiki/Introducao-ao-Software)  
+> [O que é o software e para que serve?](https://github.com/fazendapro/cowtech/wiki/Introduction-&-Description)
 > [Quais são os requisitos para instalar?](https://github.com/usuario/agrogest/wiki/Requisitos-de-Instalacao)  
 > [Como faço para começar a usar?](https://github.com/usuario/agrogest/wiki/Guia-de-Inicio-Rapido)  
 > [Posso usar o software offline?](https://github.com/usuario/agrogest/wiki/Modo-Offline)  
