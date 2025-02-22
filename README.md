@@ -34,10 +34,6 @@ O projeto CowTech é uma solução agropecuária que visa facilitar a gestão de
 
 ---
 
-### 3.4. Considerações de Segurança
-
-Análise de possíveis questões de segurança e como mitigá-las.
-
 ## 4. Próximos Passos
 
 Descrição dos passos seguintes após a conclusão do documento, com uma visão geral do cronograma para Portfólio I e II.
