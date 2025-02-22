@@ -1,31 +1,32 @@
 # Capa
 
-- **Título do Projeto**: [Título claro e conciso que reflete a essência do produto ou ferramenta].
-- **Nome do Estudante**: [Nome completo do estudante].
+- **Título do Projeto**: CowTech - Soluções Agropecuárias
+- **Nome do Estudante**: Gustavo Henrique Dias
 - **Curso**: Engenharia de Software.
 - **Data de Entrega**: [Data].
 
 # Resumo
 
-Breve descrição do conteúdo do documento, incluindo o propósito do projeto e os principais pontos de discussão.
+O projeto CowTech é uma solução agropecuária que visa facilitar a gestão de fazendas e a produção de leite. O sistema oferece uma interface intuitiva para gerenciar animais, pastagens e produção de leite, além de fornecer insights para tomada de decisão. Uma das principais funcionalidades é a monitoração de vacas em lactação, permitindo acompanhar a produção de leite e identificar possíveis problemas, assim como manter seu histórico, como genitora, filho, etc.
 
 ## 1. Introdução
 
-- **Contexto**: Breve descrição do contexto que envolve o projeto.
-- **Justificativa**: Explicação da relevância do projeto para o campo da engenharia de software.
-- **Objetivos**: Descrição do objetivo principal do projeto e de quaisquer objetivos secundários.
+- **Contexto**: o contexto do projeto é a gestão de fazendas e a produção de leite.
+  - **Justificativa**: a relevancia do projeto é valorização financeira dos animais e a produção de leite, além de facilitar a gestão de fazendas e a produção de leite.
+  - **Objetivos**: o objetivo principal do projeto é criar um sistema que permita a gestão de fazendas e a produção de leite de forma eficiente e ágil.
 
 ## 2. Descrição do Projeto
 
-- **Tema do Projeto**: Detalhes do tema, incluindo o produto ou ferramenta a ser desenvolvido.
-- **Problemas a Resolver**: Lista dos principais problemas que o projeto visa resolver.
-- **Limitações**: Delimitação dos problemas que o projeto não abordará.
+- **Tema do Projeto**: o tema do projeto é a gestão de fazendas e a produção de leite.
+- **Problemas a Resolver**: o principal problema a ser resolvido é a documentação de vacas, fator que influencia diretamente no seu valor de mercado.
+- **Limitações**: ---.
 
 ## 3. Especificação Técnica
 
 Descrição detalhada da proposta, incluindo requisitos de software, protocolos, algoritmos, procedimentos, formatos de dados, etc.
 
 ### 3.1. Requisitos de Software
+
 - Apresentar os requisitos do tema proposto.
 - **Lista de Requisitos:** Apresentar uma lista contendo os Requisitos Funcionais (RF) e Não-Funcionais (RNF).
 - **Representação dos Requisitos:** Representar os RFs por meio de um Diagrama de Casos de Uso (UML).
@@ -39,10 +40,36 @@ Descrição detalhada da proposta, incluindo requisitos de software, protocolos,
 
 ### 3.3. Stack Tecnológica
 
-- **Linguagens de Programação**: Justificativa para a escolha de linguagens específicas.
-- **Frameworks e Bibliotecas**: Frameworks e bibliotecas a serem utilizados.
-- **Ferramentas de Desenvolvimento e Gestão de Projeto**: Ferramentas para desenvolvimento e gestão do projeto.
-... qualquer outra informação referente a stack tecnológica ...
+- **Linguagens de Programação**:
+  - TypeScript
+- **Frameworks e Bibliotecas**:
+  - React
+  - Node.js
+  - Express
+  - Sequelize
+  - Styled Components
+  - React Router
+  - React Hook Form
+  - React Query
+  - React Toastify
+  - React Icons
+  - React Select
+  - Yup
+  - Jest
+  - Cypress
+  - Docker
+  - PostgreSQL
+  - Docker
+  - Docker Compose
+- **Ferramentas de Desenvolvimento e Gestão de Projeto**:
+  - Git
+  - GitHub
+  - Github Actions
+  - Github Projects
+  - Cursor
+  - Docker
+  - Docker Compose
+  - MySQL
 
 ### 3.4. Considerações de Segurança
 
@@ -59,9 +86,11 @@ Listagem de todas as fontes de pesquisa, frameworks, bibliotecas e ferramentas q
 ## 6. Apêndices (Opcionais)
 
 Informações complementares, dados de suporte ou discussões detalhadas fora do corpo principal.
+
 ## 7. Avaliações de Professores
 
 Adicionar três páginas no final do RFC para que os Professores escolhidos possam fazer suas considerações e assinatura:
+
 - Considerações Professor/a:
 - Considerações Professor/a:
 - Considerações Professor/a:
