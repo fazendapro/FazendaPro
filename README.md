@@ -9,17 +9,6 @@
 
 O projeto CowTech é uma solução agropecuária que visa facilitar a gestão de fazendas e a produção de leite. O sistema oferece uma interface intuitiva para gerenciar animais, pastagens e produção de leite, além de fornecer insights para tomada de decisão. Uma das principais funcionalidades é a monitoração de vacas em lactação, permitindo acompanhar a produção de leite e identificar possíveis problemas, assim como manter seu histórico, como genitora, filho, etc.
 
-## 1. Introdução
-
-- **Contexto**: o contexto do projeto é a gestão de fazendas e a produção de leite.
-  - **Justificativa**: a relevancia do projeto é valorização financeira dos animais e a produção de leite, além de facilitar a gestão de fazendas e a produção de leite.
-  - **Objetivos**: o objetivo principal do projeto é criar um sistema que permita a gestão de fazendas e a produção de leite de forma eficiente e ágil.
-
-## 2. Descrição do Projeto
-
-- **Tema do Projeto**: o tema do projeto é a gestão de fazendas e a produção de leite.
-- **Problemas a Resolver**: o principal problema a ser resolvido é a documentação de vacas, fator que influencia diretamente no seu valor de mercado.
-- **Limitações**: ---.
 
 ## 3. Especificação Técnica
 
