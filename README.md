@@ -34,24 +34,6 @@ O projeto CowTech é uma solução agropecuária que visa facilitar a gestão de
 
 ---
 
-
-## 3. Especificação Técnica
-
-Descrição detalhada da proposta, incluindo requisitos de software, protocolos, algoritmos, procedimentos, formatos de dados, etc.
-
-### 3.1. Requisitos de Software
-
-- Apresentar os requisitos do tema proposto.
-- **Lista de Requisitos:** Apresentar uma lista contendo os Requisitos Funcionais (RF) e Não-Funcionais (RNF).
-- **Representação dos Requisitos:** Representar os RFs por meio de um Diagrama de Casos de Uso (UML).
-
-### 3.2. Considerações de Design
-
-- Discussão sobre as escolhas de design, incluindo alternativas consideradas e justificativas para as decisões tomadas.
-- **Visão Inicial da Arquitetura**: Descrição dos componentes principais e suas interconexões.
-- **Padrões de Arquitetura**: Indicação de padrões específicos utilizados (ex.: MVC, Microserviços).
-- **Modelos C4**: Detalhamento da arquitetura em níveis: Contexto, Contêineres, Componentes, Código.
-
 ### 3.4. Considerações de Segurança
 
 Análise de possíveis questões de segurança e como mitigá-las.
