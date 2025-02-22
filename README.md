@@ -26,7 +26,7 @@ O projeto CowTech é uma solução agropecuária que visa facilitar a gestão de
 > 
 > [Como é feito o deploy?](https://github.com/usuario/agrogest/actions)
 > 
-> [Quais tecnologias são usadas?](https://github.com/usuario/agrogest/wiki/Stack-Tecnologica)
+> [Quais tecnologias são usadas?](https://github.com/usuario/agrogest/wiki/Stack-Tecnológica)
 > 
 > [Onde está o roadmap do projeto?](https://github.com/users/usuario/projects/1)
 > 
