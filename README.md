@@ -50,17 +50,6 @@ Listagem de todas as fontes de pesquisa, frameworks, bibliotecas e ferramentas q
 
 Informações complementares, dados de suporte ou discussões detalhadas fora do corpo principal.
 
-## Architecture Overview
-
-```mermaid
-graph TD
-    A[Frontend Application] -->|API Calls| B[Backend API]
-    A -->|Imports| C[Shared Components]
-    B -->|Database Operations| D[(PostgreSQL)]
-    B -->|Background Jobs| E[Sidekiq]
-    C -->|Publishing| F[NPM Package]
-```
-
 ## 7. Avaliações de Professores
 
 Adicionar três páginas no final do RFC para que os Professores escolhidos possam fazer suas considerações e assinatura:
