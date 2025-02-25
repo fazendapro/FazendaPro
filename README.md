@@ -30,7 +30,7 @@ O projeto CowTech é uma solução agropecuária que visa facilitar a gestão de
 > 
 > [Onde está o roadmap do projeto?](https://github.com/fazendapro/cowtech/projects/1)
 > 
-> [Onde vejo o design da interface?](https://www.figma.com/design/exemplo-agrogest)
+> [Onde vejo o design da interface?](http://figma.com/proto/ZoKjm0cUGoA5tQncXZeGtb/Inventory-Management-Dashboard-(Community)?node-id=459-576)
 
 ---
 
