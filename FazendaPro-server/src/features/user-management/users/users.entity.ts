@@ -11,6 +11,21 @@ export class User {
   @Column()
   lastName: string;
 
+  @Column()
+  email: string;
+
+  @Column()
+  phone: string;
+
+  @Column()
+  password: string;
+
+  @Column()
+  lastAccess: Date;
+
+  @Column()
+  farmId: number;
+
   @Column({ default: true })
   isActive: boolean;
 }
