@@ -1,18 +1,11 @@
 import React from 'react';
-import { FormProvider, useFormContext } from 'react-hook-form';
+import { FormProvider, useFormContext, Controller, FieldValues } from 'react-hook-form';
 import { Form as AntForm, Checkbox, Row, Col, Typography, Input } from 'antd';
-import { FieldValues, SubmitHandler, UseFormReturn } from 'react-hook-form';
+import { SubmitHandler, UseFormReturn } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { FieldType } from '../../types/field-types';
 
 const { Link } = Typography;
-
-type FieldType = {
-  name: string;
-  label: string;
-  type: 'text' | 'password' | 'checkbox' | 'link';
-  placeholder?: string;
-  colSpan?: number;
-  isRequired?: boolean;
-};
 
 interface FormProps<T extends FieldValues> {
   onSubmit: SubmitHandler<T>;
@@ -22,7 +15,8 @@ interface FormProps<T extends FieldValues> {
 }
 
 const FieldRenderer: React.FC<{ fields: FieldType[] }> = ({ fields }) => {
-  const { register, formState: { errors } } = useFormContext();
+  const { control, formState: { errors } } = useFormContext();
+  const { t } = useTranslation();
 
   return (
     <>
@@ -30,31 +24,45 @@ const FieldRenderer: React.FC<{ fields: FieldType[] }> = ({ fields }) => {
         <Col span={field.colSpan || 24} key={`field-${index}`}>
           {field.type === 'checkbox' ? (
             <div style={{ marginBottom: 16 }}>
-              <Checkbox {...register(field.name)}>
-                {field.label}
-              </Checkbox>
+              <Controller
+                name={field.name}
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <Checkbox checked={value} onChange={e => onChange(e.target.checked)}>
+                    {t(field.label)}
+                  </Checkbox>
+                )}
+              />
             </div>
           ) : field.type === 'link' ? (
             <Link href="#" style={{ float: 'right' }}>
-              {field.label}
+              {t(field.label)}
             </Link>
           ) : (
             <AntForm.Item
-              label={field.label}
+              label={t(field.label)}
               validateStatus={errors[field.name] ? 'error' : ''}
               help={errors[field.name]?.message as string}
             >
-              {field.type === 'password' ? (
-                <Input.Password
-                  placeholder={field.placeholder}
-                  {...register(field.name)}
-                />
-              ) : (
-                <Input
-                  placeholder={field.placeholder}
-                  {...register(field.name)}
-                />
-              )}
+              <Controller
+                name={field.name}
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  field.type === 'password' ? (
+                    <Input.Password
+                      value={value}
+                      onChange={onChange}
+                      placeholder={field.placeholder ? t(field.placeholder) : undefined}
+                    />
+                  ) : (
+                    <Input
+                      value={value}
+                      onChange={onChange}
+                      placeholder={field.placeholder ? t(field.placeholder) : undefined}
+                    />
+                  )
+                )}
+              />
             </AntForm.Item>
           )}
         </Col>
@@ -64,9 +72,11 @@ const FieldRenderer: React.FC<{ fields: FieldType[] }> = ({ fields }) => {
 };
 
 export const Form = <T extends FieldValues>({ onSubmit, fields, children, methods }: FormProps<T>) => {
+  const { handleSubmit } = methods;
+
   return (
     <FormProvider {...methods}>
-      <AntForm onFinish={methods.handleSubmit(onSubmit)} layout="vertical">
+      <AntForm onFinish={handleSubmit(onSubmit)} layout="vertical">
         <Row gutter={16}>
           <FieldRenderer fields={fields} />
         </Row>
