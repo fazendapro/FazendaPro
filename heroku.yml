@@ -1,5 +1,5 @@
 build:
   docker:
-    web: Dockerfile
+    web: FazendaPro-server/Dockerfile
 run:
-  web: npm run start:prod
+  web: cd FazendaPro-server && npm run start:prod
