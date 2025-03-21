@@ -1,5 +1,5 @@
-echo 'build:
+build:
   docker:
-    web: Dockerfile
+    web: FazendaPro-server/Dockerfile
 run:
-  web: npm run start:prod' > heroku.yml
+  web: cd FazendaPro-server && npm run start:prod
