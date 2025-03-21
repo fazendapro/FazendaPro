@@ -33,9 +33,8 @@ const Login = () => {
   const onSubmit = async (data: LoginForm) => {
     try {
       const success = await login(data.email, data.password);
-      if (success && data.remember) {
+      if (success) {
         toast.success(t('loginSuccess'));
-        //wip
       }
     } catch (error) {
       toast.error(`Erro no login: ${error}`);

@@ -13,8 +13,8 @@ export class UsersController {
   }
 
   @Get(':username')
-  findOneByUsername(@Param('username') username: string) {
-    return this.usersService.findOneByUsername(username);
+  findOneByEmail(@Param('email') email: string) {
+    return this.usersService.findOneByEmail(email);
   }
 
   @Post()

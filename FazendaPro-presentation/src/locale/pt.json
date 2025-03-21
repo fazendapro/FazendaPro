@@ -14,6 +14,7 @@
     "passwordPlaceholder": "Digite sua senha",
     "rememberPassword": "Lembrar da senha",
     "forgotPassword": "Esqueceu a senha?",
-    "access": "Acessar"
+    "access": "Acessar",
+    "loginSuccess": "Login realizado com sucesso"
   }
 }
