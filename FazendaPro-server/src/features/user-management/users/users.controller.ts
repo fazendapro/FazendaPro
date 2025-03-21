@@ -2,7 +2,7 @@ import { Controller, Delete, Get, Param, Post, Body } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './users.entity';
 import { CreateUserDto } from './dto/create-user-dto';
-
+import { Public } from 'src/auth/public.decorator';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -17,6 +17,7 @@ export class UsersController {
     return this.usersService.findOneByEmail(email);
   }
 
+  @Public()
   @Post()
   create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.usersService.create(createUserDto);
