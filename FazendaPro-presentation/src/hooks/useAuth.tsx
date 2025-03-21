@@ -1,16 +1,31 @@
 import { useState, useEffect } from 'react'
 import { jwtDecode } from 'jwt-decode'
 import axios from 'axios'
-
+import { useNavigate } from 'react-router';
 interface DecodedToken {
   exp: number
   iat: number
   sub: string
 }
 
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL
+});
+
 export const useAuth = () => {
-  const [token, setToken] = useState<string | null>(localStorage.getItem('token'))
+  const navigate = useNavigate();
+  const [token, setToken] = useState<string | null>(() => {
+    const savedToken = localStorage.getItem('token')
+    return savedToken
+  })
   const [user, setUser] = useState<DecodedToken | null>(null)
+
+  useEffect(() => {
+    const savedToken = localStorage.getItem('token')
+    if (savedToken) {
+      setToken(savedToken)
+    }
+  }, [])
 
   useEffect(() => {
     if (token) {
@@ -22,7 +37,6 @@ export const useAuth = () => {
           setUser(decoded)
         }
       } catch (error) {
-        console.error(error)
         logout()
       }
     }
@@ -30,13 +44,20 @@ export const useAuth = () => {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await axios.post('/api/auth/login', { email, password })
-      const newToken = response.data.token
+      const response = await api.post('/auth/login', { email, password })
+      const newToken = response.data.access_token
+
+      if (!newToken) {
+        return false
+      }
+      
+      navigate('/home')
       localStorage.setItem('token', newToken)
+
       setToken(newToken)
+
       return true
     } catch (error) {
-      console.error('Login failed:', error)
       return false
     }
   }
