@@ -1,5 +1,5 @@
-echo 'build:
+build:
   docker:
     web: Dockerfile
 run:
-  web: npm run start:prod' > heroku.yml
+  web: npm run start:prod
