@@ -6,8 +6,7 @@ import { Layout } from 'antd';
 
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, token, user } = useAuth()
-  console.log('Estado de autenticação:', { isAuthenticated, hasToken: !!token, hasUser: !!user })
+  const { isAuthenticated } = useAuth()
   return isAuthenticated ? children : <Navigate to="/login" />
 }
 

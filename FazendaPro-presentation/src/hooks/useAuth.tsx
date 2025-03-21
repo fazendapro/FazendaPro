@@ -37,15 +37,12 @@ export const useAuth = () => {
     if (token) {
       try {
         const decoded = jwtDecode<DecodedToken>(token)
-        console.log('Token decodificado:', decoded)
         if (decoded.exp * 1000 < Date.now()) {
-          console.log('Token expirado')
           logout()
         } else {
           setUser(decoded)
         }
       } catch (error) {
-        console.error('Erro ao decodificar token:', error)
         logout()
       }
     }
@@ -72,13 +69,11 @@ export const useAuth = () => {
       }, 100); 
       
     } catch (error) {
-      console.error('Erro ao decodificar token:', error);
       return false;
     }
 
     return true;
   } catch (error) {
-    console.error('Erro durante login:', error);
     return false;
   }
 };
