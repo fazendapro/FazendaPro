@@ -75,10 +75,52 @@ O projeto FazendaPro é uma solução agropecuária que visa facilitar a gestão
 
 ### 3.2. Considerações de Design
 
-- Discussão sobre as escolhas de design, incluindo alternativas consideradas e justificativas para as decisões tomadas.
-- **Visão Inicial da Arquitetura**: Descrição dos componentes principais e suas interconexões.
-- **Padrões de Arquitetura**: A ideia principal seria usar uma arquitetura MVC para o backend do projeto e usar um microsserviço de notificação para enviar um chat no Whatsapp quando for concluído.
-- **Modelos C4**: Detalhamento da arquitetura em níveis: Contexto, Contêineres, Componentes, Código.
+**Visão Inicial da Arquitetura**: Foi decidido usar a arquitetura modular para o projeto. A arquitetura modular oferece um equilíbrio entre a simplicidade de um monolito e a flexibilidade dos microserviços. O NestJS facilita essa abordagem através de seus módulos bem definidos, permitindo escalabilidade sem a complexidade inicial dos microserviços. Esta escolha permite que o sistema cresça naturalmente, com a possibilidade de extrair módulos para microserviços no futuro (como é o caso das notificações no futuro).
+
+**Padrões de Arquitetura**: A ideia seria usar uma arquitetura limpa como o DDD (Domain-Driven Design) com arquitetura hexagonal.
+
+```bash
+src/
+├── core/                 # Núcleo da aplicação (domínio)
+│   ├── domain/           # Entidades e regras de negócio
+│   │   ├── entities/     # Entidades de domínio puras
+│   │   ├── value-objects/# Objetos de valor
+│   │   ├── events/       # Eventos de domínio
+│   │   └── services/     # Serviços de domínio
+│   ├── application/      # Casos de uso da aplicação
+│   │   ├── commands/     # Comandos para alterar estado
+│   │   ├── queries/      # Consultas para buscar dados
+│   │   ├── dtos/         # Objetos de transferência de dados
+│   │   └── interfaces/   # Interfaces para as portas
+│   └── ports/            # Portas para interagir com o mundo externo
+│       ├── input/        # Portas de entrada (API, CLI)
+│       └── output/       # Portas de saída (Repos, Serviços externos)
+├── infrastructure/       # Implementações técnicas
+│   ├── database/         # Configuração e implementações de BD
+│   │   ├── repositories/ # Implementações dos repositórios
+│   │   ├── models/       # Modelos ORM
+│   │   └── migrations/   # Migrações de BD
+│   ├── http/             # Adaptadores HTTP
+│   │   ├── controllers/  # Controladores NestJS
+│   │   ├── middlewares/  # Middlewares
+│   │   └── dtos/         # DTOs específicos da API
+│   ├── auth/             # Implementação de autenticação
+│   └── external-services/# Serviços externos
+├── modules/              # Módulos de domínio específicos
+│   └── user-management/  # Módulo de gestão de usuários
+└── shared/               # Utilidades compartilhadas
+    ├── utils/            # Funções utilitárias
+    ├── decorators/       # Decoradores personalizados
+    ├── interceptors/     # Interceptadores NestJS
+    ├── filters/          # Filtros de exceção
+    └── constants/        # Constantes da aplicação
+```
+
+**Modelos C4**: Detalhamento da arquitetura em níveis: Contexto, Contêineres, Componentes, Código.
+
+- Aplicação Web: React.
+- Api Server: servidor NestJS em container no Heroku, funcionando como núcleo do sistema.
+- Armazenamento persistente de dados (MySql)
 
 ### 3.3. Stack Tecnológica
 
@@ -112,7 +154,7 @@ O projeto FazendaPro é uma solução agropecuária que visa facilitar a gestão
 - Credenciais expostas (senhas fracas ou vazamento de tokens).
   - Vai ser utilizado hash para senhas com bcrypt
 - Falta de proteção contra ataques de força bruta.
-- Será usado limite de tentativas de login (rate limiting) com @nestjs/throttler
+  - Será usado limite de tentativas de login (rate limiting) com @nestjs/throttler
 
 2. Exposição de Dados Sensíveis
 
