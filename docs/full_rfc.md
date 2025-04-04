@@ -71,7 +71,22 @@ O projeto FazendaPro é uma solução agropecuária que visa facilitar a gestão
 - O sistema deve oferecer a opção de exportar o histórico do animal em PDF no momento da venda.
 
 - **Representação dos Requisitos:**
-  ![vapooo](images/cases-of-use.drawio.png)
+
+## Diagrama de Casos de uso
+
+![Casos de uso](images/cases-of-use.drawio.png)
+
+## Diagrama de Classes
+
+![vapooo](images/classesDiagram.drawio.png)
+
+## Diagram de Relacionamento
+
+![vapooo](images/entityRelationshipDiagram.drawio.png)
+
+## Diagrama de Estados
+
+![vapooo](images/stateDiagram.drawio.png)
 
 ### 3.2. Considerações de Design
 
@@ -149,27 +164,27 @@ src/
 
 ### 3.4. Considerações de Segurança
 
-1. Autenticação e Autorização (as rotas serão protegidas)
+#### Autenticação e Autorização (as rotas serão protegidas)
 
 - Credenciais expostas (senhas fracas ou vazamento de tokens).
   - Vai ser utilizado hash para senhas com bcrypt
 - Falta de proteção contra ataques de força bruta.
   - Será usado limite de tentativas de login (rate limiting) com @nestjs/throttler
 
-2. Exposição de Dados Sensíveis
+#### Exposição de Dados Sensíveis
 
 - Vazamento de informações em respostas da API
-- Será usado DTO para retornar apenas o necessário pela API.
+  - Será usado DTO para retornar apenas o necessário pela API.
 - Configurações inadequadas de CORS permitindo acesso não autorizado.
 - Logs com informações sensíveis
-- O Heroku usa automaticamente o HTTPS para criptografar a comunicação.
+  - O Heroku usa automaticamente o HTTPS para criptografar a comunicação.
 
-3. Injeção de Código (SQL Injection, XSS, etc.)
+#### Injeção de Código (SQL Injection, XSS, etc.)
 
 - Consultas SQL no backend
-- será usado o TypeORM e não queries brutas
+  - será usado o TypeORM e não queries brutas
 - Scripts maliciosos injetados no frontend React via entradas de usuário
-- será implementado Content Security Policy (CSP) no frontend para limitar fontes de scripts.
+  - será implementado Content Security Policy (CSP) no frontend para limitar fontes de scripts.
 
 ## 4. Próximos Passos
 
@@ -190,3 +205,10 @@ Adicionar três páginas no final do RFC para que os Professores escolhidos poss
 - Considerações Professor/a:
 - Considerações Professor/a:
 - Considerações Professor/a:
+
+escrever sobre:
+
+- new relic
+- redis para cache
+- sentry
+- integração ci/cd com Heroku
