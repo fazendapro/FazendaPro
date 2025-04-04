@@ -1,13 +1,14 @@
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Button, Row, Col, Typography } from 'antd';
+import { Button, Row, Col, Typography, Flex, Image } from 'antd';
 import { useAuth } from '../../hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import { Form } from '../../components/lib/form';
 import { FieldType } from '../../types/field-types';
 import { loginSchema } from './login-schema';
-import { centering } from '../../styles/common/centering';
 import { toast } from 'react-toastify';
+import logo from '../../assets/logo.png';
+import { baseStyle } from './styles';
 
 const { Title } = Typography;
 
@@ -57,11 +58,6 @@ const Login = () => {
       isRequired: true,
     },
     {
-      name: 'remember',
-      label: t('rememberPassword'),
-      type: 'checkbox',
-    },
-    {
       name: 'forgotPassword',
       label: t('forgotPassword'),
       type: 'link',
@@ -69,15 +65,17 @@ const Login = () => {
   ];
 
   return (
-    <div className="login-container">
-      <Row gutter={16} style={{ height: '50vh', gap: '50px', ...centering }}>
-        <Col xs={24} md={12} style={{ textAlign: 'center', ...centering }}>
+    <Flex vertical className="login-container">
+      <Row gutter={16}>
+        <Col className='logo-container' xs={24} md={12} style={{ textAlign: 'center' }}>
           <div className="logo-placeholder">
-            <div style={{ fontSize: '200px' }}>🐂</div>
+            <div style={{ fontSize: '200px' }}>
+              <Image src={logo} preview={false} alt="logo" />
+            </div>
           </div>
         </Col>
 
-        <Col xs={24} md={12}>
+        <Col xs={24} md={12} style={baseStyle}>
           <div className="form-container">
             <Title level={3}>{t('loginTitle')}</Title>
             <Form<LoginForm>
@@ -86,7 +84,9 @@ const Login = () => {
               methods={methods}
             >
               <Button
+                className="login-button"
                 type="primary"
+                style={{ marginTop: '10px' }}
                 htmlType="submit"
                 block
                 loading={methods.formState.isSubmitting}
@@ -97,7 +97,7 @@ const Login = () => {
           </div>
         </Col>
       </Row>
-    </div>
+    </Flex>
   );
 };
 

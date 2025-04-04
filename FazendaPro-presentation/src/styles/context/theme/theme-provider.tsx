@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ThemeProviderProps } from "../types/theme-props";
+import { ThemeProviderProps } from "../../types/theme-props";
 import { ThemeContext } from "./theme-context";
 
 export const ThemeProvider = ({
@@ -19,8 +19,10 @@ export const ThemeProvider = ({
     localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
     if (isDarkMode) {
       document.body.classList.add('dark-mode');
+      document.body.style.fontFamily = "'Inter', sans-serif"
     } else {
       document.body.classList.remove('dark-mode');
+      document.body.style.fontFamily = "'Inter', sans-serif"
     }
   }, [isDarkMode]);
 
