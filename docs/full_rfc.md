@@ -27,50 +27,50 @@ O projeto FazendaPro é uma solução agropecuária que visa facilitar a gestão
 
 **1. RF01 - Acessar o Sistema**
 
-- O sistema deve permitir que o usuário faça o login na plataforma com seus credenciais.
-- O sistema deve validar as credenciais do usuário e conceder acesso apenas para os usuários que geraram o token.
+- RF01.01 O sistema deve permitir que o usuário faça o login na plataforma com seus credenciais.
+- RF01.02 O sistema deve validar as credenciais do usuário e conceder acesso apenas para os usuários que geraram o token.
 
 **2. RF02 - Adicionar um Animal**
 
-- O sistema deve permitir que o usuário cadastre um novo animal no sistema.
+- RF02.01 sistema deve permitir que o usuário cadastre um novo animal no sistema.
 
-  - O sistema deve permitir incluir dados do animal como, no mínimo: identificação (nome e número do brinco), data de nascimento, genitora, filho (caso exista), raça, sexo e informações de saúde (vacinas).
+- RF02.02 O sistema deve permitir incluir dados do animal como, no mínimo: identificação (nome e número do brinco), data de nascimento, genitora, filho (caso exista), raça, sexo e informações de saúde (vacinas).
 
 **RF03 - Gerenciar o Animal**
 
-- O sistema deve permitir que o usuário edite ou exclua as informações de um animal já cadastrado.
-- O sistema deve oferecer a opção de exportar o histórico do animal em formato PDF.
+- RF03.01 O sistema deve permitir que o usuário edite ou exclua as informações de um animal já cadastrado.
+- RF03.02 O sistema deve oferecer a opção de exportar o histórico do animal em formato PDF.
 
 **RF05 - Analisar Dashboards**
 
-- O sistema deve fornecer dashboards com informações analíticas sobre os animais, como produção de leite, saúde geral, e tendências de desempenho.
+- RF05.01 O sistema deve fornecer dashboards com informações analíticas sobre os animais, como produção de leite, saúde geral, e tendências de desempenho.
 
 **RF06 - Inserir Informações do Animal**
 
-- O sistema deve permitir que o usuário insira informações adicionais sobre o animal, como registros de vacinas, alimentação, tratamentos ou eventos, como nascimento de filhotes.
+- RF06.01 O sistema deve permitir que o usuário insira informações adicionais sobre o animal, como registros de vacinas, alimentação, tratamentos ou eventos, como nascimento de filhotes.
 
 **RF07 - Registrar Peso do Animal por Mês/Semana**
 
-- O sistema deve permitir que o usuário registre o peso do animal em intervalos regulares (mensal ou semanal).
-- O sistema deve armazenar esses registros para acompanhamento do desenvolvimento do animal.
-- O sistema deve permitir a edição ou exclusão desses registros.
+- RF07.01 O sistema deve permitir que o usuário registre o peso do animal em intervalos regulares (mensal ou semanal).
+- RF07.02 O sistema deve armazenar esses registros para acompanhamento do desenvolvimento do animal.
+- RF07.03 O sistema deve permitir a edição ou exclusão desses registros.
 
 **RF08 - Mudar de Lote**
 
-- O sistema deve mudar automaticamente o lote ao qual um animal pertence dependendo da sua produção de leite.
+- RF08.01 O sistema deve mudar automaticamente o lote ao qual um animal pertence dependendo da sua produção de leite.
 
-**RF09 - Colocar Data de Prenhez**
+**RF09 - Definir Data de Prenhez**
 
-- O sistema deve permitir que o usuário registre a data de prenhez de uma vaca.
-- O sistema deve notificar o usuário (via WhatsApp) quando a data de prenhez estiver próxima do parto, 20 dias antes.
+- RF09.01 sistema deve permitir que o usuário registre a data de prenhez de uma vaca.
+- RF09.02 sistema deve notificar o usuário (via WhatsApp) quando a data de prenhez estiver próxima do parto, 20 dias antes.
 
 **RF10 - Vender o Animal**
 
-- O sistema deve permitir que o usuário registre a venda de um animal.
-- O sistema deve atualizar o status do animal para "vendido" e registrar a data da venda.
-- O sistema deve oferecer a opção de exportar o histórico do animal em PDF no momento da venda.
+- RF10.01 O sistema deve permitir que o usuário registre a venda de um animal.
+- RF10.02 O sistema deve atualizar o status do animal para "vendido" e registrar a data da venda.
+- RF10.03 O sistema deve oferecer a opção de exportar o histórico do animal em PDF no momento da venda.
 
-- **Representação dos Requisitos:**
+## Requisitos Não Funcionais (RNF)
 
 ## Diagrama de Casos de uso
 
@@ -131,7 +131,7 @@ src/
     └── constants/        # Constantes da aplicação
 ```
 
-### Modelos C4: Detalhamento da arquitetura em níveis: Contexto, Contêineres, Componentes, Código.
+### Modelos C4:
 
 ![Diagrama de Estados](images/architecture.png)
 
