@@ -1,0 +1,7 @@
+build:
+  docker:
+    web: FazendaPro-server/Dockerfile
+    frontend: FazendaPro-presentation/Dockerfile
+run:
+  web: node back/index.js
+  frontend: npm start --prefix front
