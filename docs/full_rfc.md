@@ -78,15 +78,15 @@ O projeto FazendaPro é uma solução agropecuária que visa facilitar a gestão
 
 ## Diagrama de Classes
 
-![vapooo](images/classesDiagram.drawio.png)
+![Diagrama de Classes](images/classesDiagram.drawio.png)
 
 ## Diagram de Relacionamento
 
-![vapooo](images/entityRelationshipDiagram.drawio.png)
+![Diagram de Relacionamento](images/entityRelationshipDiagram.drawio.png)
 
 ## Diagrama de Estados
 
-![vapooo](images/stateDiagram.drawio.png)
+![Diagrama de Estados](images/stateDiagram.drawio.png)
 
 ### 3.2. Considerações de Design
 
@@ -131,11 +131,21 @@ src/
     └── constants/        # Constantes da aplicação
 ```
 
-**Modelos C4**: Detalhamento da arquitetura em níveis: Contexto, Contêineres, Componentes, Código.
+### Modelos C4: Detalhamento da arquitetura em níveis: Contexto, Contêineres, Componentes, Código.
 
-- Aplicação Web: React.
-- Api Server: servidor NestJS em container no Heroku, funcionando como núcleo do sistema.
-- Armazenamento persistente de dados (MySql)
+![Diagrama de Estados](images/architecture.png)
+
+**Aplicação Web:** React.
+
+**Api Server:** servidor NestJS em container no Heroku, funcionando como núcleo do sistema.
+
+Inclui: Redis rodando no mesmo container para caching em memória.
+
+**Armazenamento persistente de dados (MySql)**
+
+**Interações:**
+A Aplicação Web faz requisições HTTP (REST) ao API Server.
+O API Server usa Redis internamente para caching e consulta o JawsDB MySQL via conexão SQL.
 
 ### 3.3. Stack Tecnológica
 
