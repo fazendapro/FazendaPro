@@ -95,40 +95,40 @@ O projeto FazendaPro é uma solução agropecuária que visa facilitar a gestão
 **Padrões de Arquitetura**: A ideia seria usar uma arquitetura limpa como o DDD (Domain-Driven Design) com arquitetura hexagonal.
 
 ```bash
-src/
-├── core/                 # Núcleo da aplicação (domínio)
-│   ├── domain/           # Entidades e regras de negócio
-│   │   ├── entities/     # Entidades de domínio puras
-│   │   ├── value-objects/# Objetos de valor
-│   │   ├── events/       # Eventos de domínio
-│   │   └── services/     # Serviços de domínio
-│   ├── application/      # Casos de uso da aplicação
-│   │   ├── commands/     # Comandos para alterar estado
-│   │   ├── queries/      # Consultas para buscar dados
-│   │   ├── dtos/         # Objetos de transferência de dados
-│   │   └── interfaces/   # Interfaces para as portas
-│   └── ports/            # Portas para interagir com o mundo externo
-│       ├── input/        # Portas de entrada (API, CLI)
-│       └── output/       # Portas de saída (Repos, Serviços externos)
-├── infrastructure/       # Implementações técnicas
-│   ├── database/         # Configuração e implementações de BD
-│   │   ├── repositories/ # Implementações dos repositórios
-│   │   ├── models/       # Modelos ORM
-│   │   └── migrations/   # Migrações de BD
-│   ├── http/             # Adaptadores HTTP
-│   │   ├── controllers/  # Controladores NestJS
-│   │   ├── middlewares/  # Middlewares
-│   │   └── dtos/         # DTOs específicos da API
-│   ├── auth/             # Implementação de autenticação
-│   └── external-services/# Serviços externos
-├── modules/              # Módulos de domínio específicos
-│   └── user-management/  # Módulo de gestão de usuários
-└── shared/               # Utilidades compartilhadas
-    ├── utils/            # Funções utilitárias
-    ├── decorators/       # Decoradores personalizados
-    ├── interceptors/     # Interceptadores NestJS
-    ├── filters/          # Filtros de exceção
-    └── constants/        # Constantes da aplicação
+fazendapro-api/
+├── api/                    # Definições de handlers e endpoints HTTP
+│   ├── handlers/           # Funções que lidam com requisições HTTP
+│   │   ├── user.go         # Ex.: handler para rotas de usuário
+│   │   └── product.go      # Ex.: handler para rotas de produtos
+│   └── middleware/         # Middlewares (ex.: autenticação JWT)
+│       └── auth.go         # Middleware de validação de token
+├── cmd/                    # Ponto de entrada do projeto
+│   └── app/                # Aplicação principal
+│       └── main.go         # Arquivo principal que inicializa o servidor
+├── config/                 # Configurações (ex.: variáveis de ambiente)
+│   └── config.go           # Carrega .env ou outras configs
+├── internal/               # Código interno (não exposto para outros pacotes)
+│   ├── models/             # Estruturas de dados (ex.: User, Product)
+│   │   ├── user.go
+│   │   └── product.go
+│   ├── repository/         # Acesso a dados (ex.: banco de dados)
+│   │   ├── user_repository.go
+│   │   └── product_repository.go
+│   └── service/            # Lógica de negócio
+│       ├── user_service.go
+│       └── product_service.go
+├── pkg/                    # Código reutilizável (se necessário)
+│   └── jwt/                # Funções utilitárias para JWT
+│       └── jwt.go
+├── scripts/                # Scripts úteis (ex.: para build ou deploy)
+├── tests/                  # Testes unitários e de integração
+│   ├── handlers/
+│   ├── repository/
+│   └── service/
+├── .env                    # Variáveis de ambiente (ex.: JWT_SECRET)
+├── go.mod                  # Definição do módulo Go
+├── go.sum                  # Dependências
+└── README.md               # Documentação do projeto
 ```
 
 ### Modelos C4:
