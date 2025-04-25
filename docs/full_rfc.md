@@ -23,7 +23,7 @@ O projeto FazendaPro é uma solução agropecuária que visa facilitar a gestão
 
 ## 3. Especificação Técnica
 
-## Requisitos Funcionais (RF) - WIP
+## Requisitos Funcionais (RF)
 
 **1. RF01 - Acessar o Sistema**
 
@@ -33,7 +33,6 @@ O projeto FazendaPro é uma solução agropecuária que visa facilitar a gestão
 **2. RF02 - Adicionar um Animal**
 
 - RF02.01 sistema deve permitir que o usuário cadastre um novo animal no sistema.
-
 - RF02.02 O sistema deve permitir incluir dados do animal como, no mínimo: identificação (nome e número do brinco), data de nascimento, genitora, filho (caso exista), raça, sexo e informações de saúde (vacinas).
 
 **RF03 - Gerenciar o Animal**
@@ -69,8 +68,43 @@ O projeto FazendaPro é uma solução agropecuária que visa facilitar a gestão
 - RF10.01 O sistema deve permitir que o usuário registre a venda de um animal.
 - RF10.02 O sistema deve atualizar o status do animal para "vendido" e registrar a data da venda.
 - RF10.03 O sistema deve oferecer a opção de exportar o histórico do animal em PDF no momento da venda.
+- RF10.04 O sistema deve permitir verificar o histórico de todas as vendas dentro do módulo de vendas
+
+**RF11 - Cadastrar Vacinas**
+
+- RF11.01 O sistema deve permitir que o usuário cadastre a vacina para que depois ela seja vinculada ao animal
+- RF11.02 O sistema deve permitir a pesquisa de vacinas por datas
+
+**RF12 - Separar Módulo**
+
+- RF12.01 O sistema deve organizar as informações através de módulos dentro de um menu lateral (Dashboard, Vacas, Fornecedores, Vendas, Estoque)
+
+**RF13 - Sair da Plataforma**
+
+- RF13.01 O sistema deve permitir que o usuário faça o logout da plataforma
 
 ## Requisitos Não Funcionais (RNF)
+
+**1. RNF01 - Estilização**
+
+- RNF01.01 A estilização da aplicação deve seguir os padrões de estilo do Figma
+- RNF01.02 Para facilitar a estilização deve ser usado Tailwind ou outra biblioteca de CSS
+- RNF01.03 Componentes padrões devem ser criados para seguir um padrão geral
+- RNF01.04 As cores da aplicação devem apresentar-se de forma agradável
+
+**2. RNF02 - Ferramentas**
+
+- RNF02.01 Para o Frontend deve-se utilizar React com bibliotecas para facilitar o fetch das informações
+- RNF02.02 Para o Backend será usado NestJS para serviços de autenticação e notificações, contudo para todo os resto será usado Go
+
+**3. RNF03 - Idiomas**
+
+- RNF03.01 Todo o desenvolvimento deve ser feito respeitando variáveis de idioma
+- RNF02.02 O idioma principal será PT-BR, posteriormente pode ser implementado EN-US e ES-ES
+
+**4. RNF04 - Mobile**
+
+- RNF04.01 - O desenvolvimento deve respeitar os casos de mobile, respeitando um design responsivo e agradável
 
 ## Diagrama de Casos de uso
 
