@@ -1,5 +1,3 @@
 build:
-  docker:
-    web: FazendaPro-server/Dockerfile
-run:
-  web: npm run start:prod
+  config:
+    NODE_BUILD_DIR: FazendaPro-presentation
