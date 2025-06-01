@@ -5,19 +5,22 @@ services:
     build: .
     tty: true
     ports:
-      - "3000:3000"
+      - '3000:3000'
       - '5555:5555'
+    environment:
+      - PORT=3000
+      - FRONTEND_URL=https://fazenda-pro-front-stage-add359aad123.herokuapp.com
     depends_on:
       - mysql
     volumes:
       - .:/app
-    command: ["/app/wait-for-mysql.sh", "npm", "run", "start"]
+    command: ['/app/wait-for-mysql.sh', 'npm', 'run', 'start']
 
   mysql:
     image: mysql:8.0
     container_name: mysql-container
     ports:
-      - "3306:3306"
+      - '3306:3306'
     environment:
       MYSQL_ROOT_PASSWORD: 123456
       MYSQL_DATABASE: fazendapro_db
