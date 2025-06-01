@@ -9,7 +9,7 @@ services:
       - '5555:5555'
     environment:
       - PORT=3000
-      - FRONTEND_URL=https://fazenda-pro-front-6d03de3b3f19.herokuapp.com
+      - FRONTEND_URL=https://fazenda-pro-front-stage-add359aad123.herokuapp.com
     depends_on:
       - mysql
     volumes:
