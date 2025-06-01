@@ -65,7 +65,7 @@ const Login = () => {
   ];
 
   return (
-    <Flex vertical className="login-container">
+    <Flex style={{ padding: '50px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }} vertical className="login-container">
       <Row gutter={16}>
         <Col className='logo-container' xs={24} md={12} style={{ textAlign: 'center' }}>
           <div className="logo-placeholder">
