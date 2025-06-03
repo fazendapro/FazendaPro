@@ -268,15 +268,13 @@ classDiagram
     Dashboard --> Redis : Cache de métricas
 ```
 
-![Diagrama de Estados](images/architecture.png)
-
 **Aplicação Web:** React.
 
 **Api Server:** servidor NestJS em container no Heroku, funcionando como núcleo do sistema.
 
 Inclui: Redis rodando no mesmo container para caching em memória.
 
-**Armazenamento persistente de dados (MySql)**
+#### Armazenamento persistente de dados (MySql)
 
 **Interações:**
 A Aplicação Web faz requisições HTTP (REST) ao API Server.
@@ -286,25 +284,7 @@ O API Server usa Redis internamente para caching e consulta o JawsDB MySQL via c
 
 - **Linguagens de Programação**: Justificativa para a escolha de linguagens específicas.
 - **Frameworks e Bibliotecas**:
-  - React
-  - Nest.js
-  - TypeORM
-  - JWT
-  - Bcrypt
-  - Express
-  - Styled Components (em poucos casos)
-  - React Router
-  - React Hook Form
-  - React Query
-  - React Toastify
-  - React Icons
-  - Yup
-  - Jest
-  - Cypress
-  - Docker
-  - MySql
-  - Docker
-  - Docker Compose
+  Aqui está a lista formatada no mesmo estilo Markdown que você forneceu, com os links para os sites oficiais ou páginas de documentação de cada ferramenta: - [React](https://react.dev) - [Nest.js](https://nestjs.com) - [TypeORM](https://typeorm.io) - [Go](https://go.dev) - [JWT](https://jwt.io) - [Bcrypt](https://www.npmjs.com/package/bcrypt) - [Express](https://expressjs.com) - [Styled Components (em poucos casos)](https://styled-components.com) - [React Router](https://reactrouter.com) - [React Hook Form](https://react-hook-form.com) - [React Query](https://tanstack.com/query) - [React Toastify](https://fkhadra.github.io/react-toastify/) - [React Icons](https://react-icons.github.io/react-icons/) - [Yup](https://github.com/jquense/yup) - [Jest](https://jestjs.io) - [Cypress](https://www.cypress.io) - [Docker](https://www.docker.com) - [MySql](https://www.mysql.com) - [Docker Compose](https://docs.docker.com/compose/)
 - **Ferramentas de Desenvolvimento e Gestão de Projeto**: Para a gestão do projeto foi utilizado o Github Projects para criar as atividades. Algumas atividades já foram criadas e podem ser vistas neste [link](https://github.com/orgs/fazendapro/projects/1).
 
 ### 3.4. Considerações de Segurança
@@ -331,6 +311,36 @@ O API Server usa Redis internamente para caching e consulta o JawsDB MySQL via c
 - Scripts maliciosos injetados no frontend React via entradas de usuário
   - será implementado Content Security Policy (CSP) no frontend para limitar fontes de scripts.
 
+### 3.5 Branches e pipeline
+
+Atualmente temos 6 branches principais que se relacionam aos ambientes de stage e produção e que são responsáveis por todos os componentes da aplicação: Serviços, Backend e Frontend.
+
+**Stage:**
+
+- back/develop - para o backend
+- front/develop - para o frontend
+- service/release - para os microsserviços
+
+**Produção:**
+
+- back/release - para o backend
+- front/release - para o frontend
+- service/release - para os microsserviços
+
+Toda vez que eu for começar um feature nova eu crio uma branch a partir de produção. Para testes, eu abro a Pull Request apontando para a release, eu subo ela em stage e faço os testes necessários. Caso eles passem, eu faço o merge dessa branch em produção.
+
+```mermaid
+graph TD
+    A[Produção] -->|Criar nova branch| B[Branch da Feature]
+    B -->|Abrir Pull Request| C[Release]
+    C -->|Subir para| D[Stage]
+    D -->|Realizar testes| E{Testes passam?}
+    E -->|Sim| F[Merge na Produção]
+    E -->|Não| G[Corrigir na Branch da Feature]
+    G --> B
+    F --> A
+```
+
 ## 4. Próximos Passos
 
 Descrição dos passos seguintes após a conclusão do documento, com uma visão geral do cronograma para Portfólio I e II.
@@ -350,10 +360,3 @@ Adicionar três páginas no final do RFC para que os Professores escolhidos poss
 - Considerações Professor/a:
 - Considerações Professor/a:
 - Considerações Professor/a:
-
-escrever sobre:
-
-- new relic
-- redis para cache
-- sentry
-- integração ci/cd com Heroku
