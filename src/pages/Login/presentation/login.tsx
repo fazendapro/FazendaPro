@@ -1,14 +1,14 @@
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Button, Row, Col, Typography, Flex, Image } from 'antd';
-import { useAuth } from '../../hooks/useAuth';
 import { useTranslation } from 'react-i18next';
-import { Form } from '../../components/lib/form';
-import { FieldType } from '../../types/field-types';
+import { Form } from '../../../components/lib/form';
+import { FieldType } from '../../../types/field-types';
 import { loginSchema } from './login-schema';
 import { toast } from 'react-toastify';
-import logo from '../../assets/logo.png';
+import logo from '../../../assets/logo.png';
 import { baseStyle } from './styles';
+import { useAuth } from '../hooks/useAuth';
 
 const { Title } = Typography;
 
