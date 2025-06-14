@@ -1,7 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router'
-import { useAuth } from './hooks/useAuth';
-import { Home } from './pages/Home/home';
-import Login from './pages/Login/login';
+import { useAuth, Login, Home } from './pages';
 import { Layout } from 'antd';
 import { Sidebar } from './components/Sidebar/sidebar';
 import { Spinner } from './components/Spinner/spinner';
