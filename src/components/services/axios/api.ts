@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios'
 import { baseAxios } from './base'
 
-export function api(domain: string, prefix: string = 'o'): AxiosInstance {
-  return baseAxios(domain + `/api/v1/${prefix}`)
+export function api(domain: string, prefix: string = 'api'): AxiosInstance {
+  return baseAxios(domain + `/${prefix}`)
 }

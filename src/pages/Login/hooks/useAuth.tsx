@@ -1,20 +1,21 @@
-import { useState, useEffect, useCallback } from 'react'
-import { jwtDecode } from 'jwt-decode'
-import axios from 'axios'
+import { useState, useEffect, useCallback } from 'react';
+import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
+import { LoginFactory } from '../factories';
+import { useCsrfTokenContext } from '../../../contexts';
 
 interface DecodedToken {
-  exp: number
-  iat: number
-  sub: string
+  exp: number;
+  iat: number;
+  sub: string;
 }
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL
-});
-
 export const useAuth = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+  const { csrfToken } = useCsrfTokenContext();
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
   const [user, setUser] = useState<DecodedToken | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -22,7 +23,7 @@ export const useAuth = () => {
   const validateToken = useCallback((tokenToValidate: string) => {
     try {
       const decoded = jwtDecode<DecodedToken>(tokenToValidate);
-      if (decoded.exp * 500000 < Date.now()) {
+      if (decoded.exp * 1000 < Date.now()) {
         return false;
       }
       return decoded;
@@ -51,29 +52,37 @@ export const useAuth = () => {
     initializeAuth();
   }, [initializeAuth]);
 
-  const login = async (email: string, password: string) => {
-    try {
-      const response = await api.post('/auth/login', { email, password });
-      const newToken = response.data.access_token;
+  const login = useCallback(
+    async (email: string, password: string) => {
+      try {
+        const loginUseCase = LoginFactory(csrfToken);
+        const response = await loginUseCase.authenticate({ email, password });
 
-      if (!newToken) {
+        console.log(response);
+        if (!response.data?.access_token) {
+          toast.error(t('loginError'));
+          return false;
+        }
+
+        const decoded = validateToken(response.data.access_token);
+        if (!decoded) {
+          toast.error(t('invalidToken'));
+          return false;
+        }
+
+        localStorage.setItem('token', response.data.access_token);
+        setToken(response.data.access_token);
+        setUser(decoded);
+        toast.success(t('loginSuccess'));
+        navigate('/', { replace: true });
+        return true;
+      } catch (error) {
+        toast.error(`Erro no login: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
         return false;
       }
-
-      const decoded = validateToken(newToken);
-      if (!decoded) {
-        return false;
-      }
-
-      localStorage.setItem('token', newToken);
-      setToken(newToken);
-      setUser(decoded);
-      navigate('/', { replace: true });
-      return true;
-    } catch {
-      return false;
-    }
-  };
+    },
+    [navigate, validateToken, t, csrfToken]
+  );
 
   const logout = useCallback(() => {
     localStorage.removeItem('token');
@@ -88,6 +97,6 @@ export const useAuth = () => {
     user,
     login,
     logout,
-    token
+    token,
   };
 };

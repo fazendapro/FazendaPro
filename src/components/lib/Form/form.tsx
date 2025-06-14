@@ -3,7 +3,7 @@ import { FormProvider, useFormContext, Controller, FieldValues } from 'react-hoo
 import { Form as AntForm, Checkbox, Row, Col, Typography, Input } from 'antd';
 import { SubmitHandler, UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { FieldType } from '../../types/field-types';
+import { FieldType } from '../../../types/field-types';
 
 const { Link } = Typography;
 
