@@ -2,7 +2,7 @@ import { api } from '../../../../components';
 import { LoginDomain, LoginParams, LoginResponse } from '../../domain/usecases/login-domain';
 import { AxiosError } from 'axios';
 
-const axiosInstance = api(import.meta.env.VITE_API_URL, 'auth');
+const axiosInstance = api('auth');
 
 export class RemoteLogin implements LoginDomain {
   constructor(
