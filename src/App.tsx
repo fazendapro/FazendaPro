@@ -1,8 +1,7 @@
-import { Routes, Route, Navigate } from 'react-router'
-import { useAuth, Login, Home } from './pages';
 import { Layout } from 'antd';
-import { Sidebar } from './components/Sidebar/sidebar';
-import { Spinner } from './components/Spinner/spinner';
+import { useAuth, Login, Dashboard } from './pages';
+import { Sidebar, Spinner } from './components';
+import { Routes, Route, Navigate } from 'react-router'
 
 const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading } = useAuth()
@@ -41,7 +40,7 @@ export const App = () => {
         path="/"
         element={
           <ProtectedLayout>
-            <Home />
+            <Dashboard />
           </ProtectedLayout>
         }
       />

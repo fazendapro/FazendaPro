@@ -58,7 +58,6 @@ export const useAuth = () => {
         const loginUseCase = LoginFactory(csrfToken);
         const response = await loginUseCase.authenticate({ email, password });
 
-        console.log(response);
         if (!response.data?.access_token) {
           toast.error(t('loginError'));
           return false;
