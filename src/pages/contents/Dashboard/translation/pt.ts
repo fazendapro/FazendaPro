@@ -1,0 +1,29 @@
+export const translations = {
+  cattleQuantity: "Quantidade de gado",
+  dashboard: {
+    machos: "Machos",
+    femeas: "Fêmeas",
+    nextToCalve: "Próximas para parir",
+    overview: "Visão geral",
+    shoppingOverview: "Visão geral de compras",
+    rations: "Tipos de rações",
+    title: "Dashboard",
+    sales: "Vendas",
+    revenue: "Receita",
+    profit: "Lucro",
+    cost: "Custo",
+    salesOverview: "Vendas Visão Geral",
+    suppliers: "Fornecedores",
+    categories: "Categorias",
+    weekly: "Semanalmente",
+    purchases: "Compras",
+    slaughter: "Abate",
+    return: "Retorno",
+    name: "Nome",
+    production: "Produção de Leite",
+    fat: "Gordura",
+    price: "Preço",
+    salesAndPurchases: "Vendas & Compras",
+    semenation: "Seminação"
+  }
+};

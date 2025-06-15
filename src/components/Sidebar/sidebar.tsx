@@ -38,7 +38,6 @@ export const Sidebar = () => {
   ];
 
   if (!isAuthenticated) {
-    console.log('Sidebar não renderizada - usuário não autenticado');
     return null;
   }
 
