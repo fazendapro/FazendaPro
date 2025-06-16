@@ -11,13 +11,23 @@ O projeto FazendaPro é uma solução agropecuária que visa facilitar a gestão
 
 ## 1. Introdução
 
-- **Contexto**: o software se mostra útil no contexto pecuário, resolvendo problemas e facilitando o gerenciamento de animais.
-- **Justificativa**: a ideia surgiu para resolver uma dor real de um fazendeiro do norte de Minas Gerais, que não tinha bons faturamentos na venda de seus animais, pois não tira o histórico de cada animal.
-- **Objetivos**: o objetivo principal do projeto é criar um sistema que permita a gestão de fazendas e a produção de leite de forma eficiente e ágil, guardando histórico dos animais e calculando gastos e faturamento.
+- **Contexto**: O projeto FazendaPro insere-se no contexto da pecuária leiteira brasileira, um setor essencial para a economia, mas que enfrenta desafios significativos, especialmente entre pequenos e médios produtores rurais. No Brasil, a pecuária leiteira é marcada por práticas tradicionais de gestão, com muitos fazendeiros utilizando métodos manuais ou planilhas para controlar animais, pastagens e produção de leite. Esse cenário resulta em ineficiências, como a falta de rastreamento do histórico genético e de saúde dos animais, dificuldades na previsão de faturamento e altos custos operacionais. O problema reside, principalmente, na ausência de ferramentas acessíveis que integrem dados de forma prática e ofereçam insights para otimizar a produção. No norte de Minas Gerais, por exemplo, produtores relatam dificuldades em valorizar seus animais no mercado devido à falta de documentação detalhada sobre sua procedência e desempenho. O FazendaPro busca resolver essas dores, proporcionando uma solução tecnológica de baixo custo, adaptada às necessidades dos produtores rurais.
+
+- **Justificativa**: A criação do FazendaPro é justificada pela necessidade de modernizar a gestão pecuária, especialmente para pequenos e médios produtores que enfrentam barreiras no acesso a tecnologias avançadas. No Brasil, a pecuária leiteira representa uma fonte de renda para milhares de famílias, mas a falta de ferramentas acessíveis limita a competitividade e a lucratividade. Um fazendeiro do norte de Minas Gerais, por exemplo, relatou perdas significativas na venda de animais devido à ausência de um histórico detalhado que comprove sua qualidade genética e sanitária. Além disso, sistemas existentes no mercado muitas vezes possuem custos elevados, interfaces complexas e não atendem às necessidades específicas de produtores rurais. O FazendaPro é importante porque oferece uma solução de baixo custo, intuitiva e escalável, que permite o acompanhamento detalhado de cada animal, aumenta a valorização do gado no mercado e promove a tomada de decisões baseadas em dados. Ao democratizar o acesso à tecnologia, o projeto contribui para a sustentabilidade econômica e social do setor agropecuário, reduzindo custos operacionais, aumentando a eficiência e fortalecendo a rastreabilidade.
+- **Objetivos**:
+- Objetivo Principal:
+  - Desenvolver uma plataforma digital que permita a gestão eficiente de fazendas leiteiras, garantindo a valorização do gado no mercado por meio do registro detalhado de seu histórico genético, sanitário e produtivo.
+- Objetivos Secundários:
+  - Criar um sistema de baixo custo que seja acessível a pequenos e médios produtores rurais.
+  - Implementar funcionalidades para monitoramento em tempo real da produção de leite e da saúde animal.
+  - Automatizar processos como notificações de prenhez e mudança de lotes, reduzindo o trabalho manual.
+  - Fornecer dashboards analíticos que auxiliem na tomada de decisão com base em dados de desempenho.
+  - Garantir a exportação de históricos em PDF para facilitar negociações e vendas de animais.
+  - Desenvolver uma interface responsiva e intuitiva, adaptada para uso em dispositivos móveis.
 
 ## 2. Descrição do Projeto
 
-- **Tema do Projeto**: o tema do projeto é a gestão de fazendas, o histórico do gado e a produção de leite.
+- **Tema do Projeto**: o tema do projeto é o desenvolvimento de uma aplicação web focada na gestão de fazendas de gado leiteiro, com ênfase no registro histórico dos animais e na otimização da produção de leite. A FazendaPro combina tecnologia de ponta, como interfaces modernas e análises de dados, com uma abordagem acessível para atender às demandas de produtores rurais que enfrentam dificuldades na gestão manual ou com ferramentas de alto custo. O projeto abrange o controle de informações sobre o gado (genética, vacinas, alimentação, reprodução), a automação de processos operacionais e a geração de relatórios que aumentam a competitividade no mercado. Esse tema é relevante no contexto da transformação digital do agronegócio, promovendo eficiência, rastreabilidade e sustentabilidade.
 - **Problemas a Resolver**: o principal problema a ser resolvido é a garantia da valorização de um gado no mercado, por meio do seu histórico, desde o nascimento, genética, vacinas, alimentação entre outras informações. Além de oferecer um sistema baixo custo para produtores e fazendeiros que não tem acesso a tecnologias semelhantes por causa do altos preços do softwares existentes no mercado.
 - **Limitações**: Delimitação dos problemas que o projeto não abordará.
 
@@ -108,7 +118,7 @@ O projeto FazendaPro é uma solução agropecuária que visa facilitar a gestão
 
 ## Diagrama de Casos de uso
 
-![Casos de uso](images/cases-of-use.drawio.png)
+![Casos de uso](images/cases-of-use.drawio.svg)
 
 ## Diagrama de Classes
 
@@ -117,10 +127,6 @@ O projeto FazendaPro é uma solução agropecuária que visa facilitar a gestão
 ## Diagram de Relacionamento
 
 ![Diagram de Relacionamento](images/entityRelationshipDiagram.drawio.png)
-
-## Diagrama de Estados
-
-![Diagrama de Estados](images/stateDiagram.drawio.png)
 
 ### 3.2. Considerações de Design
 
@@ -165,7 +171,7 @@ fazendapro-api/
 └── README.md               # Documentação do projeto
 ```
 
-### Modelos C3:
+### Modelos C4:
 
 ```mermaid
 classDiagram
@@ -273,6 +279,24 @@ classDiagram
 **Api Server:** servidor NestJS em container no Heroku, funcionando como núcleo do sistema.
 
 Inclui: Redis rodando no mesmo container para caching em memória.
+
+## Modelo C4 - Contexto
+
+```mermaid
+classDiagram
+    %% Diagrama de Contexto (C4 Nível 1)
+    class FazendaPro {
+        +Gerencia fazendas e produção de leite
+    }
+    class Fazendeiro {
+        +Gerencia animais e vendas
+    }
+    class WhatsApp {
+        +Envia notificações
+    }
+    Fazendeiro --> FazendaPro : Usa
+    FazendaPro --> WhatsApp : Envia notificações de prenhez
+```
 
 #### Armazenamento persistente de dados (MySql)
 
