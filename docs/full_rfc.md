@@ -369,9 +369,61 @@ graph TD
 
 Descrição dos passos seguintes após a conclusão do documento, com uma visão geral do cronograma para Portfólio I e II.
 
+Com certeza! Farei as adaptações necessárias para tornar a seção 5 mais formal e alinhada ao estilo acadêmico.
+
+---
+
 ## 5. Referências
 
-Listagem de todas as fontes de pesquisa, frameworks, bibliotecas e ferramentas que serão utilizadas.
+Esta seção compila as **fontes de pesquisa**, **frameworks**, **bibliotecas** e **ferramentas** que fundamentam o desenvolvimento do projeto FazendaPro. A inclusão destas referências visa proporcionar transparência quanto às tecnologias e conhecimentos empregados, além de possibilitar a consulta e verificação por parte dos interessados.
+
+### 5.1. Linguagens de Programação
+
+- **Go**: Adotada para a implementação dos microsserviços de _backend_, devido à sua eficiência, concorrência nativa e performance em ambientes de alta demanda. [Disponível em: [https://go.dev](https://go.dev)].
+- **TypeScript**: Selecionada para o desenvolvimento do _frontend_, oferecendo uma camada de tipagem estática ao JavaScript, o que contribui para a robustez e manutenibilidade do código. [Disponível em: [https://www.typescriptlang.org/](https://www.typescriptlang.org/)].
+- **JavaScript**: Linguagem fundamental para o desenvolvimento web, empregada tanto no _frontend_ (em conjunto com React e TypeScript) quanto no _backend_ (por meio do ambiente Node.js para o Nest.js). [Disponível em: [https://developer.mozilla.org/pt-BR/docs/Web/JavaScript](https://developer.mozilla.org/pt-BR/docs/Web/JavaScript)].
+
+### 5.2. Frameworks e Bibliotecas
+
+- **React**: Biblioteca JavaScript para a construção de interfaces de usuário reativas e componentizadas. [Disponível em: [https://react.dev](https://react.dev)].
+- **Nest.js**: Framework Node.js progressivo para a construção de aplicações _backend_ eficientes, escaláveis e com arquitetura modular. [Disponível em: [https://nestjs.com](https://nestjs.com)].
+- **TypeORM**: Mapeador Objeto-Relacional (ORM) para TypeScript e JavaScript, que facilita a interação com bancos de dados relacionais. [Disponível em: [https://typeorm.io](https://typeorm.io)].
+- **JWT (JSON Web Tokens)**: Padrão aberto utilizado para a criação de tokens de acesso, empregado na implementação de mecanismos de autenticação e autorização. [Disponível em: [https://jwt.io](https://jwt.io)].
+- **Bcrypt**: Biblioteca criptográfica para a função de _hash_ de senhas, essencial para garantir a segurança das credenciais dos usuários. [Disponível em: [https://www.npmjs.com/package/bcrypt](https://www.npmjs.com/package/bcrypt)].
+- **Express**: Framework web para Node.js, serve como base para a construção de APIs e rotas, sendo um componente subjacente em algumas implementações do Nest.js. [Disponível em: [https://expressjs.com](https://expressjs.com)].
+- **Styled Components**: Biblioteca que permite a estilização de componentes React utilizando a abordagem CSS-in-JS. [Disponível em: [https://styled-components.com](https://styled-components.com)].
+- **React Router**: Biblioteca para gerenciamento de roteamento declarativo em aplicações React de página única (SPA). [Disponível em: [https://reactrouter.com](https://reactrouter.com)].
+- **React Hook Form**: Biblioteca para gerenciamento e validação de formulários em aplicações React, com foco em performance e simplicidade. [Disponível em: [https://react-hook-form.com](https://react-hook-form.com)].
+- **React Query**: Biblioteca para gerenciamento de estado do servidor, otimizando a obtenção, armazenamento em cache e sincronização de dados. [Disponível em: [https://tanstack.com/query](https://tanstack.com/query)].
+- **React Toastify**: Biblioteca para exibição de notificações não obstrutivas (_toast notifications_) na interface do usuário. [Disponível em: [https://fkhadra.github.io/react-toastify/](https://fkhadra.github.io/react-toastify/)].
+- **React Icons**: Conjunto de bibliotecas de ícones populares, facilitando a inclusão de elementos visuais na interface. [Disponível em: [https://react-icons.github.io/react-icons/](https://react-icons.github.io/react-icons/)].
+- **Yup**: Construtor de esquemas JavaScript para validação de dados, utilizado para garantir a integridade das informações inseridas. [Disponível em: [https://github.com/jquense/yup](https://github.com/jquense/yup)].
+- **Jest**: Framework de testes JavaScript, empregado para a realização de testes unitários e de integração no desenvolvimento. [Disponível em: [https://jestjs.io](https://jestjs.io)].
+- **Cypress**: Ferramenta de teste de ponta a ponta (_end-to-end testing_) para aplicações web, permitindo a simulação de interações do usuário. [Disponível em: [https://www.cypress.io](https://www.cypress.io)].
+- **Tailwind CSS**: Framework CSS utility-first, que acelera o processo de estilização e garante a consistência visual da aplicação. [Disponível em: [https://tailwindcss.com/](https://tailwindcss.com/)].
+
+### 5.3. Ferramentas e Plataformas
+
+- **Docker**: Plataforma de contêineres que facilita o desenvolvimento, empacotamento e execução de aplicações em ambientes isolados e portáveis. [Disponível em: [https://www.docker.com](https://www.docker.com)].
+- **MySQL**: Sistema de gerenciamento de banco de dados relacional (SGBDR) de código aberto, utilizado para o armazenamento persistente dos dados do sistema. [Disponível em: [https://www.mysql.com](https://www.mysql.com)].
+- **Docker Compose**: Ferramenta para definir e executar aplicações Docker multi-contêineres, simplificando a orquestração de serviços. [Disponível em: [https://docs.docker.com/compose/](https://docs.docker.com/compose/)].
+- **Figma**: Ferramenta de design colaborativo e prototipagem, utilizada para a concepção e padronização da interface do usuário. [Disponível em: [https://www.figma.com/](https://www.figma.com/)].
+- **GitHub Projects**: Funcionalidade de gestão de projetos integrada ao GitHub, utilizada para o planejamento, organização e acompanhamento das tarefas do projeto. [Disponível em: [https://github.com/orgs/fazendapro/projects/1](https://github.com/orgs/fazendapro/projects/1)].
+- **Heroku**: Plataforma como Serviço (PaaS) para implantação, gerenciamento e escalonamento de aplicações, simplificando o processo de _deploy_. [Disponível em: [https://www.heroku.com/](https://www.heroku.com/)].
+- **JawsDB (MySQL no Heroku)**: Serviço de banco de dados MySQL integrado à plataforma Heroku, fornecendo armazenamento de dados na nuvem. [Disponível em: [https://devcenter.heroku.com/articles/jawsdb](https://devcenter.heroku.com/articles/jawsdb)].
+- **Redis**: Banco de dados de estrutura de dados em memória, empregado para _caching_ e otimização do acesso a dados. [Disponível em: [https://redis.io/](https://redis.io/)].
+- **New Relic**: Plataforma de observabilidade para monitoramento de performance de aplicações (APM), auxiliando na identificação de gargalos e otimização. [Disponível em: [https://newrelic.com/](https://newrelic.com/)].
+- **Sentry**: Ferramenta de monitoramento de erros em tempo real, que permite a detecção e o rastreamento de exceções na aplicação. [Disponível em: [https://sentry.io/](https://sentry.io/)].
+- **Mermaid**: Ferramenta baseada em JavaScript para a geração de diagramas e fluxogramas a partir de código, utilizada para a representação visual da arquitetura. [Disponível em: [https://mermaid.js.org/](https://mermaid.js.org/)].
+
+### 5.4. Conceitos e Metodologias
+
+- **Arquitetura Modular**: Abordagem de design de _software_ que visa a organização da funcionalidade em componentes independentes e coesos, facilitando a escalabilidade e manutenção.
+- **DDD (Domain-Driven Design)**: Metodologia de desenvolvimento de _software_ que enfatiza a modelagem do sistema para refletir de forma precisa o domínio de negócio.
+- **Arquitetura Hexagonal (Ports and Adapters)**: Padrão arquitetural que visa isolar a lógica de negócio central das dependências externas (interfaces, bancos de dados, etc.), promovendo a testabilidade e a flexibilidade.
+- **Modelo C4**: Abordagem de documentação e visualização de arquiteturas de _software_ em diferentes níveis de abstração (Contexto, Contêineres, Componentes e Código). [Disponível em: [https://c4model.com/](https://c4model.com/)].
+- **REST (Representational State Transfer)**: Estilo arquitetural para sistemas distribuídos, amplamente utilizado na concepção de APIs web devido à sua escalabilidade e flexibilidade.
+- **CI/CD (Continuous Integration/Continuous Deployment)**: Conjunto de práticas de _software_ que automatizam o processo de integração, teste e entrega contínua de código, agilizando o ciclo de desenvolvimento.
 
 ## 6. Apêndices (Opcionais)
 

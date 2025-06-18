@@ -1,0 +1,471 @@
+\UseRawInputEncoding
+% Preâmbulo: Configuração inicial do documento com pacotes compatíveis
+\documentclass[12pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[portuguese]{babel}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{indentfirst}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+
+% Configuração de margens conforme ABNT NBR 14724:2011
+\geometry{left=3cm, right=2cm, top=3cm, bottom=2cm}
+
+% Configuração de espaçamento e fonte
+\onehalfspacing
+\renewcommand{\familydefault}{\rmdefault}
+
+% Configuração de títulos conforme ABNT
+\titleformat{\section}{\normalfont\large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalfont\normalsize\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\normalfont\normalsize\bfseries}{\thesubsubsection}{1em}{}
+
+% Configuração do sumário
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftsecdotsep}{\cftdot}
+\setlength{\cftbeforesecskip}{0.5em}
+\setlength{\cftbeforesubsecskip}{0.2em}
+
+% Configuração de hiperlinks
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+    citecolor=black
+}
+
+% Configuração para listagens de código
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny,
+    keywordstyle=\color{blue},
+    stringstyle=\color{red},
+    commentstyle=\color{gray},
+    showstringspaces=false
+}
+
+\begin{document}
+
+% --- Capa ---
+\begin{titlepage}
+    \centering
+    \vspace*{1cm}
+    {\large\bfseries UNIVERSIDADE [NOME DA INSTITUIÇÃO]\\
+    FACULDADE DE [NOME DA FACULDADE]\\
+    CURSO DE ENGENHARIA DE SOFTWARE}\par
+    \vspace{2cm}
+    {\Large\bfseries FAZENDAPRO - SOLUÇÕES AGROPECUÁRIAS}\par
+    \vspace{2cm}
+    {\normalsize\bfseries Autor: Gustavo Henrique Dias}\par
+    \vspace{1cm}
+    {\normalsize Orientador: [Nome do Orientador]}\par
+    \vspace{3cm}
+    {\normalsize [CIDADE]\\
+    17 DE JUNHO DE 2025}\par
+\end{titlepage}
+
+% --- Sumário ---
+\tableofcontents
+\newpage
+
+% --- Resumo ---
+\section*{Resumo}
+\addcontentsline{toc}{section}{Resumo}
+\begin{spacing}{1.5}
+O projeto FazendaPro é uma solução agropecuária que visa facilitar a gestão de fazendas e a produção de leite. O sistema oferece uma interface intuitiva para gerenciar animais, pastagens e produção de leite, além de fornecer \textit{insights} para tomada de decisão. Uma das principais funcionalidades é a monitoração de vacas em lactação, permitindo acompanhar a produção de leite e identificar possíveis problemas, assim como manter seu histórico, como genitora, filho, etc.
+\end{spacing}
+\vspace{0.5cm}
+\textbf{Palavras-chave:} Gestão agropecuária, Pecuária leiteira, Tecnologia, Rastreabilidade, Produção de leite.
+\newpage
+
+% --- Introdução ---
+\section{Introdução}
+
+\subsection{Contexto}
+\begin{spacing}{1.5}
+O projeto FazendaPro insere-se no contexto da pecuária leiteira brasileira, um setor essencial para a economia, mas que enfrenta desafios significativos, especialmente entre pequenos e médios produtores rurais. No Brasil, a pecuária leiteira é marcada por práticas tradicionais de gestão, com muitos fazendeiros utilizando métodos manuais ou planilhas para controlar animais, pastagens e produção de leite. Esse cenário resulta em ineficiências, como a falta de rastreamento do histórico genético e de saúde dos animais, dificuldades na previsão de faturamento e altos custos operacionais. O problema reside, principalmente, na ausência de ferramentas acessíveis que integrem dados de forma prática e ofereçam \textit{insights} para otimizar a produção. No norte de Minas Gerais, por exemplo, produtores relatam dificuldades em valorizar seus animais no mercado devido à falta de documentação detalhada sobre sua procedência e desempenho. O FazendaPro busca resolver essas dores, proporcionando uma solução tecnológica de baixo custo, adaptada às necessidades dos produtores rurais.
+\end{spacing}
+
+\subsection{Justificativa}
+\begin{spacing}{1.5}
+A criação do FazendaPro é justificada pela necessidade de modernizar a gestão pecuária, especialmente para pequenos e médios produtores que enfrentam barreiras no acesso a tecnologias avançadas. No Brasil, a pecuária leiteira representa uma fonte de renda para milhares de famílias, mas a falta de ferramentas acessíveis limita a competitividade e a lucratividade. Um fazendeiro do norte de Minas Gerais, por exemplo, relatou perdas significativas na venda de animais devido à ausência de um histórico detalhado que comprove sua qualidade genética e sanitária. Além disso, sistemas existentes no mercado muitas vezes possuem custos elevados, interfaces complexas e não atendem às necessidades específicas de produtores rurais. O FazendaPro é importante porque oferece uma solução de baixo custo, intuitiva e escalável, que permite o acompanhamento detalhado de cada animal, aumenta a valorização do gado no mercado e promove a tomada de decisões baseadas em dados. Ao democratizar o acesso à tecnologia, o projeto contribui para a sustentabilidade econômica e social do setor agropecuário, reduzindo custos operacionais, aumentando a eficiência e fortalecendo a rastreabilidade.
+\end{spacing}
+
+\subsection{Objetivos}
+\begin{spacing}{1.5}
+\subsubsection{Objetivo Principal}
+Desenvolver uma plataforma digital que permita a gestão eficiente de fazendas leiteiras, garantindo a valorização do gado no mercado por meio do registro detalhado de seu histórico genético, sanitário e produtivo.
+
+\subsubsection{Objetivos Secundários}
+\begin{itemize}
+    \item Criar um sistema de baixo custo que seja acessível a pequenos e médios produtores rurais.
+    \item Implementar funcionalidades para monitoramento em tempo real da produção de leite e da saúde animal.
+    \item Automatizar processos como notificações de prenhez e mudança de lotes, reduzindo o trabalho manual.
+    \item Fornecer \textit{dashboards} analíticos que auxiliem na tomada de decisão com base em dados de desempenho.
+    \item Garantir a exportação de históricos em PDF para facilitar negociações e vendas de animais.
+    \item Desenvolver uma interface responsiva e intuitiva, adaptada para uso em dispositivos móveis.
+\end{itemize}
+\end{spacing}
+
+% --- Descrição do Projeto ---
+\section{Descrição do Projeto}
+
+\subsection{Tema do Projeto}
+\begin{spacing}{1.5}
+O tema do projeto é o desenvolvimento de uma aplicação web focada na gestão de fazendas de gado leiteiro, com ênfase no registro histórico dos animais e na otimização da produção de leite. A FazendaPro combina tecnologia de ponta, como interfaces modernas e análises de dados, com uma abordagem acessível para atender às demandas de produtores rurais que enfrentam dificuldades na gestão manual ou com ferramentas de alto custo. O projeto abrange o controle de informações sobre o gado (genética, vacinas, alimentação, reprodução), a automação de processos operacionais e a geração de relatórios que aumentam a competitividade no mercado. Esse tema é relevante no contexto da transformação digital do agronegócio, promovendo eficiência, rastreabilidade e sustentabilidade.
+\end{spacing}
+
+\subsection{Problemas a Resolver}
+\begin{spacing}{1.5}
+O principal problema a ser resolvido é a garantia da valorização de um gado no mercado, por meio do seu histórico, desde o nascimento, genética, vacinas, alimentação, entre outras informações. Além de oferecer um sistema de baixo custo para produtores e fazendeiros que não têm acesso a tecnologias semelhantes por causa dos altos preços dos \textit{softwares} existentes no mercado.
+\end{spacing}
+
+\subsection{Limitações}
+\begin{spacing}{1.5}
+[Delimitação dos problemas que o projeto não abordará. Como não foi especificado no documento original, este campo pode ser preenchido pelo autor posteriormente.]
+\end{spacing}
+
+% --- Especificação Técnica ---
+\section{Especificação Técnica}
+
+\subsection{Requisitos Funcionais (RF)}
+\begin{spacing}{1.5}
+\begin{enumerate}[label=RF\arabic{*}.]
+    \item \textbf{Acessar o Sistema}
+    \begin{enumerate}[label=RF\arabic{*}.0\arabic{*}]
+        \item O sistema deve permitir que o usuário faça o \textit{login} na plataforma com suas credenciais.
+        \item O sistema deve validar as credenciais do usuário e conceder acesso apenas para os usuários que geraram o \textit{token}.
+    \end{enumerate}
+    \item \textbf{Adicionar um Animal}
+    \begin{enumerate}[label=RF\arabic{*}.0\arabic{*}]
+        \item O sistema deve permitir que o usuário cadastre um novo animal no sistema.
+        \item O sistema deve permitir incluir dados do animal como, no mínimo: identificação (nome e número do brinco), data de nascimento, genitora, filho (caso exista), raça, sexo e informações de saúde (vacinas).
+    \end{enumerate}
+    \item \textbf{Gerenciar o Animal}
+    \begin{enumerate}[label=RF\arabic{*}.0\arabic{*}]
+        \item O sistema deve permitir que o usuário edite ou exclua as informações de um animal já cadastrado.
+        \item O sistema deve oferecer a opção de exportar o histórico do animal em formato PDF.
+    \end{enumerate}
+    \item \textbf{Analisar Dashboards}
+    \begin{enumerate}[label=RF05.0\arabic{*}]
+        \item O sistema deve fornecer \textit{dashboards} com informações analíticas sobre os animais, como produção de leite, saúde geral e tendências de desempenho.
+    \end{enumerate}
+    \item \textbf{Inserir Informações do Animal}
+    \begin{enumerate}[label=RF06.0\arabic{*}]
+        \item O sistema deve permitir que o usuário insira informações adicionais sobre o animal, como registros de vacinas, alimentação, tratamentos ou eventos, como nascimento de filhotes.
+    \end{enumerate}
+    \item \textbf{Registrar Peso do Animal por Mês/Semana}
+    \begin{enumerate}[label=RF07.0\arabic{*}]
+        \item O sistema deve permitir que o usuário registre o peso do animal em intervalos regulares (mensal ou semanal).
+        \item O sistema deve armazenar esses registros para acompanhamento do desenvolvimento do animal.
+        \item O sistema deve permitir a edição ou exclusão desses registros.
+    \end{enumerate}
+    \item \textbf{Mudar de Lote}
+    \begin{enumerate}[label=RF08.0\arabic{*}]
+        \item O sistema deve mudar automaticamente o lote ao qual um animal pertence dependendo da sua produção de leite.
+    \end{enumerate}
+    \item \textbf{Definir Data de Prenhez}
+    \begin{enumerate}[label=RF09.0\arabic{*}]
+        \item O sistema deve permitir que o usuário registre a data de prenhez de uma vaca.
+        \item O sistema deve notificar o usuário (via WhatsApp) quando a data de prenhez estiver próxima do parto, 20 dias antes.
+    \end{enumerate}
+    \item \textbf{Vender o Animal}
+    \begin{enumerate}[label=RF10.0\arabic{*}]
+        \item O sistema deve permitir que o usuário registre a venda de um animal.
+        \item O sistema deve atualizar o status do animal para ``vendido'' e registrar a data da venda.
+        \item O sistema deve oferecer a opção de exportar o histórico do animal em PDF no momento da venda.
+        \item O sistema deve permitir verificar o histórico de todas as vendas dentro do módulo de vendas.
+    \end{enumerate}
+    \item \textbf{Cadastrar Vacinas}
+    \begin{enumerate}[label=RF11.0\arabic{*}]
+        \item O sistema deve permitir que o usuário cadastre a vacina para que depois ela seja vinculada ao animal.
+        \item O sistema deve permitir a pesquisa de vacinas por datas.
+    \end{enumerate}
+    \item \textbf{Separar Módulo}
+    \begin{enumerate}[label=RF12.0\arabic{*}]
+        \item O sistema deve organizar as informações através de módulos dentro de um menu lateral (Dashboard, Vacas, Fornecedores, Vendas, Estoque).
+    \end{enumerate}
+    \item \textbf{Sair da Plataforma}
+    \begin{enumerate}[label=RF13.0\arabic{*}]
+        \item O sistema deve permitir que o usuário faça o \textit{logout} da plataforma.
+    \end{enumerate}
+\end{enumerate}
+\end{spacing}
+
+\subsection{Requisitos Não Funcionais (RNF)}
+\begin{spacing}{1.5}
+\begin{enumerate}[label=RNF\arabic{*}.]
+    \item \textbf{Estilização}
+    \begin{enumerate}[label=RNF\arabic{*}.0\arabic{*}]
+        \item A estilização da aplicação deve seguir os padrões de estilo do Figma.
+        \item Para facilitar a estilização, deve ser usado Tailwind ou outra biblioteca de CSS.
+        \item Componentes padrões devem ser criados para seguir um padrão geral.
+        \item As cores da aplicação devem apresentar-se de forma agradável.
+    \end{enumerate}
+    \item \textbf{Ferramentas}
+    \begin{enumerate}[label=RNF\arabic{*}.0\arabic{*}]
+        \item Para o \textit{Frontend}, deve-se utilizar React com bibliotecas para facilitar o \textit{fetch} das informações.
+        \item Para o \textit{Backend}, será usado NestJS para serviços de autenticação e notificações, contudo, para todo o resto, será usado Go.
+    \end{enumerate}
+    \item \textbf{Idiomas}
+    \begin{enumerate}[label=RNF\arabic{*}.0\arabic{*}]
+        \item Todo o desenvolvimento deve ser feito respeitando variáveis de idioma.
+        \item O idioma principal será PT-BR, posteriormente pode ser implementado EN-US e ES-ES.
+    \end{enumerate}
+    \item \textbf{Mobile}
+    \begin{enumerate}[label=RNF04.0\arabic{*}]
+        \item O desenvolvimento deve respeitar os casos de \textit{mobile}, respeitando um design responsivo e agradável.
+    \end{enumerate}
+\end{enumerate}
+\end{spacing}
+
+\subsection{Considerações de Design}
+
+\subsubsection{Visão Inicial da Arquitetura}
+\begin{spacing}{1.5}
+Foi decidido usar a arquitetura modular para o projeto. A arquitetura modular oferece um equilíbrio entre a simplicidade de um monolito e a flexibilidade dos microsserviços. O NestJS facilita essa abordagem através de seus módulos bem definidos, permitindo escalabilidade sem a complexidade inicial dos microsserviços. Esta escolha permite que o sistema cresça naturalmente, com a possibilidade de extrair módulos para microsserviços no futuro (como é o caso das notificações no futuro).
+\end{spacing}
+
+\subsubsection{Padrões de Arquitetura}
+\begin{spacing}{1.5}
+A ideia seria usar uma arquitetura limpa como o DDD (\textit{Domain-Driven Design}) com arquitetura hexagonal.
+\end{spacing}
+
+\begin{lstlisting}[language=bash, caption={Estrutura de Diretórios do Projeto}]
+fazendapro-api/
+├── api/                    # Definições de handlers e endpoints HTTP
+│   ├── handlers/           # Funções que lidam com requisições HTTP
+│   │   ├── user.go         # Ex.: handler para rotas de usuário
+│   │   └── product.go      # Ex.: handler para rotas de produtos
+│   └── middleware/         # Middlewares (ex.: autenticação JWT)
+│       └── auth.go         # Middleware de validação de token
+├── cmd/                    # Ponto de entrada do projeto
+│   └── app/                # Aplicação principal
+│       └── main.go         # Arquivo principal que inicializa o servidor
+├── config/                 # Configurações (ex.: variáveis de ambiente)
+│   └── config.go           # Carrega .env ou outras configs
+├── internal/               # Código interno (não exposto para outros pacotes)
+│   ├── models/             # Estruturas de dados (ex.: User, Product)
+│   │   ├── user.go
+│   │   └── product.go
+│   ├── repository/         # Acesso a dados (ex.: banco de dados)
+│   │   ├── user_repository.go
+│   │   └── product_repository.go
+│   └── service/            # Lógica de negócio
+│       ├── user_service.go
+│       └── product_service.go
+├── pkg/                    # Código reutilizável (se necessário)
+│   └── jwt/                # Funções utilitárias para JWT
+│       └── jwt.go
+├── scripts/                # Scripts úteis (ex.: para build ou deploy)
+├── tests/                  # Testes unitários e de integração
+│   ├── handlers/
+│   ├── repository/
+│   └── service/
+├── .env                    # Variáveis de ambiente (ex.: JWT_SECRET)
+├── go.mod                  # Definição do módulo Go
+├── go.sum                  # Dependências
+└── README.md               # Documentação do projeto
+\end{lstlisting}
+
+\subsubsection{Modelo C4}
+\begin{spacing}{1.5}
+Os diagramas C4 (Contexto, Contêineres, Componentes) estão disponíveis no Apêndice A.
+\end{spacing}
+
+\subsubsection{Aplicação Web}
+\begin{spacing}{1.5}
+A aplicação web será desenvolvida com React. O \textit{API Server} será um servidor NestJS em \textit{container} no Heroku, funcionando como núcleo do sistema, incluindo Redis rodando no mesmo \textit{container} para \textit{caching} em memória.
+\end{spacing}
+
+\subsubsection{Armazenamento Persistente de Dados}
+\begin{spacing}{1.5}
+O armazenamento persistente será realizado com MySQL (JawsDB). A aplicação web faz requisições HTTP (REST) ao \textit{API Server}, que usa Redis internamente para \textit{caching} e consulta o JawsDB MySQL via conexão SQL.
+\end{spacing}
+
+\subsection{Stack Tecnológica}
+\begin{spacing}{1.5}
+\subsubsection{Linguagens de Programação}
+As linguagens escolhidas incluem Go, TypeScript e JavaScript, justificadas pela sua eficiência, tipagem estática e ampla adoção em desenvolvimento web.
+
+\subsubsection{Frameworks e Bibliotecas}
+\begin{spacing}{1.5}
+\begin{itemize}
+    \item React
+    \item Nest.js
+    \item TypeORM
+    \item Go
+    \item JWT
+    \item Bcrypt
+    \item Express
+    \item Styled Components
+    \item React Router
+    \item React Hook Form
+    \item React Query
+    \item React Toastify
+    \item React Icons
+    \item Yup
+    \item Jest
+    \item Cypress
+    \item Tailwind CSS
+\end{itemize}
+\end{spacing}
+
+\subsubsection{Ferramentas de Desenvolvimento e Gestão de Projeto}
+\begin{itemize}
+    \item Docker
+    \item MySQL
+    \item Docker Compose
+    \item Figma
+    \item GitHub Projects
+    \item Heroku
+    \item JawsDB
+    \item Redis
+    \item New Relic
+    \item Sentry
+    \item Mermaid
+\end{itemize}
+\end{spacing}
+
+\subsection{Considerações de Segurança}
+
+\subsubsection{Autenticação e Autorização}
+\begin{spacing}{1.5}
+\begin{itemize}
+    \item \textbf{Credenciais expostas}: Será utilizado \textit{hash} para senhas com Bcrypt.
+    \item \textbf{Ataques de força bruta}: Será usado limite de tentativas de \textit{login} (\textit{rate limiting}) com \texttt{@nestjs/throttler}.
+\end{itemize}
+\end{spacing}
+
+\subsubsection{Exposição de Dados Sensíveis}
+\begin{spacing}{1.5}
+\begin{itemize}
+    \item \textbf{Vazamento em respostas da API}: Será usado DTO para retornar apenas o necessário.
+    \item \textbf{CORS}: Configurações adequadas para evitar acesso não autorizado.
+    \item \textbf{Logs}: O Heroku usa HTTPS automaticamente para criptografar a comunicação.
+\end{itemize}
+\end{spacing}
+
+\subsubsection{Injeção de Código}
+\begin{spacing}{1.5}
+\begin{itemize}
+    \item \textbf{SQL Injection}: Será usado TypeORM, evitando \textit{queries} brutas.
+    \item \textbf{XSS}: Será implementado Content Security Policy (CSP) no \textit{frontend}.
+\end{itemize}
+\end{spacing}
+
+\subsection{Branches e Pipeline}
+\begin{spacing}{1.5}
+Atualmente, existem seis \textit{branches} principais relacionadas aos ambientes de \textit{stage} e produção, responsáveis por todos os componentes da aplicação: Serviços, \textit{Backend} e \textit{Frontend}.
+
+\textbf{Stage:}
+\begin{itemize}
+    \item \texttt{back/develop} - para o \textit{backend}.
+    \item \texttt{front/develop} - para o \textit{frontend}.
+    \item \texttt{service/release} - para os microsserviços.
+\end{itemize}
+
+\textbf{Produção:}
+\begin{itemize}
+    \item \texttt{back/release} - para o \textit{backend}.
+    \item \texttt{front/release} - para o \textit{frontend}.
+    \item \texttt{service/release} - para os microsserviços.
+\end{itemize}
+
+O fluxo de desenvolvimento segue o seguinte processo: para cada nova \textit{feature}, cria-se uma \textit{branch} a partir da produção. Para testes, abre-se uma \textit{Pull Request} apontando para a \textit{release}, sobe-se para \textit{stage} e realizam-se os testes necessários. Caso os testes sejam aprovados, realiza-se o \textit{merge} na produção. O fluxo é representado no Apêndice B.
+\end{spacing}
+
+% --- Próximos Passos ---
+\section{Próximos Passos}
+\begin{spacing}{1.5}
+Os próximos passos incluem a implementação das funcionalidades descritas, com foco na construção do \textit{backend} e \textit{frontend}, testes de integração e validação em ambiente de \textit{stage}. O cronograma para os Portfólios I e II será detalhado em documentos complementares, priorizando a entrega das funcionalidades principais até o final do primeiro semestre de 2026.
+\end{spacing}
+
+% --- Referências ---
+\section{Referências}
+\begin{spacing}{1.5}
+\begin{itemize}
+    \item GO. \textit{Go Programming Language}. Disponível em: \url{https://go.dev}. Acesso em: 17 jun. 2025.
+    \item TYPESCRIPT. \textit{The TypeScript Handbook}. Disponível em: \url{https://www.typescriptlang.org}. Acesso em: 17 jun. 2025.
+    \item JAVASCRIPT. \textit{MDN Web Docs}. Disponível em: \url{https://developer.mozilla.org/pt-BR/docs/Web/JavaScript}. Acesso em: 17 jun. 2025.
+    \item REACT. \textit{React Documentation}. Disponível em: \url{https://react.dev}. Acesso em: 17 jun. 2025.
+    \item NESTJS. \textit{NestJS Documentation}. Disponível em: \url{https://nestjs.com}. Acesso em: 17 jun. 2025.
+    \item TYPEORM. \textit{TypeORM Documentation}. Disponível em: \url{https://typeorm.io}. Acesso em: 17 jun. 2025.
+    \item JWT. \textit{JSON Web Tokens}. Disponível em: \url{https://jwt.io}. Acesso em: 17 jun. 2025.
+    \item BCRYPT. \textit{Bcrypt Documentation}. Disponível em: \url{https://www.npmjs.com/package/bcrypt}. Acesso em: 17 jun. 2025.
+    \item EXPRESS. \textit{Express Documentation}. Disponível em: \url{https://expressjs.com}. Acesso em: 17 jun. 2025.
+    \item STYLED COMPONENTS. \textit{Styled Components Documentation}. Disponível em: \url{https://styled-components.com}. Acesso em: 17 jun. 2025.
+    \item REACT ROUTER. \textit{React Router Documentation}. Disponível em: \url{https://reactrouter.com}. Acesso em: 17 jun. 2025.
+    \item REACT HOOK FORM. \textit{React Hook Form Documentation}. Disponível em: \url{https://react-hook-form.com}. Acesso em: 17 jun. 2025.
+    \item REACT QUERY. \textit{React Query Documentation}. Disponível em: \url{https://tanstack.com/query}. Acesso em: 17 jun. 2025.
+    \item REACT TOASTIFY. \textit{React Toastify Documentation}. Disponível em: \url{https://fkhadra.github.io/react-toastify/}. Acesso em: 17 jun. 2025.
+    \item REACT ICONS. \textit{React Icons Documentation}. Disponível em: \url{https://react-icons.github.io/react-icons/}. Acesso em: 17 jun. 2025.
+    \item YUP. \textit{Yup Documentation}. Disponível em: \url{https://github.com/jquense/yup}. Acesso em: 17 jun. 2025.
+    \item JEST. \textit{Jest Documentation}. Disponível em: \url{https://jestjs.io}. Acesso em: 17 jun. 2025.
+    \item CYPRESS. \textit{Cypress Documentation}. Disponível em: \url{https://www.cypress.io}. Acesso em: 17 jun. 2025.
+    \item TAILWIND CSS. \textit{Tailwind CSS Documentation}. Disponível em: \url{https://tailwindcss.com}. Acesso em: 17 jun. 2025.
+    \item DOCKER. \textit{Docker Documentation}. Disponível em: \url{https://www.docker.com}. Acesso em: 17 jun. 2025.
+    \item MYSQL. \textit{MySQL Documentation}. Disponível em: \url{https://www.mysql.com}. Acesso em: 17 jun. 2025.
+    \item DOCKER COMPOSE. \textit{Docker Compose Documentation}. Disponível em: \url{https://docs.docker.com/compose/}. Acesso em: 17 jun. 2025.
+    \item FIGMA. \textit{Figma Documentation}. Disponível em: \url{https://www.figma.com}. Acesso em: 17 jun. 2025.
+    \item GITHUB PROJECTS. \textit{FazendaPro Project}. Disponível em: \url{https://github.com/orgs/fazendapro/projects/1}. Acesso em: 17 jun. 2025.
+    \item HEROKU. \textit{Heroku Documentation}. Disponível em: \url{https://www.heroku.com}. Acesso em: 17 jun. 2025.
+    \item JAWSDB. \textit{JawsDB Documentation}. Disponível em: \url{https://devcenter.heroku.com/articles/jawsdb}. Acesso em: 17 jun. 2025.
+    \item REDIS. \textit{Redis Documentation}. Disponível em: \url{https://redis.io}. Acesso em: 17 jun. 2025.
+    \item NEW RELIC. \textit{New Relic Documentation}. Disponível em: \url{https://newrelic.com}. Acesso em: 17 jun. 2025.
+    \item SENTRY. \textit{Sentry Documentation}. Disponível em: \url{https://sentry.io}. Acesso em: 17 jun. 2025.
+    \item MERMAID. \textit{Mermaid Documentation}. Disponível em: \url{https://mermaid.js.org}. Acesso em: 17 jun. 2025.
+    \item C4 MODEL. \textit{C4 Model Documentation}. Disponível em: \url{https://c4model.com}. Acesso em: 17 jun. 2025.
+\end{itemize}
+\end{spacing}
+
+% --- Apêndices ---
+\section{Apêndices}
+\begin{spacing}{1.5}
+\textbf{Apêndice A - Diagramas C4}
+
+Os diagramas de Contexto, Contêineres e Componentes (Modelo C4) estão disponíveis nos arquivos originais do projeto (\texttt{images/cases-of-use.drawio.svg}, \texttt{images/classesDiagram.drawio.png}, \texttt{images/entityRelationshipDiagram.drawio.png}).
+
+\textbf{Apêndice B - Fluxo de Pipeline}
+
+O diagrama do fluxo de \textit{pipeline} (Mermaid) está disponível no arquivo original do projeto.
+\end{spacing}
+
+% --- Avaliações de Professores ---
+\section{Avaliações de Professores}
+\begin{spacing}{1.5}
+\textbf{Considerações do Professor/a:}
+
+\vspace{5cm}
+
+\rule{0.5\textwidth}{0.4pt}
+
+\vspace{1cm}
+
+\textbf{Considerações do Professor/a:}
+
+\vspace{5cm}
+
+\rule{0.5\textwidth}{0.4pt}
+
+\vspace{1cm}
+
+\textbf{Considerações do Professor/a:}
+
+\vspace{5cm}
+
+\rule{0.5\textwidth}{0.4pt}
+\end{spacing}
+
+\end{document}
