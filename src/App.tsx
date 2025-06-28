@@ -1,10 +1,13 @@
-import { Layout } from 'antd';
+import { Layout, Grid } from 'antd';
 import { useAuth, Login, Dashboard } from './pages';
 import { Sidebar, Spinner } from './components';
 import { Routes, Route, Navigate } from 'react-router'
 
+const { useBreakpoint } = Grid;
+
 const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading } = useAuth()
+  const screens = useBreakpoint();
 
   if (isLoading) return <Spinner />
 
@@ -13,12 +16,21 @@ const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sidebar />
-      <Layout>
+      <Layout style={{
+        marginLeft: screens.xs ? 0 : 280,
+        transition: 'all 0.2s'
+      }}>
         <Layout.Content style={{ 
-          padding: '24px',
-          transition: 'all 0.2s'
+          height: '100vh',
+          overflow: 'auto',
+          background: '#f5f5f5'
         }}>
-          {children}
+          <div style={{
+            padding: '24px',
+            minHeight: 'calc(100vh - 48px)'
+          }}>
+            {children}
+          </div>
         </Layout.Content>
       </Layout>
     </Layout>
@@ -48,7 +60,7 @@ export const App = () => {
         path="/vacas"
         element={
           <ProtectedLayout>
-            <div>Página de Vacas</div>
+            <h1>Página de Vacas</h1>
           </ProtectedLayout>
         }
       />
@@ -56,7 +68,7 @@ export const App = () => {
         path="/relatorios"
         element={
           <ProtectedLayout>
-            <div>Página de Relatórios</div>
+            <h1>Página de Relatórios</h1>
           </ProtectedLayout>
         }
       />
@@ -64,7 +76,7 @@ export const App = () => {
         path="/fornecedores"
         element={
           <ProtectedLayout>
-            <div>Página de Fornecedores</div>
+            <h1>Página de Fornecedores</h1>
           </ProtectedLayout>
         }
       />
@@ -72,7 +84,7 @@ export const App = () => {
         path="/vendas"
         element={
           <ProtectedLayout>
-            <div>Página de Vendas</div>
+            <h1>Página de Vendas</h1>
           </ProtectedLayout>
         }
       />
@@ -80,7 +92,7 @@ export const App = () => {
         path="/estoque"
         element={
           <ProtectedLayout>
-            <div>Página de Estoque</div>
+            <h1>Página de Estoque</h1>
           </ProtectedLayout>
         }
       />
@@ -88,7 +100,7 @@ export const App = () => {
         path="/configuracoes"
         element={
           <ProtectedLayout>
-            <div>Página de Configurações</div>
+            <h1>Página de Configurações</h1>
           </ProtectedLayout>
         }
       />

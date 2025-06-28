@@ -1,12 +1,10 @@
 import { useRef, useEffect } from 'react';
-import { Layout, Row, Col, Card } from 'antd';
+import { Row, Col, Card } from 'antd';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import { Line } from 'react-chartjs-2';
 import { Overview, MilkProduction, NextToCalve, Rations, CattleQuantity, ShoppingOverview } from '../components';
 import { useTranslation } from 'react-i18next';
-
-const { Content } = Layout;
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement);
 
@@ -51,13 +49,17 @@ const Dashboard = () => {
         label: 'Semeadas',
         data: [4000, 3000, 3500, 2000, 4000],
         backgroundColor: '#F59E0B',
+        borderColor: '#F59E0B',
         tension: 0.4,
+        fill: false,
       },
       {
         label: 'Não semeadas',
         data: [2500, 2000, 3000, 1500, 3500],
         backgroundColor: '#93C5FD',
+        borderColor: '#93C5FD',
         tension: 0.4,
+        fill: false,
       },
     ],
   };
@@ -92,34 +94,32 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <Layout style={{ padding: '24px' }}>
-      <Content>
-        <Row gutter={16}>
-          <Col span={16}><Overview /></Col>
-          <Col span={8}><CattleQuantity /></Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={16}><ShoppingOverview /></Col>
-          <Col span={8}><Rations /></Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Card title={t('dashboard.salesAndPurchases')} extra={<span>{t('dashboard.weekly')}</span>}>
-              <Bar ref={barChartRef} data={barData} options={barOptions} />
-            </Card>
-          </Col>
-          <Col span={12}>
-            <Card title={t('dashboard.semenation')}>
-              <Line ref={lineChartRef} data={lineData} options={lineOptions} />
-            </Card>
-          </Col>
-        </Row>
-        <Row gutter={16} style={{ marginTop: 16 }}>
-          <Col span={12}><MilkProduction /></Col>
-          <Col span={12}><NextToCalve /></Col>
-        </Row>
-      </Content>
-    </Layout>
+    <div>
+      <Row gutter={16} style={{ marginBottom: 16 }}>
+        <Col span={16}><Overview /></Col>
+        <Col span={8}><CattleQuantity /></Col>
+      </Row>
+      <Row gutter={16} style={{ marginBottom: 16 }}>
+        <Col span={16}><ShoppingOverview /></Col>
+        <Col span={8}><Rations /></Col>
+      </Row>
+      <Row gutter={16} style={{ marginBottom: 16 }}>
+        <Col span={12}>
+          <Card title={t('dashboard.salesAndPurchases')} extra={<span>{t('dashboard.weekly')}</span>}>
+            <Bar ref={barChartRef} data={barData} options={barOptions} />
+          </Card>
+        </Col>
+        <Col span={12}>
+          <Card title={t('dashboard.semenation')}>
+            <Line ref={lineChartRef} data={lineData} options={lineOptions} />
+          </Card>
+        </Col>
+      </Row>
+      <Row gutter={16}>
+        <Col span={12}><MilkProduction /></Col>
+        <Col span={12}><NextToCalve /></Col>
+      </Row>
+    </div>
   );
 };
 
