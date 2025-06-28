@@ -174,104 +174,76 @@ fazendapro-api/
 ### Modelos C4:
 
 ```mermaid
-classDiagram
-    %% Diagrama de Contexto (C4 Nível 1)
-    class FazendaPro {
-        +Gerencia fazendas e produção de leite
-    }
-    class Fazendeiro {
-        +Gerencia animais e vendas
-    }
-    class Sistema_de_Pagamento {
-        +Processa transações (futuro)
-    }
-    class WhatsApp {
-        +Envia notificações
-    }
-    Fazendeiro --> FazendaPro : Usa
-    FazendaPro --> Sistema_de_Pagamento : Integra (futuro)
-    FazendaPro --> WhatsApp : Envia notificações de prenhez
+flowchart TD
 
-    %% Diagrama de Containers (C4 Nível 2)
-    class WebApp {
-        +Interface do usuário
-        +React, TypeScript, Tailwind
-    }
-    class API_Server {
-        +Gerencia lógica de negócios
-        +NestJS (autenticação, notificações), Go (demais serviços)
-    }
-    class Banco_de_Dados {
-        +Armazena dados
-        +MySQL (JawsDB)
-    }
-    class Redis {
-        +Cache em memória
-        +Redis
-    }
-    class New_Relic {
-        +Monitoramento de performance
-        +APM
-    }
-    class Sentry {
-        +Monitoramento de erros
-        +Error Tracking
-    }
-    class Heroku {
-        +Hospedagem e CI/CD
-        +Plataforma PaaS
-    }
+Fazendeiro[Fazendeiro - Gerencia animais e vendas]
+FazendaPro[FazendaPro
+ Gerencia fazendas e produção de leite]
+WhatsApp[WhatsApp
+Notificações]
 
-    Fazendeiro --> WebApp : Acessa via navegador/mobile
-    WebApp --> API_Server : Faz chamadas REST
-    API_Server --> Banco_de_Dados : Lê/Escreve via TypeORM
-    API_Server --> Redis : Cache de dados
-    API_Server --> WhatsApp : Envia notificações
-    API_Server --> New_Relic : Envia métricas
-    API_Server --> Sentry : Reporta erros
-    API_Server --> Heroku : Deploy via CI/CD
+Fazendeiro -->|Usa| FazendaPro
+FazendaPro -->|Envia notificações| WhatsApp
+```
 
-    %% Diagrama de Componentes (C4 Nível 3 - Foco na API_Server)
-    class Autenticacao {
-        +Gerencia login/logout
-        +JWT, Bcrypt
-    }
-    class Gerenciador_de_Animais {
-        +Cadastra, edita, exclui animais
-        +Historico, PDF
-    }
-    class Gerenciador_de_Vacinas {
-        +Cadastra, vincula vacinas
-    }
-    class Gerenciador_de_Lotes {
-        +Move animais entre lotes
-    }
-    class Gerenciador_de_Prenhez {
-        +Registra datas, notifica
-    }
-    class Gerenciador_de_Vendas {
-        +Registra vendas, exporta PDF
-    }
-    class Dashboard {
-        +Exibe analises
-    }
-    API_Server *--> Autenticacao
-    API_Server *--> Gerenciador_de_Animais
-    API_Server *--> Gerenciador_de_Vacinas
-    API_Server *--> Gerenciador_de_Lotes
-    API_Server *--> Gerenciador_de_Prenhez
-    API_Server *--> Gerenciador_de_Vendas
-    API_Server *--> Dashboard
-    Autenticacao --> Banco_de_Dados : Valida credenciais
-    Gerenciador_de_Animais --> Banco_de_Dados : Lê/Escreve dados de animais
-    Gerenciador_de_Animais --> Redis : Cache de históricos
-    Gerenciador_de_Vacinas --> Banco_de_Dados : Lê/Escreve vacinas
-    Gerenciador_de_Lotes --> Banco_de_Dados : Atualiza lotes
-    Gerenciador_de_Prenhez --> Banco_de_Dados : Registra prenhez
-    Gerenciador_de_Prenhez --> WhatsApp : Envia notificações
-    Gerenciador_de_Vendas --> Banco_de_Dados : Registra vendas
-    Dashboard --> Banco_de_Dados : Lê dados analíticos
-    Dashboard --> Redis : Cache de métricas
+```mermaid
+flowchart TD
+
+Fazendeiro[Fazendeiro]
+WebApp[Web App\nReact / TypeScript / Tailwind]
+APIServer[API Server\nNestJS Auth/Notificações\nGo Serviços]
+DB[Banco de Dados\nMySQL JawsDB]
+Redis[Redis\nCache]
+NewRelic[New Relic\nMonitoramento APM]
+Sentry[Sentry\nError Tracking]
+Heroku[Heroku\nPaaS Deploy]
+WhatsApp[WhatsApp\nNotificações]
+
+Fazendeiro -->|Acessa via navegador/mobile| WebApp
+WebApp -->|Requisições REST| APIServer
+
+APIServer -->|Lê/Escreve| DB
+APIServer -->|Cache| Redis
+APIServer -->|Notificações| WhatsApp
+APIServer -->|Métricas| NewRelic
+APIServer -->|Erros| Sentry
+APIServer -->|Deploy| Heroku
+```
+
+```mermaid
+flowchart TD
+
+APIServer[API Server]
+
+Auth[Autenticação\nJWT, Bcrypt]
+GAnimais[Gerenciador de Animais\nCRUD, Histórico, PDF]
+GVacinas[Gerenciador de Vacinas]
+GLotes[Gerenciador de Lotes]
+GPrenhez[Gerenciador de Prenhez\nNotificações]
+GVendas[Gerenciador de Vendas\nExportação PDF]
+Dashboard[Dashboard\nAnálises e Métricas]
+DB[Banco de Dados\nMySQL]
+Redis[Redis\nCache]
+WhatsApp[WhatsApp\nNotificações]
+
+APIServer --> Auth
+APIServer --> GAnimais
+APIServer --> GVacinas
+APIServer --> GLotes
+APIServer --> GPrenhez
+APIServer --> GVendas
+APIServer --> Dashboard
+
+Auth -->|Valida usuários| DB
+GAnimais -->|CRUD animais| DB
+GAnimais -->|Cache histórico| Redis
+GVacinas -->|CRUD vacinas| DB
+GLotes -->|CRUD lotes| DB
+GPrenhez -->|Registra prenhez| DB
+GPrenhez -->|Notifica prenhez| WhatsApp
+GVendas -->|Registra vendas| DB
+Dashboard -->|Consulta dados| DB
+Dashboard -->|Cache de métricas| Redis
 ```
 
 **Aplicação Web:** React.
