@@ -49,12 +49,13 @@ export const Sidebar = () => {
       width={280}
       style={{
         background: 'white',
-        position: screens.xs ? 'fixed' : 'relative',
+        position: 'fixed',
         height: '100vh',
         zIndex: 1000,
         left: 0,
         top: 0,
-        padding: '24px'
+        overflow: 'auto',
+        transition: 'all 0.2s'
       }}
       trigger={screens.xs ? (
         <Button
@@ -75,11 +76,17 @@ export const Sidebar = () => {
       ) : null}
     >
       <div style={{
-        height: 32,
+        height: 64,
         margin: 16,
+        marginTop: 24,
         textAlign: 'center',
         background: 'rgba(255, 255, 255, 0.2)',
-        display: collapsed ? 'none' : 'block'
+        display: collapsed ? 'none' : 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontWeight: 'bold',
+        fontSize: '14px',
+        color: '#333'
       }}>
         FAZENDA BOM JARDIM
       </div>
@@ -88,7 +95,10 @@ export const Sidebar = () => {
         mode="inline"
         selectedKeys={[location.pathname]}
         items={menuItems}
-        style={{ borderRight: 0 }}
+        style={{ 
+          borderRight: 0,
+          padding: '0 16px'
+        }}
         onClick={({ key }) => handleMenuClick(key)}
       />
     </Sider>

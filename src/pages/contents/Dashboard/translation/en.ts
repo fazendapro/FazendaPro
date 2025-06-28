@@ -24,6 +24,7 @@ export const translations = {
     price: "Price",
     salesAndPurchases: "Sales & Purchases",
     semenation: "Semenation",
-    title: "Dashboard"
+    title: "Dashboard",
+    topMilkProducers: "Top Milk Producers"
   }
 }
