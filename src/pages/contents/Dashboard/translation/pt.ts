@@ -24,6 +24,7 @@ export const translations = {
     fat: "Gordura",
     price: "Preço",
     salesAndPurchases: "Vendas & Compras",
-    semenation: "Seminação"
+    semenation: "Seminação",
+    topMilkProducers: "Top Produtoras de Leite"
   }
 };
