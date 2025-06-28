@@ -50,15 +50,13 @@ const Dashboard = () => {
       {
         label: 'Semeadas',
         data: [4000, 3000, 3500, 2000, 4000],
-        borderColor: '#F59E0B',
-        fill: false,
+        backgroundColor: '#F59E0B',
         tension: 0.4,
       },
       {
         label: 'Não semeadas',
         data: [2500, 2000, 3000, 1500, 3500],
-        borderColor: '#93C5FD',
-        fill: false,
+        backgroundColor: '#93C5FD',
         tension: 0.4,
       },
     ],

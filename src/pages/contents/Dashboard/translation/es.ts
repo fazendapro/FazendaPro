@@ -24,6 +24,7 @@ export const translations = {
     price: "Precio",
     salesAndPurchases: "Ventas & Compras",
     semenation: "Semenación",
-    title: "Panel de control"
+    title: "Panel de control",
+    topMilkProducers: "Top Produtores de Leite"
   }
 }
