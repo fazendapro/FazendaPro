@@ -99,7 +99,7 @@ O projeto FazendaPro é desenvolvido no âmbito da pecuária brasileira, com foc
 
 \subsection{Justificativa}
 \begin{spacing}{1.5}
-O desenvolvimento do FazendaPro justifica-se pela necessidade de modernizar a gestão pecuária, com foco na pecuária leiteira, para pequenos e médios produtores que enfrentam barreiras no acesso a tecnologias avançadas. A pecuária leiteira é uma atividade econômica essencial, empregando cerca de 4 milhões de pessoas no Brasil \cite{4milhao}, mas a falta de ferramentas acessíveis compromete a eficiência e a competitividade. Um produtor do norte de Minas Gerais relatou perdas na comercialização de animais devido à ausência de registros detalhados sobre genética e saúde, conforme destacado em reportagem do G1 \cite{g12022}. Além disso, sistemas comerciais existentes frequentemente apresentam custos elevados e interfaces inadequadas às necessidades rurais, conforme apontado análise pelo blog Agrolink \cite{agropec2024}. O FazendaPro, como projeto acadêmico, propõe uma solução técnica, acessível e escalável, com ênfase na rastreabilidade de rebanhos e no monitoramento da produção leiteira, contribuindo para a eficiência operacional, a valorização do gado e a sustentabilidade do setor.
+O desenvolvimento do FazendaPro justifica-se pela necessidade de modernizar a gestão pecuária, com foco na pecuária leiteira, para pequenos e médios produtores que enfrentam barreiras no acesso à tecnologias avançadas. A pecuária leiteira é uma atividade econômica essencial, empregando cerca de 4 milhões de pessoas no Brasil \cite{4milhao}, mas a falta de ferramentas acessíveis compromete a eficiência e a competitividade. Um produtor do norte de Minas Gerais relatou perdas na comercialização de animais devido à ausência de registros detalhados sobre genética e saúde, conforme destacado em reportagem do G1 \cite{g12022}. Além disso, sistemas comerciais existentes frequentemente apresentam custos elevados e interfaces inadequadas às necessidades rurais, conforme apontado análise pelo blog Agrolink \cite{agropec2024}. O FazendaPro, como projeto acadêmico, propõe uma solução técnica, acessível e escalável, com ênfase na rastreabilidade de rebanhos e no monitoramento da produção leiteira, contribuindo para a eficiência operacional, a valorização do gado e a sustentabilidade do setor.
 \end{spacing}
 
 \subsection{Objetivos}
@@ -108,15 +108,14 @@ O desenvolvimento do FazendaPro justifica-se pela necessidade de modernizar a ge
 Desenvolver uma plataforma digital para a gestão integrada de rebanhos bovinos, com foco na pecuária leiteira, que permita o registro detalhado do histórico genético, sanitário e produtivo dos animais, promovendo a rastreabilidade e a eficiência na produção de leite.
 
 \subsubsection{Objetivos Secundários}
-\begin{itemize}
-    \item Desenvolver um sistema acessível e de baixo custo para pequenos e médios produtores rurais.
-    \item Implementar funcionalidades para monitoramento em tempo real da produção de leite e da saúde animal.
-    \item Automatizar processos operacionais, como notificações de prenhez e gerenciamento de lotes, reduzindo a dependência de tarefas manuais.
-    \item Fornecer dashboards analíticos com dados de desempenho para apoiar a tomada de decisão.
-    \item Habilitar a exportação de históricos em PDF para facilitar a comercialização de animais.
+\begin{enumerate}[label=\alph*)]
+    \item Desenvolver um sistema acessível e de baixo custo para pequenos e médios produtores rurais;
+    \item Implementar funcionalidades para monitoramento em tempo real da produção de leite e da saúde animal;
+    \item Automatizar processos operacionais, como notificações de prenhez e gerenciamento de lotes, reduzindo a dependência de tarefas manuais;
+    \item Fornecer dashboards analíticos com dados de desempenho para apoiar a tomada de decisão;
+    \item Habilitar a exportação de históricos em PDF para facilitar a comercialização de animais;
     \item Desenvolver uma interface responsiva e funcional, otimizada para dispositivos móveis.
-\end{itemize}
-\end{spacing}
+\end{enumerate}
 
 % --- Descrição do Projeto ---
 \section{Descrição do Projeto}
@@ -127,30 +126,29 @@ Desenvolver uma plataforma digital para a gestão integrada de rebanhos bovinos,
 O projeto FazendaPro tem como objetivo desenvolver uma aplicação web para a gestão de rebanhos bovinos leiteiros, voltada especialmente para pequenos e médios produtores. A plataforma oferece uma solução acessível, baseada em tecnologia moderna, para apoiar a coleta e análise de dados sobre genética, saúde, alimentação, reprodução e produção de leite. Com isso, busca-se promover maior controle, rastreabilidade e eficiência na produção, alinhando-se à transformação digital do agronegócio.
 \end{spacing}
 
-\subsection{Problemas a Resolver}
-
-\begin{spacing}{1.5}
-O FazendaPro busca enfrentar os seguintes desafios enfrentados por pequenos e médios produtores de leite:
-
-\begin{itemize}
-\item \textbf{Falta de rastreabilidade}: ausência de registros estruturados sobre o histórico dos animais (nascimento, vacinação, produção etc.).
-\item \textbf{Baixa eficiência na gestão}: controle manual ou informal dificulta decisões baseadas em dados.
-\item \textbf{Alto custo de sistemas existentes}: soluções comerciais são inacessíveis para a realidade de pequenos produtores.
-\item \textbf{Pouco uso de tecnologia no campo}: falta de ferramentas simples e eficazes adaptadas ao ambiente rural.
-\end{itemize}
-\end{spacing}
+\subsubsection{Problemas a Resolver}
+\begin{enumerate}[label=\alph*)]
+    \item \textbf{Falta de rastreabilidade}: ausência de registros estruturados sobre o histórico dos animais (nascimento, vacinação, produção etc.).
+    \item \textbf{Baixa eficiência na gestão}: controle manual ou informal dificulta decisões baseadas em dados.
+    \item \textbf{Falta de acessibilidade às tecnologias disponíveis}: falta de acessibilidade ferramentas simples e eficazes adaptadas ao ambiente rural\cite{uspDemocrata}.
+\end{enumerate}
 
 \subsection{Limitações}
 \begin{spacing}{1.5}
 O projeto FazendaPro apresenta as seguintes limitações, identificadas com base no escopo e nos requisitos definidos:
 
-\begin{itemize}
+\begin{enumerate}[label=\alph*)]
     \item \textbf{Dependência de Conectividade à Internet}: A aplicação web requer conexão estável, o que pode ser um desafio em áreas rurais com acesso limitado à internet, impactando funcionalidades como monitoramento em tempo real e notificações via WhatsApp.
     \item \textbf{Foco Primário na Pecuária Leiteira}: Embora o sistema contemple a gestão geral de rebanhos bovinos, seu foco principal é a pecuária leiteira, limitando a aplicabilidade a outros tipos de pecuária ou atividades agrícolas.
     \item \textbf{Ausência de Funcionalidades Offline}: Não há suporte para operações sem conexão, o que pode dificultar o uso em áreas com conectividade instável.
     \item \textbf{Curva de Aprendizado para Usuários}: Produtores com baixa familiaridade tecnológica podem enfrentar dificuldades na adoção de funcionalidades analíticas.
     \item \textbf{Dependência de Serviços de Terceiros}: A utilização de Heroku, JawsDB e WhatsApp introduz riscos relacionados a custos e disponibilidade.
-\end{itemize}
+    \item \textbf{Escalabilidade Limitada}: O sistema foi projetado inicialmente para pequenos e médios produtores (até 10.000 animais), podendo necessitar re-arquitetura para operações de grande escala.
+    \item \textbf{Custos Operacionais}: Dependência de serviços em nuvem pode gerar custos crescentes conforme o volume de dados e usuários, sem análise detalhada de ROI para diferentes cenários.
+    \item \textbf{Integração WhatsApp}: Limitações da API não-oficial do WhatsApp podem impactar as notificações, com risco de bloqueio ou mudanças nas políticas de uso.
+    \item \textbf{Conformidade Regulatória}: Embora contemple LGPD, pode necessitar adaptações para outras regulamentações internacionais em caso de expansão.
+    \item \textbf{Tolerância a Falhas}: Ausência de redundância geográfica pode impactar a disponibilidade em caso de falhas regionais dos provedores de nuvem.
+\end{enumerate}
 \end{spacing}
 
 % --- Especificação Técnica ---
@@ -161,8 +159,8 @@ O projeto FazendaPro apresenta as seguintes limitações, identificadas com base
 \begin{enumerate}[label=RF0\arabic{*}.]
     \item \textbf{Acessar o Sistema}
     \begin{enumerate}[label=RF01.0\arabic{*}]
-        \item O sistema deve permitir que o usuário faça o login na plataforma com suas credenciais.
-        \item O sistema deve validar as credenciais do usuário e conceder acesso apenas para os usuários que geraram o token.
+        \item O sistema deve permitir que o usuário faça o login na plataforma com suas credenciais, que são fornecidas pelos desenvolvedores do software.
+        \item O sistema deve validar as credenciais do usuário e conceder acesso apenas para os usuários que geraram o token (\textit{JSON Web Token}).
     \end{enumerate}
     \item \textbf{Adicionar um Animal}
     \begin{enumerate}[label=RF02.0\arabic{*}]
@@ -209,6 +207,14 @@ O projeto FazendaPro apresenta as seguintes limitações, identificadas com base
     \begin{enumerate}[label=RF10.0\arabic{*}]
         \item O sistema deve permitir que o usuário faça o logout da plataforma.
     \end{enumerate}
+    \item \textbf{Relatórios Avançados}
+    \begin{enumerate}[label=RF11.0\arabic{*}]
+        \item O sistema deve gerar relatórios de produtividade por animal, lote e período.
+        \item O sistema deve fornecer análises preditivas de produção de leite baseadas em histórico.
+        \item O sistema deve gerar relatórios de eficiência reprodutiva e sanitária do rebanho.
+        \item O sistema deve permitir exportação de relatórios em múltiplos formatos (PDF, Excel, CSV).
+        \item O sistema deve oferecer dashboards interativos com filtros personalizáveis.
+    \end{enumerate}
 \end{enumerate}
 \end{spacing}
 
@@ -240,16 +246,95 @@ O projeto FazendaPro apresenta as seguintes limitações, identificadas com base
     \begin{enumerate}[label=RF05.0\arabic{*}]
         \item O sistema deve fornecer dashboards com informações analíticas sobre os animais, como produção de leite, saúde geral e tendências de desempenho.
     \end{enumerate}
+    \item \textbf{Desempenho}
+    \begin{enumerate}[label=RNF06.0\arabic{*}]
+        \item O sistema deve ter tempo de resposta inferior a 2 segundos para operações básicas (CRUD).
+        \item O sistema deve suportar até 100 usuários simultâneos sem degradação de performance.
+        \item O sistema deve carregar a página inicial em menos de 3 segundos.
+        \item O sistema deve processar relatórios complexos em menos de 10 segundos.
+    \end{enumerate}
+    \item \textbf{Escalabilidade}
+    \begin{enumerate}[label=RNF07.0\arabic{*}]
+        \item O sistema deve suportar até 10.000 animais por fazenda sem perda de performance.
+        \item O sistema deve permitir expansão horizontal através de containers.
+        \item O sistema deve implementar cache distribuído para otimizar consultas frequentes.
+        \item O sistema deve suportar sharding de banco de dados para grandes volumes de dados.
+    \end{enumerate}
+    \item \textbf{Disponibilidade e Tolerância a Falhas}
+    \begin{enumerate}[label=RNF08.0\arabic{*}]
+        \item O sistema deve ter disponibilidade de 99.5\% mensal.
+        \item O sistema deve implementar circuit breakers para serviços externos.
+        \item O sistema deve ter plano de contingência para falhas de serviços terceiros.
+        \item O sistema deve realizar backup automático diário dos dados.
+    \end{enumerate}
+    \item \textbf{Conectividade e Suporte Offline}
+    \begin{enumerate}[label=RNF09.0\arabic{*}]
+        \item O sistema deve funcionar com conexões de internet limitadas (3G).
+        \item O sistema deve implementar cache local para operações básicas offline.
+        \item O sistema deve sincronizar dados automaticamente quando a conexão for restabelecida.
+        \item O sistema deve comprimir dados para reduzir uso de banda.
+    \end{enumerate}
+    \item \textbf{Otimizações Móveis}
+    \begin{enumerate}[label=RNF10.0\arabic{*}]
+        \item O sistema deve implementar lazy loading para imagens e componentes.
+        \item O sistema deve comprimir assets CSS/JS em produção.
+        \item O sistema deve ter interface responsiva para dispositivos móveis.
+        \item O sistema deve implementar Progressive Web App (PWA) para melhor experiência móvel.
+    \end{enumerate}
+    \item \textbf{Conformidade e Privacidade}
+    \begin{enumerate}[label=RNF11.0\arabic{*}]
+        \item O sistema deve estar em conformidade com a LGPD para tratamento de dados.
+        \item O sistema deve implementar anonimização de dados sensíveis em relatórios.
+        \item O sistema deve manter logs de auditoria por no mínimo 5 anos.
+        \item O sistema deve permitir exclusão completa de dados conforme direito ao esquecimento.
+    \end{enumerate}
+        \item \textbf{Conformidade com LGPD}
+    \begin{enumerate}[label=RF12.0\arabic{*}]
+        \item O sistema deve implementar mecanismos de consentimento explícito para coleta e uso de dados sensíveis dos animais.
+        \item O sistema deve permitir que o usuário visualize, edite e exclua dados pessoais conforme direitos da LGPD.
+        \item O sistema deve manter logs de auditoria para todas as operações com dados sensíveis.
+        \item O sistema deve permitir a exportação de dados em formato legível conforme direito de portabilidade.
+    \end{enumerate}
+    \item \textbf{Integração com IoT}
+    \begin{enumerate}[label=RF13.0\arabic{*}]
+        \item O sistema deve permitir integração futura com dispositivos IoT para coleta automática de dados de produção de leite.
+    \end{enumerate}
 \end{enumerate}
 \end{spacing}
 
 \subsection{Diagrama de Casos de Uso}
 \begin{spacing}{1.5}
-O diagrama de casos de uso está apresentado na Figura \ref{fig:cases-of-use}. Nela busca-se explicar um pouca da história do usuário através das principais funcionalidade e ideais do sistema. Nesse exemplo, o usuário acessará o sistems e poderá gerenciar o animal 
-\begin{figure}[ht]
+O diagrama de casos de uso está apresentado na Figura \ref{fig:cases-of-use}. Nela busca-se explicar um pouca da história do usuário através das principais funcionalidade e ideais do sistema. Nesse exemplo, o usuário acessará o sistema e poderá gerenciar ou cadastrar o animal, independente da decisão ele terá que fornecer as informações do animal, como idade, raça, etc.
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{images/cases-of-use-3.drawio.png}
-    \caption{Diagrama de Casos de Uso}
+    \includegraphics[width=1\textwidth]{images/gerenciador-caso-de-uso.drawio.png}
+    \caption{Diagrama de Casos de Uso - Gerenciador do Animal}
+    \label{fig:cases-of-use}
+\end{figure}
+\end{spacing}
+Poderá também fazer o registro do peso do animal já existente, e caso respeite a regra específica, o animal é trocado de lote por um worker.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/movimentacao-caso-de-uso.drawio.png}
+    \caption{Diagrama de Casos de Uso - Movimentação}
+    \label{fig:cases-of-use}
+\end{figure}
+
+ O usuário poderá visualizar o histórico do animal e vendê-lo. A ação de vender implica na exportação de um PDF com as informações e histórico do animal, conforme é mostrado nas figuras 3 e 4.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/venda-caso-de-uso.drawio.png}
+    \caption{Diagrama de Casos de Uso - Venda}
+    \label{fig:cases-of-use}
+\end{figure}
+\end{spacing}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/relatorios-casos-de-uso.drawio.png}
+    \caption{Diagrama de Casos de Uso - Relatórios}
     \label{fig:cases-of-use}
 \end{figure}
 \end{spacing}
@@ -257,29 +342,29 @@ O diagrama de casos de uso está apresentado na Figura \ref{fig:cases-of-use}. N
 \subsection{Diagrama de Classes}
 \begin{spacing}{1.5}
 O diagrama de classes está apresentado na Figura \ref{fig:classes-diagram}. Nele pode-se encontrar a fluxo das classes que será representado a nível de código. Ajuda o desenvolvedor a criar e visualizar as classes com maior facilidade.
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{images/classesDiagram.drawio.png}
+    \includegraphics[width=1\textwidth]{images/classesDiagram-new.drawio.png}
     \caption{Diagrama de Classes}
     \label{fig:classes-diagram}
 \end{figure}
 \end{spacing}
 
-\subsection{Diagrama de Relacionamento}
+\subsection{Modelo Lógico}
 \begin{spacing}{1.5}
-O diagrama de relacionamento está apresentado na Figura \ref{fig:entity-relationship}, e reproduzido abaixo. Com o relacionamento é criado toda a regra de negócio. Refere-se às tabela do banco de dados.
+O modelo lógico está apresentado na Figura \ref{fig:entity-relationship}, e reproduzido abaixo. Com o modelo lógico é criada toda a regra de negócio. Ele se refere às tabelas do banco de dados.
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.6\textwidth]{images/entity.png}
-    \caption{Diagrama de Relacionamento}
-    \label{fig:entity-relationship}
+\centering
+\includegraphics[width=1\textwidth]{images/modelo-logico.drawio-1.png}
+\caption{Modelo Lógico}
+\label{fig:entity-relationship}
 \end{figure}
 \end{spacing}
 
 \subsection{Considerações de Design}
 \subsubsection{Visão Inicial da Arquitetura}
 \begin{spacing}{1.5}
-O projeto adota uma arquitetura modular, equilibrando a simplicidade de um monolito com a flexibilidade de serviços. O NestJS facilita a organização em módulos, permitindo escalabilidade futura para extração de serviços, como notificações. Essa escolha suporta a gestão eficiente de rebanhos, com foco na pecuária leiteira, mantendo a robustez para expansão.
+O projeto adota uma arquitetura modular, equilibrando a simplicidade de um monolito com a flexibilidade de serviços. O NestJS facilita a organização em módulos, permitindo escalabilidade futura para extração de serviços, como notificações. Essa escolha, juntamento com Go, suporta a gestão eficiente de rebanhos, com foco na pecuária leiteira, mantendo a robustez para expansão.
 \end{spacing}
 
 \subsubsection{Padrões de Arquitetura}
@@ -326,7 +411,7 @@ fazendapro-api/
 
 \subsubsection{Modelo C4 — Diagrama de Contexto, Containers e Componentes}
 \begin{spacing}{1.5}
-A Figura \ref{fig:C4-Contexto} apresenta o Diagrama de Contexto, ilustrando as interações do sistema FazendaPro com atores externos, como o usuário (produtor) e serviços de notificações (WhatsApp).
+Na Figura \ref{fig:C4-Contexto} é apresentado o Diagrama de Contexto, ilustrando as interações do sistema FazendaPro com atores externos, como o usuário (produtor) e serviços de notificações (WhatsApp).
 
 \begin{figure}[H]
     \centering
@@ -337,7 +422,7 @@ A Figura \ref{fig:C4-Contexto} apresenta o Diagrama de Contexto, ilustrando as i
 
 \vspace{0.5cm}
 
-A Figura \ref{fig:C4-Containers} detalha o Diagrama de Containers, descrevendo os componentes de software, como frontend, backend, banco de dados, cache, monitoramento e pipeline de deploy, com ênfase na interação com a gestão de rebanhos e produção leiteira.
+Na Figura \ref{fig:C4-Containers} é detalhado o Diagrama de Containers, descrevendo os componentes de software, como frontend, backend, banco de dados, cache, monitoramento e pipeline de deploy, com ênfase na interação com a gestão de rebanhos e produção leiteira.
 
 \begin{figure}[H]
     \centering
@@ -348,7 +433,7 @@ A Figura \ref{fig:C4-Containers} detalha o Diagrama de Containers, descrevendo o
 
 \vspace{0.5cm}
 
-A Figura \ref{fig:C4-Componentes} apresenta o Diagrama de Componentes, detalhando os módulos do API Server, incluindo autenticação, gerenciamento de animais, vacinas, lotes, prenhez, vendas e dashboards analíticos, com foco na rastreabilidade e produção leiteira.
+Na Figura \ref{fig:C4-Componentes} é apresentado o Diagrama de Componentes, detalhando os módulos do API Server, incluindo autenticação, gerenciamento de animais, vacinas, lotes, prenhez, vendas e dashboards analíticos, com foco na rastreabilidade e produção leiteira.
 
 \begin{figure}[H]
     \centering
@@ -360,12 +445,50 @@ A Figura \ref{fig:C4-Componentes} apresenta o Diagrama de Componentes, detalhand
 
 \subsubsection{Aplicação Web}
 \begin{spacing}{1.5}
-A aplicação web será desenvolvida com React, enquanto o API Server, hospedado em container no Heroku, utilizará NestJS, com Redis para caching em memória, garantindo desempenho na gestão de dados pecuários.
+A aplicação web será desenvolvida com React, enquanto o API Server, hospedado em container no Heroku, utilizará NestJS, Go com Redis (SSPL - Server Side Public License) para caching em memória, garantindo desempenho na gestão de dados pecuários.
 \end{spacing}
 
 \subsubsection{Armazenamento Persistente de Dados}
 \begin{spacing}{1.5}
-O armazenamento utiliza MySQL (JawsDB). A aplicação web realiza requisições HTTP (REST) ao API Server, que consulta o JawsDB via conexão SQL e utiliza Redis para caching, otimizando o acesso a dados de rebanhos e produção leiteira.
+O armazenamento utiliza JawsDB. A aplicação web realiza requisições HTTP (REST) ao API Server, que consulta o JawsDB via conexão SQL e utiliza Redis para caching, otimizando o acesso a dados de rebanhos e produção leiteira.
+\end{spacing}
+
+\subsubsection{Arquitetura de Alta Disponibilidade e Escalabilidade}
+\begin{spacing}{1.5}
+\textbf{Estratégias de Escalabilidade:}
+\begin{enumerate}[label=\alph*)]
+\item \textbf{Escalabilidade Horizontal}: Arquitetura baseada em containers permite adicionar instâncias conforme demanda.
+\item \textbf{Load Balancing}: Distribuição de carga automática via Heroku Load Balancer.
+\item \textbf{Database Sharding}: Particionamento por fazenda para suportar até 10.000 animais por instância.
+\item \textbf{Cache Distribuído}: Redis Cluster para cache compartilhado entre instâncias.
+\item \textbf{CDN}: Cloudflare para entrega otimizada de assets estáticos.
+\end{enumerate}
+
+\textbf{Tolerância a Falhas:}
+\begin{enumerate}[label=\alph*)]
+\item \textbf{Circuit Breakers}: Implementação de circuit breakers para serviços externos (WhatsApp, JawsDB).
+\item \textbf{Retry Logic}: Tentativas automáticas com backoff exponencial para falhas temporárias.
+\item \textbf{Health Checks}: Monitoramento contínuo de saúde dos serviços com alertas automáticos.
+\item \textbf{Graceful Degradation}: Funcionalidades essenciais continuam operando mesmo com falha de serviços secundários.
+\item \textbf{Database Replication}: Réplicas de leitura para distribuir carga e garantir disponibilidade.
+\end{enumerate}
+
+\textbf{Plano de Contingência:}
+\begin{enumerate}[label=\alph*)]
+\item \textbf{Multi-Region Backup}: Backup automático em múltiplas regiões geográficas.
+\item \textbf{Disaster Recovery}: RTO de 4 horas e RPO de 1 hora para restauração completa.
+\item \textbf{Alternate Providers}: Configuração pré-estabelecida para migração rápida para AWS/GCP.
+\item \textbf{Offline Mode}: Cache local para operações críticas durante indisponibilidade da internet.
+\end{enumerate}
+
+\textbf{Monitoramento e Observabilidade:}
+\begin{enumerate}[label=\alph*)]
+\item \textbf{Métricas de Performance}: Tempo de resposta, throughput, taxa de erro.
+\item \textbf{Alertas Proativos}: Notificação automática quando métricas excedem thresholds.
+\item \textbf{Distributed Tracing}: Rastreamento de requisições através de múltiplos serviços.
+\item \textbf{Business Metrics}: Monitoramento de KPIs específicos do negócio (animais cadastrados, relatórios gerados).
+\item \textbf{Capacity Planning}: Análise preditiva para planejamento de capacidade baseado em tendências de uso.
+\end{enumerate}
 \end{spacing}
 
 \subsection{Stack Tecnológica}
@@ -373,8 +496,9 @@ O armazenamento utiliza MySQL (JawsDB). A aplicação web realiza requisições 
 \subsubsection{Linguagens de Programação}
 As linguagens Go, TypeScript e JavaScript foram escolhidas para serem padrões no projeto por sua eficiência, tipagem estática e adequação ao desenvolvimento web.
 
+
 \subsubsection{Frameworks e Bibliotecas}
-\begin{itemize}
+\begin{enumerate}[label=\alph*)]
 \item \textbf{React} – Biblioteca JavaScript para construção de interfaces de usuário.
 \item \textbf{Nest.js} – Framework backend para Node.js com foco em arquitetura escalável.
 \item \textbf{TypeORM} – ORM que facilita a manipulação de bancos de dados com TypeScript.
@@ -392,47 +516,160 @@ As linguagens Go, TypeScript e JavaScript foram escolhidas para serem padrões n
 \item \textbf{Jest} – Framework de testes para JavaScript/TypeScript.
 \item \textbf{Cypress} – Ferramenta de testes end-to-end para aplicações web.
 \item \textbf{Tailwind CSS} – Framework utilitário para estilização com classes CSS pré-definidas.
-\end{itemize}
+\end{enumerate}
+
+
 
 \subsubsection{Ferramentas de Desenvolvimento e Gestão de Projeto}
-\begin{itemize}
+\begin{enumerate}[label=\alph*)]
 \item \textbf{Docker} – Plataforma de conteinerização para empacotar e executar aplicações.
 \item \textbf{MySQL} – Sistema de gerenciamento de banco de dados relacional.
 \item \textbf{Docker Compose} – Ferramenta para definir e executar múltiplos containers Docker.
 \item \textbf{Figma} – Ferramenta colaborativa de design de interfaces e prototipação.
 \item \textbf{GitHub Projects} – Ferramenta de gerenciamento de tarefas integrada ao GitHub.
-\item \textbf{Heroku} – Plataforma em nuvem para deploy rápido de aplicações.
+\item \textbf{Heroku} – Plataforma em nuvem para deploy rápido de aplicações. Foi escolhida pela precificação de estudante.
 \item \textbf{JawsDB} – Serviço de banco de dados MySQL baseado em nuvem, utilizado com Heroku.
 \item \textbf{Redis} – Banco de dados em memória usado para cache e filas de mensagens.
 \item \textbf{New Relic} – Plataforma de observabilidade e monitoramento de performance de apps.
 \item \textbf{Sentry} – Ferramenta para monitoramento de erros e exceções em tempo real.
 \item \textbf{Mermaid} – Linguagem de marcação para criação de diagramas em texto (usada com Markdown).
-\end{itemize}
+\end{enumerate}
+
+\subsubsection{Justificativa da Stack Tecnológica}
+\begin{spacing}{1.5}
+A escolha das tecnologias foi baseada em critérios de performance, escalabilidade e custo-benefício:
+
+\begin{enumerate}[label=\alph*)]
+\item \textbf{Go}: Escolhido para serviços de alta performance devido à baixa latência (sub-milissegundo) e eficiência em processamento concorrente, essencial para lidar com até 10.000 animais.
+\item \textbf{React + TypeScript}: Garante desenvolvimento ágil com tipagem estática, reduzindo bugs em produção e facilitando manutenção.
+\item \textbf{NestJS}: Arquitetura modular que facilita escalabilidade horizontal e manutenção de código.
+\item \textbf{Redis}: Cache em memória com latência de sub-milissegundo, otimizando consultas frequentes de dashboards.
+\end{enumerate}
+\end{spacing}
+
+\subsubsection{Análise de Custos e Alternativas}
+\begin{spacing}{1.5}
+\textbf{Custos Estimados (mensal):}
+\begin{enumerate}[label=\alph*)]
+\item \textbf{Heroku}: \$7/mês (Hobby Dyno) + \$9/mês (Redis) = \$16/mês
+\item \textbf{JawsDB}: \$9.99/mês (10GB MySQL)
+\item \textbf{WhatsApp Business API}: \$0.005 por mensagem (estimativa 1000 mensagens/mês = \$5)
+\item \textbf{Total estimado}: \$30.99/mês para até 100 usuários
+\end{enumerate}
+
+\textbf{Alternativas consideradas:}
+\begin{enumerate}[label=\alph*)]
+\item \textbf{AWS}: Maior complexidade, custo inicial similar, melhor escalabilidade
+\item \textbf{DigitalOcean}: 50\% menor custo, maior complexidade de setup
+\item \textbf{PostgreSQL local}: Menor custo operacional, maior complexidade de manutenção
+\end{enumerate}
+
+\textbf{Plano de Contingência:}
+\begin{enumerate}[label=\alph*)]
+\item Migração para AWS em caso de limitações do Heroku
+\item Backup diário automático para múltiplas regiões
+\item API de notificação alternativa (SMS/Email) em caso de problemas com WhatsApp
+\end{enumerate}
+\end{spacing}
+
+\subsubsection{Integração com WhatsApp}
+\begin{spacing}{1.5}
+\textbf{Implementação técnica:}
+\begin{enumerate}[label=\alph*)]
+\item Utilização da biblioteca \texttt{whatsapp-web.js} para automação
+\item Rate limiting de 20 mensagens por minuto conforme limitações da plataforma
+\item Fallback para email em caso de falha na entrega via WhatsApp
+\item Queue system com Redis para gerenciar envio de notificações
+\end{enumerate}
+
+\textbf{Limitações e riscos:}
+\begin{enumerate}[label=\alph*)]
+\item API não-oficial sujeita a bloqueios
+\item Necessidade de QR Code scan periódico para manutenção da sessão
+\item Limite de 256 conversas simultâneas
+\item Política de uso do WhatsApp pode mudar
+\end{enumerate}
+\end{spacing}
 
 \subsection{Considerações de Segurança}
+
+\subsubsection{Conformidade com LGPD}
+\begin{spacing}{1.5}
+\begin{enumerate}[label=\alph*)]
+    \item \textbf{Consentimento}: Implementação de mecanismo de opt-in explícito para coleta de dados sensíveis dos animais.
+    \item \textbf{Direitos do titular}: Portal de autoatendimento para visualização, correção e exclusão de dados pessoais.
+    \item \textbf{Minimização de dados}: Coleta apenas de dados estritamente necessários para a finalidade declarada.
+    \item \textbf{Portabilidade}: Exportação de dados em formato estruturado (JSON/CSV) para facilitar migração.
+    \item \textbf{Anonimização}: Técnicas de pseudonimização para dados em relatórios e analytics.
+    \item \textbf{DPO}: Designação de Data Protection Officer para gestão de conformidade.
+\end{enumerate}
+\end{spacing}
+
 \subsubsection{Autenticação e Autorização}
 \begin{spacing}{1.5}
-\begin{itemize}
-    \item \textbf{Credenciais expostas}: Senhas serão armazenadas com hash via Bcrypt.
-    \item \textbf{Ataques de força bruta}: Limite de tentativas de login com @nestjs/throttler.
-\end{itemize}
+\begin{enumerate}[label=\alph*)]
+    \item \textbf{Credenciais expostas}: Senhas armazenadas com hash Bcrypt (custo 12) e salt único.
+    \item \textbf{Ataques de força bruta}: Rate limiting progressivo com @nestjs/throttler (3 tentativas/min).
+    \item \textbf{JWT Security}: Tokens com expiração de 15 minutos, refresh tokens com rotação.
+    \item \textbf{Multi-factor Authentication}: Implementação opcional via TOTP para usuários admin.
+    \item \textbf{Session Management}: Invalidação automática de sessões inativas após 30 minutos.
+\end{enumerate}
 \end{spacing}
 
-\subsubsection{Exposição de Dados Sensíveis}
+\subsubsection{Criptografia e Proteção de Dados}
 \begin{spacing}{1.5}
-\begin{itemize}
-    \item \textbf{Vazamento em respostas da API}: Uso de DTOs para retornar apenas dados necessários.
-    \item \textbf{CORS}: Configurações para evitar acesso não autorizado.
-    \item \textbf{Logs}: Comunicação criptografada via HTTPS no Heroku.
-\end{itemize}
+\begin{enumerate}[label=\alph*)]
+    \item \textbf{Dados em repouso}: Criptografia AES-256 para campos sensíveis no banco de dados.
+    \item \textbf{Chaves de criptografia}: Gerenciamento via HSM ou AWS KMS para rotação automática.
+    \item \textbf{Backup encryption}: Backups criptografados com chaves separadas do ambiente produtivo.
+    \item \textbf{API Keys}: Armazenamento seguro de credenciais via variáveis de ambiente criptografadas.
+\end{enumerate}
 \end{spacing}
 
-\subsubsection{Injeção de Código}
+\subsubsection{Proteção contra Vulnerabilidades Web}
 \begin{spacing}{1.5}
-\begin{itemize}
-    \item \textbf{SQL Injection}: Uso de TypeORM para evitar queries brutas.
-    \item \textbf{XSS}: Implementação de Content Security Policy (CSP) no frontend.
-\end{itemize}
+\begin{enumerate}[label=\alph*)]
+    \item \textbf{SQL Injection}: Uso exclusivo de ORM com prepared statements, validação de entrada.
+    \item \textbf{XSS}: Content Security Policy (CSP) rigoroso, sanitização de dados de entrada.
+    \item \textbf{CSRF}: Tokens CSRF únicos por sessão, validação de origem (SameSite cookies).
+    \item \textbf{Clickjacking}: Headers X-Frame-Options e CSP frame-ancestors.
+    \item \textbf{SSRF}: Whitelist de URLs permitidas para integrações externas.
+    \item \textbf{Input Validation}: Validação rigorosa com Yup/Joi em todas as entradas.
+\end{enumerate}
+\end{spacing}
+
+\subsubsection{Logs de Auditoria e Monitoramento}
+\begin{spacing}{1.5}
+\begin{enumerate}[label=\alph*)]
+    \item \textbf{Audit Trail}: Log completo de todas as operações com dados sensíveis (CRUD de animais).
+    \item \textbf{Security Events}: Detecção e alerta de tentativas de acesso não autorizado.
+    \item \textbf{Compliance Logs}: Armazenamento de logs por 5 anos conforme requisitos legais.
+    \item \textbf{Log Integrity}: Assinatura digital de logs para prevenir adulteração.
+    \item \textbf{SIEM Integration}: Integração com ferramentas de monitoramento (Sentry, New Relic).
+    \item \textbf{Alertas automáticos}: Notificação para administradores em caso de atividades suspeitas.
+\end{enumerate}
+\end{spacing}
+
+\subsubsection{Testes de Segurança}
+\begin{spacing}{1.5}
+\begin{enumerate}[label=\alph*)]
+    \item \textbf{Penetration Testing}: Testes trimestrais por empresa especializada.
+    \item \textbf{Vulnerability Scanning}: Varredura automatizada semanal com ferramentas como OWASP ZAP.
+    \item \textbf{Dependency Scanning}: Verificação automática de vulnerabilidades em dependências (npm audit, Snyk).
+    \item \textbf{Static Analysis}: Análise estática de código com SonarQube para identificar vulnerabilidades.
+    \item \textbf{DAST}: Dynamic Application Security Testing em ambiente de staging.
+\end{enumerate}
+\end{spacing}
+
+\subsubsection{Gestão de Incidentes de Segurança}
+\begin{spacing}{1.5}
+\begin{enumerate}[label=\alph*)]
+    \item \textbf{Plano de Resposta}: Procedimento documentado para resposta a incidentes de segurança.
+    \item \textbf{Notificação ANPD}: Processo para notificação à autoridade em até 72h conforme LGPD.
+    \item \textbf{Comunicação}: Templates para comunicação com usuários afetados em caso de vazamento.
+    \item \textbf{Forensics}: Ferramentas e procedimentos para análise forense de incidentes.
+    \item \textbf{Business Continuity}: Plano de continuidade de negócios em caso de comprometimento.
+\end{enumerate}
 \end{spacing}
 
 \subsection{Gitflow e Branches}
@@ -440,28 +677,20 @@ As linguagens Go, TypeScript e JavaScript foram escolhidas para serem padrões n
 O projeto utiliza seis branches principais para ambientes de stage e produção, cobrindo serviços, backend e frontend:
 
 \textbf{Stage:}
-\begin{itemize}
+\begin{enumerate}[label=\alph*)]
     \item \texttt{back/develop} - backend.
     \item \texttt{front/develop} - frontend.
     \item \texttt{service/develop} - serviços.
-\end{itemize}
+\end{enumerate}
 
 \textbf{Produção:}
-\begin{itemize}
+\begin{enumerate}[label=\alph*)]
     \item \texttt{back/release} - backend.
     \item \texttt{front/release} - frontend.
     \item \texttt{service/release} - serviços.
-\end{itemize}
+\end{enumerate}
 
-O fluxo de desenvolvimento envolve criar branches a partir da produção para novas funcionalidades, abrir Pull Requests para a release, testar em stage e, se aprovado, realizar o merge na produção. O fluxo é representado no Apêndice B.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.6\textwidth]{images/gitflow.png}
-    \caption{Modelo C4}
-    \label{fig:C4}
-\end{figure}
-\end{spacing}
+O fluxo de desenvolvimento envolve criar branches a partir da produção para novas funcionalidades, abrir Pull Requests para a release, testar em stage e, se aprovado, realizar o merge na produção.
 
 % --- Próximos Passos ---
 \section{Próximos Passos}
@@ -469,10 +698,11 @@ O fluxo de desenvolvimento envolve criar branches a partir da produção para no
 Os próximos passos incluem a implementação das funcionalidades descritas, com foco na construção do backend e frontend, testes de integração e validação em ambiente de stage. O cronograma será detalhado em documentos complementares, priorizando a entrega das funcionalidades principais até o final do primeiro semestre de 2025.
 \end{spacing}
 
-% --- Referências ---
-\section{Referências}
-\begin{spacing}{1.5}
-\begin{itemize}
+\appendix
+\section{Apêndice} % Or 'Links Úteis', 'Recursos Online', etc.
+
+\begin{enumerate}
+
     \item GO. \textit{Go Programming Language}. Disponível em: \url{https://go.dev}. Acesso em: 17 jun. 2025.
     \item TYPESCRIPT. \textit{The TypeScript Handbook}. Disponível em: \url{https://www.typescriptlang.org}. Acesso em: 17 jun. 2025.
     \item JAVASCRIPT. \textit{MDN Web Docs}. Disponível em: \url{https://developer.mozilla.org/pt-BR/docs/Web/JavaScript}. Acesso em: 17 jun. 2025.
@@ -490,6 +720,8 @@ Os próximos passos incluem a implementação das funcionalidades descritas, com
     \item REACT ICONS. \textit{React Icons Documentation}. Disponível em: \url{https://react-icons.github.io/react-icons/}. Acesso em: 17 jun. 2025.
     \item YUP. \textit{Yup Documentation}. Disponível em: \url{https://github.com/jquense/yup}. Acesso em: 17 jun. 2025.
     \item JEST. \textit{Jest Documentation}. Disponível em: \url{https://jestjs.io}. Acesso em: 17 jun. 2025.
+    \item SSPL. \textit{Server Side Public License
+}. Disponível em: \url{https://www.mongodb.com/legal/licensing/server-side-public-license}. Acesso em: 3 jun. 2025.
     \item CYPRESS. \textit{Cypress Documentation}. Disponível em: \url{https://www.cypress.io}. Acesso em: 17 jun. 2025.
     \item TAILWIND CSS. \textit{Tailwind CSS Documentation}. Disponível em: \url{https://tailwindcss.com}. Acesso em: 17 jun. 2025.
     \item DOCKER. \textit{Docker Documentation}. Disponível em: \url{https://www.docker.com}. Acesso em: 17 jun. 2025.
@@ -504,10 +736,16 @@ Os próximos passos incluem a implementação das funcionalidades descritas, com
     \item SENTRY. \textit{Sentry Documentation}. Disponível em: \url{https://sentry.io}. Acesso em: 17 jun. 2025.
     \item MERMAID. \textit{Mermaid Documentation}. Disponível em: \url{https://mermaid.js.org}. Acesso em: 17 jun. 2025.
     \item C4 MODEL. \textit{C4 Model Documentation}. Disponível em: \url{https://c4model.com}. Acesso em: 17 jun. 2025.
-\end{itemize}
-\end{spacing}
+    \item NESTJS THROTTLER. \textit{NestJS Throttler Documentation}. Disponível em: \url{https://docs.nestjs.com/techniques/throttler}. Acesso em: 17 jun. 2025.
+    \item WHATSAPP WEB JS. \textit{WhatsApp Web.js Documentation}. Disponível em: \url{https://wwebjs.dev}. Acesso em: 17 jun. 2025.
+    \item OWASP ZAP. \textit{OWASP Zed Attack Proxy}. Disponível em: \url{https://www.zaproxy.org}. Acesso em: 17 jun. 2025.
+    \item SONARQUBE. \textit{SonarQube Documentation}. Disponível em: \url{https://www.sonarqube.org}. Acesso em: 17 jun. 2025.
+    \item SNYK. \textit{Snyk Developer Security Platform}. Disponível em: \url{https://snyk.io}. Acesso em: 17 jun. 2025.
+    \item CLOUDFLARE. \textit{Cloudflare CDN Documentation}. Disponível em: \url{https://www.cloudflare.com}. Acesso em: 17 jun. 2025.
 
-\section{Bibliografia}
+\end{enumerate}
+
+
 \begin{thebibliography}{99}
 
 \bibitem{agro20}
@@ -524,6 +762,15 @@ Agrolink. \textit{Tecnologia na pecuária custa chegar ao produtor}. Disponível
 
 \bibitem{4milhao}
 Agrolink \textit{Agronegócio Brasileiro: entre narrativas e números}. Disponível em: \url{https://www.agrolink.com.br/noticias/setor-leiteiro-emprega-cerca-de-4-milhoes-de-pessoas_465448.html}
+
+\bibitem{uspDemocrata}
+Agência FAPESP \text{Existem muitas tecnologias para o campo, mas falta democratizar o acesso, apontam especialistas}. Disponível em: \url{https://agencia.fapesp.br/existem-muitas-tecnologias-para-o-campo-mas-falta-democratizar-o-acesso-apontam-especialistas/44714}
+
+\bibitem{lgpd2018}
+BRASIL. Lei nº 13.709, de 14 de agosto de 2018. \textit{Lei Geral de Proteção de Dados Pessoais (LGPD)}. Brasília: Presidência da República, 2018. Disponível em: \url{http://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm}. Acesso em: 24 jun. 2025.
+
+\bibitem{anpd2024}
+ANPD - Autoridade Nacional de Proteção de Dados. \textit{Guia de boas práticas para tratamento de dados pessoais}. Brasília: ANPD, 2024. Disponível em: \url{https://www.gov.br/anpd/pt-br}. Acesso em: 24 jun. 2025.
 
 \end{thebibliography}
 
