@@ -23,3 +23,12 @@ go.work.sum
 
 # env file
 .env
+.env.development
+.env.production
+env.development
+env.example
+
+# Cloud SQL Proxy version directory
+cloud-sql-proxy --version/
+
+fazendapro-api
