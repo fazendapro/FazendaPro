@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: fazendapro_postgres
+    environment:
+      POSTGRES_DB: fazendapro
+      POSTGRES_USER: fazendapro_user
+      POSTGRES_PASSWORD: fazendapro_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - fazendapro_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fazendapro_user -d fazendapro"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fazendapro_app
+    environment:
+      - PORT=8080
+      - JWT_SECRET=dev-secret-key-change-in-production
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=fazendapro_user
+      - DB_PASSWORD=fazendapro_password
+      - DB_NAME=fazendapro
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - fazendapro_network
+    volumes:
+      - ./migrations:/app/migrations
+    command: ["./main", "-port=8080"]
+
+  migration:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fazendapro_migration
+    environment:
+      - ENV=development
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=fazendapro_user
+      - DB_PASSWORD=fazendapro_password
+      - DB_NAME=fazendapro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - fazendapro_network
+    volumes:
+      - ./migrations:/app/migrations
+    command: ["./main", "migrate"]
+    profiles:
+      - migrate
+
+volumes:
+  postgres_data:
+
+networks:
+  fazendapro_network:
+    driver: bridge 

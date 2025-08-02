@@ -13,13 +13,14 @@ type Database struct {
 }
 
 func NewDatabase(cfg *config.Config) (*Database, error) {
+	sslMode := "require"
+	if cfg.DBHost == "localhost" || cfg.DBHost == "postgres" {
+		sslMode = "disable"
+	}
+
 	dsn := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=America/Sao_Paulo",
-		cfg.DBHost,
-		cfg.User,
-		cfg.Password,
-		cfg.Name,
-		cfg.DBPort,
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
+		cfg.DBHost, cfg.User, cfg.Password, cfg.Name, cfg.DBPort, sslMode,
 	)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
