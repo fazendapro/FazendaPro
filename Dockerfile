@@ -14,8 +14,8 @@ COPY . .
 
 RUN npm run build
 
-COPY wait-for-mysql.sh /app/wait-for-mysql.sh
-RUN chmod +x /app/wait-for-mysql.sh
+COPY wait-for-postgres.sh /app/wait-for-postgres.sh
+RUN chmod +x /app/wait-for-postgres.sh
 
 EXPOSE 3000 5555
 
