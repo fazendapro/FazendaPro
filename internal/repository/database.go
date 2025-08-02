@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/fazendapro/FazendaPro-api/config"
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -14,15 +14,15 @@ type Database struct {
 
 func NewDatabase(cfg *config.Config) (*Database, error) {
 	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=America/Sao_Paulo",
+		cfg.DBHost,
 		cfg.User,
 		cfg.Password,
-		cfg.DBHost,
-		cfg.DBPort,
 		cfg.Name,
+		cfg.DBPort,
 	)
 
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("erro ao conectar ao banco: %w", err)
 	}
