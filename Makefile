@@ -48,11 +48,17 @@ dev-setup: ## Configura ambiente de desenvolvimento
 	fi
 	@chmod +x scripts/*.sh
 
-dev-start: dev-setup ## Inicia ambiente de desenvolvimento completo
+dev: dev-setup ## Inicia ambiente de desenvolvimento completo
 	@echo "Iniciando ambiente de desenvolvimento..."
 	./scripts/dev.sh start
+	ENV=development go run main.go
 
-dev-quick: ## Inicia apenas a aplicação (banco já deve estar rodando)
+prod: ## Inicia aplicação em produção
+	@echo "Iniciando aplicação em produção..."
+	cp env.production .env
+	ENV=production go run main.go
+
+quick: ## Inicia apenas a aplicação (banco já deve estar rodando)
 	@echo "Iniciando aplicação..."
 	go run main.go
 

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/fazendapro/FazendaPro-api/config"
 	"gorm.io/driver/postgres"
@@ -13,15 +14,31 @@ type Database struct {
 }
 
 func NewDatabase(cfg *config.Config) (*Database, error) {
-	sslMode := "require"
-	if cfg.DBHost == "localhost" || cfg.DBHost == "postgres" {
+	sslMode := "disable"
+
+	env := os.Getenv("ENV")
+	if env == "production" {
+		if os.Getenv("DB_SSL_MODE") != "" {
+			sslMode = os.Getenv("DB_SSL_MODE")
+		} else {
+			sslMode = "disable"
+		}
+	} else {
 		sslMode = "disable"
 	}
 
-	dsn := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
-		cfg.DBHost, cfg.User, cfg.Password, cfg.Name, cfg.DBPort, sslMode,
-	)
+	var dsn string
+	if env == "production" {
+		dsn = fmt.Sprintf(
+			"host=%s user=%s password=%s port=%s sslmode=%s",
+			cfg.DBHost, cfg.User, cfg.Password, cfg.DBPort, sslMode,
+		)
+	} else {
+		dsn = fmt.Sprintf(
+			"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
+			cfg.DBHost, cfg.User, cfg.Password, cfg.Name, cfg.DBPort, sslMode,
+		)
+	}
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {

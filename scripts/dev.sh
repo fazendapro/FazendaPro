@@ -60,6 +60,23 @@ case $COMMAND in
         print_message "Aplicação disponível em: http://localhost:8080"
         print_message "Banco de dados em: localhost:5432"
         
+        # Configurar ambiente de desenvolvimento (usando localhost)
+        cat > .env << EOF
+# Configurações para Desenvolvimento
+ENV=development
+
+# Configurações da Aplicação
+PORT=8080
+JWT_SECRET=dev-secret-key-change-in-production
+
+# Configurações do Banco de Dados (Local)
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=fazendapro_user
+DB_PASSWORD=fazendapro_password
+DB_NAME=fazendapro
+EOF
+        
         go run main.go
         ;;
     "stop")
