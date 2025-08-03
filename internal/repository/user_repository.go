@@ -38,7 +38,7 @@ func (r *UserRepository) CreateWithPerson(user *models.User, personData *models.
 		return fmt.Errorf("error creating person: %w", err)
 	}
 
-	user.PersonID = personData.ID
+	user.PersonID = &personData.ID
 
 	if err := tx.Create(user).Error; err != nil {
 		tx.Rollback()

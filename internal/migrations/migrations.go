@@ -36,6 +36,7 @@ func RunMigrations(db *gorm.DB) error {
 		{"009_update_users_table", updateUsersTable},
 		{"011_update_users_with_person", updateUsersWithPerson},
 		{"010_create_expenses_table", createExpensesTable},
+		{"012_add_company_name", addCompanyName},
 	}
 
 	for _, migration := range migrations {
@@ -115,6 +116,10 @@ func updateUsersWithPerson(db *gorm.DB) error {
 	return db.AutoMigrate(&models.User{})
 }
 
+func addCompanyName(db *gorm.DB) error {
+	return db.AutoMigrate(&models.Company{})
+}
+
 func RollbackMigrations(db *gorm.DB, steps int) error {
 	var migrations []Migration
 	if err := db.Order("id desc").Limit(steps).Find(&migrations).Error; err != nil {
@@ -174,6 +179,10 @@ func RollbackMigrations(db *gorm.DB, steps int) error {
 			}
 			if err := db.AutoMigrate(&models.User{}); err != nil {
 				return fmt.Errorf("error recreating users table: %w", err)
+			}
+		case "012_add_company_name":
+			if err := db.Migrator().DropColumn(&models.Company{}, "company_name"); err != nil {
+				return fmt.Errorf("error reverting migration %s: %w", migration.Name, err)
 			}
 		}
 
