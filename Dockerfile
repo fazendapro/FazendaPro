@@ -11,7 +11,7 @@ RUN apk add --no-cache gettext
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-COPY nginx.conf.template /etc/nginx/nginx.conf.template
+COPY nginx.conf /etc/nginx/nginx.conf.template
 COPY start-nginx.sh /start-nginx.sh
 
 RUN chmod +x /start-nginx.sh
