@@ -27,6 +27,12 @@ steps:
       - '512Mi'
       - '--cpu'
       - '1'
+      - '--timeout'
+      - '300'
+      - '--concurrency'
+      - '80'
+      - '--max-instances'
+      - '10'
 
 # Substitui a imagem com a tag 'latest' também
 images:

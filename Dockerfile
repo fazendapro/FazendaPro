@@ -16,7 +16,12 @@ COPY start-nginx.sh /start-nginx.sh
 
 RUN chmod +x /start-nginx.sh
 
+# Garante que o diretório de logs existe
+RUN mkdir -p /var/log/nginx
+
+# Define a porta padrão
 ENV PORT 8080
 EXPOSE 8080
 
+# Usa o script de inicialização
 CMD ["/start-nginx.sh"]
