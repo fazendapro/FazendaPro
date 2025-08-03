@@ -8,6 +8,7 @@ type Farm struct {
 	ID        uint      `gorm:"primaryKey"`
 	CompanyID uint      `gorm:"not null"`
 	Company   Company   `gorm:"foreignKey:CompanyID"`
+	Logo      string    // URL or path to farm logo
 	Users     []User    `gorm:"foreignKey:FarmID"`
 	Animals   []Animal  `gorm:"foreignKey:FarmID"`
 	Expenses  []Expense `gorm:"foreignKey:FarmID"`

@@ -37,6 +37,8 @@ func RunMigrations(db *gorm.DB) error {
 		{"011_update_users_with_person", updateUsersWithPerson},
 		{"010_create_expenses_table", createExpensesTable},
 		{"012_add_company_name", addCompanyName},
+		{"013_add_farm_logo", addFarmLogo},
+		{"014_add_animal_photo", addAnimalPhoto},
 	}
 
 	for _, migration := range migrations {
@@ -120,6 +122,14 @@ func addCompanyName(db *gorm.DB) error {
 	return db.AutoMigrate(&models.Company{})
 }
 
+func addFarmLogo(db *gorm.DB) error {
+	return db.AutoMigrate(&models.Farm{})
+}
+
+func addAnimalPhoto(db *gorm.DB) error {
+	return db.AutoMigrate(&models.Animal{})
+}
+
 func RollbackMigrations(db *gorm.DB, steps int) error {
 	var migrations []Migration
 	if err := db.Order("id desc").Limit(steps).Find(&migrations).Error; err != nil {
@@ -182,6 +192,14 @@ func RollbackMigrations(db *gorm.DB, steps int) error {
 			}
 		case "012_add_company_name":
 			if err := db.Migrator().DropColumn(&models.Company{}, "company_name"); err != nil {
+				return fmt.Errorf("error reverting migration %s: %w", migration.Name, err)
+			}
+		case "013_add_farm_logo":
+			if err := db.Migrator().DropColumn(&models.Farm{}, "logo"); err != nil {
+				return fmt.Errorf("error reverting migration %s: %w", migration.Name, err)
+			}
+		case "014_add_animal_photo":
+			if err := db.Migrator().DropColumn(&models.Animal{}, "photo"); err != nil {
 				return fmt.Errorf("error reverting migration %s: %w", migration.Name, err)
 			}
 		}

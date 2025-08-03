@@ -14,6 +14,7 @@ type Animal struct {
 	Breed         string  `gorm:"not null"`
 	Type          string  `gorm:"not null"`
 	Age           int     `gorm:"not null"`
+	Photo         string  // URL or path to animal photo
 	FatherID      *uint   // FK para Animal (pai)
 	Father        *Animal `gorm:"foreignKey:FatherID"`
 	MotherID      *uint   // FK para Animal (mãe)
