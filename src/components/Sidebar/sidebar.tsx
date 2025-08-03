@@ -12,7 +12,8 @@ export const Sidebar = () => {
   const navigate = useNavigate();
   const screens = useBreakpoint();
   const [collapsed, setCollapsed] = useState(screens.xs);
-  const { isAuthenticated, logout } = useAuth();
+  const { logout } = useAuth();
+  const isAuthenticated = true; // TODO: remove this and remove useAuth
 
   const handleMenuClick = (key: string) => {
     if (key === '/sair') {

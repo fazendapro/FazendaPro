@@ -4,9 +4,10 @@ import { Sidebar, Spinner } from './components';
 import { Routes, Route, Navigate } from 'react-router'
 
 const { useBreakpoint } = Grid;
+const isAuthenticated = true; // TODO: remove this and remove useAuth
 
 const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, isLoading } = useAuth()
+  const { isLoading } = useAuth()
   const screens = useBreakpoint();
 
   if (isLoading) return <Spinner />
@@ -38,7 +39,7 @@ const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
 }
 
 export const App = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isLoading } = useAuth();
 
   if (isLoading) return <Spinner />
 
