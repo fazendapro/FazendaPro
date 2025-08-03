@@ -49,11 +49,7 @@ func main() {
 		log.Fatal("Erro ao executar migrações:", err)
 	}
 
-	// userRepo := repository.NewUserRepository(db)
-	// userService := service.NewUserService(*userRepo)
-	// userHandler := handlers.NewUserHandler(userService)
-
-	r := routes.SetupRoutes(app)
+	r := routes.SetupRoutes(app, db)
 	server := http.Server{
 		Addr:         fmt.Sprintf(":%d", port),
 		Handler:      r,

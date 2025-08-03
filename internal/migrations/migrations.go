@@ -18,7 +18,7 @@ type Migration struct {
 
 func RunMigrations(db *gorm.DB) error {
 	if err := db.AutoMigrate(&Migration{}); err != nil {
-		return fmt.Errorf("erro ao criar tabela de migrações: %w", err)
+		return fmt.Errorf("error creating migrations table: %w", err)
 	}
 
 	migrations := []struct {
@@ -32,6 +32,10 @@ func RunMigrations(db *gorm.DB) error {
 		{"005_create_milk_collections_table", createMilkCollectionsTable},
 		{"006_create_reproductions_table", createReproductionsTable},
 		{"007_create_weights_table", createWeightsTable},
+		{"008_create_persons_table", createPersonsTable},
+		{"009_update_users_table", updateUsersTable},
+		{"011_update_users_with_person", updateUsersWithPerson},
+		{"010_create_expenses_table", createExpensesTable},
 	}
 
 	for _, migration := range migrations {
@@ -41,19 +45,19 @@ func RunMigrations(db *gorm.DB) error {
 				log.Printf("Executando migração: %s", migration.name)
 
 				if err := migration.fn(db); err != nil {
-					return fmt.Errorf("erro ao executar migração %s: %w", migration.name, err)
+					return fmt.Errorf("error executing migration %s: %w", migration.name, err)
 				}
 
 				if err := db.Create(&Migration{Name: migration.name}).Error; err != nil {
-					return fmt.Errorf("erro ao registrar migração %s: %w", migration.name, err)
+					return fmt.Errorf("error registering migration %s: %w", migration.name, err)
 				}
 
-				log.Printf("Migração %s executada com sucesso", migration.name)
+				log.Printf("Migration %s executed successfully", migration.name)
 			} else {
-				return fmt.Errorf("erro ao verificar migração %s: %w", migration.name, err)
+				return fmt.Errorf("error checking migration %s: %w", migration.name, err)
 			}
 		} else {
-			log.Printf("Migração %s já foi executada", migration.name)
+			log.Printf("Migration %s already executed", migration.name)
 		}
 	}
 
@@ -88,51 +92,96 @@ func createWeightsTable(db *gorm.DB) error {
 	return db.AutoMigrate(&models.Weight{})
 }
 
+func createPersonsTable(db *gorm.DB) error {
+	return db.AutoMigrate(&models.Person{})
+}
+
+func updateUsersTable(db *gorm.DB) error {
+	var count int64
+	db.Model(&models.User{}).Count(&count)
+
+	if count > 0 {
+		log.Printf("Users table has %d records. Executing auto migrate...", count)
+	}
+
+	return db.AutoMigrate(&models.User{})
+}
+
+func createExpensesTable(db *gorm.DB) error {
+	return db.AutoMigrate(&models.Expense{})
+}
+
+func updateUsersWithPerson(db *gorm.DB) error {
+	return db.AutoMigrate(&models.User{})
+}
+
 func RollbackMigrations(db *gorm.DB, steps int) error {
 	var migrations []Migration
 	if err := db.Order("id desc").Limit(steps).Find(&migrations).Error; err != nil {
-		return fmt.Errorf("erro ao buscar migrações: %w", err)
+		return fmt.Errorf("error searching migrations: %w", err)
 	}
 
 	for _, migration := range migrations {
-		log.Printf("Revertendo migração: %s", migration.Name)
+		log.Printf("Reverting migration: %s", migration.Name)
 
 		switch migration.Name {
 		case "001_create_users_table":
 			if err := db.Migrator().DropTable(&models.User{}); err != nil {
-				return fmt.Errorf("erro ao reverter migração %s: %w", migration.Name, err)
+				return fmt.Errorf("error reverting migration %s: %w", migration.Name, err)
 			}
 		case "002_create_companies_table":
 			if err := db.Migrator().DropTable(&models.Company{}); err != nil {
-				return fmt.Errorf("erro ao reverter migração %s: %w", migration.Name, err)
+				return fmt.Errorf("error reverting migration %s: %w", migration.Name, err)
 			}
 		case "003_create_farms_table":
 			if err := db.Migrator().DropTable(&models.Farm{}); err != nil {
-				return fmt.Errorf("erro ao reverter migração %s: %w", migration.Name, err)
+				return fmt.Errorf("error reverting migration %s: %w", migration.Name, err)
 			}
 		case "004_create_animals_table":
 			if err := db.Migrator().DropTable(&models.Animal{}); err != nil {
-				return fmt.Errorf("erro ao reverter migração %s: %w", migration.Name, err)
+				return fmt.Errorf("error reverting migration %s: %w", migration.Name, err)
 			}
 		case "005_create_milk_collections_table":
 			if err := db.Migrator().DropTable(&models.MilkCollection{}); err != nil {
-				return fmt.Errorf("erro ao reverter migração %s: %w", migration.Name, err)
+				return fmt.Errorf("error reverting migration %s: %w", migration.Name, err)
 			}
 		case "006_create_reproductions_table":
 			if err := db.Migrator().DropTable(&models.Reproduction{}); err != nil {
-				return fmt.Errorf("erro ao reverter migração %s: %w", migration.Name, err)
+				return fmt.Errorf("error reverting migration %s: %w", migration.Name, err)
 			}
 		case "007_create_weights_table":
 			if err := db.Migrator().DropTable(&models.Weight{}); err != nil {
-				return fmt.Errorf("erro ao reverter migração %s: %w", migration.Name, err)
+				return fmt.Errorf("error reverting migration %s: %w", migration.Name, err)
+			}
+		case "008_create_persons_table":
+			if err := db.Migrator().DropTable(&models.Person{}); err != nil {
+				return fmt.Errorf("error reverting migration %s: %w", migration.Name, err)
+			}
+		case "009_update_users_table":
+			if err := db.Migrator().DropTable(&models.User{}); err != nil {
+				return fmt.Errorf("error reverting migration %s: %w", migration.Name, err)
+			}
+			if err := db.AutoMigrate(&models.User{}); err != nil {
+				return fmt.Errorf("error recreating users table: %w", err)
+			}
+		case "010_create_expenses_table":
+			if err := db.Migrator().DropTable(&models.Expense{}); err != nil {
+				return fmt.Errorf("error reverting migration %s: %w", migration.Name, err)
+			}
+		case "011_update_users_with_person":
+			if err := db.Migrator().DropTable(&models.User{}); err != nil {
+				return fmt.Errorf("error reverting migration %s: %w", migration.Name, err)
+			}
+			if err := db.AutoMigrate(&models.User{}); err != nil {
+				return fmt.Errorf("error recreating users table: %w", err)
 			}
 		}
 
 		if err := db.Delete(&migration).Error; err != nil {
-			return fmt.Errorf("erro ao remover registro da migração %s: %w", migration.Name, err)
+			return fmt.Errorf("error removing migration record %s: %w", migration.Name, err)
 		}
 
-		log.Printf("Migração %s revertida com sucesso", migration.Name)
+		log.Printf("Migration %s reverted successfully", migration.Name)
 	}
 
 	return nil
