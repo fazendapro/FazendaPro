@@ -13,7 +13,7 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - 'fazendapro'
+      - 'fazendapro-frontend'
       - '--image'
       - 'gcr.io/$PROJECT_ID/fazendapro:$COMMIT_SHA'
       - '--region'
