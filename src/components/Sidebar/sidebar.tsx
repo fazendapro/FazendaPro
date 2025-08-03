@@ -1,7 +1,7 @@
 import { Menu, Layout, Grid, Button } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { HomeOutlined, UserOutlined, FileTextOutlined, ShoppingCartOutlined, SettingOutlined, LogoutOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
+import { HomeOutlined, UserOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { useAuth } from "../../pages/Login/hooks/useAuth";
 
 const { Sider } = Layout;
@@ -30,12 +30,12 @@ export const Sidebar = () => {
   const menuItems = [
     { key: '/', icon: <HomeOutlined />, label: 'Dashboard' },
     { key: '/vacas', icon: <UserOutlined />, label: 'Vacas' },
-    { key: '/relatorios', icon: <FileTextOutlined />, label: 'Relatórios' },
-    { key: '/fornecedores', icon: <ShoppingCartOutlined />, label: 'Fornecedores' },
-    { key: '/vendas', icon: <ShoppingCartOutlined />, label: 'Vendas' },
-    { key: '/estoque', icon: <FileTextOutlined />, label: 'Estoque' },
-    { key: '/configuracoes', icon: <SettingOutlined />, label: 'Configurações' },
-    { key: '/sair', icon: <LogoutOutlined />, label: 'Sair' },
+    // { key: '/relatorios', icon: <FileTextOutlined />, label: 'Relatórios' },
+    // { key: '/fornecedores', icon: <ShoppingCartOutlined />, label: 'Fornecedores' },
+    // { key: '/vendas', icon: <ShoppingCartOutlined />, label: 'Vendas' },
+    // { key: '/estoque', icon: <FileTextOutlined />, label: 'Estoque' },
+    // { key: '/configuracoes', icon: <SettingOutlined />, label: 'Configurações' },
+    // { key: '/sair', icon: <LogoutOutlined />, label: 'Sair' },
   ];
 
   if (!isAuthenticated) {

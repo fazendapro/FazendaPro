@@ -1,5 +1,5 @@
 import { Layout, Grid } from 'antd';
-import { useAuth, Login, Dashboard } from './pages';
+import { useAuth, Login, Dashboard, Animals } from './pages';
 import { Sidebar, Spinner } from './components';
 import { Routes, Route, Navigate } from 'react-router'
 
@@ -61,7 +61,7 @@ export const App = () => {
         path="/vacas"
         element={
           <ProtectedLayout>
-            <h1>Página de Vacas</h1>
+            <Animals />
           </ProtectedLayout>
         }
       />
