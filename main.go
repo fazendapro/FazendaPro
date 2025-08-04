@@ -44,12 +44,11 @@ func main() {
 	}
 	defer db.Close()
 
-	// Executar migrações automaticamente na inicialização
 	if err := migrations.RunMigrations(db.DB); err != nil {
 		log.Fatal("Erro ao executar migrações:", err)
 	}
 
-	r := routes.SetupRoutes(app, db)
+	r := routes.SetupRoutes(app, db, cfg)
 	server := http.Server{
 		Addr:         fmt.Sprintf(":%d", port),
 		Handler:      r,

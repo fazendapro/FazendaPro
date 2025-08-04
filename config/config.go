@@ -3,6 +3,8 @@ package config
 import (
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -15,6 +17,16 @@ type Config struct {
 	User      string
 	Password  string
 	Name      string
+	CORS      CORSConfig
+}
+
+type CORSConfig struct {
+	AllowedOrigins   []string
+	AllowedMethods   []string
+	AllowedHeaders   []string
+	ExposedHeaders   []string
+	AllowCredentials bool
+	MaxAge           int
 }
 
 func Load() (*Config, error) {
@@ -22,19 +34,16 @@ func Load() (*Config, error) {
 		fmt.Printf("WARNING: Não foi possível carregar .env: %v\n", err)
 	}
 
-	// Determinar ambiente
 	env := os.Getenv("ENV")
 	if env == "" {
 		env = "development"
 	}
 
-	// Carregar arquivo de ambiente específico se existir
 	envFile := ".env." + env
 	if err := godotenv.Load(envFile); err != nil {
 		fmt.Printf("WARNING: Não foi possível carregar %s: %v\n", envFile, err)
 	}
 
-	// Debug: imprimir configurações carregadas
 	fmt.Printf("DEBUG: ENV=%s, DB_HOST=%s, DB_PORT=%s, DB_USER=%s, DB_NAME=%s\n",
 		os.Getenv("ENV"),
 		os.Getenv("DB_HOST"),
@@ -50,6 +59,7 @@ func Load() (*Config, error) {
 		User:      getEnvWithDefault("DB_USER", "fazendapro_user"),
 		Password:  getEnvWithDefault("DB_PASSWORD", "fazendapro_password"),
 		Name:      getEnvWithDefault("DB_NAME", "fazendapro"),
+		CORS:      loadCORSConfig(),
 	}, nil
 }
 
@@ -58,4 +68,36 @@ func getEnvWithDefault(key, defaultValue string) string {
 		return value
 	}
 	return defaultValue
+}
+
+func loadCORSConfig() CORSConfig {
+	return CORSConfig{
+		AllowedOrigins:   splitEnvVar(getEnvWithDefault("CORS_ALLOWED_ORIGINS", "*")),
+		AllowedMethods:   splitEnvVar(getEnvWithDefault("CORS_ALLOWED_METHODS", "GET,POST,PUT,DELETE,OPTIONS")),
+		AllowedHeaders:   splitEnvVar(getEnvWithDefault("CORS_ALLOWED_HEADERS", "Content-Type,Authorization")),
+		ExposedHeaders:   splitEnvVar(getEnvWithDefault("CORS_EXPOSED_HEADERS", "")),
+		AllowCredentials: getEnvWithDefault("CORS_ALLOW_CREDENTIALS", "true") == "true",
+		MaxAge:           parseInt(getEnvWithDefault("CORS_MAX_AGE", "86400")),
+	}
+}
+
+func splitEnvVar(value string) []string {
+	if value == "" {
+		return []string{}
+	}
+
+	var result []string
+	for _, item := range strings.Split(value, ",") {
+		if trimmed := strings.TrimSpace(item); trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+	return result
+}
+
+func parseInt(value string) int {
+	if i, err := strconv.Atoi(value); err == nil {
+		return i
+	}
+	return 0
 }

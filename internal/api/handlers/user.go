@@ -25,52 +25,47 @@ func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 	email := r.URL.Query().Get("email")
 	user, err := h.service.GetUserByEmail(email)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		SendErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if user == nil {
-		http.Error(w, "User not found", http.StatusNotFound)
+		SendErrorResponse(w, "Usuário não encontrado", http.StatusNotFound)
 		return
 	}
 
-	json.NewEncoder(w).Encode(user)
+	SendSuccessResponse(w, user, "Usuário encontrado com sucesso", http.StatusOK)
 }
 
 func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		SendErrorResponse(w, "Método não permitido", http.StatusMethodNotAllowed)
 		return
 	}
 
 	var req CreateUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Error decoding JSON: "+err.Error(), http.StatusBadRequest)
+		SendErrorResponse(w, "Erro ao decodificar JSON: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	if err := h.service.CreateUser(&req.User, &req.Person); err != nil {
-		http.Error(w, "Error creating user: "+err.Error(), http.StatusBadRequest)
+		SendErrorResponse(w, "Erro ao criar usuário: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	response := map[string]interface{}{
+	data := map[string]interface{}{
 		"id":        req.User.ID,
 		"person_id": req.User.PersonID,
 		"farm_id":   req.User.FarmID,
-		"message":   "User created successfully",
 	}
-
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(response)
+	SendSuccessResponse(w, data, "Usuário criado com sucesso", http.StatusCreated)
 }
 
 func (h *UserHandler) GetUserWithPerson(w http.ResponseWriter, r *http.Request) {
 	userID := r.URL.Query().Get("id")
 	if userID == "" {
-		http.Error(w, "User ID is required", http.StatusBadRequest)
+		SendErrorResponse(w, "ID do usuário é obrigatório", http.StatusBadRequest)
 		return
 	}
 
@@ -80,29 +75,27 @@ func (h *UserHandler) GetUserWithPerson(w http.ResponseWriter, r *http.Request) 
 
 	user, err := h.service.GetUserWithPerson(1) // Placeholder - implemente a extração do ID
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		SendErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if user == nil {
-		http.Error(w, "User not found", http.StatusNotFound)
+		SendErrorResponse(w, "Usuário não encontrado", http.StatusNotFound)
 		return
 	}
 
-	json.NewEncoder(w).Encode(user)
+	SendSuccessResponse(w, user, "Usuário encontrado com sucesso", http.StatusOK)
 }
 
 func (h *UserHandler) UpdatePersonData(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	if r.Method != http.MethodPut {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		SendErrorResponse(w, "Método não permitido", http.StatusMethodNotAllowed)
 		return
 	}
 
 	var personData models.Person
 	if err := json.NewDecoder(r.Body).Decode(&personData); err != nil {
-		http.Error(w, "Error decoding JSON: "+err.Error(), http.StatusBadRequest)
+		SendErrorResponse(w, "Erro ao decodificar JSON: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -110,14 +103,9 @@ func (h *UserHandler) UpdatePersonData(w http.ResponseWriter, r *http.Request) {
 	userID := uint(1) // Placeholder - implemente a extração do ID
 
 	if err := h.service.UpdatePersonData(userID, &personData); err != nil {
-		http.Error(w, "Error updating person data: "+err.Error(), http.StatusBadRequest)
+		SendErrorResponse(w, "Erro ao atualizar dados da pessoa: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	response := map[string]interface{}{
-		"message": "Person data updated successfully",
-	}
-
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(response)
+	SendSuccessResponse(w, nil, "Dados da pessoa atualizados com sucesso", http.StatusOK)
 }

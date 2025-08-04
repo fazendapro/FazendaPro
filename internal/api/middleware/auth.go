@@ -1,17 +1,41 @@
 package middleware
 
 import (
+	"encoding/json"
 	"net/http"
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
+// ErrorResponse representa uma resposta de erro padronizada
+type ErrorResponse struct {
+	Success bool   `json:"success"`
+	Error   string `json:"error"`
+	Message string `json:"message"`
+	Code    int    `json:"code"`
+}
+
+// SendErrorResponse envia uma resposta de erro padronizada
+func SendErrorResponse(w http.ResponseWriter, message string, statusCode int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+
+	response := ErrorResponse{
+		Success: false,
+		Error:   http.StatusText(statusCode),
+		Message: message,
+		Code:    statusCode,
+	}
+
+	json.NewEncoder(w).Encode(response)
+}
+
 func Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenString := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
 		if tokenString == "" {
-			http.Error(w, "Token não fornecido", http.StatusUnauthorized)
+			SendErrorResponse(w, "Token não fornecido", http.StatusUnauthorized)
 			return
 		}
 
@@ -20,7 +44,7 @@ func Auth(next http.Handler) http.Handler {
 		})
 
 		if err != nil || !token.Valid {
-			http.Error(w, "Token inválido", http.StatusUnauthorized)
+			SendErrorResponse(w, "Token inválido", http.StatusUnauthorized)
 			return
 		}
 
