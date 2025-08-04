@@ -39,6 +39,7 @@ func RunMigrations(db *gorm.DB) error {
 		{"012_add_company_name", addCompanyName},
 		{"013_add_farm_logo", addFarmLogo},
 		{"014_add_animal_photo", addAnimalPhoto},
+		{"015_update_animals_table", updateAnimalsTable},
 	}
 
 	for _, migration := range migrations {
@@ -130,6 +131,53 @@ func addAnimalPhoto(db *gorm.DB) error {
 	return db.AutoMigrate(&models.Animal{})
 }
 
+func updateAnimalsTable(db *gorm.DB) error {
+	// Remove a coluna ear_tag_number antiga
+	if db.Migrator().HasColumn(&models.Animal{}, "ear_tag_number") {
+		if err := db.Migrator().DropColumn(&models.Animal{}, "ear_tag_number"); err != nil {
+			return fmt.Errorf("error dropping ear_tag_number column: %w", err)
+		}
+	}
+
+	// Remove a coluna age antiga
+	if db.Migrator().HasColumn(&models.Animal{}, "age") {
+		if err := db.Migrator().DropColumn(&models.Animal{}, "age"); err != nil {
+			return fmt.Errorf("error dropping age column: %w", err)
+		}
+	}
+
+	// Remove a coluna fertilization antiga (string)
+	if db.Migrator().HasColumn(&models.Animal{}, "fertilization") {
+		if err := db.Migrator().DropColumn(&models.Animal{}, "fertilization"); err != nil {
+			return fmt.Errorf("error dropping fertilization column: %w", err)
+		}
+	}
+
+	// Remove a coluna status antiga (string)
+	if db.Migrator().HasColumn(&models.Animal{}, "status") {
+		if err := db.Migrator().DropColumn(&models.Animal{}, "status"); err != nil {
+			return fmt.Errorf("error dropping status column: %w", err)
+		}
+	}
+
+	// Remove a coluna purpose antiga (string)
+	if db.Migrator().HasColumn(&models.Animal{}, "purpose") {
+		if err := db.Migrator().DropColumn(&models.Animal{}, "purpose"); err != nil {
+			return fmt.Errorf("error dropping purpose column: %w", err)
+		}
+	}
+
+	// Remove a coluna animal_type antiga
+	if db.Migrator().HasColumn(&models.Animal{}, "animal_type") {
+		if err := db.Migrator().DropColumn(&models.Animal{}, "animal_type"); err != nil {
+			return fmt.Errorf("error dropping animal_type column: %w", err)
+		}
+	}
+
+	// Executa o AutoMigrate para adicionar as novas colunas
+	return db.AutoMigrate(&models.Animal{})
+}
+
 func RollbackMigrations(db *gorm.DB, steps int) error {
 	var migrations []Migration
 	if err := db.Order("id desc").Limit(steps).Find(&migrations).Error; err != nil {
@@ -201,6 +249,10 @@ func RollbackMigrations(db *gorm.DB, steps int) error {
 		case "014_add_animal_photo":
 			if err := db.Migrator().DropColumn(&models.Animal{}, "photo"); err != nil {
 				return fmt.Errorf("error reverting migration %s: %w", migration.Name, err)
+			}
+		case "015_update_animals_table":
+			if err := db.AutoMigrate(&models.Animal{}); err != nil {
+				return fmt.Errorf("error reverting animals table: %w", err)
 			}
 		}
 

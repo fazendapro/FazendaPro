@@ -1,0 +1,45 @@
+steps:
+  # Build the frontend application
+  - name: 'gcr.io/cloud-builders/docker'
+    args: 
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/fazendapro-frontend:$COMMIT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/fazendapro-frontend:latest'
+      - '.'
+    dir: '.'
+
+  # Push the container image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/fazendapro-frontend:$COMMIT_SHA']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/fazendapro-frontend:latest']
+
+  # Deploy container image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'fazendapro-frontend'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/fazendapro-frontend:$COMMIT_SHA'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '80'
+      - '--memory'
+      - '256Mi'
+      - '--cpu'
+      - '1'
+      - '--max-instances'
+      - '10'
+
+images:
+  - 'gcr.io/$PROJECT_ID/fazendapro-frontend:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/fazendapro-frontend:latest' 
