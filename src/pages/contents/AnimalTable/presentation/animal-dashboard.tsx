@@ -1,72 +1,271 @@
 import React from 'react';
-import { Button, Input, Select, Modal } from 'antd';
+import { Button, Input, Select, Modal, Card, Row, Col, Statistic, Space, Form, DatePicker } from 'antd';
 import { useModal } from '../../../../hooks';
+import { useTranslation } from 'react-i18next';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { animalSchema } from './animal-schema';
+import { toast } from 'react-toastify';
+
 const { Search } = Input;
 const { Option } = Select;
 
+interface AnimalForm {
+  animalName: string;
+  earringNumber: string;
+  earringNumberGlobal: string;
+  type: 'vaca' | 'bezerro' | 'touro' | 'novilho';
+  sex: 'macho' | 'fêmea';
+  breed: string;
+  birthDate: string;
+}
+
 const AnimalDashboard: React.FC = () => {
   const { isOpen, onOpen, onClose } = useModal();
+  const { t } = useTranslation();
+
+  const methods = useForm<AnimalForm>({
+    resolver: yupResolver(animalSchema),
+    defaultValues: {
+      animalName: '',
+      earringNumber: '',
+      earringNumberGlobal: '',
+      type: 'vaca',
+      sex: 'macho',
+      breed: '',
+      birthDate: ''
+    },
+  });
+
+  const onSubmit = async (data: AnimalForm) => {
+    try {
+      console.log('Dados do animal:', data);
+      toast.success('Animal adicionado com sucesso!');
+      onClose();
+      methods.reset();
+    } catch (error) {
+      toast.error(`Erro ao adicionar animal: ${error}`);
+    }
+  };
+
+  const handleCancel = () => {
+    onClose();
+    methods.reset();
+  };
 
   return (
-    <div style={{ background: '#f5f5f5', borderRadius: '8px' }}>
-      <div style={{ marginBottom: '20px', background: '#fff', padding: '10px', borderRadius: '4px' }}>
-        <span style={{ color: '#1890ff' }}>Categorias: 14</span> | <span style={{ color: '#faad14' }}>Total de animais: 868</span> | <span style={{ color: '#000' }}>Receita: R$25000</span>
-        <span style={{ marginLeft: '20px', color: '#722ed1' }}>Melhores Vendas: 5</span> | <span style={{ color: '#000' }}>Custo: R$2500</span>
-        <span style={{ marginLeft: '20px', color: '#ff4d4f' }}>Em baixa produção: 12</span> | <span style={{ color: '#000' }}>Semindas: 2</span> | <span style={{ color: '#000' }}>Não semindas: 2</span>
-      </div>
-      <div style={{ marginBottom: '20px', background: '#fff', padding: '10px', borderRadius: '4px', display: 'flex', alignItems: 'center' }}>
-        <Button type="primary" style={{ marginRight: '10px' }} onClick={onOpen}>Criar Vaca</Button>
-        <Select defaultValue="Filtro" style={{ width: 120, marginRight: '10px' }}>
-          <Option value="filtro">Filtro</Option>
-        </Select>
-        <Search placeholder="Importar csv" style={{ width: 200 }} />
-      </div>
+    <div style={{ }}>
+      <Card style={{ marginBottom: '16px' }}>
+        <Row gutter={16}>
+          <Col span={6}>
+            <Statistic 
+              title={t('animalTable.categories')} 
+              value={14} 
+              valueStyle={{ color: '#1890ff' }}
+            />
+          </Col>
+          <Col span={6}>
+            <Statistic 
+              title={t('animalTable.totalAnimals')} 
+              value={868} 
+              valueStyle={{ color: '#faad14' }}
+            />
+          </Col>
+          <Col span={6}>
+            <Statistic 
+              title={t('animalTable.revenue')} 
+              value={25000} 
+              prefix="R$"
+              valueStyle={{ color: '#000' }}
+            />
+          </Col>
+          <Col span={6}>
+            <Statistic 
+              title={t('animalTable.bestSales')} 
+              value={5} 
+              valueStyle={{ color: '#722ed1' }}
+            />
+          </Col>
+        </Row>
+        <Row gutter={16} style={{ marginTop: '16px' }}>
+          <Col span={6}>
+            <Statistic 
+              title={t('animalTable.cost')} 
+              value={2500} 
+              prefix="R$"
+              valueStyle={{ color: '#000' }}
+            />
+          </Col>
+          <Col span={6}>
+            <Statistic 
+              title={t('animalTable.lowProduction')} 
+              value={12} 
+              valueStyle={{ color: '#ff4d4f' }}
+            />
+          </Col>
+          <Col span={6}>
+            <Statistic 
+              title={t('animalTable.inseminated')} 
+              value={2} 
+              valueStyle={{ color: '#000' }}
+            />
+          </Col>
+          <Col span={6}>
+            <Statistic 
+              title={t('animalTable.notInseminated')} 
+              value={2} 
+              valueStyle={{ color: '#000' }}
+            />
+          </Col>
+        </Row>
+      </Card>
+
+      <Card style={{ marginBottom: '16px' }}>
+        <Space>
+          <Button type="primary" onClick={onOpen}>
+            {t('animalTable.createCow')}
+          </Button>
+          <Select defaultValue="filtro" style={{ width: 120 }}>
+            <Option value="filtro">{t('animalTable.filter')}</Option>
+          </Select>
+          <Search 
+            placeholder={t('animalTable.search')} 
+            style={{ width: 200 }} 
+          />
+        </Space>
+      </Card>
+
       <Modal
-        title="Novo Gado"
+        title={t('animalTable.newCattle')}
         open={isOpen}
-        onOk={onClose}
-        onCancel={onClose}
+        onCancel={handleCancel}
         footer={[
-          <Button key="back" onClick={onClose}>
-            Abatear
+          <Button key="back" onClick={handleCancel}>
+            {t('animalTable.cancel')}
           </Button>,
-          <Button key="submit" type="primary" onClick={onClose}>
-            Adicionar gado
+          <Button 
+            key="submit" 
+            type="primary" 
+            onClick={methods.handleSubmit(onSubmit)}
+            loading={methods.formState.isSubmitting}
+          >
+            {t('animalTable.addCattle')}
           </Button>,
         ]}
+        width={600}
       >
-        <div style={{ padding: '20px' }}>
-          <div style={{ marginBottom: '10px' }}>
-            <label>Nome do Animal</label>
-            <Input placeholder="Coloque o Nome do Animal" />
-          </div>
-          <div style={{ marginBottom: '10px' }}>
-            <label>Número do Brinco</label>
-            <Input placeholder="Coloque o número do brinco" />
-          </div>
-          <div style={{ marginBottom: '10px' }}>
-            <label>Categoria</label>
-            <Select placeholder="Selecione o tipo do animal">
-              <Option value="vaca">Vaca</Option>
-            </Select>
-          </div>
-          <div style={{ marginBottom: '10px' }}>
-            <label>Preço da Compra</label>
-            <Input placeholder="Coloque o preço da compra" />
-          </div>
-          <div style={{ marginBottom: '10px' }}>
-            <label>Data de Nascimento</label>
-            <Input placeholder="Coloque a data de nascimento" />
-          </div>
-          <div style={{ marginBottom: '10px' }}>
-            <label>Peso</label>
-            <Input placeholder="Coloque o peso de nascimento" />
-          </div>
-          <div style={{ marginBottom: '10px' }}>
-            <label>Pais</label>
-            <Input placeholder="Enter threshold value" />
-          </div>
-        </div>
+        <Form layout="vertical">
+          <Row gutter={16}>
+            <Col span={24}>
+              <Form.Item
+                label={t('animalTable.animalName')}
+                validateStatus={methods.formState.errors.animalName ? 'error' : ''}
+                help={methods.formState.errors.animalName?.message}
+              >
+                <Input
+                  {...methods.register('animalName')}
+                  placeholder={t('animalTable.animalNamePlaceholder')}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label={t('animalTable.earringNumberLocal')}
+                validateStatus={methods.formState.errors.earringNumber ? 'error' : ''}
+                help={methods.formState.errors.earringNumber?.message}
+              >
+                <Input
+                  {...methods.register('earringNumber')}
+                  placeholder={t('animalTable.earringNumberLocalPlaceholder')}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label={t('animalTable.earringNumberGlobal')}
+                validateStatus={methods.formState.errors.earringNumberGlobal ? 'error' : ''}
+                help={methods.formState.errors.earringNumberGlobal?.message}
+              >
+                <Input
+                  {...methods.register('earringNumberGlobal')}
+                  placeholder={t('animalTable.earringNumberGlobalPlaceholder')}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label={t('animalTable.type')}
+                validateStatus={methods.formState.errors.type ? 'error' : ''}
+                help={methods.formState.errors.type?.message}
+              >
+                <Select
+                  value={methods.watch('type')}
+                  placeholder={t('animalTable.selectAnimalType')}
+                  onChange={(value) => methods.setValue('type', value)}
+                >
+                  <Option value="vaca">{t('animalTable.cow')}</Option>
+                  <Option value="bezerro">{t('animalTable.calf')}</Option>
+                  <Option value="touro">{t('animalTable.bull')}</Option>
+                  <Option value="novilho">{t('animalTable.heifer')}</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label={t('animalTable.sex')}
+                validateStatus={methods.formState.errors.sex ? 'error' : ''}
+                help={methods.formState.errors.sex?.message}
+              >
+                <Select
+                  value={methods.watch('sex')}
+                  placeholder={t('animalTable.selectAnimalSex')}
+                  onChange={(value) => methods.setValue('sex', value)}
+                >
+                  <Option value="macho">{t('animalTable.male')}</Option>
+                  <Option value="fêmea">{t('animalTable.female')}</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label={t('animalTable.breed')}
+                validateStatus={methods.formState.errors.breed ? 'error' : ''}
+                help={methods.formState.errors.breed?.message}
+              >
+                <Input
+                  {...methods.register('breed')}
+                  placeholder={t('animalTable.breedPlaceholder')}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label={t('animalTable.birthDate')}
+                validateStatus={methods.formState.errors.birthDate ? 'error' : ''}
+                help={methods.formState.errors.birthDate?.message}
+              >
+                <DatePicker
+                  style={{ width: '100%' }}
+                  onChange={(date, dateString) => {
+                    if (typeof dateString === 'string') {
+                      methods.setValue('birthDate', dateString);
+                    }
+                  }}
+                  placeholder={t('animalTable.birthDatePlaceholder')}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+        </Form>
       </Modal>
     </div>
   );

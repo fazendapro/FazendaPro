@@ -4,24 +4,28 @@ import pt from "./pt.json";
 import es from "./es.json";
 import en from "./en.json";
 import { translations as dashboardTranslations } from "../pages/contents/Dashboard/translation/pt";
+import { animalTableTranslations } from "../pages/contents/AnimalTable/translation";
 
 const resources = {
   pt: {
     translation: {
       ...pt.translation,
-      ...dashboardTranslations
+      ...dashboardTranslations,
+      ...animalTableTranslations
     }
   },
   es: {
     translation: {
       ...es.translation,
-      ...dashboardTranslations
+      ...dashboardTranslations,
+      ...animalTableTranslations
     }
   },
   en: {
     translation: {
       ...en.translation,
-      ...dashboardTranslations
+      ...dashboardTranslations,
+      ...animalTableTranslations
     }
   }
 };
