@@ -6,7 +6,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { animalSchema } from './animal-schema';
 import { toast } from 'react-toastify';
 import { CreateAnimalFactory } from '../factories';
-import { useCsrfTokenContext } from '../../../../contexts';
 import { Form as CustomForm } from '../../../../components';
 import { FieldType } from '../../../../types/field-types';
 import { AnimalForm, AnimalSex } from '../types/type';
@@ -20,7 +19,6 @@ interface CreateAnimalModalProps {
 
 const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
-  const { csrfToken } = useCsrfTokenContext();
 
   const methods = useForm<AnimalForm>({
     resolver: yupResolver(animalSchema),
@@ -39,7 +37,7 @@ const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({ isOpen, onClose }
     try {
       const farmId = 1; // TODO: get farmId from context
 
-      const createAnimalUseCase = CreateAnimalFactory(csrfToken);
+      const createAnimalUseCase = CreateAnimalFactory(); // TODO: add csrf token
       const response = await createAnimalUseCase.create({ ...data, farm_id: farmId });
 
       if (response?.success) {
