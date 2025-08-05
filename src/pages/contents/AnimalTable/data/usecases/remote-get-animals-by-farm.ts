@@ -5,9 +5,9 @@ import { AxiosError } from 'axios';
 import { t } from 'i18next';
 
 export class RemoteGetAnimalsByFarm implements GetAnimalsByFarmDomain {
-  constructor(
-    private readonly csrfToken?: string
-  ) {}
+  // constructor(
+  //   private readonly csrfToken?: string
+  // ) {} // TODO: add csrf token
 
   async getAnimalsByFarm(params: GetAnimalsByFarmParams): Promise<GetAnimalsByFarmResponse> {
     try {

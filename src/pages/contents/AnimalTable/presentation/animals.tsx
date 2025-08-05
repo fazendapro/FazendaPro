@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { AnimalDashboard } from "./animal-dashboard";
 import { AnimalTable } from "./animal-table";
 import { useAnimalColumnBuilder } from "./column-builder";
