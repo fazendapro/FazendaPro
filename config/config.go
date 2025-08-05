@@ -80,11 +80,6 @@ func loadCORSConfig() CORSConfig {
 		MaxAge:           parseInt(getEnvWithDefault("CORS_MAX_AGE", "86400")),
 	}
 
-	fmt.Printf("DEBUG CORS: AllowedOrigins=%v\n", corsConfig.AllowedOrigins)
-	fmt.Printf("DEBUG CORS: AllowedMethods=%v\n", corsConfig.AllowedMethods)
-	fmt.Printf("DEBUG CORS: AllowedHeaders=%v\n", corsConfig.AllowedHeaders)
-	fmt.Printf("DEBUG CORS: AllowCredentials=%v\n", corsConfig.AllowCredentials)
-
 	return corsConfig
 }
 
