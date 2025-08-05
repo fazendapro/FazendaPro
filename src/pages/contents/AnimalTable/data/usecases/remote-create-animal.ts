@@ -1,0 +1,39 @@
+import { api } from '../../../../../components';
+import { CreateAnimalDomain, CreateAnimalResponse } from '../../domain/usecases/create-animal-domain';
+import { CreateAnimalParams } from '../../types/type';
+import { AxiosError } from 'axios';
+import { t } from 'i18next';
+
+export class RemoteCreateAnimal implements CreateAnimalDomain {
+  constructor(
+    private readonly csrfToken?: string
+  ) {}
+
+  async create(params: CreateAnimalParams): Promise<CreateAnimalResponse> {
+    try {
+      const { data, status } = await api('animals').post(
+        '',
+        params,
+        {
+          // headers: {
+          //   'X-CSRF-Token': this.csrfToken || '', // TODO: add csrf token
+          // },
+        }
+      );
+
+      const { message, ...rest } = data;
+      return {
+        data: rest,
+        status,
+        message: message || t('animalTable.animalCreatedSuccessfully'), 
+        success: true
+      };
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        throw new Error(error.response?.data?.message || 'Erro ao criar animal');
+      }
+      console.log(error);
+      throw new Error('Erro desconhecido ao criar animal');
+    }
+  }
+} 

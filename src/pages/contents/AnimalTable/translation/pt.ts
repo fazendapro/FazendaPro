@@ -37,5 +37,6 @@ export const translations = {
     weight: "Peso",
     weightPlaceholder: "Coloque o peso de nascimento",
     search: "Pesquisar",
+    animalCreatedSuccessfully: "Animal criado com sucesso",
   }
 }; 

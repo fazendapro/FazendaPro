@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormProvider, useFormContext, Controller, FieldValues } from 'react-hook-form';
-import { Form as AntForm, Checkbox, Row, Col, Typography, Input } from 'antd';
+import { Form as AntForm, Checkbox, Row, Col, Typography, Input, InputNumber } from 'antd';
 import { SubmitHandler, UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { FieldType } from '../../../types/field-types';
@@ -53,6 +53,13 @@ const FieldRenderer: React.FC<{ fields: FieldType[] }> = ({ fields }) => {
                       value={value}
                       onChange={onChange}
                       placeholder={field.placeholder ? t(field.placeholder) : undefined}
+                    />
+                  ) : field.type === 'number' ? (
+                    <InputNumber
+                      value={value}
+                      onChange={onChange}
+                      placeholder={field.placeholder ? t(field.placeholder) : undefined}
+                      style={{ width: '100%' }}
                     />
                   ) : (
                     <Input
