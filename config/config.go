@@ -71,7 +71,7 @@ func getEnvWithDefault(key, defaultValue string) string {
 }
 
 func loadCORSConfig() CORSConfig {
-	return CORSConfig{
+	corsConfig := CORSConfig{
 		AllowedOrigins:   splitEnvVar(getEnvWithDefault("CORS_ALLOWED_ORIGINS", "*")),
 		AllowedMethods:   splitEnvVar(getEnvWithDefault("CORS_ALLOWED_METHODS", "GET,POST,PUT,DELETE,OPTIONS")),
 		AllowedHeaders:   splitEnvVar(getEnvWithDefault("CORS_ALLOWED_HEADERS", "Content-Type,Authorization")),
@@ -79,6 +79,13 @@ func loadCORSConfig() CORSConfig {
 		AllowCredentials: getEnvWithDefault("CORS_ALLOW_CREDENTIALS", "true") == "true",
 		MaxAge:           parseInt(getEnvWithDefault("CORS_MAX_AGE", "86400")),
 	}
+
+	fmt.Printf("DEBUG CORS: AllowedOrigins=%v\n", corsConfig.AllowedOrigins)
+	fmt.Printf("DEBUG CORS: AllowedMethods=%v\n", corsConfig.AllowedMethods)
+	fmt.Printf("DEBUG CORS: AllowedHeaders=%v\n", corsConfig.AllowedHeaders)
+	fmt.Printf("DEBUG CORS: AllowCredentials=%v\n", corsConfig.AllowCredentials)
+
+	return corsConfig
 }
 
 func splitEnvVar(value string) []string {

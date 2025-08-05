@@ -46,6 +46,11 @@ func CORSMiddleware(cfg *config.Config) func(http.Handler) http.Handler {
 					if !originAllowed {
 						log.Printf("CORS: Origin %s not allowed", origin)
 					}
+				} else {
+					if len(cfg.CORS.AllowedOrigins) > 0 {
+						w.Header().Set("Access-Control-Allow-Origin", cfg.CORS.AllowedOrigins[0])
+						log.Printf("CORS: Setting Access-Control-Allow-Origin to %s (no origin header)", cfg.CORS.AllowedOrigins[0])
+					}
 				}
 			}
 

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
@@ -18,12 +19,30 @@ func NewAnimalHandler(service *service.AnimalService) *AnimalHandler {
 }
 
 type CreateAnimalRequest struct {
-	models.Animal
+	ID                   uint   `json:"id"`
+	FarmID               uint   `json:"farmID"`
+	EarTagNumberLocal    int    `json:"earringNumber"`
+	EarTagNumberRegister int    `json:"earringNumberGlobal"`
+	AnimalName           string `json:"animalName"`
+	Sex                  int    `json:"sex"`
+	Breed                string `json:"breed"`
+	Type                 string `json:"type"`
+	BirthDate            string `json:"birthDate,omitempty"`
+	Photo                string `json:"photo,omitempty"`
+	FatherID             *uint  `json:"fatherID,omitempty"`
+	MotherID             *uint  `json:"motherID,omitempty"`
+	Confinement          bool   `json:"confinement"`
+	AnimalType           int    `json:"animalType"`
+	Status               int    `json:"status"`
+	Fertilization        bool   `json:"fertilization"`
+	Castrated            bool   `json:"castrated"`
+	Purpose              int    `json:"purpose"`
+	CurrentBatch         int    `json:"currentBatch"`
 }
 
 type AnimalResponse struct {
 	ID                   uint   `json:"id"`
-	FarmID               uint   `json:"farm_id"`
+	FarmID               uint   `json:"farmID"`
 	EarTagNumberLocal    int    `json:"ear_tag_number_local"`
 	EarTagNumberRegister int    `json:"ear_tag_number_register"`
 	AnimalName           string `json:"animal_name"`
@@ -57,13 +76,45 @@ func (h *AnimalHandler) CreateAnimal(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.service.CreateAnimal(&req.Animal); err != nil {
+	var birthDate *time.Time
+	if req.BirthDate != "" {
+		parsedDate, err := time.Parse("2006-01-02", req.BirthDate)
+		if err != nil {
+			SendErrorResponse(w, "Formato de data inválido. Use YYYY-MM-DD", http.StatusBadRequest)
+			return
+		}
+		birthDate = &parsedDate
+	}
+
+	animal := models.Animal{
+		ID:                   req.ID,
+		FarmID:               req.FarmID,
+		EarTagNumberLocal:    req.EarTagNumberLocal,
+		EarTagNumberRegister: req.EarTagNumberRegister,
+		AnimalName:           req.AnimalName,
+		Sex:                  req.Sex,
+		Breed:                req.Breed,
+		Type:                 req.Type,
+		BirthDate:            birthDate,
+		Photo:                req.Photo,
+		FatherID:             req.FatherID,
+		MotherID:             req.MotherID,
+		Confinement:          req.Confinement,
+		AnimalType:           req.AnimalType,
+		Status:               req.Status,
+		Fertilization:        req.Fertilization,
+		Castrated:            req.Castrated,
+		Purpose:              req.Purpose,
+		CurrentBatch:         req.CurrentBatch,
+	}
+
+	if err := h.service.CreateAnimal(&animal); err != nil {
 		SendErrorResponse(w, "Erro ao criar animal: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	data := map[string]interface{}{
-		"id": req.Animal.ID,
+		"id": animal.ID,
 	}
 	SendSuccessResponse(w, data, "Animal criado com sucesso", http.StatusCreated)
 }
@@ -123,10 +174,42 @@ func (h *AnimalHandler) UpdateAnimal(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var animal models.Animal
-	if err := json.NewDecoder(r.Body).Decode(&animal); err != nil {
+	var req CreateAnimalRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		SendErrorResponse(w, "Erro ao decodificar JSON: "+err.Error(), http.StatusBadRequest)
 		return
+	}
+
+	var birthDate *time.Time
+	if req.BirthDate != "" {
+		parsedDate, err := time.Parse("2006-01-02", req.BirthDate)
+		if err != nil {
+			SendErrorResponse(w, "Formato de data inválido. Use YYYY-MM-DD", http.StatusBadRequest)
+			return
+		}
+		birthDate = &parsedDate
+	}
+
+	animal := models.Animal{
+		ID:                   req.ID,
+		FarmID:               req.FarmID,
+		EarTagNumberLocal:    req.EarTagNumberLocal,
+		EarTagNumberRegister: req.EarTagNumberRegister,
+		AnimalName:           req.AnimalName,
+		Sex:                  req.Sex,
+		Breed:                req.Breed,
+		Type:                 req.Type,
+		BirthDate:            birthDate,
+		Photo:                req.Photo,
+		FatherID:             req.FatherID,
+		MotherID:             req.MotherID,
+		Confinement:          req.Confinement,
+		AnimalType:           req.AnimalType,
+		Status:               req.Status,
+		Fertilization:        req.Fertilization,
+		Castrated:            req.Castrated,
+		Purpose:              req.Purpose,
+		CurrentBatch:         req.CurrentBatch,
 	}
 
 	if err := h.service.UpdateAnimal(&animal); err != nil {
