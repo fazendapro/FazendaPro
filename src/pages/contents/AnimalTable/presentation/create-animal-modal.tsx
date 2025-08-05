@@ -37,7 +37,6 @@ const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({ isOpen, onClose }
 
   const onSubmit = async (data: AnimalForm) => {
     try {
-      console.log('Dados do formulário:', data);
       const farmId = 1; // TODO: get farmId from context
 
       const createAnimalUseCase = CreateAnimalFactory(csrfToken);
@@ -51,7 +50,6 @@ const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({ isOpen, onClose }
         toast.error('Erro ao criar animal');
       }
     } catch (error) {
-      console.error('Erro completo:', error);
       toast.error(`Erro ao adicionar animal: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     }
   };

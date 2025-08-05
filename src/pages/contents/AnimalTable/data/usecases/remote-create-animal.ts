@@ -32,7 +32,6 @@ export class RemoteCreateAnimal implements CreateAnimalDomain {
       if (error instanceof AxiosError) {
         throw new Error(error.response?.data?.message || 'Erro ao criar animal');
       }
-      console.log(error);
       throw new Error('Erro desconhecido ao criar animal');
     }
   }
