@@ -30,7 +30,7 @@ export const animalSchema = yup.object().shape({
     .string()
     .matches(/^\d{4}-\d{2}-\d{2}$/, 'A data deve estar no formato YYYY-MM-DD')
     .required('A data de nascimento é obrigatória'),
-  ear_tag_number_global: yup
+  ear_tag_number_register: yup
     .number()
     .min(1, 'O número do brinco de registro é obrigatório')
     .required('O número do brinco de registro é obrigatório'),

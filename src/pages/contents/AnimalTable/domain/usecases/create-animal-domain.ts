@@ -5,7 +5,7 @@ export interface CreateAnimalResponse extends BaseHttpResponse<{
   id: string;
   animal_name: string;
   ear_tag_number_local: string;
-  ear_tag_number_global: string;
+  ear_tag_number_register: string;
   farm_id: number;
   type: string;
   sex: string;

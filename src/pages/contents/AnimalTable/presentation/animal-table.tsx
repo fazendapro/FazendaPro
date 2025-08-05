@@ -27,12 +27,12 @@ const AnimalTable = forwardRef<AnimalTableRef>((props, ref) => {
       key: 'Type' 
     },
     { 
-      title: 'Número da Orelha (Local)', 
+      title: 'Número do Brinco (Local)', 
       dataIndex: 'EarTagNumberLocal', 
       key: 'EarTagNumberLocal' 
     },
     { 
-      title: 'Número da Orelha (Registro)', 
+      title: 'Número do Brinco (Registro)', 
       dataIndex: 'EarTagNumberRegister', 
       key: 'EarTagNumberRegister' 
     },

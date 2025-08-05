@@ -27,7 +27,7 @@ const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({ isOpen, onClose }
     defaultValues: {
       animal_name: '',
       ear_tag_number_local: 0,
-      ear_tag_number_global: 0,
+      ear_tag_number_register: 0,
       type: 'vaca',
       sex: AnimalSex.MALE,
       breed: '',
@@ -77,7 +77,7 @@ const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({ isOpen, onClose }
       colSpan: 12
     },
     {
-      name: 'ear_tag_number_global',
+      name: 'ear_tag_number_register',
       label: t('animalTable.earringNumberGlobal'),
       type: 'number',
       placeholder: t('animalTable.earringNumberGlobalPlaceholder'),

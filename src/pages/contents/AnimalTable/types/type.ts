@@ -6,7 +6,7 @@ export enum AnimalSex {
 export interface AnimalForm {
   animal_name: string;
   ear_tag_number_local: number;
-  ear_tag_number_global: number;
+  ear_tag_number_register: number;
   type: 'vaca' | 'bezerro' | 'touro' | 'novilho';
   sex: AnimalSex;
   breed: string;
