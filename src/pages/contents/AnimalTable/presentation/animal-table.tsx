@@ -1,40 +1,158 @@
 import React from 'react';
-import { Table, Tag } from 'antd';
-
-const columns = [
-  { title: 'Nomes', dataIndex: 'name', key: 'name' },
-  { title: 'Preço de Venda', dataIndex: 'price', key: 'price' },
-  { title: 'Peso Atual', dataIndex: 'currentWeight', key: 'currentWeight' },
-  { title: 'Peso Ideal', dataIndex: 'idealWeight', key: 'idealWeight' },
-  { title: 'Última Atualização', dataIndex: 'lastUpdate', key: 'lastUpdate' },
-  {
-    title: 'Produção de Leite',
-    dataIndex: 'milkProduction',
-    key: 'milkProduction',
-    render: (text: string) => {
-      let color = 'green';
-      if (text === 'Baixa') color = 'red';
-      else if (text === 'Média') color = 'orange';
-      return <Tag color={color}>{text}</Tag>;
-    },
-  },
-];
-
-const data = [
-  { key: '1', name: 'Maggi', price: 'R$430', currentWeight: '43 Kg', idealWeight: '12 Kg', lastUpdate: '11/12/22', milkProduction: 'Alta' },
-  { key: '2', name: 'Bru', price: 'R$257', currentWeight: '22 Kg', idealWeight: '12 Kg', lastUpdate: '21/12/22', milkProduction: 'Baixa' },
-  { key: '3', name: 'Red Bull', price: 'R$405', currentWeight: '36 Kg', idealWeight: '9 Kg', lastUpdate: '5/12/22', milkProduction: 'Alta' },
-  { key: '4', name: 'Bourn Vita', price: 'R$502', currentWeight: '14 Kg', idealWeight: '6 Kg', lastUpdate: '8/12/22', milkProduction: 'Baixa' },
-  { key: '5', name: 'Horlicks', price: 'R$530', currentWeight: '5 Kg', idealWeight: '5 Kg', lastUpdate: '9/12/23', milkProduction: 'Alta' },
-  { key: '6', name: 'Harpic', price: 'R$605', currentWeight: '10 Kg', idealWeight: '5 Kg', lastUpdate: '9/12/23', milkProduction: 'Alta' },
-  { key: '7', name: 'Ariel', price: 'R$408', currentWeight: '23 Kg', idealWeight: '7 Kg', lastUpdate: '15/12/23', milkProduction: 'Baixa' },
-  { key: '8', name: 'Scotch Brite', price: 'R$359', currentWeight: '43 Kg', idealWeight: '8 Kg', lastUpdate: '6/12/23', milkProduction: 'Alta' },
-  { key: '9', name: 'Coca Cola', price: 'R$205', currentWeight: '41 Kg', idealWeight: '10 Kg', lastUpdate: '11/12/22', milkProduction: 'Média' },
-];
+import { Table, Spin, Alert } from 'antd';
+import { useAnimals } from '../hooks/useAnimals';
+import { useFarm } from '../../../../hooks/useFarm';
 
 const AnimalTable: React.FC = () => {
+  const { farm } = useFarm();
+  const { animals, loading, error } = useAnimals(farm.id);
+
+  const columns = [
+    { 
+      title: 'Nome do Animal', 
+      dataIndex: 'AnimalName', 
+      key: 'AnimalName' 
+    },
+    { 
+      title: 'Tipo', 
+      dataIndex: 'Type', 
+      key: 'Type' 
+    },
+    { 
+      title: 'Número da Orelha (Local)', 
+      dataIndex: 'EarTagNumberLocal', 
+      key: 'EarTagNumberLocal' 
+    },
+    { 
+      title: 'Número da Orelha (Registro)', 
+      dataIndex: 'EarTagNumberRegister', 
+      key: 'EarTagNumberRegister' 
+    },
+    { 
+      title: 'Raça', 
+      dataIndex: 'Breed', 
+      key: 'Breed' 
+    },
+    { 
+      title: 'Data de Nascimento', 
+      dataIndex: 'BirthDate', 
+      key: 'BirthDate',
+      render: (date: string) => {
+        if (!date) return '-';
+        return new Date(date).toLocaleDateString('pt-BR');
+      }
+    },
+    { 
+      title: 'Sexo', 
+      dataIndex: 'Sex', 
+      key: 'Sex',
+      render: (sex: number) => {
+        return sex === 0 ? 'Macho' : 'Fêmea';
+      }
+    },
+    { 
+      title: 'Castrado', 
+      dataIndex: 'Castrated', 
+      key: 'Castrated',
+      render: (castrated: boolean) => {
+        return castrated ? 'Sim' : 'Não';
+      }
+    },
+    { 
+      title: 'Confinamento', 
+      dataIndex: 'Confinement', 
+      key: 'Confinement',
+      render: (confinement: boolean) => {
+        return confinement ? 'Sim' : 'Não';
+      }
+    },
+    { 
+      title: 'Fertilização', 
+      dataIndex: 'Fertilization', 
+      key: 'Fertilization',
+      render: (fertilization: boolean) => {
+        return fertilization ? 'Sim' : 'Não';
+      }
+    },
+    { 
+      title: 'Status', 
+      dataIndex: 'Status', 
+      key: 'Status',
+      render: (status: number) => {
+        const statusMap = {
+          0: 'Ativo',
+          1: 'Inativo',
+          2: 'Vendido',
+          3: 'Abatido'
+        };
+        return statusMap[status as keyof typeof statusMap] || 'Desconhecido';
+      }
+    },
+    { 
+      title: 'Propósito', 
+      dataIndex: 'Purpose', 
+      key: 'Purpose',
+      render: (purpose: number) => {
+        const purposeMap = {
+          0: 'Leite',
+          1: 'Carne',
+          2: 'Reprodução',
+          3: 'Misto'
+        };
+        return purposeMap[purpose as keyof typeof purposeMap] || 'Desconhecido';
+      }
+    },
+    { 
+      title: 'Lote Atual', 
+      dataIndex: 'CurrentBatch', 
+      key: 'CurrentBatch' 
+    },
+    { 
+      title: 'Criado em', 
+      dataIndex: 'CreatedAt', 
+      key: 'CreatedAt',
+      render: (date: string) => {
+        if (!date) return '-';
+        return new Date(date).toLocaleDateString('pt-BR');
+      }
+    }
+  ];
+
+  console.log('Animals data:', animals);
+  console.log('Animals type:', typeof animals);
+  console.log('Is array:', Array.isArray(animals));
+
+  if (loading) {
     return (
-      <Table columns={columns} dataSource={data} pagination={{ showSizeChanger: true }} />
+      <div style={{ textAlign: 'center', padding: '50px' }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert
+        message="Erro"
+        description={error}
+        type="error"
+        showIcon
+        style={{ marginBottom: '16px' }}
+      />
+    );
+  }
+
+  // Garantir que animals seja sempre um array
+  const animalsData = Array.isArray(animals) ? animals : [];
+
+  return (
+    <Table 
+      columns={columns} 
+      dataSource={animalsData} 
+      pagination={{ showSizeChanger: true }}
+      rowKey="ID"
+      scroll={{ x: 1500 }}
+    />
   );
 };
 

@@ -17,3 +17,18 @@ export interface CreateAnimalParams extends AnimalForm {
   farm_id: number;
 }
 
+export interface Animal extends AnimalForm {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  price?: string;
+  current_weight?: string;
+  ideal_weight?: string;
+  last_update?: string;
+  milk_production?: string;
+}
+
+export interface GetAnimalsByFarmParams {
+  farm_id: number;
+}
+
