@@ -39,5 +39,18 @@ export const translations = {
     search: "Pesquisar",
     animalCreatedSuccessfully: "Animal criado com sucesso",
     animalsRetrievedSuccessfully: "Animais carregados com sucesso",
+    columnFilter: "Filtrar Colunas",
+    selectAll: "Selecionar Todos",
+    deselectAll: "Desselecionar Todos",
+    resetToDefault: "Restaurar Padrão",
+    apply: "Aplicar",
+    selectedColumns: "Colunas selecionadas",
+    age: "Idade",
+    milkProduction: "Produção de Leite",
+    lastInsemination: "Última Inseminação",
+    pregnancyStatus: "Status de Gestação",
+    healthStatus: "Status de Saúde",
+    location: "Localização",
+    owner: "Proprietário",
   }
 }; 

@@ -1,24 +1,50 @@
-import React from 'react';
-import { Button, Input, Select, Card, Row, Col, Statistic, Space } from 'antd';
+import React, { useState } from 'react';
+import { Button, Input, Card, Row, Col, Statistic, Space } from 'antd';
 import { useModal } from '../../../../hooks';
 import { useTranslation } from 'react-i18next';
 import { CreateAnimalModal } from './create-animal-modal';
+import { FilterModal } from './filter-modal';
 
 const { Search } = Input;
-const { Option } = Select;
 
 interface AnimalDashboardProps {
   onAnimalCreated?: () => void;
+  onColumnsChanged?: (columns: string[]) => void;
+  selectedColumns?: string[];
 }
 
-const AnimalDashboard: React.FC<AnimalDashboardProps> = ({ onAnimalCreated }) => {
+const AnimalDashboard: React.FC<AnimalDashboardProps> = ({ 
+  onAnimalCreated, 
+  onColumnsChanged, 
+  selectedColumns: externalSelectedColumns 
+}) => {
   const { isOpen, onOpen, onClose } = useModal();
+  const { isOpen: isFilterOpen, onOpen: onFilterOpen, onClose: onFilterClose } = useModal();
   const { t } = useTranslation();
+
+  const [selectedColumns, setSelectedColumns] = useState<string[]>(
+    externalSelectedColumns || [
+      'animal_name',
+      'ear_tag_number_local', 
+      'ear_tag_number_register',
+      'type',
+      'sex',
+      'breed',
+      'birth_date'
+    ]
+  );
 
   const handleAnimalCreated = () => {
     onClose();
     if (onAnimalCreated) {
       onAnimalCreated();
+    }
+  };
+
+  const handleApplyFilters = (columns: string[]) => {
+    setSelectedColumns(columns);
+    if (onColumnsChanged) {
+      onColumnsChanged(columns);
     }
   };
 
@@ -94,9 +120,9 @@ const AnimalDashboard: React.FC<AnimalDashboardProps> = ({ onAnimalCreated }) =>
           <Button type="primary" onClick={onOpen}>
             {t('animalTable.createCow')}
           </Button>
-          <Select defaultValue="filtro" style={{ width: 120 }}>
-            <Option value="filtro">{t('animalTable.filter')}</Option>
-          </Select>
+          <Button onClick={onFilterOpen}>
+            {t('animalTable.filter')}
+          </Button>
           <Search 
             placeholder={t('animalTable.search')} 
             style={{ width: 200 }} 
@@ -105,6 +131,12 @@ const AnimalDashboard: React.FC<AnimalDashboardProps> = ({ onAnimalCreated }) =>
       </Card>
 
       <CreateAnimalModal isOpen={isOpen} onClose={handleAnimalCreated} />
+      <FilterModal 
+        isOpen={isFilterOpen} 
+        onClose={onFilterClose}
+        onApplyFilters={handleApplyFilters}
+        currentColumns={selectedColumns}
+      />
     </div>
   );
 };

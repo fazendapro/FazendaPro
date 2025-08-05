@@ -2,129 +2,27 @@ import { forwardRef, useImperativeHandle } from 'react';
 import { Table, Spin, Alert } from 'antd';
 import { useAnimals } from '../hooks/useAnimals';
 import { useFarm } from '../../../../hooks/useFarm';
+import { useAnimalColumnBuilder } from './column-builder';
 
 interface AnimalTableRef {
   refetch: () => void;
 }
 
-const AnimalTable = forwardRef<AnimalTableRef>((props, ref) => {
+interface AnimalTableProps {
+  selectedColumns?: string[];
+}
+
+const AnimalTable = forwardRef<AnimalTableRef, AnimalTableProps>((props, ref) => {
+  const { selectedColumns = [] } = props;
   const { farm } = useFarm();
   const { animals, loading, error, refetch } = useAnimals(farm.id);
+  const { buildTableColumns } = useAnimalColumnBuilder();
 
   useImperativeHandle(ref, () => ({
     refetch
   }));
 
-  const columns = [
-    { 
-      title: 'Nome do Animal', 
-      dataIndex: 'AnimalName', 
-      key: 'AnimalName' 
-    },
-    { 
-      title: 'Tipo', 
-      dataIndex: 'Type', 
-      key: 'Type' 
-    },
-    { 
-      title: 'Número do Brinco (Local)', 
-      dataIndex: 'EarTagNumberLocal', 
-      key: 'EarTagNumberLocal' 
-    },
-    { 
-      title: 'Número do Brinco (Registro)', 
-      dataIndex: 'EarTagNumberRegister', 
-      key: 'EarTagNumberRegister' 
-    },
-    { 
-      title: 'Raça', 
-      dataIndex: 'Breed', 
-      key: 'Breed' 
-    },
-    { 
-      title: 'Data de Nascimento', 
-      dataIndex: 'BirthDate', 
-      key: 'BirthDate',
-      render: (date: string) => {
-        if (!date) return '-';
-        return new Date(date).toLocaleDateString('pt-BR');
-      }
-    },
-    { 
-      title: 'Sexo', 
-      dataIndex: 'Sex', 
-      key: 'Sex',
-      render: (sex: number) => {
-        return sex === 0 ? 'Macho' : 'Fêmea';
-      }
-    },
-    { 
-      title: 'Castrado', 
-      dataIndex: 'Castrated', 
-      key: 'Castrated',
-      render: (castrated: boolean) => {
-        return castrated ? 'Sim' : 'Não';
-      }
-    },
-    { 
-      title: 'Confinamento', 
-      dataIndex: 'Confinement', 
-      key: 'Confinement',
-      render: (confinement: boolean) => {
-        return confinement ? 'Sim' : 'Não';
-      }
-    },
-    { 
-      title: 'Fertilização', 
-      dataIndex: 'Fertilization', 
-      key: 'Fertilization',
-      render: (fertilization: boolean) => {
-        return fertilization ? 'Sim' : 'Não';
-      }
-    },
-    { 
-      title: 'Status', 
-      dataIndex: 'Status', 
-      key: 'Status',
-      render: (status: number) => {
-        const statusMap = {
-          0: 'Ativo',
-          1: 'Inativo',
-          2: 'Vendido',
-          3: 'Abatido'
-        };
-        return statusMap[status as keyof typeof statusMap] || 'Desconhecido';
-      }
-    },
-    { 
-      title: 'Propósito', 
-      dataIndex: 'Purpose', 
-      key: 'Purpose',
-      render: (purpose: number) => {
-        const purposeMap = {
-          0: 'Leite',
-          1: 'Carne',
-          2: 'Reprodução',
-          3: 'Misto'
-        };
-        return purposeMap[purpose as keyof typeof purposeMap] || 'Desconhecido';
-      }
-    },
-    { 
-      title: 'Lote Atual', 
-      dataIndex: 'CurrentBatch', 
-      key: 'CurrentBatch' 
-    },
-    { 
-      title: 'Criado em', 
-      dataIndex: 'CreatedAt', 
-      key: 'CreatedAt',
-      render: (date: string) => {
-        if (!date) return '-';
-        return new Date(date).toLocaleDateString('pt-BR');
-      }
-    }
-  ];
+  const filteredColumns = buildTableColumns(selectedColumns);
 
   if (loading) {
     return (
@@ -148,7 +46,7 @@ const AnimalTable = forwardRef<AnimalTableRef>((props, ref) => {
 
   return (
     <Table 
-      columns={columns} 
+      columns={filteredColumns} 
       dataSource={animals} 
       pagination={{ showSizeChanger: true }}
       rowKey="ID"
