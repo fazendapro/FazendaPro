@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -18,7 +19,8 @@ func NewAnimalHandler(service *service.AnimalService) *AnimalHandler {
 	return &AnimalHandler{service: service}
 }
 
-type CreateAnimalRequest struct {
+// AnimalData representa os dados base de um animal
+type AnimalData struct {
 	ID                   uint   `json:"id"`
 	FarmID               uint   `json:"farmID"`
 	EarTagNumberLocal    int    `json:"earringNumber"`
@@ -40,28 +42,78 @@ type CreateAnimalRequest struct {
 	CurrentBatch         int    `json:"currentBatch"`
 }
 
+type CreateAnimalRequest struct {
+	AnimalData
+}
+
 type AnimalResponse struct {
-	ID                   uint   `json:"id"`
-	FarmID               uint   `json:"farmID"`
-	EarTagNumberLocal    int    `json:"ear_tag_number_local"`
-	EarTagNumberRegister int    `json:"ear_tag_number_register"`
-	AnimalName           string `json:"animal_name"`
-	Sex                  int    `json:"sex"`
-	Breed                string `json:"breed"`
-	Type                 string `json:"type"`
-	BirthDate            string `json:"birth_date,omitempty"`
-	Photo                string `json:"photo,omitempty"`
-	FatherID             *uint  `json:"father_id,omitempty"`
-	MotherID             *uint  `json:"mother_id,omitempty"`
-	Confinement          bool   `json:"confinement"`
-	AnimalType           int    `json:"animal_type"`
-	Status               int    `json:"status"`
-	Fertilization        bool   `json:"fertilization"`
-	Castrated            bool   `json:"castrated"`
-	Purpose              int    `json:"purpose"`
-	CurrentBatch         int    `json:"current_batch"`
-	CreatedAt            string `json:"created_at"`
-	UpdatedAt            string `json:"updated_at"`
+	AnimalData
+	CreatedAt string `json:"createdAt"`
+	UpdatedAt string `json:"updatedAt"`
+}
+
+func animalDataToModel(data AnimalData) models.Animal {
+	var birthDate *time.Time
+	if data.BirthDate != "" {
+		if parsedDate, err := time.Parse("2006-01-02", data.BirthDate); err == nil {
+			birthDate = &parsedDate
+		}
+	}
+
+	return models.Animal{
+		ID:                   data.ID,
+		FarmID:               data.FarmID,
+		EarTagNumberLocal:    data.EarTagNumberLocal,
+		EarTagNumberRegister: data.EarTagNumberRegister,
+		AnimalName:           data.AnimalName,
+		Sex:                  data.Sex,
+		Breed:                data.Breed,
+		Type:                 data.Type,
+		BirthDate:            birthDate,
+		Photo:                data.Photo,
+		FatherID:             data.FatherID,
+		MotherID:             data.MotherID,
+		Confinement:          data.Confinement,
+		AnimalType:           data.AnimalType,
+		Status:               data.Status,
+		Fertilization:        data.Fertilization,
+		Castrated:            data.Castrated,
+		Purpose:              data.Purpose,
+		CurrentBatch:         data.CurrentBatch,
+	}
+}
+
+func modelToAnimalResponse(animal *models.Animal) AnimalResponse {
+	var birthDate string
+	if animal.BirthDate != nil {
+		birthDate = animal.BirthDate.Format("2006-01-02")
+	}
+
+	return AnimalResponse{
+		AnimalData: AnimalData{
+			ID:                   animal.ID,
+			FarmID:               animal.FarmID,
+			EarTagNumberLocal:    animal.EarTagNumberLocal,
+			EarTagNumberRegister: animal.EarTagNumberRegister,
+			AnimalName:           animal.AnimalName,
+			Sex:                  animal.Sex,
+			Breed:                animal.Breed,
+			Type:                 animal.Type,
+			BirthDate:            birthDate,
+			Photo:                animal.Photo,
+			FatherID:             animal.FatherID,
+			MotherID:             animal.MotherID,
+			Confinement:          animal.Confinement,
+			AnimalType:           animal.AnimalType,
+			Status:               animal.Status,
+			Fertilization:        animal.Fertilization,
+			Castrated:            animal.Castrated,
+			Purpose:              animal.Purpose,
+			CurrentBatch:         animal.CurrentBatch,
+		},
+		CreatedAt: animal.CreatedAt.Format("2006-01-02 15:04:05"),
+		UpdatedAt: animal.UpdatedAt.Format("2006-01-02 15:04:05"),
+	}
 }
 
 func (h *AnimalHandler) CreateAnimal(w http.ResponseWriter, r *http.Request) {
@@ -76,37 +128,7 @@ func (h *AnimalHandler) CreateAnimal(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var birthDate *time.Time
-	if req.BirthDate != "" {
-		parsedDate, err := time.Parse("2006-01-02", req.BirthDate)
-		if err != nil {
-			SendErrorResponse(w, "Formato de data inválido. Use YYYY-MM-DD", http.StatusBadRequest)
-			return
-		}
-		birthDate = &parsedDate
-	}
-
-	animal := models.Animal{
-		ID:                   req.ID,
-		FarmID:               req.FarmID,
-		EarTagNumberLocal:    req.EarTagNumberLocal,
-		EarTagNumberRegister: req.EarTagNumberRegister,
-		AnimalName:           req.AnimalName,
-		Sex:                  req.Sex,
-		Breed:                req.Breed,
-		Type:                 req.Type,
-		BirthDate:            birthDate,
-		Photo:                req.Photo,
-		FatherID:             req.FatherID,
-		MotherID:             req.MotherID,
-		Confinement:          req.Confinement,
-		AnimalType:           req.AnimalType,
-		Status:               req.Status,
-		Fertilization:        req.Fertilization,
-		Castrated:            req.Castrated,
-		Purpose:              req.Purpose,
-		CurrentBatch:         req.CurrentBatch,
-	}
+	animal := animalDataToModel(req.AnimalData)
 
 	if err := h.service.CreateAnimal(&animal); err != nil {
 		SendErrorResponse(w, "Erro ao criar animal: "+err.Error(), http.StatusBadRequest)
@@ -143,7 +165,8 @@ func (h *AnimalHandler) GetAnimal(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	SendSuccessResponse(w, animal, "Animal encontrado com sucesso", http.StatusOK)
+	response := modelToAnimalResponse(animal)
+	SendSuccessResponse(w, response, "Animal encontrado com sucesso", http.StatusOK)
 }
 
 func (h *AnimalHandler) GetAnimalsByFarm(w http.ResponseWriter, r *http.Request) {
@@ -165,7 +188,14 @@ func (h *AnimalHandler) GetAnimalsByFarm(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	SendSuccessResponse(w, animals, "Animais encontrados com sucesso", http.StatusOK)
+	var responses []AnimalResponse
+	for _, animal := range animals {
+		responses = append(responses, modelToAnimalResponse(&animal))
+	}
+
+	fmt.Printf("FarmID: %d, Animais encontrados: %d\n", id, len(animals))
+
+	SendSuccessResponse(w, responses, fmt.Sprintf("Animais encontrados com sucesso (%d animais)", len(animals)), http.StatusOK)
 }
 
 func (h *AnimalHandler) UpdateAnimal(w http.ResponseWriter, r *http.Request) {
@@ -180,37 +210,7 @@ func (h *AnimalHandler) UpdateAnimal(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var birthDate *time.Time
-	if req.BirthDate != "" {
-		parsedDate, err := time.Parse("2006-01-02", req.BirthDate)
-		if err != nil {
-			SendErrorResponse(w, "Formato de data inválido. Use YYYY-MM-DD", http.StatusBadRequest)
-			return
-		}
-		birthDate = &parsedDate
-	}
-
-	animal := models.Animal{
-		ID:                   req.ID,
-		FarmID:               req.FarmID,
-		EarTagNumberLocal:    req.EarTagNumberLocal,
-		EarTagNumberRegister: req.EarTagNumberRegister,
-		AnimalName:           req.AnimalName,
-		Sex:                  req.Sex,
-		Breed:                req.Breed,
-		Type:                 req.Type,
-		BirthDate:            birthDate,
-		Photo:                req.Photo,
-		FatherID:             req.FatherID,
-		MotherID:             req.MotherID,
-		Confinement:          req.Confinement,
-		AnimalType:           req.AnimalType,
-		Status:               req.Status,
-		Fertilization:        req.Fertilization,
-		Castrated:            req.Castrated,
-		Purpose:              req.Purpose,
-		CurrentBatch:         req.CurrentBatch,
-	}
+	animal := animalDataToModel(req.AnimalData)
 
 	if err := h.service.UpdateAnimal(&animal); err != nil {
 		SendErrorResponse(w, "Erro ao atualizar animal: "+err.Error(), http.StatusBadRequest)

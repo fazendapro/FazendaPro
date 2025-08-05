@@ -24,7 +24,7 @@ func (r *AnimalRepository) Create(animal *models.Animal) error {
 
 func (r *AnimalRepository) FindByID(id uint) (*models.Animal, error) {
 	var animal models.Animal
-	if err := r.db.DB.Preload("Farm").Preload("Father").Preload("Mother").Where("id = ?", id).First(&animal).Error; err != nil {
+	if err := r.db.DB.Where("id = ?", id).First(&animal).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
 		}
@@ -35,7 +35,7 @@ func (r *AnimalRepository) FindByID(id uint) (*models.Animal, error) {
 
 func (r *AnimalRepository) FindByFarmID(farmID uint) ([]models.Animal, error) {
 	var animals []models.Animal
-	if err := r.db.DB.Preload("Farm").Preload("Father").Preload("Mother").Where("farm_id = ?", farmID).Find(&animals).Error; err != nil {
+	if err := r.db.DB.Where("farm_id = ?", farmID).Find(&animals).Error; err != nil {
 		return nil, fmt.Errorf("erro ao buscar animais da fazenda: %w", err)
 	}
 	return animals, nil
