@@ -1,11 +1,19 @@
-import React from 'react';
+import { forwardRef, useImperativeHandle } from 'react';
 import { Table, Spin, Alert } from 'antd';
 import { useAnimals } from '../hooks/useAnimals';
 import { useFarm } from '../../../../hooks/useFarm';
 
-const AnimalTable: React.FC = () => {
+interface AnimalTableRef {
+  refetch: () => void;
+}
+
+const AnimalTable = forwardRef<AnimalTableRef>((props, ref) => {
   const { farm } = useFarm();
-  const { animals, loading, error } = useAnimals(farm.id);
+  const { animals, loading, error, refetch } = useAnimals(farm.id);
+
+  useImperativeHandle(ref, () => ({
+    refetch
+  }));
 
   const columns = [
     { 
@@ -118,10 +126,6 @@ const AnimalTable: React.FC = () => {
     }
   ];
 
-  console.log('Animals data:', animals);
-  console.log('Animals type:', typeof animals);
-  console.log('Is array:', Array.isArray(animals));
-
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '50px' }}>
@@ -142,18 +146,15 @@ const AnimalTable: React.FC = () => {
     );
   }
 
-  // Garantir que animals seja sempre um array
-  const animalsData = Array.isArray(animals) ? animals : [];
-
   return (
     <Table 
       columns={columns} 
-      dataSource={animalsData} 
+      dataSource={animals} 
       pagination={{ showSizeChanger: true }}
       rowKey="ID"
       scroll={{ x: 1500 }}
     />
   );
-};
+});
 
 export { AnimalTable };

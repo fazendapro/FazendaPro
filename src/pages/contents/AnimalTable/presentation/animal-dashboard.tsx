@@ -7,9 +7,20 @@ import { CreateAnimalModal } from './create-animal-modal';
 const { Search } = Input;
 const { Option } = Select;
 
-const AnimalDashboard: React.FC = () => {
+interface AnimalDashboardProps {
+  onAnimalCreated?: () => void;
+}
+
+const AnimalDashboard: React.FC<AnimalDashboardProps> = ({ onAnimalCreated }) => {
   const { isOpen, onOpen, onClose } = useModal();
   const { t } = useTranslation();
+
+  const handleAnimalCreated = () => {
+    onClose();
+    if (onAnimalCreated) {
+      onAnimalCreated();
+    }
+  };
 
   return (
     <div>
@@ -93,7 +104,7 @@ const AnimalDashboard: React.FC = () => {
         </Space>
       </Card>
 
-      <CreateAnimalModal isOpen={isOpen} onClose={onClose} />
+      <CreateAnimalModal isOpen={isOpen} onClose={handleAnimalCreated} />
     </div>
   );
 };

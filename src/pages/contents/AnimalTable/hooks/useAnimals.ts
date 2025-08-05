@@ -15,13 +15,8 @@ export const useAnimals = (farmId: number) => {
       const getAnimalsByFarm = GetAnimalsByFarmFactory();
       const response = await getAnimalsByFarm.getAnimalsByFarm({ farm_id: farmId });
 
-      console.log('API Response:', response);
-
       if (response.success) {
-        // Garantir que response.data seja sempre um array
-        const animalsData = Array.isArray(response.data) ? response.data : [];
-        console.log('Animals data after processing:', animalsData);
-        setAnimals(animalsData);
+        setAnimals(response.data || []);
       } else {
         setError(response.message || 'Erro ao buscar animais');
       }
@@ -35,7 +30,7 @@ export const useAnimals = (farmId: number) => {
 
   useEffect(() => {
     fetchAnimals();
-  }, [farmId]);
+  }, []);
 
   return {
     animals,

@@ -11,7 +11,6 @@ export const animalSchema = yup.object().shape({
   ear_tag_number_local: yup
     .number()
     .min(1, 'O número do brinco é obrigatório')
-    .max(20, 'O número do brinco deve ter no máximo 20 caracteres')
     .required('O número do brinco é obrigatório'),
   type: yup
     .string()
@@ -34,6 +33,5 @@ export const animalSchema = yup.object().shape({
   ear_tag_number_global: yup
     .number()
     .min(1, 'O número do brinco de registro é obrigatório')
-    .max(20, 'O número do brinco de registro deve ter no máximo 20 caracteres')
     .required('O número do brinco de registro é obrigatório'),
 }); 
