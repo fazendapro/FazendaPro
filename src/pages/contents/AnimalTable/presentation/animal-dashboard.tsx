@@ -12,7 +12,7 @@ const AnimalDashboard: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <div style={{ padding: '16px' }}>
+    <div>
       <Card style={{ marginBottom: '16px' }}>
         <Row gutter={16}>
           <Col span={6}>
