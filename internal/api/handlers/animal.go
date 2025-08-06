@@ -170,20 +170,29 @@ func (h *AnimalHandler) GetAnimal(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AnimalHandler) GetAnimalsByFarm(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("GetAnimalsByFarm chamado - URL: %s, Query: %s\n", r.URL.Path, r.URL.RawQuery)
+
 	farmID := r.URL.Query().Get("farmId")
 	if farmID == "" {
+		fmt.Printf("Erro: farmId não fornecido\n")
 		SendErrorResponse(w, "ID da fazenda é obrigatório", http.StatusBadRequest)
 		return
 	}
 
+	fmt.Printf("FarmID recebido: %s\n", farmID)
+
 	id, err := strconv.ParseUint(farmID, 10, 32)
 	if err != nil {
+		fmt.Printf("Erro ao converter farmId: %v\n", err)
 		SendErrorResponse(w, "ID da fazenda inválido", http.StatusBadRequest)
 		return
 	}
 
+	fmt.Printf("FarmID convertido: %d\n", id)
+
 	animals, err := h.service.GetAnimalsByFarmID(uint(id))
 	if err != nil {
+		fmt.Printf("Erro ao buscar animais: %v\n", err)
 		SendErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

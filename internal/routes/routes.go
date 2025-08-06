@@ -18,6 +18,13 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 
 	r.Use(middleware.CORSMiddleware(cfg))
 
+	r.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			app.Logger.Printf("Request: %s %s", r.Method, r.URL.Path)
+			next.ServeHTTP(w, r)
+		})
+	})
+
 	r.Get("/health", app.HealthCheck)
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -25,6 +32,7 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 	})
 
 	if db != nil && db.DB != nil {
+		app.Logger.Println("Database conectado - configurando rotas de dados")
 		repoFactory := repository.NewRepositoryFactory(db)
 		serviceFactory := service.NewServiceFactory(repoFactory)
 
@@ -46,8 +54,10 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 			r.Put("/", animalHandler.UpdateAnimal)
 			r.Delete("/", animalHandler.DeleteAnimal)
 		})
+
+		app.Logger.Println("Rotas de animais configuradas: /animals/farm")
 	} else {
-		fmt.Println("Database não disponível - rotas de dados desabilitadas")
+		app.Logger.Println("Database não disponível - rotas de dados desabilitadas")
 	}
 
 	fmt.Println("Todas as rotas configuradas com sucesso")

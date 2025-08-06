@@ -30,8 +30,8 @@ func NewDatabase(cfg *config.Config) (*Database, error) {
 	var dsn string
 	if env == "production" {
 		dsn = fmt.Sprintf(
-			"host=%s user=%s password=%s port=%s sslmode=%s",
-			cfg.DBHost, cfg.User, cfg.Password, cfg.DBPort, sslMode,
+			"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
+			cfg.DBHost, cfg.User, cfg.Password, cfg.Name, cfg.DBPort, sslMode,
 		)
 	} else {
 		dsn = fmt.Sprintf(
