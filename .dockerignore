@@ -15,10 +15,6 @@ README*.md
 scripts/
 Makefile
 
-# Configurações
-.env*
-env.example
-
 # Logs
 *.log
 

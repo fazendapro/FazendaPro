@@ -23,8 +23,6 @@ WORKDIR /app
 
 COPY --from=builder /app/main .
 
-COPY --from=builder /app/.env* ./
-
 RUN chown -R appuser:appgroup /app
 
 USER appuser
