@@ -1,7 +1,9 @@
 import axios, { AxiosInstance } from 'axios'
 
 export function baseAxios(baseUrl: string): AxiosInstance {
-  return axios.create({ 
-    baseURL: `http://localhost:8080/${baseUrl}` 
+  const apiUrl = import.meta.env.VITE_API_URL
+
+  return axios.create({
+    baseURL: `${apiUrl}/${baseUrl}` 
   })
 }
