@@ -40,7 +40,7 @@ steps:
       - '--max-instances'
       - '10'
       - '--set-env-vars'
-      - 'ENV=production'
+      - 'ENV=production,DB_HOST=${_DB_HOST},DB_PORT=${_DB_PORT},DB_USER=${_DB_USER},DB_PASSWORD=${_DB_PASSWORD},DB_NAME=${_DB_NAME},JWT_SECRET=${_JWT_SECRET}'
 
 images:
   - 'gcr.io/$PROJECT_ID/fazendapro-api:$COMMIT_SHA'

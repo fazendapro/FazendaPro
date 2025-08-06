@@ -40,15 +40,23 @@ func main() {
 
 	db, err := repository.NewDatabase(cfg)
 	if err != nil {
-		log.Fatal("Erro ao conectar ao banco:", err)
-	}
-	defer db.Close()
+		app.Logger.Printf("WARNING: Erro ao conectar ao banco: %v", err)
+		app.Logger.Println("Continuando sem conexão com banco de dados...")
+		// Don't fail the application if DB is not available
+	} else {
+		defer db.Close()
 
-	if err := migrations.RunMigrations(db.DB); err != nil {
-		log.Fatal("Erro ao executar migrações:", err)
+		if err := migrations.RunMigrations(db.DB); err != nil {
+			app.Logger.Printf("WARNING: Erro ao executar migrações: %v", err)
+			app.Logger.Println("Continuando sem migrações...")
+		}
 	}
 
-	r := routes.SetupRoutes(app, db, cfg)
+	var dbInstance *repository.Database
+	if db != nil {
+		dbInstance = db
+	}
+	r := routes.SetupRoutes(app, dbInstance, cfg)
 	server := http.Server{
 		Addr:         fmt.Sprintf(":%d", port),
 		Handler:      r,

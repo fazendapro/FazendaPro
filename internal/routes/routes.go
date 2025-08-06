@@ -2,6 +2,7 @@ package routes
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/fazendapro/FazendaPro-api/cmd/app"
 	"github.com/fazendapro/FazendaPro-api/config"
@@ -18,28 +19,36 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 	r.Use(middleware.CORSMiddleware(cfg))
 
 	r.Get("/health", app.HealthCheck)
-
-	repoFactory := repository.NewRepositoryFactory(db)
-	serviceFactory := service.NewServiceFactory(repoFactory)
-
-	userService := serviceFactory.CreateUserService()
-	userHandler := handlers.NewUserHandler(userService)
-
-	r.Route("/users", func(r chi.Router) {
-		r.Post("/", userHandler.CreateUser)
-		r.Get("/", userHandler.GetUser)
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("FazendaPro API is running!"))
 	})
 
-	animalService := serviceFactory.CreateAnimalService()
-	animalHandler := handlers.NewAnimalHandler(animalService)
+	if db != nil && db.DB != nil {
+		repoFactory := repository.NewRepositoryFactory(db)
+		serviceFactory := service.NewServiceFactory(repoFactory)
 
-	r.Route("/animals", func(r chi.Router) {
-		r.Post("/", animalHandler.CreateAnimal)
-		r.Get("/", animalHandler.GetAnimal)
-		r.Get("/farm", animalHandler.GetAnimalsByFarm)
-		r.Put("/", animalHandler.UpdateAnimal)
-		r.Delete("/", animalHandler.DeleteAnimal)
-	})
+		userService := serviceFactory.CreateUserService()
+		userHandler := handlers.NewUserHandler(userService)
+
+		r.Route("/users", func(r chi.Router) {
+			r.Post("/", userHandler.CreateUser)
+			r.Get("/", userHandler.GetUser)
+		})
+
+		animalService := serviceFactory.CreateAnimalService()
+		animalHandler := handlers.NewAnimalHandler(animalService)
+
+		r.Route("/animals", func(r chi.Router) {
+			r.Post("/", animalHandler.CreateAnimal)
+			r.Get("/", animalHandler.GetAnimal)
+			r.Get("/farm", animalHandler.GetAnimalsByFarm)
+			r.Put("/", animalHandler.UpdateAnimal)
+			r.Delete("/", animalHandler.DeleteAnimal)
+		})
+	} else {
+		fmt.Println("Database não disponível - rotas de dados desabilitadas")
+	}
 
 	fmt.Println("Todas as rotas configuradas com sucesso")
 	return r
