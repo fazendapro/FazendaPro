@@ -1,13 +1,13 @@
 import axios, { AxiosInstance } from 'axios'
 
 export function baseAxios(baseUrl: string): AxiosInstance {
-  const apiUrl = import.meta.env.VITE_API_URL
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
   
-  if (!apiUrl) {
-    throw new Error('VITE_API_URL não está definida. Verifique as variáveis de ambiente.')
+  if (import.meta.env.DEV) {
+    console.log('API URL:', apiUrl)
   }
-
-  return axios.create({
+  
+  return axios.create({ 
     baseURL: `${apiUrl}/${baseUrl}` 
   })
 }

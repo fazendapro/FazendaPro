@@ -6,6 +6,7 @@ steps:
       - '-t'
       - 'gcr.io/$PROJECT_ID/fazendapro:$COMMIT_SHA'
       - '--build-arg'
+      - 'VITE_API_URL=$_VITE_API_URL'
       - '.'
   
   - name: 'gcr.io/cloud-builders/docker'
@@ -36,6 +37,8 @@ steps:
       - '80'
       - '--max-instances'
       - '10'
+      - '--set-env-vars'
+      - 'VITE_API_URL=$_VITE_API_URL'
 
 images:
   - 'gcr.io/$PROJECT_ID/fazendapro:$COMMIT_SHA'
