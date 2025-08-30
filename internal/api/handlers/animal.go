@@ -22,24 +22,24 @@ func NewAnimalHandler(service *service.AnimalService) *AnimalHandler {
 // AnimalData representa os dados base de um animal
 type AnimalData struct {
 	ID                   uint   `json:"id"`
-	FarmID               uint   `json:"farmID"`
-	EarTagNumberLocal    int    `json:"earringNumber"`
-	EarTagNumberRegister int    `json:"earringNumberGlobal"`
-	AnimalName           string `json:"animalName"`
+	FarmID               uint   `json:"farm_id"`
+	EarTagNumberLocal    int    `json:"ear_tag_number_local"`
+	EarTagNumberRegister int    `json:"ear_tag_number_register"`
+	AnimalName           string `json:"animal_name"`
 	Sex                  int    `json:"sex"`
 	Breed                string `json:"breed"`
 	Type                 string `json:"type"`
-	BirthDate            string `json:"birthDate,omitempty"`
+	BirthDate            string `json:"birth_date,omitempty"`
 	Photo                string `json:"photo,omitempty"`
-	FatherID             *uint  `json:"fatherID,omitempty"`
-	MotherID             *uint  `json:"motherID,omitempty"`
+	FatherID             *uint  `json:"father_id,omitempty"`
+	MotherID             *uint  `json:"mother_id,omitempty"`
 	Confinement          bool   `json:"confinement"`
-	AnimalType           int    `json:"animalType"`
+	AnimalType           int    `json:"animal_type"`
 	Status               int    `json:"status"`
 	Fertilization        bool   `json:"fertilization"`
 	Castrated            bool   `json:"castrated"`
 	Purpose              int    `json:"purpose"`
-	CurrentBatch         int    `json:"currentBatch"`
+	CurrentBatch         int    `json:"current_batch"`
 }
 
 type CreateAnimalRequest struct {
@@ -57,10 +57,12 @@ func animalDataToModel(data AnimalData) models.Animal {
 	if data.BirthDate != "" {
 		if parsedDate, err := time.Parse("2006-01-02", data.BirthDate); err == nil {
 			birthDate = &parsedDate
+		} else {
+			fmt.Printf("Erro ao fazer parse da data: %v\n", err)
 		}
 	}
 
-	return models.Animal{
+	animal := models.Animal{
 		ID:                   data.ID,
 		FarmID:               data.FarmID,
 		EarTagNumberLocal:    data.EarTagNumberLocal,
@@ -81,6 +83,8 @@ func animalDataToModel(data AnimalData) models.Animal {
 		Purpose:              data.Purpose,
 		CurrentBatch:         data.CurrentBatch,
 	}
+
+	return animal
 }
 
 func modelToAnimalResponse(animal *models.Animal) AnimalResponse {

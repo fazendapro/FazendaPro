@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"log"
 	"time"
 
 	"github.com/fazendapro/FazendaPro-api/internal/models"
@@ -17,6 +18,7 @@ func NewAnimalService(repository repository.AnimalRepositoryInterface) *AnimalSe
 }
 
 func (s *AnimalService) CreateAnimal(animal *models.Animal) error {
+	log.Println("Creating animal", animal)
 	if animal.FarmID == 0 {
 		return errors.New("farm ID é obrigatório")
 	}
