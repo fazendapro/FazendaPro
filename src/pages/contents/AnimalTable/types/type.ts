@@ -19,8 +19,16 @@ export interface CreateAnimalParams extends AnimalForm {
 
 export interface Animal extends AnimalForm {
   id: string;
-  created_at: string;
-  updated_at: string;
+  farm_id: number;
+  animal_type: number;
+  status: number;
+  confinement: boolean;
+  fertilization: boolean;
+  castrated: boolean;
+  purpose: number;
+  current_batch: number;
+  createdAt: string;
+  updatedAt: string;
   price?: string;
   current_weight?: string;
   ideal_weight?: string;

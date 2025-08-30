@@ -49,7 +49,7 @@ const AnimalTable = forwardRef<AnimalTableRef, AnimalTableProps>((props, ref) =>
       columns={filteredColumns} 
       dataSource={animals} 
       pagination={{ showSizeChanger: true }}
-      rowKey="ID"
+      rowKey="id"
       scroll={{ x: 1500 }}
     />
   );

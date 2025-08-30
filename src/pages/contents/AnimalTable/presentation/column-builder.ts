@@ -21,7 +21,7 @@ export class AnimalColumnBuilder {
       {
         key: 'animal_name',
         title: 'Nome do Animal',
-        dataIndex: 'animalName',
+        dataIndex: 'animal_name',
         defaultVisible: true
       },
       {
@@ -33,13 +33,13 @@ export class AnimalColumnBuilder {
       {
         key: 'ear_tag_number_local',
         title: 'Número do Brinco Local',
-        dataIndex: 'earringNumber',
+        dataIndex: 'ear_tag_number_local',
         defaultVisible: true
       },
       {
         key: 'ear_tag_number_register',
         title: 'Número do Brinco de Registro',
-        dataIndex: 'earringNumberGlobal',
+        dataIndex: 'ear_tag_number_register',
         defaultVisible: true
       },
       {
@@ -51,7 +51,7 @@ export class AnimalColumnBuilder {
       {
         key: 'birth_date',
         title: 'Data de Nascimento',
-        dataIndex: 'birthDate',
+        dataIndex: 'birth_date',
         defaultVisible: true,
         render: (date: unknown) => {
           if (!date || typeof date !== 'string') return '-';
@@ -91,7 +91,7 @@ export class AnimalColumnBuilder {
       {
         key: 'milk_production',
         title: 'Produção de Leite',
-        dataIndex: 'milkProduction',
+        dataIndex: 'milk_production',
         defaultVisible: false,
         render: (production: unknown) => {
           if (typeof production !== 'number') return '-';
@@ -101,7 +101,7 @@ export class AnimalColumnBuilder {
       {
         key: 'last_insemination',
         title: 'Última Inseminação',
-        dataIndex: 'lastInsemination',
+        dataIndex: 'last_insemination',
         defaultVisible: false,
         render: (date: unknown) => {
           if (!date || typeof date !== 'string') return '-';
@@ -111,7 +111,7 @@ export class AnimalColumnBuilder {
       {
         key: 'pregnancy_status',
         title: 'Status de Gestação',
-        dataIndex: 'pregnancyStatus',
+        dataIndex: 'pregnancy_status',
         defaultVisible: false,
         render: (status: unknown) => {
           if (typeof status !== 'number') return '-';
@@ -126,7 +126,7 @@ export class AnimalColumnBuilder {
       {
         key: 'health_status',
         title: 'Status de Saúde',
-        dataIndex: 'healthStatus',
+        dataIndex: 'health_status',
         defaultVisible: false,
         render: (status: unknown) => {
           if (typeof status !== 'number') return '-';
@@ -215,7 +215,7 @@ export class AnimalColumnBuilder {
       {
         key: 'current_batch',
         title: 'Lote Atual',
-        dataIndex: 'currentBatch',
+        dataIndex: 'current_batch',
         defaultVisible: false
       },
       {
