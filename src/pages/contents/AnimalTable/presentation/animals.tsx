@@ -20,14 +20,14 @@ const Animals = () => {
   };
 
   return (
-    <div>
-      <AnimalDashboard 
+    <div id="animals-list">
+      <AnimalDashboard
         onAnimalCreated={handleAnimalCreated}
         onColumnsChanged={handleColumnsChanged}
         selectedColumns={selectedColumns}
       />
-      <AnimalTable 
-        ref={tableRef} 
+      <AnimalTable
+        ref={tableRef}
         selectedColumns={selectedColumns}
       />
     </div>

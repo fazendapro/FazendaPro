@@ -52,5 +52,9 @@ export const translations = {
     healthStatus: "Status de Saúde",
     location: "Localização",
     owner: "Proprietário",
+    tabs: {
+      animalsList: "Lista de Animais",
+      milkProduction: "Produção de Leite"
+    }
   }
 }; 

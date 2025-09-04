@@ -39,5 +39,9 @@ export const translations = {
     search: "Search",
     animalCreatedSuccessfully: "Animal created successfully",
     animalsRetrievedSuccessfully: "Animals loaded successfully",
+    tabs: {
+      animalsList: "Animals List",
+      milkProduction: "Milk Production"
+    }
   }
 }; 

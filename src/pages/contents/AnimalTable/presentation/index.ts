@@ -3,5 +3,5 @@ export * from './animal-schema';
 export * from './create-animal-modal';
 export * from './filter-modal';
 export * from './column-builder';
-export * from './animals';
+export * from './animals-container';
 export * from './index';
