@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { DesktopTabs, MobileTabs, Tab } from '../../../../components/tabs';
 import { useIsMobile } from '../../../../hooks/use-is-mobile';
 import { Animals as AnimalsComponent } from "./animals";
+import { MilkProduction } from "./milk-production";
 
 const Animals = () => {
   const isMobile = useIsMobile();
@@ -26,7 +27,7 @@ const Animals = () => {
       title: t('animalTable.tabs.milkProduction'),
       name: 'milk-production',
       component: (
-        <>oi</>
+        <MilkProduction />
       )
     }
   ], [t]);

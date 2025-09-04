@@ -55,6 +55,32 @@ export const translations = {
     tabs: {
       animalsList: "Lista de Animais",
       milkProduction: "Produção de Leite"
-    }
+    },
+    milkProductionContainer: {
+      animalName: "Nome do Animal",
+      earTag: "Brinco",
+      liters: "Litros",
+      date: "Data",
+      addProduction: "Adicionar Produção",
+      createTitle: "Registrar Produção de Leite",
+      selectAnimal: "Selecionar Animal",
+      selectAnimalPlaceholder: "Selecione o animal",
+      animalRequired: "Selecione um animal",
+      litersRequired: "Informe a quantidade de litros",
+      litersFormat: "Formato inválido (ex: 25.5)",
+      litersPlaceholder: "Ex: 25.5",
+      dateRequired: "Selecione a data",
+      datePlaceholder: "Selecione a data",
+      create: "Registrar",
+      createdSuccessfully: "Produção registrada com sucesso",
+      createError: "Erro ao registrar produção",
+      filters: {
+        all: "Todos",
+        week: "Semana",
+        month: "Mês",
+        startDate: "Data inicial",
+        endDate: "Data final"
+      }
+    },
   }
 }; 
