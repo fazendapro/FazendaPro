@@ -11,13 +11,13 @@ export class RemoteCreateAnimal implements CreateAnimalDomain {
 
   async create(params: CreateAnimalParams): Promise<CreateAnimalResponse> {
     try {
-      const { data, status } = await api('animals').post(
-        '',
+      const { data, status } = await api().post(
+        '/api/v1/animals',
         params,
         {
-          // headers: {
-          //   'X-CSRF-Token': this.csrfToken || '', // TODO: add csrf token
-          // },
+          headers: {
+            'Content-Type': 'application/json'
+          }
         }
       );
 

@@ -16,10 +16,10 @@ export class RemoteGetAnimalsByFarm implements GetAnimalsByFarmDomain {
         {
           params: {
             farmId: params.farm_id
+          },
+          headers: {
+            'Content-Type': 'application/json'
           }
-          // headers: {
-          //   'X-CSRF-Token': this.csrfToken || '', // TODO: add csrf token
-          // },
         }
       );
 
