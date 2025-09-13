@@ -36,26 +36,38 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 		repoFactory := repository.NewRepositoryFactory(db)
 		serviceFactory := service.NewServiceFactory(repoFactory)
 
-		userService := serviceFactory.CreateUserService()
-		userHandler := handlers.NewUserHandler(userService)
+		r.Route("/api/v1", func(r chi.Router) {
+			userService := serviceFactory.CreateUserService()
+			userHandler := handlers.NewUserHandler(userService)
 
-		r.Route("/users", func(r chi.Router) {
-			r.Post("/", userHandler.CreateUser)
-			r.Get("/", userHandler.GetUser)
+			r.Route("/users", func(r chi.Router) {
+				r.Post("/", userHandler.CreateUser)
+				r.Get("/", userHandler.GetUser)
+			})
+
+			animalService := serviceFactory.CreateAnimalService()
+			animalHandler := handlers.NewAnimalHandler(animalService)
+
+			r.Route("/animals", func(r chi.Router) {
+				r.Post("/", animalHandler.CreateAnimal)
+				r.Get("/", animalHandler.GetAnimal)
+				r.Get("/farm", animalHandler.GetAnimalsByFarm)
+				r.Put("/", animalHandler.UpdateAnimal)
+				r.Delete("/", animalHandler.DeleteAnimal)
+			})
+
+			milkCollectionService := serviceFactory.CreateMilkCollectionService()
+			milkCollectionHandler := handlers.NewMilkCollectionHandler(milkCollectionService)
+
+			r.Route("/milk-collections", func(r chi.Router) {
+				r.Post("/", milkCollectionHandler.CreateMilkCollection)
+				r.Get("/farm/{farmId}", milkCollectionHandler.GetMilkCollectionsByFarmID)
+				r.Get("/animal/{animalId}", milkCollectionHandler.GetMilkCollectionsByAnimalID)
+			})
 		})
 
-		animalService := serviceFactory.CreateAnimalService()
-		animalHandler := handlers.NewAnimalHandler(animalService)
-
-		r.Route("/animals", func(r chi.Router) {
-			r.Post("/", animalHandler.CreateAnimal)
-			r.Get("/", animalHandler.GetAnimal)
-			r.Get("/farm", animalHandler.GetAnimalsByFarm)
-			r.Put("/", animalHandler.UpdateAnimal)
-			r.Delete("/", animalHandler.DeleteAnimal)
-		})
-
-		app.Logger.Println("Rotas de animais configuradas: /animals/farm")
+		app.Logger.Println("Rotas de animais configuradas: /api/v1/animals/farm")
+		app.Logger.Println("Rotas de milk collections configuradas: /api/v1/milk-collections")
 	} else {
 		app.Logger.Println("Database não disponível - rotas de dados desabilitadas")
 	}

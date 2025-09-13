@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"time"
+
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 )
 
@@ -22,4 +24,14 @@ type UserRepositoryInterface interface {
 	ValidatePassword(userID uint, password string) (bool, error)
 	FindByEmail(email string) (*models.User, error)
 	Create(user *models.User) error
+}
+
+type MilkCollectionRepositoryInterface interface {
+	Create(milkCollection *models.MilkCollection) error
+	FindByID(id uint) (*models.MilkCollection, error)
+	FindByFarmID(farmID uint) ([]models.MilkCollection, error)
+	FindByFarmIDWithDateRange(farmID uint, startDate, endDate *time.Time) ([]models.MilkCollection, error)
+	FindByAnimalID(animalID uint) ([]models.MilkCollection, error)
+	Update(milkCollection *models.MilkCollection) error
+	Delete(id uint) error
 }

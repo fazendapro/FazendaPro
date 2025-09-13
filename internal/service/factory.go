@@ -21,3 +21,8 @@ func (f *ServiceFactory) CreateUserService() *UserService {
 	userRepo := f.repoFactory.CreateUserRepository()
 	return NewUserService(userRepo)
 }
+
+func (f *ServiceFactory) CreateMilkCollectionService() *MilkCollectionService {
+	milkCollectionRepo := f.repoFactory.CreateMilkCollectionRepository()
+	return NewMilkCollectionService(milkCollectionRepo)
+}

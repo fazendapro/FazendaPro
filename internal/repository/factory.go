@@ -15,3 +15,7 @@ func (f *RepositoryFactory) CreateAnimalRepository() AnimalRepositoryInterface {
 func (f *RepositoryFactory) CreateUserRepository() UserRepositoryInterface {
 	return NewUserRepository(f.db)
 }
+
+func (f *RepositoryFactory) CreateMilkCollectionRepository() MilkCollectionRepositoryInterface {
+	return NewMilkCollectionRepository(f.db.DB)
+}
