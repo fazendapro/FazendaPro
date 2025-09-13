@@ -80,7 +80,10 @@ export const translations = {
         month: "Mês",
         startDate: "Data inicial",
         endDate: "Data final"
-      }
+      },
+      actions: "Ações",
+      add: "Adicionar",
+      addProductionForAnimal: "Adicionar produção para este animal"
     },
   }
 }; 

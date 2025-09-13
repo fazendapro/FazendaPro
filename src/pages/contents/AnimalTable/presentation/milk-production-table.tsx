@@ -1,11 +1,11 @@
 import { forwardRef, useImperativeHandle, useState } from 'react'
 import { Table, Spin, Alert, Button, Space, DatePicker, Select } from 'antd'
-import { PlusOutlined } from '@ant-design/icons'
+import { PlusOutlined, EditOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { useMilkProduction } from '../hooks/useMilkProduction'
 import { useFarm } from '../../../../hooks/useFarm'
-import { MilkProduction } from '../types/milk-production'
-import { MilkProductionFilters } from '../types/milk-production'
+import { MilkProduction, MilkProductionFilters } from '../domain/model/milk-production'
+import dayjs from 'dayjs'
 
 const { RangePicker } = DatePicker
 const { Option } = Select
@@ -16,10 +16,11 @@ interface MilkProductionTableRef {
 
 interface MilkProductionTableProps {
   onAddProduction?: () => void
+  onAddProductionForAnimal?: (animalId: number) => void
 }
 
 const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTableProps>((props, ref) => {
-  const { onAddProduction } = props
+  const { onAddProduction, onAddProductionForAnimal } = props
   const { t } = useTranslation()
   const { farm } = useFarm()
   const [filters, setFilters] = useState<MilkProductionFilters>({ period: 'all' })
@@ -33,17 +34,17 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
   const columns = [
     {
       title: t('animalTable.milkProductionContainer.animalName'),
-      dataIndex: ['animal', 'name'],
+      dataIndex: ['animal', 'animal_name'],
       key: 'animalName',
       sorter: (a: MilkProduction, b: MilkProduction) => 
-        a.animal.name.localeCompare(b.animal.name)
+        a.animal.animal_name.localeCompare(b.animal.animal_name)
     },
     {
       title: t('animalTable.milkProductionContainer.earTag'),
-      dataIndex: ['animal', 'earTagNumberLocal'],
+      dataIndex: ['animal', 'ear_tag_number_local'],
       key: 'earTag',
       sorter: (a: MilkProduction, b: MilkProduction) => 
-        a.animal.earTagNumberLocal.localeCompare(b.animal.earTagNumberLocal)
+        a.animal.ear_tag_number_local - b.animal.ear_tag_number_local
     },
     {
       title: t('animalTable.milkProductionContainer.liters'),
@@ -59,6 +60,22 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
       sorter: (a: MilkProduction, b: MilkProduction) => 
         new Date(a.date).getTime() - new Date(b.date).getTime(),
       render: (date: string) => new Date(date).toLocaleDateString('pt-BR')
+    },
+    {
+      title: t('animalTable.milkProductionContainer.actions'),
+      key: 'actions',
+      width: 120,
+      render: (record: MilkProduction) => (
+        <Button
+          type="primary"
+          size="small"
+          icon={<EditOutlined />}
+          onClick={() => onAddProductionForAnimal?.(record.animal_id)}
+          title={t('animalTable.milkProductionContainer.addProductionForAnimal')}
+        >
+          {t('animalTable.milkProductionContainer.add')}
+        </Button>
+      )
     }
   ]
 
@@ -66,12 +83,12 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
     setFilters(prev => ({ ...prev, period: value }))
   }
 
-  const handleDateRangeChange = (dates: any) => {
-    if (dates && dates.length === 2) {
+  const handleDateRangeChange = (dates: [dayjs.Dayjs | null, dayjs.Dayjs | null] | null) => {
+    if (dates && dates.length === 2 && dates[0] && dates[1]) {
       setFilters(prev => ({
         ...prev,
-        startDate: dates[0].format('YYYY-MM-DD'),
-        endDate: dates[1].format('YYYY-MM-DD')
+        startDate: dates[0]!.format('YYYY-MM-DD'),
+        endDate: dates[1]!.format('YYYY-MM-DD')
       }))
     } else {
       setFilters(prev => ({

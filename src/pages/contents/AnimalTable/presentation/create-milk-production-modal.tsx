@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useAnimals } from '../hooks/useAnimals'
 import { useMilkProduction } from '../hooks/useMilkProduction'
 import { useFarm } from '../../../../hooks/useFarm'
-import { CreateMilkProductionRequest } from '../types/milk-production'
+import { CreateMilkProductionRequest } from '../domain/model/milk-production'
 import dayjs from 'dayjs'
 
 const { Option } = Select
@@ -13,12 +13,14 @@ interface CreateMilkProductionModalProps {
   visible: boolean
   onCancel: () => void
   onSuccess: () => void
+  preselectedAnimalId?: number
 }
 
 export const CreateMilkProductionModal: React.FC<CreateMilkProductionModalProps> = ({
   visible,
   onCancel,
-  onSuccess
+  onSuccess,
+  preselectedAnimalId
 }) => {
   const { t } = useTranslation()
   const { farm } = useFarm()
@@ -32,26 +34,35 @@ export const CreateMilkProductionModal: React.FC<CreateMilkProductionModalProps>
     if (visible) {
       form.resetFields()
       form.setFieldsValue({
-        date: dayjs()
+        date: dayjs(),
+        animalId: preselectedAnimalId
       })
     }
-  }, [visible, form])
+  }, [visible, form, preselectedAnimalId])
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: {
+    animalId: number
+    liters: number
+    date: dayjs.Dayjs
+  }) => {
+    console.log('Form values:', values)
     setLoading(true)
     
     try {
       const data: CreateMilkProductionRequest = {
-        animalId: values.animalId,
-        liters: parseFloat(values.liters),
+        animal_id: values.animalId,
+        liters: values.liters,
         date: values.date.format('YYYY-MM-DD')
       }
 
-      await createMilkProduction(data)
+      console.log('Sending data:', data)
+      const result = await createMilkProduction(data)
+      console.log('Success result:', result)
       message.success(t('animalTable.milkProductionContainer.createdSuccessfully'))
       onSuccess()
       form.resetFields()
-    } catch {
+    } catch (error) {
+      console.error('Error creating milk production:', error)
       message.error(t('animalTable.milkProductionContainer.createError'))
     } finally {
       setLoading(false)
@@ -91,11 +102,10 @@ export const CreateMilkProductionModal: React.FC<CreateMilkProductionModalProps>
             loading={animalsLoading}
             showSearch
             optionFilterProp="children"
-            filterOption={(input, option) =>
-              (option?.children as unknown as string)
-                ?.toLowerCase()
-                .includes(input.toLowerCase())
-            }
+            filterOption={(input, option) => {
+              const children = String(option?.children || '')
+              return children.toLowerCase().includes(input.toLowerCase())
+            }}
           >
             {animals.map(animal => (
               <Option key={animal.id} value={animal.id}>
