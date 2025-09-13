@@ -5,10 +5,10 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { animalSchema } from './animal-schema';
 import { toast } from 'react-toastify';
-import { CreateAnimalFactory } from '../factories';
-import { Form as CustomForm } from '../../../../components';
-import { FieldType } from '../../../../types/field-types';
-import { AnimalForm, AnimalSex } from '../types/type';
+import { CreateAnimalFactory } from '../../factories';
+import { Form as CustomForm } from '../../../../../components';
+import { FieldType } from '../../../../../types/field-types';
+import { AnimalForm, AnimalSex } from '../../types/type';
 
 const { Option } = Select;
 

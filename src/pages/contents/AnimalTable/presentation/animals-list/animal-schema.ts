@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import { AnimalSex } from '../types/type';
+import { AnimalSex } from '../../types/type';
 
 export const animalSchema = yup.object().shape({
   animal_name: yup

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Input, Card, Row, Col, Statistic, Space } from 'antd';
-import { useModal } from '../../../../hooks';
+import { useModal } from '../../../../../hooks';
 import { useTranslation } from 'react-i18next';
 import { CreateAnimalModal } from './create-animal-modal';
 import { FilterModal } from './filter-modal';

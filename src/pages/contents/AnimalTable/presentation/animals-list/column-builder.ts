@@ -1,5 +1,5 @@
 import { ColumnType } from 'antd/es/table';
-import { Animal } from '../types/type';
+import { Animal } from '../../types/type';
 
 export interface AnimalColumn {
   key: string;

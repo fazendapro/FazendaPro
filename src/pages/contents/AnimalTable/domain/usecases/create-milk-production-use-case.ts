@@ -3,3 +3,4 @@ import { MilkProduction, CreateMilkProductionRequest } from '../model/milk-produ
 export interface CreateMilkProductionUseCase {
   createMilkProduction: (data: CreateMilkProductionRequest) => Promise<MilkProduction>
 }
+

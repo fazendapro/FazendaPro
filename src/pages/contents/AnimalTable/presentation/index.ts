@@ -1,7 +1,4 @@
-export * from './animal-dashboard';
-export * from './animal-schema';
-export * from './create-animal-modal';
-export * from './filter-modal';
-export * from './column-builder';
-export * from './animals-container';
-export * from './index';
+// Exportações organizadas por tipo de página/tab
+export * from './animals-list';
+export * from './milk-production';
+export * from './shared';

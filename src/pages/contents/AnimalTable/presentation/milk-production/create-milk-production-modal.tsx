@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Modal, Form, Input, DatePicker, Select, Button, message, Space } from 'antd'
 import { useTranslation } from 'react-i18next'
-import { useAnimals } from '../hooks/useAnimals'
-import { useMilkProduction } from '../hooks/useMilkProduction'
-import { useFarm } from '../../../../hooks/useFarm'
-import { CreateMilkProductionRequest } from '../domain/model/milk-production'
+import { useAnimals } from '../../hooks/useAnimals'
+import { useMilkProduction } from '../../hooks/useMilkProduction'
+import { useFarm } from '../../../../../hooks/useFarm'
+import { CreateMilkProductionRequest } from '../../domain/model/milk-production'
 import dayjs from 'dayjs'
 
 const { Option } = Select

@@ -2,9 +2,9 @@ import { forwardRef, useImperativeHandle, useState } from 'react'
 import { Table, Spin, Alert, Button, Space, DatePicker, Select } from 'antd'
 import { PlusOutlined, EditOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
-import { useMilkProduction } from '../hooks/useMilkProduction'
-import { useFarm } from '../../../../hooks/useFarm'
-import { MilkProduction, MilkProductionFilters } from '../domain/model/milk-production'
+import { useMilkProduction } from '../../hooks/useMilkProduction'
+import { useFarm } from '../../../../../hooks/useFarm'
+import { MilkProduction, MilkProductionFilters } from '../../domain/model/milk-production'
 import dayjs from 'dayjs'
 
 const { RangePicker } = DatePicker

@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DesktopTabs, MobileTabs, Tab } from '../../../../components/tabs';
-import { useIsMobile } from '../../../../hooks/use-is-mobile';
+import { DesktopTabs, MobileTabs, Tab } from '../../../../../components/tabs';
+import { useIsMobile } from '../../../../../hooks/use-is-mobile';
 import { Animals as AnimalsComponent } from "./animals";
-import { MilkProduction } from "./milk-production";
+import { MilkProduction } from "../milk-production/milk-production";
 
 const Animals = () => {
   const isMobile = useIsMobile();

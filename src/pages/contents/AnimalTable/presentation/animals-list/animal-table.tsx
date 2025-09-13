@@ -1,7 +1,7 @@
 import { forwardRef, useImperativeHandle } from 'react';
 import { Table, Spin, Alert } from 'antd';
-import { useAnimals } from '../hooks/useAnimals';
-import { useFarm } from '../../../../hooks/useFarm';
+import { useAnimals } from '../../hooks/useAnimals';
+import { useFarm } from '../../../../../hooks/useFarm';
 import { useAnimalColumnBuilder } from './column-builder';
 
 interface AnimalTableRef {
