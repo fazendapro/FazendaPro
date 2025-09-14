@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -89,6 +90,68 @@ func (h *MilkCollectionHandler) CreateMilkCollection(w http.ResponseWriter, r *h
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(response)
+}
+
+// UpdateMilkCollection atualiza uma coleta de leite existente
+func (h *MilkCollectionHandler) UpdateMilkCollection(w http.ResponseWriter, r *http.Request) {
+	milkCollectionIDStr := chi.URLParam(r, "id")
+	milkCollectionID, err := strconv.ParseUint(milkCollectionIDStr, 10, 32)
+	if err != nil {
+		http.Error(w, "Invalid milk collection ID", http.StatusBadRequest)
+		return
+	}
+
+	var req CreateMilkCollectionRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		return
+	}
+
+	// Parse da data
+	date, err := time.Parse("2006-01-02", req.Date)
+	if err != nil {
+		http.Error(w, "Invalid date format. Use YYYY-MM-DD", http.StatusBadRequest)
+		return
+	}
+
+	milkCollection := &models.MilkCollection{
+		ID:       uint(milkCollectionID),
+		AnimalID: req.AnimalID,
+		Liters:   req.Liters,
+		Date:     date,
+	}
+
+	fmt.Printf("DEBUG: Updating milk collection with ID: %d, AnimalID: %d, Liters: %.2f, Date: %s\n",
+		milkCollection.ID, milkCollection.AnimalID, milkCollection.Liters, milkCollection.Date.Format("2006-01-02"))
+
+	if err := h.service.UpdateMilkCollection(milkCollection); err != nil {
+		fmt.Printf("DEBUG: Error updating milk collection: %v\n", err)
+		http.Error(w, "Failed to update milk collection", http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Printf("DEBUG: Milk collection updated successfully\n")
+
+	// Buscar a coleta atualizada com os dados do animal
+	updatedMilkCollection, err := h.service.GetMilkCollectionByID(milkCollection.ID)
+	if err != nil {
+		fmt.Printf("DEBUG: Error retrieving updated milk collection: %v\n", err)
+		http.Error(w, "Failed to retrieve updated milk collection", http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Printf("DEBUG: Retrieved updated milk collection: ID=%d, Liters=%.2f\n",
+		updatedMilkCollection.ID, updatedMilkCollection.Liters)
+
+	response := MilkCollectionResponse{
+		Success: true,
+		Data:    h.mapToMilkCollectionData(updatedMilkCollection),
+		Message: "Milk collection updated successfully",
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
 }
 

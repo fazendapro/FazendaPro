@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/fazendapro/FazendaPro-api/internal/models"
@@ -21,10 +22,16 @@ func (r *MilkCollectionRepository) Create(milkCollection *models.MilkCollection)
 
 func (r *MilkCollectionRepository) FindByID(id uint) (*models.MilkCollection, error) {
 	var milkCollection models.MilkCollection
-	err := r.db.Preload("Animal").First(&milkCollection, id).Error
+	fmt.Printf("DEBUG: Repository FindByID - Looking for ID: %d\n", id)
+
+	err := r.db.Preload("Animal").Where("id = ?", id).First(&milkCollection).Error
 	if err != nil {
+		fmt.Printf("DEBUG: Repository FindByID Error: %v\n", err)
 		return nil, err
 	}
+
+	fmt.Printf("DEBUG: Repository FindByID - Found: ID=%d, Liters=%.2f\n",
+		milkCollection.ID, milkCollection.Liters)
 	return &milkCollection, nil
 }
 
@@ -65,7 +72,34 @@ func (r *MilkCollectionRepository) FindByAnimalID(animalID uint) ([]models.MilkC
 }
 
 func (r *MilkCollectionRepository) Update(milkCollection *models.MilkCollection) error {
-	return r.db.Save(milkCollection).Error
+	fmt.Printf("DEBUG: Repository Update - ID: %d, AnimalID: %d, Liters: %.2f\n",
+		milkCollection.ID, milkCollection.AnimalID, milkCollection.Liters)
+
+	// Verificar se o registro existe
+	var existingMilkCollection models.MilkCollection
+	err := r.db.Where("id = ?", milkCollection.ID).First(&existingMilkCollection).Error
+	if err != nil {
+		fmt.Printf("DEBUG: Record not found with ID %d: %v\n", milkCollection.ID, err)
+		return err
+	}
+
+	fmt.Printf("DEBUG: Found existing record - ID: %d, Liters: %.2f\n",
+		existingMilkCollection.ID, existingMilkCollection.Liters)
+
+	// Atualizar apenas os campos necessários
+	result := r.db.Model(&models.MilkCollection{}).Where("id = ?", milkCollection.ID).Updates(map[string]interface{}{
+		"animal_id": milkCollection.AnimalID,
+		"liters":    milkCollection.Liters,
+		"date":      milkCollection.Date,
+	})
+
+	if result.Error != nil {
+		fmt.Printf("DEBUG: Repository Update Error: %v\n", result.Error)
+		return result.Error
+	}
+
+	fmt.Printf("DEBUG: Repository Update - Rows affected: %d\n", result.RowsAffected)
+	return nil
 }
 
 func (r *MilkCollectionRepository) Delete(id uint) error {

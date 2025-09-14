@@ -61,6 +61,7 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 
 			r.Route("/milk-collections", func(r chi.Router) {
 				r.Post("/", milkCollectionHandler.CreateMilkCollection)
+				r.Put("/{id}", milkCollectionHandler.UpdateMilkCollection)
 				r.Get("/farm/{farmId}", milkCollectionHandler.GetMilkCollectionsByFarmID)
 				r.Get("/animal/{animalId}", milkCollectionHandler.GetMilkCollectionsByAnimalID)
 			})
