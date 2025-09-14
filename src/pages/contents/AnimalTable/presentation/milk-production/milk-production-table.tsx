@@ -16,11 +16,11 @@ interface MilkProductionTableRef {
 
 interface MilkProductionTableProps {
   onAddProduction?: () => void
-  onAddProductionForAnimal?: (animalId: number) => void
+  onEditProduction?: (production: MilkProduction) => void
 }
 
 const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTableProps>((props, ref) => {
-  const { onAddProduction, onAddProductionForAnimal } = props
+  const { onAddProduction, onEditProduction } = props
   const { t } = useTranslation()
   const { farm } = useFarm()
   const [filters, setFilters] = useState<MilkProductionFilters>({ period: 'all' })
@@ -70,10 +70,10 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
           type="primary"
           size="small"
           icon={<EditOutlined />}
-          onClick={() => onAddProductionForAnimal?.(record.animal_id)}
-          title={t('animalTable.milkProductionContainer.addProductionForAnimal')}
+          onClick={() => onEditProduction?.(record)}
+          title={t('animalTable.milkProductionContainer.editProduction')}
         >
-          {t('animalTable.milkProductionContainer.add')}
+          {t('animalTable.milkProductionContainer.edit')}
         </Button>
       )
     }

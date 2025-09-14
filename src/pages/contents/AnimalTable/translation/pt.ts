@@ -72,8 +72,12 @@ export const translations = {
       dateRequired: "Selecione a data",
       datePlaceholder: "Selecione a data",
       create: "Registrar",
+      update: "Atualizar",
+      editTitle: "Editar Produção de Leite",
       createdSuccessfully: "Produção registrada com sucesso",
+      updatedSuccessfully: "Produção atualizada com sucesso",
       createError: "Erro ao registrar produção",
+      updateError: "Erro ao atualizar produção",
       filters: {
         all: "Todos",
         week: "Semana",
@@ -83,7 +87,9 @@ export const translations = {
       },
       actions: "Ações",
       add: "Adicionar",
-      addProductionForAnimal: "Adicionar produção para este animal"
+      edit: "Editar",
+      addProductionForAnimal: "Adicionar produção para este animal",
+      editProduction: "Editar produção de leite"
     },
   }
 }; 

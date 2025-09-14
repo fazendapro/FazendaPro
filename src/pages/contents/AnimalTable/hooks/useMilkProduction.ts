@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { MilkProduction, CreateMilkProductionRequest, MilkProductionFilters } from '../domain/model/milk-production'
-import { getMilkProductionsFactory, createMilkProductionFactory } from '../factories'
+import { UpdateMilkProductionRequest } from '../domain/usecases/update-milk-production-use-case'
+import { getMilkProductionsFactory, createMilkProductionFactory, updateMilkProductionFactory } from '../factories'
 
 export const useMilkProduction = (farmId: number, filters?: MilkProductionFilters) => {
   const [milkProductions, setMilkProductions] = useState<MilkProduction[]>([])
@@ -35,6 +36,22 @@ export const useMilkProduction = (farmId: number, filters?: MilkProductionFilter
     }
   }
 
+  const updateMilkProduction = async (data: UpdateMilkProductionRequest) => {
+    try {
+      const updateMilkProductionUseCase = updateMilkProductionFactory()
+      const updatedProduction = await updateMilkProductionUseCase.updateMilkProduction(data)
+      setMilkProductions(prev => 
+        prev.map(production => 
+          production.id === data.id ? updatedProduction : production
+        )
+      )
+      return updatedProduction
+    } catch (err: unknown) {
+      const error = err as Error
+      throw new Error(error.message || 'Erro ao atualizar registro de produção de leite')
+    }
+  }
+
   useEffect(() => {
     if (farmId) {
       fetchMilkProductions()
@@ -46,6 +63,7 @@ export const useMilkProduction = (farmId: number, filters?: MilkProductionFilter
     loading,
     error,
     refetch: fetchMilkProductions,
-    createMilkProduction
+    createMilkProduction,
+    updateMilkProduction
   }
 }
