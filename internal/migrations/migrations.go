@@ -40,6 +40,7 @@ func RunMigrations(db *gorm.DB) error {
 		{"013_add_farm_logo", addFarmLogo},
 		{"014_add_animal_photo", addAnimalPhoto},
 		{"015_update_animals_table", updateAnimalsTable},
+		{"016_update_reproductions_table", updateReproductionsTable},
 	}
 
 	for _, migration := range migrations {
@@ -178,6 +179,28 @@ func updateAnimalsTable(db *gorm.DB) error {
 	return db.AutoMigrate(&models.Animal{})
 }
 
+func updateReproductionsTable(db *gorm.DB) error {
+	if db.Migrator().HasColumn(&models.Reproduction{}, "type") {
+		if err := db.Migrator().DropColumn(&models.Reproduction{}, "type"); err != nil {
+			return fmt.Errorf("error dropping type column: %w", err)
+		}
+	}
+
+	if db.Migrator().HasColumn(&models.Reproduction{}, "pregnancy_date") {
+		if err := db.Migrator().DropColumn(&models.Reproduction{}, "pregnancy_date"); err != nil {
+			return fmt.Errorf("error dropping pregnancy_date column: %w", err)
+		}
+	}
+
+	if db.Migrator().HasColumn(&models.Reproduction{}, "situation") {
+		if err := db.Migrator().DropColumn(&models.Reproduction{}, "situation"); err != nil {
+			return fmt.Errorf("error dropping situation column: %w", err)
+		}
+	}
+
+	return db.AutoMigrate(&models.Reproduction{})
+}
+
 func RollbackMigrations(db *gorm.DB, steps int) error {
 	var migrations []Migration
 	if err := db.Order("id desc").Limit(steps).Find(&migrations).Error; err != nil {
@@ -253,6 +276,10 @@ func RollbackMigrations(db *gorm.DB, steps int) error {
 		case "015_update_animals_table":
 			if err := db.AutoMigrate(&models.Animal{}); err != nil {
 				return fmt.Errorf("error reverting animals table: %w", err)
+			}
+		case "016_update_reproductions_table":
+			if err := db.AutoMigrate(&models.Reproduction{}); err != nil {
+				return fmt.Errorf("error reverting reproductions table: %w", err)
 			}
 		}
 

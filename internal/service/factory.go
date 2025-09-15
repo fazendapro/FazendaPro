@@ -26,3 +26,8 @@ func (f *ServiceFactory) CreateMilkCollectionService() *MilkCollectionService {
 	milkCollectionRepo := f.repoFactory.CreateMilkCollectionRepository()
 	return NewMilkCollectionService(milkCollectionRepo)
 }
+
+func (f *ServiceFactory) CreateReproductionService() *ReproductionService {
+	reproductionRepo := f.repoFactory.CreateReproductionRepository()
+	return NewReproductionService(reproductionRepo)
+}

@@ -65,10 +65,25 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 				r.Get("/farm/{farmId}", milkCollectionHandler.GetMilkCollectionsByFarmID)
 				r.Get("/animal/{animalId}", milkCollectionHandler.GetMilkCollectionsByAnimalID)
 			})
+
+			reproductionService := serviceFactory.CreateReproductionService()
+			reproductionHandler := handlers.NewReproductionHandler(reproductionService)
+
+			r.Route("/reproductions", func(r chi.Router) {
+				r.Post("/", reproductionHandler.CreateReproduction)
+				r.Get("/", reproductionHandler.GetReproduction)
+				r.Get("/animal", reproductionHandler.GetReproductionByAnimal)
+				r.Get("/farm", reproductionHandler.GetReproductionsByFarm)
+				r.Get("/phase", reproductionHandler.GetReproductionsByPhase)
+				r.Put("/", reproductionHandler.UpdateReproduction)
+				r.Put("/phase", reproductionHandler.UpdateReproductionPhase)
+				r.Delete("/", reproductionHandler.DeleteReproduction)
+			})
 		})
 
 		app.Logger.Println("Rotas de animais configuradas: /api/v1/animals/farm")
 		app.Logger.Println("Rotas de milk collections configuradas: /api/v1/milk-collections")
+		app.Logger.Println("Rotas de reprodução configuradas: /api/v1/reproductions")
 	} else {
 		app.Logger.Println("Database não disponível - rotas de dados desabilitadas")
 	}

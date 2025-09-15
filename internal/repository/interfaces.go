@@ -35,3 +35,13 @@ type MilkCollectionRepositoryInterface interface {
 	Update(milkCollection *models.MilkCollection) error
 	Delete(id uint) error
 }
+
+type ReproductionRepositoryInterface interface {
+	Create(reproduction *models.Reproduction) error
+	FindByID(id uint) (*models.Reproduction, error)
+	FindByAnimalID(animalID uint) (*models.Reproduction, error)
+	FindByFarmID(farmID uint) ([]models.Reproduction, error)
+	FindByPhase(phase models.ReproductionPhase) ([]models.Reproduction, error)
+	Update(reproduction *models.Reproduction) error
+	Delete(id uint) error
+}
