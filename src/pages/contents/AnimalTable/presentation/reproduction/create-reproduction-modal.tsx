@@ -1,0 +1,208 @@
+import { useState, useEffect } from 'react';
+import { Modal, Form, Select, DatePicker, Input, Switch, message } from 'antd';
+import { useTranslation } from 'react-i18next';
+import dayjs from 'dayjs';
+import { useReproduction } from '../../hooks/useReproduction';
+import { useAnimals } from '../../hooks/useAnimals';
+import { CreateReproductionRequest, ReproductionPhase, ReproductionPhaseLabels } from '../../domain/model/reproduction';
+import { Animal } from '../../types/type';
+
+const { TextArea } = Input;
+
+interface CreateReproductionModalProps {
+  visible: boolean;
+  onCancel: () => void;
+  onSuccess: () => void;
+  preselectedAnimalId?: number;
+}
+
+export const CreateReproductionModal = ({ 
+  visible, 
+  onCancel, 
+  onSuccess, 
+  preselectedAnimalId 
+}: CreateReproductionModalProps) => {
+  const { t } = useTranslation();
+  const { createReproduction, loading } = useReproduction();
+  const { animals = [], loading: animalsLoading } = useAnimals();
+  const [form] = Form.useForm();
+
+  useEffect(() => {
+    if (visible && preselectedAnimalId) {
+      form.setFieldsValue({ animal_id: preselectedAnimalId });
+    }
+  }, [visible, preselectedAnimalId, form]);
+
+  const handleSubmit = async (values: any) => {
+    console.log('Form values:', values);
+    
+    const data: CreateReproductionRequest = {
+      animal_id: values.animal_id,
+      current_phase: values.current_phase,
+      insemination_date: values.insemination_date?.format('YYYY-MM-DD'),
+      insemination_type: values.insemination_type,
+      pregnancy_date: values.pregnancy_date?.format('YYYY-MM-DD'),
+      expected_birth_date: values.expected_birth_date?.format('YYYY-MM-DD'),
+      actual_birth_date: values.actual_birth_date?.format('YYYY-MM-DD'),
+      lactation_start_date: values.lactation_start_date?.format('YYYY-MM-DD'),
+      lactation_end_date: values.lactation_end_date?.format('YYYY-MM-DD'),
+      dry_period_start_date: values.dry_period_start_date?.format('YYYY-MM-DD'),
+      veterinary_confirmation: values.veterinary_confirmation || false,
+      observations: values.observations,
+    };
+
+    console.log('Data to send:', data);
+
+    try {
+      const result = await createReproduction(data);
+      console.log('Create result:', result);
+      
+      if (result) {
+        message.success(t('animalTable.reproduction.createdSuccessfully'));
+        form.resetFields();
+        onSuccess();
+      } else {
+        message.error('Erro ao criar registro de reprodução');
+      }
+    } catch (error) {
+      console.error('Error creating reproduction:', error);
+      message.error('Erro ao criar registro de reprodução');
+    }
+  };
+
+  const handleCancel = () => {
+    form.resetFields();
+    onCancel();
+  };
+
+  return (
+    <Modal
+      title={t('animalTable.reproduction.createTitle')}
+      open={visible}
+      onCancel={handleCancel}
+      onOk={() => form.submit()}
+      confirmLoading={loading}
+      width={600}
+    >
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        initialValues={{
+          current_phase: ReproductionPhase.VAZIAS,
+          veterinary_confirmation: false,
+        }}
+      >
+        <Form.Item
+          name="animal_id"
+          label={t('animalTable.reproduction.selectAnimal')}
+          rules={[{ required: true, message: t('animalTable.reproduction.animalRequired') }]}
+        >
+        <Select
+          placeholder={t('animalTable.reproduction.selectAnimalPlaceholder')}
+          showSearch
+          loading={animalsLoading}
+          optionFilterProp="children"
+          filterOption={(input, option) =>
+            (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
+          }
+        >
+          {animals.map((animal) => (
+            <Select.Option key={animal.id} value={parseInt(animal.id)}>
+              {animal.animal_name} - {animal.ear_tag_number_local}
+            </Select.Option>
+          ))}
+        </Select>
+        </Form.Item>
+
+        <Form.Item
+          name="current_phase"
+          label={t('animalTable.reproduction.currentPhase')}
+          rules={[{ required: true, message: t('animalTable.reproduction.phaseRequired') }]}
+        >
+          <Select>
+            {Object.entries(ReproductionPhaseLabels).map(([value, label]) => (
+              <Select.Option key={value} value={parseInt(value)}>
+                {label}
+              </Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
+
+        <Form.Item
+          name="insemination_date"
+          label={t('animalTable.reproduction.inseminationDate')}
+        >
+          <DatePicker style={{ width: '100%' }} />
+        </Form.Item>
+
+        <Form.Item
+          name="insemination_type"
+          label={t('animalTable.reproduction.inseminationType')}
+        >
+          <Select placeholder={t('animalTable.reproduction.selectInseminationType')}>
+            <Select.Option value="Natural">Natural</Select.Option>
+            <Select.Option value="Artificial">Inseminação Artificial</Select.Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item
+          name="pregnancy_date"
+          label={t('animalTable.reproduction.pregnancyDate')}
+        >
+          <DatePicker style={{ width: '100%' }} />
+        </Form.Item>
+
+        <Form.Item
+          name="expected_birth_date"
+          label={t('animalTable.reproduction.expectedBirthDate')}
+        >
+          <DatePicker style={{ width: '100%' }} />
+        </Form.Item>
+
+        <Form.Item
+          name="actual_birth_date"
+          label={t('animalTable.reproduction.actualBirthDate')}
+        >
+          <DatePicker style={{ width: '100%' }} />
+        </Form.Item>
+
+        <Form.Item
+          name="lactation_start_date"
+          label={t('animalTable.reproduction.lactationStartDate')}
+        >
+          <DatePicker style={{ width: '100%' }} />
+        </Form.Item>
+
+        <Form.Item
+          name="lactation_end_date"
+          label={t('animalTable.reproduction.lactationEndDate')}
+        >
+          <DatePicker style={{ width: '100%' }} />
+        </Form.Item>
+
+        <Form.Item
+          name="dry_period_start_date"
+          label={t('animalTable.reproduction.dryPeriodStartDate')}
+        >
+          <DatePicker style={{ width: '100%' }} />
+        </Form.Item>
+
+        <Form.Item
+          name="veterinary_confirmation"
+          label={t('animalTable.reproduction.veterinaryConfirmation')}
+          valuePropName="checked"
+        >
+          <Switch />
+        </Form.Item>
+
+        <Form.Item
+          name="observations"
+          label={t('animalTable.reproduction.observations')}
+        >
+          <TextArea rows={3} placeholder={t('animalTable.reproduction.observationsPlaceholder')} />
+        </Form.Item>
+      </Form>
+    </Modal>
+  );
+};

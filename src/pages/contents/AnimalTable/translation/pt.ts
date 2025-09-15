@@ -54,7 +54,8 @@ export const translations = {
     owner: "Proprietário",
     tabs: {
       animalsList: "Lista de Animais",
-      milkProduction: "Produção de Leite"
+      milkProduction: "Produção de Leite",
+      reproduction: "Reprodução"
     },
     milkProductionContainer: {
       animalName: "Nome do Animal",
@@ -90,6 +91,41 @@ export const translations = {
       edit: "Editar",
       addProductionForAnimal: "Adicionar produção para este animal",
       editProduction: "Editar produção de leite"
+    },
+    reproduction: {
+      title: "Gestão de Reprodução",
+      animalName: "Nome do Animal",
+      earTag: "Brinco",
+      currentPhase: "Fase Atual",
+      inseminationDate: "Data de Inseminação",
+      inseminationType: "Tipo de Inseminação",
+      pregnancyDate: "Data de Confirmação da Prenhez",
+      expectedBirthDate: "Data Prevista do Parto",
+      actualBirthDate: "Data Real do Parto",
+      lactationStartDate: "Início da Lactação",
+      lactationEndDate: "Fim da Lactação",
+      dryPeriodStartDate: "Início do Período Seco",
+      veterinaryConfirmation: "Confirmação Veterinária",
+      observations: "Observações",
+      addReproduction: "Adicionar Reprodução",
+      createTitle: "Registrar Reprodução",
+      updatePhaseTitle: "Atualizar Fase de Reprodução",
+      selectAnimal: "Selecionar Animal",
+      selectAnimalPlaceholder: "Selecione o animal",
+      selectInseminationType: "Selecione o tipo de inseminação",
+      animalRequired: "Selecione um animal",
+      phaseRequired: "Selecione uma fase",
+      newPhase: "Nova Fase",
+      observationsPlaceholder: "Digite observações sobre a reprodução",
+      createdSuccessfully: "Registro de reprodução criado com sucesso",
+      phaseUpdatedSuccessfully: "Fase de reprodução atualizada com sucesso",
+      updatePhase: "Atualizar Fase",
+      edit: "Editar",
+      delete: "Deletar",
+      deleteConfirm: "Tem certeza que deseja deletar este registro?",
+      yes: "Sim",
+      no: "Não",
+      actions: "Ações"
     },
   }
 }; 

@@ -1,0 +1,105 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Regras para Uso de Toasts no Sistema em arquivos react
+
+## 1. Importação e Uso do Hook
+
+```typescript
+import { toast } from 'react-toastify';
+
+// No componente
+toast.error(t('loginError'));
+```
+
+## 2. Parâmetros do Toast
+
+O `showToast` aceita os seguintes parâmetros:
+- `status`: 'success' | 'error' | 'warning' | 'info'
+- `message`: string (mensagem a ser exibida)
+- `id`: string (identificador único do toast)
+- `title?`: string (opcional, título do toast)
+
+## 3. Exemplos de Uso
+
+### 3.1 Toast de Sucesso
+```typescript
+showToast(
+  'success',
+  i18n.t('integrations.sso.form.success.metadata_generated'),
+  'metadata-generator-success-toast'
+)
+```
+
+### 3.2 Toast de Erro
+```typescript
+showToast(
+  'error',
+  i18n.t('integrations.sso.form.errors.domain_required'),
+  'metadata-generator-error-toast'
+)
+```
+
+### 3.3 Toast com Título
+```typescript
+showToast(
+  'error',
+  i18n.t('integrations.api_token.regenerate.token_disabled_message'),
+  'error-toast',
+  i18n.t('integrations.api_token.regenerate.token_disabled_title')
+)
+```
+
+## 4. Boas Práticas
+
+1. **IDs Únicos**: Sempre use IDs únicos para cada toast para evitar duplicação
+2. **Internacionalização**: Use `i18n.t()` para todas as mensagens
+3. **Tratamento de Erros**: Use toasts de erro em blocos catch
+4. **Feedback de Sucesso**: Use toasts de sucesso após operações bem-sucedidas
+5. **Mensagens Claras**: Mantenha as mensagens claras e concisas
+6. **Posicionamento**: Os toasts aparecem automaticamente no canto inferior direito
+7. **Duração**: Os toasts têm duração padrão de 5 segundos
+8. **Fechamento**: Os toasts podem ser fechados manualmente pelo usuário
+
+## 5. Padrão de Nomenclatura para IDs
+
+Use o seguinte padrão para IDs de toast:
+- `[feature]-[action]-[status]-toast`
+
+Exemplos:
+- `metadata-generator-success-toast`
+- `api-token-regenerate-error-toast`
+- `user-update-success-toast`
+
+## 6. Exemplos de Implementação
+
+### 6.1 Em Operações Assíncronas
+```typescript
+try {
+  await someAsyncOperation()
+  showToast('success', i18n.t('operation.success'), 'operation-success-toast')
+} catch (error) {
+  showToast('error', i18n.t('operation.error'), 'operation-error-toast')
+}
+```
+
+### 6.2 Em Validações
+```typescript
+if (!requiredField) {
+  showToast('error', i18n.t('validation.required'), 'validation-error-toast')
+  return
+}
+```
+
+### 6.3 Em Operações de Estado
+```typescript
+const handleStatusChange = () => {
+  if (newStatus) {
+    showToast('success', i18n.t('status.updated'), 'status-update-toast')
+  }
+}
+```
+
+Esta regra deve ser seguida em todo o sistema para manter a consistência na exibição de feedback ao usuário.

@@ -1,41 +1,50 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { useFarm } from '../../../../hooks/useFarm';
 import { GetAnimalsByFarmFactory } from '../factories/usecases/get-animals-by-farm-factory';
 import { Animal } from '../types/type';
 
-export const useAnimals = (farmId: number) => {
+export const useAnimals = (farmId?: number) => {
+  const { farm } = useFarm();
   const [animals, setAnimals] = useState<Animal[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchAnimals = async () => {
+  const getAnimalsByFarm = useCallback(async (): Promise<Animal[]> => {
+    const targetFarmId = farmId || farm?.id;
+    if (!targetFarmId) {
+      setError('Fazenda não encontrada');
+      return [];
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      const getAnimalsByFarm = GetAnimalsByFarmFactory();
-      const response = await getAnimalsByFarm.getAnimalsByFarm({ farm_id: farmId });
-
-      if (response.success) {
-        setAnimals(response.data || []);
-      } else {
-        setError(response.message || 'Erro ao buscar animais');
-      }
-    } catch (err) {
-      console.error('Error fetching animals:', err);
-      setError(err instanceof Error ? err.message : 'Erro desconhecido');
+      const getAnimalsByFarmUseCase = GetAnimalsByFarmFactory();
+      const result = await getAnimalsByFarmUseCase.getAnimalsByFarm({ farm_id: targetFarmId });
+      const animalsData = result.data || [];
+      setAnimals(animalsData);
+      return animalsData;
+    } catch (err: any) {
+      const errorMessage = err.message || 'Erro ao buscar animais';
+      setError(errorMessage);
+      return [];
     } finally {
       setLoading(false);
     }
-  };
+  }, [farmId, farm?.id]);
 
   useEffect(() => {
-    fetchAnimals();
-  }, []);
+    if (farmId || farm?.id) {
+      getAnimalsByFarm();
+    }
+  }, [farmId, farm?.id, getAnimalsByFarm]);
 
   return {
     animals,
+    getAnimalsByFarm,
     loading,
     error,
-    refetch: fetchAnimals
+    clearError: () => setError(null)
   };
-}; 
+};

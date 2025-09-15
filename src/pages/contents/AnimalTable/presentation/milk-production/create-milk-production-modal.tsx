@@ -30,8 +30,8 @@ export const CreateMilkProductionModal: React.FC<MilkProductionModalProps> = ({
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
   
-  const { animals, loading: animalsLoading } = useAnimals(farm.id)
-  const { createMilkProduction, updateMilkProduction } = useMilkProduction(farm.id)
+  const { animals = [], loading: animalsLoading } = useAnimals(farm?.id)
+  const { createMilkProduction, updateMilkProduction } = useMilkProduction(farm?.id)
   
   const isEditing = !!editingProduction
 

@@ -4,6 +4,7 @@ import { DesktopTabs, MobileTabs, Tab } from '../../../../../components/tabs';
 import { useIsMobile } from '../../../../../hooks/use-is-mobile';
 import { Animals as AnimalsComponent } from "./animals";
 import { MilkProduction } from "../milk-production/milk-production";
+import { Reproduction } from "../reproduction/reproduction";
 
 const Animals = () => {
   const isMobile = useIsMobile();
@@ -12,7 +13,8 @@ const Animals = () => {
 
   const tabsIndex = {
     'animals-list': 0,
-    'milk-production': 1
+    'milk-production': 1,
+    'reproduction': 2
   }
 
   const tabs: Tab[] = useMemo(() => [
@@ -28,6 +30,13 @@ const Animals = () => {
       name: 'milk-production',
       component: (
         <MilkProduction />
+      )
+    },
+    {
+      title: t('animalTable.tabs.reproduction'),
+      name: 'reproduction',
+      component: (
+        <Reproduction />
       )
     }
   ], [t]);
