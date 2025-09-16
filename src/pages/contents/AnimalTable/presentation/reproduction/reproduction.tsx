@@ -53,6 +53,7 @@ const Reproduction = () => {
         onCancel={handleModalCancel}
         onSuccess={handleModalSuccess}
         preselectedAnimalId={preselectedAnimalId}
+        editingReproduction={editingReproduction}
       />
     </div>
   )

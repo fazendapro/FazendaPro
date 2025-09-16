@@ -20,7 +20,7 @@ interface ReproductionTableProps {
 export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTableProps>(({ onAddReproduction, onEditReproduction }, ref) => {
   const { t } = useTranslation();
   const { farm } = useFarm();
-  const { getReproductionsByFarm, updateReproduction, loading, error } = useReproduction();
+  const { getReproductionsByFarm, updateReproduction, deleteReproduction, loading, error } = useReproduction();
   const [reproductions, setReproductions] = useState<Reproduction[]>([]);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [isUpdatePhaseModalVisible, setIsUpdatePhaseModalVisible] = useState(false);
@@ -48,9 +48,13 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
   }, [error]);
 
   const handleDeleteReproduction = async (id: number) => {
-    // Implementar delete se necessário
-    message.success('Registro de reprodução deletado com sucesso');
-    fetchReproductions();
+    const success = await deleteReproduction(id);
+    if (success) {
+      message.success(t('animalTable.reproduction.deletedSuccessfully'));
+      fetchReproductions();
+    } else {
+      message.error(t('animalTable.reproduction.deleteError'));
+    }
   };
 
   const handleUpdatePhase = (reproduction: Reproduction) => {
@@ -134,12 +138,6 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
             icon={<EditOutlined />}
             onClick={() => handleUpdatePhase(record)}
             title={t('animalTable.reproduction.updatePhase')}
-          />
-          <Button
-            type="link"
-            icon={<EditOutlined />}
-            onClick={() => onEditReproduction(record)}
-            title={t('animalTable.reproduction.edit')}
           />
           <Popconfirm
             title={t('animalTable.reproduction.deleteConfirm')}

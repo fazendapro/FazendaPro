@@ -4,6 +4,7 @@ import { remoteCreateReproduction } from '../data/usecases/remote-create-reprodu
 import { remoteGetReproductionsByFarm } from '../data/usecases/remote-get-reproductions-by-farm';
 import { remoteUpdateReproductionPhase } from '../data/usecases/remote-update-reproduction-phase';
 import { remoteUpdateReproduction } from '../data/usecases/remote-update-reproduction';
+import { remoteDeleteReproduction } from '../data/usecases/remote-delete-reproduction';
 import { CreateReproductionRequest, UpdateReproductionPhaseRequest, Reproduction } from '../domain/model/reproduction';
 
 export const useReproduction = () => {
@@ -92,11 +93,28 @@ export const useReproduction = () => {
     }
   }, []);
 
+  const deleteReproduction = useCallback(async (id: number): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      await remoteDeleteReproduction(id);
+      return true;
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || 'Erro ao deletar registro de reprodução';
+      setError(errorMessage);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return {
     createReproduction,
     getReproductionsByFarm,
     updateReproductionPhase,
     updateReproduction,
+    deleteReproduction,
     loading,
     error,
     clearError: () => setError(null)

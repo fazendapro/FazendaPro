@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { useReproduction } from '../../hooks/useReproduction';
 import { useAnimals } from '../../hooks/useAnimals';
-import { CreateReproductionRequest, ReproductionPhase, ReproductionPhaseLabels } from '../../domain/model/reproduction';
+import { CreateReproductionRequest, Reproduction, ReproductionPhase, ReproductionPhaseLabels } from '../../domain/model/reproduction';
 import { Animal } from '../../types/type';
 
 const { TextArea } = Input;
@@ -14,24 +14,44 @@ interface CreateReproductionModalProps {
   onCancel: () => void;
   onSuccess: () => void;
   preselectedAnimalId?: number;
+  editingReproduction?: Reproduction;
 }
 
 export const CreateReproductionModal = ({ 
   visible, 
   onCancel, 
   onSuccess, 
-  preselectedAnimalId 
+  preselectedAnimalId,
+  editingReproduction
 }: CreateReproductionModalProps) => {
   const { t } = useTranslation();
-  const { createReproduction, loading } = useReproduction();
+  const { createReproduction, updateReproduction, loading } = useReproduction();
   const { animals = [], loading: animalsLoading } = useAnimals();
   const [form] = Form.useForm();
 
   useEffect(() => {
-    if (visible && preselectedAnimalId) {
-      form.setFieldsValue({ animal_id: preselectedAnimalId });
+    if (visible) {
+      if (editingReproduction) {
+        // Preencher formulário para edição
+        form.setFieldsValue({
+          animal_id: editingReproduction.animal_id,
+          current_phase: editingReproduction.current_phase,
+          insemination_date: editingReproduction.insemination_date ? dayjs(editingReproduction.insemination_date) : undefined,
+          insemination_type: editingReproduction.insemination_type,
+          pregnancy_date: editingReproduction.pregnancy_date ? dayjs(editingReproduction.pregnancy_date) : undefined,
+          expected_birth_date: editingReproduction.expected_birth_date ? dayjs(editingReproduction.expected_birth_date) : undefined,
+          actual_birth_date: editingReproduction.actual_birth_date ? dayjs(editingReproduction.actual_birth_date) : undefined,
+          lactation_start_date: editingReproduction.lactation_start_date ? dayjs(editingReproduction.lactation_start_date) : undefined,
+          lactation_end_date: editingReproduction.lactation_end_date ? dayjs(editingReproduction.lactation_end_date) : undefined,
+          dry_period_start_date: editingReproduction.dry_period_start_date ? dayjs(editingReproduction.dry_period_start_date) : undefined,
+          veterinary_confirmation: editingReproduction.veterinary_confirmation,
+          observations: editingReproduction.observations,
+        });
+      } else if (preselectedAnimalId) {
+        form.setFieldsValue({ animal_id: preselectedAnimalId });
+      }
     }
-  }, [visible, preselectedAnimalId, form]);
+  }, [visible, preselectedAnimalId, editingReproduction, form]);
 
   const handleSubmit = async (values: any) => {
     console.log('Form values:', values);
@@ -54,19 +74,34 @@ export const CreateReproductionModal = ({
     console.log('Data to send:', data);
 
     try {
-      const result = await createReproduction(data);
-      console.log('Create result:', result);
-      
-      if (result) {
-        message.success(t('animalTable.reproduction.createdSuccessfully'));
-        form.resetFields();
-        onSuccess();
+      if (editingReproduction) {
+        // Atualizar reprodução existente
+        const updateData = { ...data, id: editingReproduction.id };
+        const success = await updateReproduction(updateData);
+        
+        if (success) {
+          message.success(t('animalTable.reproduction.updatedSuccessfully'));
+          form.resetFields();
+          onSuccess();
+        } else {
+          message.error('Erro ao atualizar registro de reprodução');
+        }
       } else {
-        message.error('Erro ao criar registro de reprodução');
+        // Criar nova reprodução
+        const result = await createReproduction(data);
+        console.log('Create result:', result);
+        
+        if (result) {
+          message.success(t('animalTable.reproduction.createdSuccessfully'));
+          form.resetFields();
+          onSuccess();
+        } else {
+          message.error('Erro ao criar registro de reprodução');
+        }
       }
     } catch (error) {
-      console.error('Error creating reproduction:', error);
-      message.error('Erro ao criar registro de reprodução');
+      console.error('Error saving reproduction:', error);
+      message.error(editingReproduction ? 'Erro ao atualizar registro de reprodução' : 'Erro ao criar registro de reprodução');
     }
   };
 
@@ -77,7 +112,7 @@ export const CreateReproductionModal = ({
 
   return (
     <Modal
-      title={t('animalTable.reproduction.createTitle')}
+      title={editingReproduction ? t('animalTable.reproduction.editTitle') : t('animalTable.reproduction.createTitle')}
       open={visible}
       onCancel={handleCancel}
       onOk={() => form.submit()}

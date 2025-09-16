@@ -18,3 +18,4 @@ export interface Animal {
   createdAt: string;
   updatedAt: string;
 }
+
