@@ -37,6 +37,7 @@ func RunMigrations(db *gorm.DB) error {
 		{"011_update_users_with_person", updateUsersWithPerson},
 		{"010_create_expenses_table", createExpensesTable},
 		{"012_add_company_name", addCompanyName},
+		{"013_create_refresh_tokens_table", createRefreshTokensTable},
 		{"013_add_farm_logo", addFarmLogo},
 		{"014_add_animal_photo", addAnimalPhoto},
 		{"015_update_animals_table", updateAnimalsTable},
@@ -277,6 +278,10 @@ func RollbackMigrations(db *gorm.DB, steps int) error {
 			if err := db.AutoMigrate(&models.Animal{}); err != nil {
 				return fmt.Errorf("error reverting animals table: %w", err)
 			}
+		case "013_create_refresh_tokens_table":
+			if err := db.Migrator().DropTable(&models.RefreshToken{}); err != nil {
+				return fmt.Errorf("error reverting migration %s: %w", migration.Name, err)
+			}
 		case "016_update_reproductions_table":
 			if err := db.AutoMigrate(&models.Reproduction{}); err != nil {
 				return fmt.Errorf("error reverting reproductions table: %w", err)
@@ -291,4 +296,8 @@ func RollbackMigrations(db *gorm.DB, steps int) error {
 	}
 
 	return nil
+}
+
+func createRefreshTokensTable(db *gorm.DB) error {
+	return db.AutoMigrate(&models.RefreshToken{})
 }

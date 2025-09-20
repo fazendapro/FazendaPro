@@ -6,6 +6,7 @@ import (
 
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/repository"
+	"github.com/fazendapro/FazendaPro-api/internal/utils"
 )
 
 type UserService struct {
@@ -49,6 +50,12 @@ func (s *UserService) CreateUser(user *models.User, personData *models.Person) e
 		return errors.New("password must have at least 6 characters")
 	}
 
+	hashedPassword, err := utils.HashPassword(personData.Password)
+	if err != nil {
+		return errors.New("error hashing password")
+	}
+	personData.Password = hashedPassword
+
 	if personData.CPF == "" {
 		return errors.New("CPF is required")
 	}
@@ -70,4 +77,17 @@ func (s *UserService) UpdatePersonData(userID uint, personData *models.Person) e
 
 func (s *UserService) ValidatePassword(userID uint, password string) (bool, error) {
 	return s.repository.ValidatePassword(userID, password)
+}
+
+// ValidatePasswordByEmail valida senha usando email (para login)
+func (s *UserService) ValidatePasswordByEmail(email, password string) (bool, error) {
+	user, err := s.GetUserByEmail(email)
+	if err != nil {
+		return false, err
+	}
+	if user == nil {
+		return false, nil
+	}
+
+	return utils.CheckPasswordHash(password, user.Person.Password), nil
 }

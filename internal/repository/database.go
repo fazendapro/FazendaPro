@@ -16,29 +16,22 @@ type Database struct {
 func NewDatabase(cfg *config.Config) (*Database, error) {
 	sslMode := "disable"
 
-	env := os.Getenv("ENV")
-	if env == "production" {
-		if os.Getenv("DB_SSL_MODE") != "" {
-			sslMode = os.Getenv("DB_SSL_MODE")
+	// Check if DB_SSL_MODE is explicitly set
+	if os.Getenv("DB_SSL_MODE") != "" {
+		sslMode = os.Getenv("DB_SSL_MODE")
+	} else {
+		env := os.Getenv("ENV")
+		if env == "production" {
+			sslMode = "require"
 		} else {
 			sslMode = "disable"
 		}
-	} else {
-		sslMode = "disable"
 	}
 
-	var dsn string
-	if env == "production" {
-		dsn = fmt.Sprintf(
-			"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
-			cfg.DBHost, cfg.User, cfg.Password, cfg.Name, cfg.DBPort, sslMode,
-		)
-	} else {
-		dsn = fmt.Sprintf(
-			"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
-			cfg.DBHost, cfg.User, cfg.Password, cfg.Name, cfg.DBPort, sslMode,
-		)
-	}
+	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
+		cfg.DBHost, cfg.User, cfg.Password, cfg.Name, cfg.DBPort, sslMode,
+	)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {

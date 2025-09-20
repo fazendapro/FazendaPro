@@ -31,23 +31,25 @@ func SendErrorResponse(w http.ResponseWriter, message string, statusCode int) {
 	json.NewEncoder(w).Encode(response)
 }
 
-func Auth(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tokenString := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
-		if tokenString == "" {
-			SendErrorResponse(w, "Token não fornecido", http.StatusUnauthorized)
-			return
-		}
+func Auth(jwtSecret string) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			tokenString := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
+			if tokenString == "" {
+				SendErrorResponse(w, "Token não fornecido", http.StatusUnauthorized)
+				return
+			}
 
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			return []byte("sua-chave-secreta"), nil
+			token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+				return []byte(jwtSecret), nil
+			})
+
+			if err != nil || !token.Valid {
+				SendErrorResponse(w, "Token inválido", http.StatusUnauthorized)
+				return
+			}
+
+			next.ServeHTTP(w, r)
 		})
-
-		if err != nil || !token.Valid {
-			SendErrorResponse(w, "Token inválido", http.StatusUnauthorized)
-			return
-		}
-
-		next.ServeHTTP(w, r)
-	})
+	}
 }

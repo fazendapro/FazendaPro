@@ -39,8 +39,18 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 		r.Route("/api/v1", func(r chi.Router) {
 			userService := serviceFactory.CreateUserService()
 			userHandler := handlers.NewUserHandler(userService)
+			refreshTokenRepo := repoFactory.CreateRefreshTokenRepository()
+			authHandler := handlers.NewAuthHandler(userService, refreshTokenRepo, cfg.JWTSecret)
+
+			r.Route("/auth", func(r chi.Router) {
+				r.Post("/login", authHandler.Login)
+				r.Post("/register", authHandler.Register)
+				r.Post("/refresh", authHandler.RefreshToken)
+				r.Post("/logout", authHandler.Logout)
+			})
 
 			r.Route("/users", func(r chi.Router) {
+				r.Use(middleware.Auth(cfg.JWTSecret))
 				r.Post("/", userHandler.CreateUser)
 				r.Get("/", userHandler.GetUser)
 			})
@@ -49,6 +59,7 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 			animalHandler := handlers.NewAnimalHandler(animalService)
 
 			r.Route("/animals", func(r chi.Router) {
+				r.Use(middleware.Auth(cfg.JWTSecret))
 				r.Post("/", animalHandler.CreateAnimal)
 				r.Get("/", animalHandler.GetAnimal)
 				r.Get("/farm", animalHandler.GetAnimalsByFarm)
@@ -60,6 +71,7 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 			milkCollectionHandler := handlers.NewMilkCollectionHandler(milkCollectionService)
 
 			r.Route("/milk-collections", func(r chi.Router) {
+				r.Use(middleware.Auth(cfg.JWTSecret))
 				r.Post("/", milkCollectionHandler.CreateMilkCollection)
 				r.Put("/{id}", milkCollectionHandler.UpdateMilkCollection)
 				r.Get("/farm/{farmId}", milkCollectionHandler.GetMilkCollectionsByFarmID)
@@ -70,6 +82,7 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 			reproductionHandler := handlers.NewReproductionHandler(reproductionService)
 
 			r.Route("/reproductions", func(r chi.Router) {
+				r.Use(middleware.Auth(cfg.JWTSecret))
 				r.Post("/", reproductionHandler.CreateReproduction)
 				r.Get("/", reproductionHandler.GetReproduction)
 				r.Get("/animal", reproductionHandler.GetReproductionByAnimal)
