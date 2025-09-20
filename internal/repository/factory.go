@@ -23,3 +23,7 @@ func (f *RepositoryFactory) CreateMilkCollectionRepository() MilkCollectionRepos
 func (f *RepositoryFactory) CreateReproductionRepository() ReproductionRepositoryInterface {
 	return NewReproductionRepository(f.db.DB)
 }
+
+func (f *RepositoryFactory) CreateRefreshTokenRepository() RefreshTokenRepositoryInterface {
+	return NewRefreshTokenRepository(f.db)
+}

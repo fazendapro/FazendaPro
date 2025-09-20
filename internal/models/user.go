@@ -1,9 +1,9 @@
 package models
 
 type User struct {
-	ID       uint    `gorm:"primaryKey"`
-	PersonID *uint   `gorm:"unique"` // Nullable for existing records
-	Person   *Person `gorm:"foreignKey:PersonID"`
-	FarmID   uint    `gorm:"not null"`
-	Farm     Farm    `gorm:"foreignKey:FarmID"`
+	ID       uint    `gorm:"primaryKey" json:"id"`
+	PersonID *uint   `gorm:"unique" json:"person_id"`
+	Person   *Person `gorm:"foreignKey:PersonID" json:"person"`
+	FarmID   uint    `gorm:"not null" json:"farm_id"`
+	Farm     Farm    `gorm:"foreignKey:FarmID" json:"farm"`
 }
