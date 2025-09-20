@@ -1,81 +1,131 @@
-.PHONY: help build run test clean docker-build docker-run docker-stop migrate migrate-docker
+# Makefile para FazendaPro API
 
-APP_NAME=fazendapro-api
-DOCKER_IMAGE=fazendapro-api
+.PHONY: help test test-coverage test-unit test-handlers clean install-deps run build
 
-help: ## Mostra esta ajuda
-	@echo "Comandos disponíveis:"
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+# Variáveis
+GO_VERSION := 1.24.2
+COVERAGE_DIR := coverage
+TEST_DIR := tests
 
-build: ## Compila a aplicação
-	go build -o bin/$(APP_NAME) main.go
+# Ajuda
+help:
+	@echo "FazendaPro API - Comandos disponíveis:"
+	@echo ""
+	@echo "📦 Dependências:"
+	@echo "  install-deps    - Instalar dependências do Go"
+	@echo ""
+	@echo "🧪 Testes:"
+	@echo "  test            - Executar todos os testes"
+	@echo "  test-coverage   - Executar testes com coverage"
+	@echo "  test-unit       - Executar testes unitários"
+	@echo "  test-handlers    - Executar testes dos handlers"
+	@echo ""
+	@echo "🔧 Desenvolvimento:"
+	@echo "  run             - Executar a aplicação"
+	@echo "  build           - Compilar a aplicação"
+	@echo "  clean           - Limpar arquivos temporários"
+	@echo ""
 
-run: ## Executa a aplicação localmente
+# Instalar dependências
+install-deps:
+	@echo "📦 Instalando dependências..."
+	go mod download
+	go mod tidy
+	@echo "✅ Dependências instaladas!"
+
+# Executar todos os testes
+test:
+	@echo "🧪 Executando todos os testes..."
+	go test -v ./...
+
+# Executar testes com coverage
+test-coverage:
+	@echo "📊 Executando testes com coverage..."
+	@mkdir -p $(COVERAGE_DIR)
+	go test -v -coverprofile=$(COVERAGE_DIR)/coverage.out -covermode=atomic ./$(TEST_DIR)/...
+	go tool cover -html=$(COVERAGE_DIR)/coverage.out -o $(COVERAGE_DIR)/coverage.html
+	go tool cover -func=$(COVERAGE_DIR)/coverage.out
+	@echo "📁 Relatório HTML gerado: $(COVERAGE_DIR)/coverage.html"
+
+# Executar testes unitários
+test-unit:
+	@echo "🔬 Executando testes unitários..."
+	go test -v -short ./$(TEST_DIR)/...
+
+# Executar testes dos handlers
+test-handlers:
+	@echo "🔐 Testando AuthHandler..."
+	go test -v ./$(TEST_DIR)/handlers -run TestAuthHandler
+	@echo ""
+	@echo "👤 Testando UserHandler..."
+	go test -v ./$(TEST_DIR)/handlers -run TestUserHandler
+	@echo ""
+	@echo "🐄 Testando AnimalHandler..."
+	go test -v ./$(TEST_DIR)/handlers -run TestAnimalHandler
+	@echo ""
+	@echo "🥛 Testando MilkCollectionHandler..."
+	go test -v ./$(TEST_DIR)/handlers -run TestMilkCollectionHandler
+	@echo ""
+	@echo "🔄 Testando ReproductionHandler..."
+	go test -v ./$(TEST_DIR)/handlers -run TestReproductionHandler
+
+# Executar a aplicação
+run:
+	@echo "🚀 Executando a aplicação..."
 	go run main.go
 
-test: ## Executa os testes
-	go test ./...
+# Compilar a aplicação
+build:
+	@echo "🔨 Compilando a aplicação..."
+	go build -o fazendapro-api main.go
+	@echo "✅ Aplicação compilada: fazendapro-api"
 
-clean: ## Remove arquivos de build e limpa o ambiente
-	rm -rf bin/
+# Limpar arquivos temporários
+clean:
+	@echo "🧹 Limpando arquivos temporários..."
+	rm -rf $(COVERAGE_DIR)
+	rm -f fazendapro-api
 	go clean
+	@echo "✅ Limpeza concluída!"
 
-docker-build: ## Constrói a imagem Docker
-	docker build -t $(DOCKER_IMAGE) .
+# Executar script de coverage
+coverage-script:
+	@echo "📊 Executando script de coverage..."
+	./scripts/test-coverage.sh
 
-docker-run: ## Executa a aplicação com Docker Compose
-	docker-compose up -d
-
-docker-stop: ## Para a aplicação Docker Compose
-	docker-compose down
-
-docker-logs: ## Mostra logs dos containers
-	docker-compose logs -f
-
-migrate: ## Executa migrações localmente
-	@chmod +x scripts/migrate.sh
-	./scripts/migrate.sh up
-
-migrate-docker: ## Executa migrações via Docker
-	@chmod +x scripts/docker-migrate.sh
-	./scripts/docker-migrate.sh up
-
-dev-setup: ## Configura ambiente de desenvolvimento
-	@echo "Configurando ambiente de desenvolvimento..."
-	@if [ ! -f .env ]; then \
-		cp env.development .env; \
-		echo "Arquivo .env criado com configurações de desenvolvimento."; \
+# Verificar qualidade do código
+lint:
+	@echo "🔍 Verificando qualidade do código..."
+	@if command -v golangci-lint >/dev/null 2>&1; then \
+		golangci-lint run; \
+	else \
+		echo "⚠️  golangci-lint não instalado. Instale com: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"; \
 	fi
-	@chmod +x scripts/*.sh
 
-dev: dev-setup ## Inicia ambiente de desenvolvimento completo
-	@echo "Iniciando ambiente de desenvolvimento..."
-	./scripts/dev.sh start
-	ENV=development go run main.go
+# Formatar código
+fmt:
+	@echo "🎨 Formatando código..."
+	go fmt ./...
+	@echo "✅ Código formatado!"
 
-prod: ## Inicia aplicação em produção
-	@echo "Iniciando aplicação em produção..."
-	cp env.production .env
-	ENV=production go run main.go
+# Verificar dependências
+deps-check:
+	@echo "🔍 Verificando dependências..."
+	go mod verify
+	go list -u -m all
+	@echo "✅ Dependências verificadas!"
 
-quick: ## Inicia apenas a aplicação (banco já deve estar rodando)
-	@echo "Iniciando aplicação..."
-	go run main.go
+# Instalar ferramentas de desenvolvimento
+install-tools:
+	@echo "🛠️  Instalando ferramentas de desenvolvimento..."
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	go install github.com/stretchr/testify@latest
+	@echo "✅ Ferramentas instaladas!"
 
-logs: ## Mostra logs da aplicação
-	docker-compose logs -f app
+# Executar todos os checks
+check: fmt lint test-coverage
+	@echo "✅ Todos os checks executados com sucesso!"
 
-db-connect: ## Conecta ao banco de dados
-	docker-compose exec postgres psql -U fazendapro_user -d fazendapro
-
-db-reset: ## Reseta o banco de dados
-	docker-compose down -v
-	docker-compose up -d postgres
-	@sleep 10
-	./scripts/docker-migrate.sh up
-
-prod-build: ## Constrói para produção
-	docker build -t $(DOCKER_IMAGE):latest .
-
-prod-deploy: ## Deploy em produção (exemplo)
-	@echo "Deploy em produção - implementar conforme necessidade" 
+# CI/CD pipeline
+ci: install-deps fmt lint test-coverage
+	@echo "✅ Pipeline CI/CD executado com sucesso!"
