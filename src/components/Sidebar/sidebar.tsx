@@ -1,7 +1,7 @@
 import { Menu, Layout, Grid, Button } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { HomeOutlined, UserOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
+import { HomeOutlined, UserOutlined, MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useAuth } from "../../pages/Login/hooks/useAuth";
 
 const { Sider } = Layout;
@@ -35,7 +35,7 @@ export const Sidebar = () => {
     // { key: '/vendas', icon: <ShoppingCartOutlined />, label: 'Vendas' },
     // { key: '/estoque', icon: <FileTextOutlined />, label: 'Estoque' },
     // { key: '/configuracoes', icon: <SettingOutlined />, label: 'Configurações' },
-    // { key: '/sair', icon: <LogoutOutlined />, label: 'Sair' },
+    { key: '/sair', icon: <LogoutOutlined />, label: 'Sair' },
   ];
 
   if (!isAuthenticated) {

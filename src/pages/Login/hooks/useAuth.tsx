@@ -3,7 +3,7 @@ import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-import { LoginFactory } from '../factories';
+import { LoginFactory, AuthFactory } from '../factories';
 import { useCsrfTokenContext } from '../../../contexts';
 
 interface DecodedToken {
@@ -17,6 +17,7 @@ export const useAuth = () => {
   const navigate = useNavigate();
   const { csrfToken } = useCsrfTokenContext();
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
+  const [refreshToken, setRefreshToken] = useState<string | null>(() => localStorage.getItem('refreshToken'));
   const [user, setUser] = useState<DecodedToken | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -32,21 +33,59 @@ export const useAuth = () => {
     }
   }, []);
 
+  const clearAuth = useCallback(() => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    setToken(null);
+    setRefreshToken(null);
+    setUser(null);
+    setIsLoading(false);
+  }, []);
+
+  const refreshAccessToken = useCallback(async (refreshTokenValue: string) => {
+    try {
+      const authUseCase = AuthFactory(csrfToken);
+      const response = await authUseCase.refreshToken({ refresh_token: refreshTokenValue });
+
+      if (response.success && response.access_token) {
+        localStorage.setItem('token', response.access_token);
+        setToken(response.access_token);
+        
+        const decoded = validateToken(response.access_token);
+        if (decoded) {
+          setUser(decoded);
+        }
+      } else {
+        clearAuth();
+      }
+    } catch (error) {
+      console.error('Erro ao renovar token:', error);
+      clearAuth();
+    }
+    setIsLoading(false);
+  }, [validateToken, clearAuth, csrfToken]);
+
   const initializeAuth = useCallback(() => {
     const savedToken = localStorage.getItem('token');
+    const savedRefreshToken = localStorage.getItem('refreshToken');
+    
     if (savedToken) {
       const decoded = validateToken(savedToken);
       if (decoded) {
         setToken(savedToken);
         setUser(decoded);
+        if (savedRefreshToken) {
+          setRefreshToken(savedRefreshToken);
+        }
+        setIsLoading(false);
       } else {
-        localStorage.removeItem('token');
-        setToken(null);
-        setUser(null);
+        if (savedRefreshToken) return refreshAccessToken(savedRefreshToken);
+        return clearAuth();
       }
+    } else {
+      setIsLoading(false);
     }
-    setIsLoading(false);
-  }, [validateToken]);
+  }, [validateToken, refreshAccessToken, clearAuth]);
 
   useEffect(() => {
     initializeAuth();
@@ -72,6 +111,12 @@ export const useAuth = () => {
         localStorage.setItem('token', response.data.access_token);
         setToken(response.data.access_token);
         setUser(decoded);
+
+        if (response.refresh_token) {
+          localStorage.setItem('refreshToken', response.refresh_token);
+          setRefreshToken(response.refresh_token);
+        }
+
         toast.success(t('loginSuccess'));
         navigate('/', { replace: true });
         return true;
@@ -83,12 +128,20 @@ export const useAuth = () => {
     [navigate, validateToken, t, csrfToken]
   );
 
-  const logout = useCallback(() => {
-    localStorage.removeItem('token');
-    setToken(null);
-    setUser(null);
+  const logout = useCallback(async () => {
+    // Tentar invalidar refresh token no backend
+    if (refreshToken) {
+      try {
+        const authUseCase = AuthFactory(csrfToken);
+        await authUseCase.logout({ refresh_token: refreshToken });
+      } catch (error) {
+        console.error('Erro ao fazer logout no backend:', error);
+      }
+    }
+    
+    clearAuth();
     navigate('/login', { replace: true });
-  }, [navigate]);
+  }, [navigate, refreshToken, clearAuth, csrfToken]);
 
   return {
     isAuthenticated: !!token && !!user,

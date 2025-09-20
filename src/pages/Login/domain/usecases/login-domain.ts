@@ -7,11 +7,13 @@ export interface LoginParams {
 
 export interface LoginResponse extends BaseHttpResponse<{
   access_token: string;
+  refresh_token?: string;
 }> {
   success: boolean;
   message: string;
   status: number;
   access_token: string;
+  refresh_token?: string;
 }
 
 export interface LoginDomain {
