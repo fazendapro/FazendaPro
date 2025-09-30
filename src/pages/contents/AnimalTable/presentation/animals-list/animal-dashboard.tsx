@@ -10,12 +10,14 @@ const { Search } = Input;
 interface AnimalDashboardProps {
   onAnimalCreated?: () => void;
   onColumnsChanged?: (columns: string[]) => void;
+  onSearchChange?: (searchTerm: string) => void;
   selectedColumns?: string[];
 }
 
 const AnimalDashboard: React.FC<AnimalDashboardProps> = ({ 
   onAnimalCreated, 
   onColumnsChanged, 
+  onSearchChange,
   selectedColumns: externalSelectedColumns 
 }) => {
   const { isOpen, onOpen, onClose } = useModal();
@@ -45,6 +47,12 @@ const AnimalDashboard: React.FC<AnimalDashboardProps> = ({
     setSelectedColumns(columns);
     if (onColumnsChanged) {
       onColumnsChanged(columns);
+    }
+  };
+
+  const handleSearch = (value: string) => {
+    if (onSearchChange) {
+      onSearchChange(value);
     }
   };
 
@@ -125,7 +133,9 @@ const AnimalDashboard: React.FC<AnimalDashboardProps> = ({
           </Button>
           <Search 
             placeholder={t('animalTable.search')} 
-            style={{ width: 200 }} 
+            style={{ width: 200 }}
+            onSearch={handleSearch}
+            allowClear
           />
         </Space>
       </Card>

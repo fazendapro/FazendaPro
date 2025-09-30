@@ -43,6 +43,7 @@ export const useAnimals = (farmId?: number) => {
   return {
     animals,
     getAnimalsByFarm,
+    refetch: getAnimalsByFarm,
     loading,
     error,
     clearError: () => setError(null)

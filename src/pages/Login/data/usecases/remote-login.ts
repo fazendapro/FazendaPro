@@ -21,7 +21,7 @@ export class RemoteLogin implements LoginDomain {
         }
       );
 
-      const { message, access_token, refresh_token, ...rest } = data;
+      const { message, access_token, refresh_token } = data;
       return { 
         data: { access_token, refresh_token }, 
         status, 

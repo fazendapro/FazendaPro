@@ -3,7 +3,7 @@ import { Row, Col, Card } from 'antd';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import { Line } from 'react-chartjs-2';
-import { Overview, MilkProduction, NextToCalve, Rations, CattleQuantity, ShoppingOverview } from '../components';
+import { Overview, DashboardMilkProduction, NextToCalve, Rations, CattleQuantity, ShoppingOverview } from '../components';
 import { useTranslation } from 'react-i18next';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement);
@@ -116,7 +116,7 @@ const Dashboard = () => {
         </Col>
       </Row>
       <Row gutter={16}>
-        <Col span={12}><MilkProduction /></Col>
+        <Col span={12}><DashboardMilkProduction /></Col>
         <Col span={12}><NextToCalve /></Col>
       </Row>
     </div>

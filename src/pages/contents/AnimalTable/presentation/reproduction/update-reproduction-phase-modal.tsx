@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Modal, Form, Select, DatePicker, Input, Switch, message } from 'antd';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { useReproduction } from '../../hooks/useReproduction';
-import { UpdateReproductionPhaseRequest, Reproduction, ReproductionPhase, ReproductionPhaseLabels } from '../../domain/model/reproduction';
+import { UpdateReproductionPhaseRequest, Reproduction, ReproductionPhaseLabels } from '../../domain/model/reproduction';
 
 const { TextArea } = Input;
 

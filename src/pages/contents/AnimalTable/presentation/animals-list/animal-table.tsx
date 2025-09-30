@@ -10,12 +10,13 @@ interface AnimalTableRef {
 
 interface AnimalTableProps {
   selectedColumns?: string[];
+  searchTerm?: string;
 }
 
 const AnimalTable = forwardRef<AnimalTableRef, AnimalTableProps>((props, ref) => {
-  const { selectedColumns = [] } = props;
+  const { selectedColumns = [], searchTerm = '' } = props;
   const { farm } = useFarm();
-  const { animals, loading, error, refetch } = useAnimals(farm.id);
+  const { animals, loading, error, refetch } = useAnimals(farm?.id);
   const { buildTableColumns } = useAnimalColumnBuilder();
 
   useImperativeHandle(ref, () => ({
@@ -23,6 +24,19 @@ const AnimalTable = forwardRef<AnimalTableRef, AnimalTableProps>((props, ref) =>
   }));
 
   const filteredColumns = buildTableColumns(selectedColumns);
+
+  const filteredAnimals = animals.filter(animal => {
+    if (!searchTerm.trim()) return true;
+    
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      animal.animal_name?.toLowerCase().includes(searchLower) ||
+      animal.ear_tag_number_local?.toString().includes(searchLower) ||
+      animal.ear_tag_number_register?.toString().includes(searchLower) ||
+      animal.breed?.toLowerCase().includes(searchLower) ||
+      animal.type?.toLowerCase().includes(searchLower)
+    );
+  });
 
   if (loading) {
     return (
@@ -47,7 +61,7 @@ const AnimalTable = forwardRef<AnimalTableRef, AnimalTableProps>((props, ref) =>
   return (
     <Table 
       columns={filteredColumns} 
-      dataSource={animals} 
+      dataSource={filteredAnimals} 
       pagination={{ showSizeChanger: true }}
       rowKey="id"
       scroll={{ x: 1500 }}

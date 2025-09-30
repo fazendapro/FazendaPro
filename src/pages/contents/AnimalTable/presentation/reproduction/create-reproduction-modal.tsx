@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Modal, Form, Select, DatePicker, Input, Switch, message } from 'antd';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { useReproduction } from '../../hooks/useReproduction';
 import { useAnimals } from '../../hooks/useAnimals';
 import { CreateReproductionRequest, Reproduction, ReproductionPhase, ReproductionPhaseLabels } from '../../domain/model/reproduction';
-import { Animal } from '../../types/type';
 
 const { TextArea } = Input;
 

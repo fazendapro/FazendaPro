@@ -102,10 +102,9 @@ export const createMockTranslations = (customTranslations: Record<string, string
   }
 }
 
-export const createMockNamespace = (namespace: string, translations: Record<string, string>) => {
+export const createMockNamespace = (_namespace: string, translations: Record<string, string>) => {
   return {
     t: (key: string, options?: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-      // const fullKey = `${namespace}:${key}`
       const translation = translations[key] || key
       
       if (options) {

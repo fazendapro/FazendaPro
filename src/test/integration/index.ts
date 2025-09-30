@@ -1,1 +1,1 @@
-export * from './animal-table-integration'
+export * from './animal-table-integration.test'

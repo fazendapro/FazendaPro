@@ -1,12 +1,12 @@
 import { vi } from 'vitest'
 
-export const mockAxios = {
+export const mockAxios: any = {
   get: vi.fn(),
   post: vi.fn(),
   put: vi.fn(),
   delete: vi.fn(),
   patch: vi.fn(),
-  create: vi.fn(() => mockAxios),
+  create: vi.fn((): any => mockAxios),
   interceptors: {
     request: {
       use: vi.fn(),

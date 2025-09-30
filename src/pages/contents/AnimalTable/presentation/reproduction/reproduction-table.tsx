@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useImperativeHandle, useRef, useState, forwardRef } from 'react';
+import { useCallback, useEffect, useImperativeHandle, useState, forwardRef } from 'react';
 import { Table, Button, Tag, Space, message, Popconfirm } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -17,10 +17,10 @@ interface ReproductionTableProps {
   onEditReproduction: (reproduction: Reproduction) => void;
 }
 
-export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTableProps>(({ onAddReproduction, onEditReproduction }, ref) => {
+export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTableProps>(({ onAddReproduction: _onAddReproduction, onEditReproduction: _onEditReproduction }, ref) => {
   const { t } = useTranslation();
   const { farm } = useFarm();
-  const { getReproductionsByFarm, updateReproduction, deleteReproduction, loading, error } = useReproduction();
+  const { getReproductionsByFarm, deleteReproduction, loading, error } = useReproduction();
   const [reproductions, setReproductions] = useState<Reproduction[]>([]);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [isUpdatePhaseModalVisible, setIsUpdatePhaseModalVisible] = useState(false);

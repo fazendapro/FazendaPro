@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { ReproductionTable } from './reproduction-table'
 import { CreateReproductionModal } from './create-reproduction-modal'
 import { Reproduction as ReproductionType } from '../../domain/model/reproduction'

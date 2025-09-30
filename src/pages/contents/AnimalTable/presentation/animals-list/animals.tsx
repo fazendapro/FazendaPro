@@ -8,6 +8,7 @@ const Animals = () => {
   const { getDefaultColumnKeys } = useAnimalColumnBuilder();
 
   const [selectedColumns, setSelectedColumns] = useState<string[]>(getDefaultColumnKeys());
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   const handleAnimalCreated = () => {
     if (tableRef.current) {
@@ -19,16 +20,22 @@ const Animals = () => {
     setSelectedColumns(columns);
   };
 
+  const handleSearchChange = (searchTerm: string) => {
+    setSearchTerm(searchTerm);
+  };
+
   return (
     <div id="animals-list">
       <AnimalDashboard
         onAnimalCreated={handleAnimalCreated}
         onColumnsChanged={handleColumnsChanged}
+        onSearchChange={handleSearchChange}
         selectedColumns={selectedColumns}
       />
       <AnimalTable
         ref={tableRef}
         selectedColumns={selectedColumns}
+        searchTerm={searchTerm}
       />
     </div>
   );

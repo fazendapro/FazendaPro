@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react'
-import { render, RenderOptions, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, RenderOptions } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import { ConfigProvider } from 'antd'
 import { ThemeProvider } from '../styles/context/theme/theme-provider'

@@ -10,7 +10,7 @@ interface MilkData {
   price: string;
 }
 
-const MilkProduction: React.FC = () => {
+const DashboardMilkProduction: React.FC = () => {
   const { t } = useTranslation();
 
   const columns = [
@@ -36,4 +36,4 @@ const MilkProduction: React.FC = () => {
   );
 };
 
-export { MilkProduction };
+export { DashboardMilkProduction };
