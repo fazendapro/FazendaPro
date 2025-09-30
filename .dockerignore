@@ -47,4 +47,6 @@ logs/
 docker-compose*
 .dockerignore
 
-.nixpacks/ 
+.nixpacks/
+nixpacks.toml
+*.nixpacks* 

@@ -1,5 +1,5 @@
 [build]
-dockerfile = "Dockerfile.dokploy"
+dockerfile = "Dockerfile"
 context = "."
 build_args = ["VITE_API_URL"]
 

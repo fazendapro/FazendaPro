@@ -1,28 +1,17 @@
-FROM node:20-alpine AS builder
+FROM node:20-alpine
+
 WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm ci --silent
+RUN npm ci
 
 COPY . .
 
-ARG VITE_API_URL
-ENV VITE_API_URL=$VITE_API_URL
-
 RUN npm run build
 
-FROM nginx:alpine
+RUN npm install -g serve
 
-RUN apk add --no-cache gettext
-
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-COPY nginx.conf /etc/nginx/nginx.conf.template
-
-RUN mkdir -p /var/log/nginx
-
-ENV PORT=8080
 EXPOSE 8080
 
-CMD ["/bin/sh", "-c", "envsubst '${PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"]
+CMD ["serve", "dist", "-s", "-l", "8080", "--single"]
