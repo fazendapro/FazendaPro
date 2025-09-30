@@ -1,6 +1,7 @@
 [build]
-dockerfile = "Dockerfile"
+dockerfile = "Dockerfile.dokploy"
 context = "."
+build_args = ["VITE_API_URL"]
 
 [deploy]
 port = 8080
