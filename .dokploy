@@ -1,0 +1,7 @@
+[build]
+dockerfile = "Dockerfile"
+context = "."
+
+[deploy]
+port = 8080
+health_check = "/health"

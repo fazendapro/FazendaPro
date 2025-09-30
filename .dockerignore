@@ -44,6 +44,7 @@ logs/
 *.temp
 *.local
 
-Dockerfile*
 docker-compose*
-.dockerignore 
+.dockerignore
+
+.nixpacks/ 
