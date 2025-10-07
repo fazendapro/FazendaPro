@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -44,21 +45,39 @@ func Load() (*Config, error) {
 		fmt.Printf("WARNING: Não foi possível carregar %s: %v\n", envFile, err)
 	}
 
+	var dbHost, dbPort, dbUser, dbPassword, dbName string
+
+	if dbURL := os.Getenv("DB_URL"); dbURL != "" {
+		fmt.Printf("DEBUG: Usando DB_URL para configuração do banco\n")
+		var err error
+		dbHost, dbPort, dbUser, dbPassword, dbName, err = parseDBURL(dbURL)
+		if err != nil {
+			return nil, fmt.Errorf("erro ao processar DB_URL: %v", err)
+		}
+	} else {
+		fmt.Printf("DEBUG: Usando configuração manual do banco\n")
+		dbHost = getEnvWithDefault("DB_HOST", "localhost")
+		dbPort = getEnvWithDefault("DB_PORT", "5432")
+		dbUser = getEnvWithDefault("DB_USER", "fazendapro_user")
+		dbPassword = getEnvWithDefault("DB_PASSWORD", "fazendapro_password")
+		dbName = getEnvWithDefault("DB_NAME", "fazendapro")
+	}
+
 	fmt.Printf("DEBUG: ENV=%s, DB_HOST=%s, DB_PORT=%s, DB_USER=%s, DB_NAME=%s\n",
 		os.Getenv("ENV"),
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_NAME"))
+		dbHost,
+		dbPort,
+		dbUser,
+		dbName)
 
 	return &Config{
 		Port:      getEnvWithDefault("PORT", "8080"),
 		JWTSecret: getEnvWithDefault("JWT_SECRET", "dev-secret-key"),
-		DBHost:    getEnvWithDefault("DB_HOST", "localhost"),
-		DBPort:    getEnvWithDefault("DB_PORT", "5432"),
-		User:      getEnvWithDefault("DB_USER", "fazendapro_user"),
-		Password:  getEnvWithDefault("DB_PASSWORD", "fazendapro_password"),
-		Name:      getEnvWithDefault("DB_NAME", "fazendapro"),
+		DBHost:    dbHost,
+		DBPort:    dbPort,
+		User:      dbUser,
+		Password:  dbPassword,
+		Name:      dbName,
 		CORS:      loadCORSConfig(),
 	}, nil
 }
@@ -102,4 +121,26 @@ func parseInt(value string) int {
 		return i
 	}
 	return 0
+}
+
+func parseDBURL(dbURL string) (host, port, user, password, dbName string, err error) {
+	parsedURL, err := url.Parse(dbURL)
+	if err != nil {
+		return "", "", "", "", "", fmt.Errorf("erro ao fazer parse da DB_URL: %v", err)
+	}
+
+	host = parsedURL.Hostname()
+	port = parsedURL.Port()
+	if port == "" {
+		port = "5432"
+	}
+
+	if parsedURL.User != nil {
+		user = parsedURL.User.Username()
+		password, _ = parsedURL.User.Password()
+	}
+
+	dbName = strings.TrimPrefix(parsedURL.Path, "/")
+
+	return host, port, user, password, dbName, nil
 }
