@@ -92,3 +92,31 @@ func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 func (r *UserRepository) Create(user *models.User) error {
 	return fmt.Errorf("use CreateWithPerson instead")
 }
+
+func (r *UserRepository) FarmExists(farmID uint) (bool, error) {
+	var count int64
+	if err := r.db.DB.Model(&models.Farm{}).Where("id = ?", farmID).Count(&count).Error; err != nil {
+		return false, fmt.Errorf("error checking farm existence: %w", err)
+	}
+	return count > 0, nil
+}
+
+func (r *UserRepository) CreateDefaultFarm(farmID uint) error {
+	company := &models.Company{
+		CompanyName: "FazendaPro Demo",
+	}
+	if err := r.db.DB.Create(company).Error; err != nil {
+		return fmt.Errorf("error creating company: %w", err)
+	}
+
+	farm := &models.Farm{
+		ID:        farmID,
+		CompanyID: company.ID,
+		Logo:      "",
+	}
+	if err := r.db.DB.Create(farm).Error; err != nil {
+		return fmt.Errorf("error creating farm: %w", err)
+	}
+
+	return nil
+}

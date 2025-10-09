@@ -9,7 +9,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// Migration representa uma migração
 type Migration struct {
 	ID        uint   `gorm:"primaryKey"`
 	Name      string `gorm:"uniqueIndex"`
@@ -42,6 +41,7 @@ func RunMigrations(db *gorm.DB) error {
 		{"014_add_animal_photo", addAnimalPhoto},
 		{"015_update_animals_table", updateAnimalsTable},
 		{"016_update_reproductions_table", updateReproductionsTable},
+		{"017_seed_initial_data", seedInitialData},
 	}
 
 	for _, migration := range migrations {
@@ -134,49 +134,42 @@ func addAnimalPhoto(db *gorm.DB) error {
 }
 
 func updateAnimalsTable(db *gorm.DB) error {
-	// Remove a coluna ear_tag_number antiga
 	if db.Migrator().HasColumn(&models.Animal{}, "ear_tag_number") {
 		if err := db.Migrator().DropColumn(&models.Animal{}, "ear_tag_number"); err != nil {
 			return fmt.Errorf("error dropping ear_tag_number column: %w", err)
 		}
 	}
 
-	// Remove a coluna age antiga
 	if db.Migrator().HasColumn(&models.Animal{}, "age") {
 		if err := db.Migrator().DropColumn(&models.Animal{}, "age"); err != nil {
 			return fmt.Errorf("error dropping age column: %w", err)
 		}
 	}
 
-	// Remove a coluna fertilization antiga (string)
 	if db.Migrator().HasColumn(&models.Animal{}, "fertilization") {
 		if err := db.Migrator().DropColumn(&models.Animal{}, "fertilization"); err != nil {
 			return fmt.Errorf("error dropping fertilization column: %w", err)
 		}
 	}
 
-	// Remove a coluna status antiga (string)
 	if db.Migrator().HasColumn(&models.Animal{}, "status") {
 		if err := db.Migrator().DropColumn(&models.Animal{}, "status"); err != nil {
 			return fmt.Errorf("error dropping status column: %w", err)
 		}
 	}
 
-	// Remove a coluna purpose antiga (string)
 	if db.Migrator().HasColumn(&models.Animal{}, "purpose") {
 		if err := db.Migrator().DropColumn(&models.Animal{}, "purpose"); err != nil {
 			return fmt.Errorf("error dropping purpose column: %w", err)
 		}
 	}
 
-	// Remove a coluna animal_type antiga
 	if db.Migrator().HasColumn(&models.Animal{}, "animal_type") {
 		if err := db.Migrator().DropColumn(&models.Animal{}, "animal_type"); err != nil {
 			return fmt.Errorf("error dropping animal_type column: %w", err)
 		}
 	}
 
-	// Executa o AutoMigrate para adicionar as novas colunas
 	return db.AutoMigrate(&models.Animal{})
 }
 
@@ -300,4 +293,32 @@ func RollbackMigrations(db *gorm.DB, steps int) error {
 
 func createRefreshTokensTable(db *gorm.DB) error {
 	return db.AutoMigrate(&models.RefreshToken{})
+}
+
+func seedInitialData(db *gorm.DB) error {
+	var companyCount int64
+	db.Model(&models.Company{}).Count(&companyCount)
+
+	if companyCount > 0 {
+		log.Printf("Dados iniciais já existem, pulando seed")
+		return nil
+	}
+
+	company := &models.Company{
+		CompanyName: "FazendaPro Demo",
+	}
+	if err := db.Create(company).Error; err != nil {
+		return fmt.Errorf("error creating company: %w", err)
+	}
+
+	farm := &models.Farm{
+		CompanyID: company.ID,
+		Logo:      "",
+	}
+	if err := db.Create(farm).Error; err != nil {
+		return fmt.Errorf("error creating farm: %w", err)
+	}
+
+	log.Printf("Dados iniciais criados: Company ID=%d, Farm ID=%d", company.ID, farm.ID)
+	return nil
 }

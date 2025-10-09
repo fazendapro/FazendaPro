@@ -8,6 +8,7 @@ import (
 	"github.com/fazendapro/FazendaPro-api/config"
 	"github.com/fazendapro/FazendaPro-api/internal/api/handlers"
 	"github.com/fazendapro/FazendaPro-api/internal/api/middleware"
+	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/repository"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
 	"github.com/go-chi/chi/v5"
@@ -29,6 +30,44 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("FazendaPro API is running!"))
+	})
+
+	r.Post("/init-data", func(w http.ResponseWriter, r *http.Request) {
+		if db == nil || db.DB == nil {
+			http.Error(w, "Database not available", http.StatusInternalServerError)
+			return
+		}
+
+		var companyCount int64
+		db.DB.Model(&models.Company{}).Count(&companyCount)
+
+		if companyCount > 0 {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"success": true, "message": "Dados já existem"}`))
+			return
+		}
+
+		company := &models.Company{
+			CompanyName: "FazendaPro Demo",
+		}
+		if err := db.DB.Create(company).Error; err != nil {
+			http.Error(w, "Error creating company: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		farm := &models.Farm{
+			CompanyID: company.ID,
+			Logo:      "",
+		}
+		if err := db.DB.Create(farm).Error; err != nil {
+			http.Error(w, "Error creating farm: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"success": true, "message": "Dados iniciais criados", "company_id": ` + fmt.Sprintf("%d", company.ID) + `, "farm_id": ` + fmt.Sprintf("%d", farm.ID) + `}`))
 	})
 
 	if db != nil && db.DB != nil {

@@ -15,7 +15,6 @@ type AnimalRepositoryInterface interface {
 	Delete(id uint) error
 }
 
-// UserRepositoryInterface define os métodos que um repositório de usuários deve implementar
 type UserRepositoryInterface interface {
 	FindByPersonEmail(email string) (*models.User, error)
 	CreateWithPerson(user *models.User, personData *models.Person) error
@@ -24,6 +23,8 @@ type UserRepositoryInterface interface {
 	ValidatePassword(userID uint, password string) (bool, error)
 	FindByEmail(email string) (*models.User, error)
 	Create(user *models.User) error
+	FarmExists(farmID uint) (bool, error)
+	CreateDefaultFarm(farmID uint) error
 }
 
 type MilkCollectionRepositoryInterface interface {

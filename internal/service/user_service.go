@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/fazendapro/FazendaPro-api/internal/models"
@@ -64,6 +65,10 @@ func (s *UserService) CreateUser(user *models.User, personData *models.Person) e
 		return errors.New("farm ID is required")
 	}
 
+	if err := s.ensureFarmExists(user.FarmID); err != nil {
+		return fmt.Errorf("error ensuring farm exists: %w", err)
+	}
+
 	return s.repository.CreateWithPerson(user, personData)
 }
 
@@ -79,7 +84,6 @@ func (s *UserService) ValidatePassword(userID uint, password string) (bool, erro
 	return s.repository.ValidatePassword(userID, password)
 }
 
-// ValidatePasswordByEmail valida senha usando email (para login)
 func (s *UserService) ValidatePasswordByEmail(email, password string) (bool, error) {
 	user, err := s.GetUserByEmail(email)
 	if err != nil {
@@ -90,4 +94,17 @@ func (s *UserService) ValidatePasswordByEmail(email, password string) (bool, err
 	}
 
 	return utils.CheckPasswordHash(password, user.Person.Password), nil
+}
+
+func (s *UserService) ensureFarmExists(farmID uint) error {
+	exists, err := s.repository.FarmExists(farmID)
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		return nil
+	}
+
+	return s.repository.CreateDefaultFarm(farmID)
 }
