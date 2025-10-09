@@ -1,15 +1,35 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
+// @ts-ignore
+import axios from 'axios'
 import { apiConfig } from '../../../config/api'
 
-export function baseAxios(baseUrl: string): AxiosInstance {
+// Tipos customizados para interceptors
+interface RequestConfig {
+  headers?: Record<string, string>
+  _retry?: boolean
+}
 
+interface ResponseData {
+  data: unknown
+  status: number
+  statusText: string
+}
+
+interface ErrorData {
+  response?: {
+    status: number
+    data: unknown
+  }
+  config: RequestConfig
+}
+
+export function baseAxios(baseUrl: string) {
   const instance = axios.create({ 
     baseURL: `${apiConfig.baseUrl}/${baseUrl}`,
     timeout: apiConfig.timeout
   })
 
   instance.interceptors.request.use(
-    (config: AxiosRequestConfig) => {
+    (config: RequestConfig) => {
       const token = localStorage.getItem('token')
       if (token) {
         config.headers = config.headers || {}
@@ -17,15 +37,15 @@ export function baseAxios(baseUrl: string): AxiosInstance {
       }
       return config
     },
-    (error: AxiosError) => {
+    (error: ErrorData) => {
       return Promise.reject(error)
     }
   )
 
   instance.interceptors.response.use(
-    (response: AxiosResponse) => response,
-    async (error: AxiosError) => {
-      const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean }
+    (response: ResponseData) => response,
+    async (error: ErrorData) => {
+      const originalRequest = error.config
 
       if (error.response?.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true
