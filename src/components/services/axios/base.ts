@@ -1,33 +1,31 @@
-import axios, { AxiosInstance } from 'axios'
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
+import { apiConfig } from '../../../config/api'
 
 export function baseAxios(baseUrl: string): AxiosInstance {
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
-  
-  if (import.meta.env.DEV) {
-    console.log('API URL:', apiUrl)
-  }
 
   const instance = axios.create({ 
-    baseURL: `${apiUrl}/${baseUrl}` 
+    baseURL: `${apiConfig.baseUrl}/${baseUrl}`,
+    timeout: apiConfig.timeout
   })
 
   instance.interceptors.request.use(
-    (config) => {
+    (config: AxiosRequestConfig) => {
       const token = localStorage.getItem('token')
       if (token) {
+        config.headers = config.headers || {}
         config.headers.Authorization = `Bearer ${token}`
       }
       return config
     },
-    (error) => {
+    (error: AxiosError) => {
       return Promise.reject(error)
     }
   )
 
   instance.interceptors.response.use(
-    (response) => response,
-    async (error) => {
-      const originalRequest = error.config
+    (response: AxiosResponse) => response,
+    async (error: AxiosError) => {
+      const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean }
 
       if (error.response?.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true
@@ -41,6 +39,7 @@ export function baseAxios(baseUrl: string): AxiosInstance {
 
             if (response.success && response.access_token) {
               localStorage.setItem('token', response.access_token)
+              originalRequest.headers = originalRequest.headers || {}
               originalRequest.headers.Authorization = `Bearer ${response.access_token}`
               return instance(originalRequest)
             }
