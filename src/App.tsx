@@ -1,5 +1,5 @@
 import { Layout, Grid } from 'antd';
-import { Login, Dashboard, Animals } from './pages';
+import { Login, Dashboard, Animals, Settings } from './pages';
 import { ResponsiveSidebar, Spinner } from './components';
 import { Routes, Route, Navigate } from 'react-router'
 import { FarmSelection } from './pages/FarmSelection';
@@ -118,7 +118,7 @@ const AppContent = () => {
         path="/configuracoes"
         element={
           <ProtectedLayout>
-            <h1>Página de Configurações</h1>
+            <Settings />
           </ProtectedLayout>
         }
       />

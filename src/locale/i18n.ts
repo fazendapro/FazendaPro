@@ -5,27 +5,31 @@ import es from "./es.json";
 import en from "./en.json";
 import { translations as dashboardTranslations } from "../pages/contents/Dashboard/translation/pt";
 import { animalTableTranslations } from "../pages/contents/AnimalTable/translation";
+import { settingsTranslations } from "../pages/contents/Settings/translation";
 
 const resources = {
   pt: {
     translation: {
       ...pt.translation,
       ...dashboardTranslations,
-      ...animalTableTranslations
+      ...animalTableTranslations,
+      ...settingsTranslations
     }
   },
   es: {
     translation: {
       ...es.translation,
       ...dashboardTranslations,
-      ...animalTableTranslations
+      ...animalTableTranslations,
+      ...settingsTranslations
     }
   },
   en: {
     translation: {
       ...en.translation,
       ...dashboardTranslations,
-      ...animalTableTranslations
+      ...animalTableTranslations,
+      ...settingsTranslations
     }
   }
 };
