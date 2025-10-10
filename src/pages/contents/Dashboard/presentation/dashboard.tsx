@@ -1,101 +1,10 @@
-import { useRef, useEffect } from 'react';
-import { Row, Col, Card } from 'antd';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement } from 'chart.js';
-import { Bar } from 'react-chartjs-2';
-import { Line } from 'react-chartjs-2';
-import { Overview, DashboardMilkProduction, NextToCalve, Rations, CattleQuantity, ShoppingOverview } from '../components';
-import { useTranslation } from 'react-i18next';
-
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement);
+import { Row, Col } from 'antd';
+import { DashboardMilkProduction, NextToCalve } from '../components';
 
 const Dashboard = () => {
-  const { t } = useTranslation();
-  const barChartRef = useRef<ChartJS<"bar", number[], unknown>>(null);
-  const lineChartRef = useRef<ChartJS<"line", number[], unknown>>(null);
-
-  const barData = {
-    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Mai', 'Jun'],
-    datasets: [
-      {
-        label: 'Compras',
-        data: [60000, 50000, 35000, 40000, 45000, 30000, 40000, 35000, 25000, 20000],
-        backgroundColor: '#A5B4FC',
-      },
-      {
-        label: 'Vendas',
-        data: [50000, 40000, 30000, 35000, 40000, 25000, 35000, 30000, 20000, 15000],
-        backgroundColor: '#34D399',
-      },
-    ],
-  };
-
-  const barOptions = {
-    plugins: {
-      legend: { position: 'bottom' as const },
-    },
-    scales: {
-      x: { title: { display: true, text: 'Meses' } },
-      y: { title: { display: true, text: 'Valor' }, beginAtZero: true },
-    },
-    barPercentage: 0.5,
-    categoryPercentage: 0.8,
-    borderRadius: 10,
-  };
-
-  const lineData = {
-    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai'],
-    datasets: [
-      {
-        label: 'Semeadas',
-        data: [4000, 3000, 3500, 2000, 4000],
-        backgroundColor: '#F59E0B',
-        borderColor: '#F59E0B',
-        tension: 0.4,
-        fill: false,
-      },
-      {
-        label: 'Não semeadas',
-        data: [2500, 2000, 3000, 1500, 3500],
-        backgroundColor: '#93C5FD',
-        borderColor: '#93C5FD',
-        tension: 0.4,
-        fill: false,
-      },
-    ],
-  };
-
-  const lineOptions = {
-    plugins: {
-      legend: { position: 'bottom' as const },
-    },
-    scales: {
-      x: { title: { display: true, text: 'Meses' } },
-      y: { title: { display: true, text: 'Valor' }, beginAtZero: true },
-    },
-  };
-
-  useEffect(() => {
-    if (barChartRef.current) {
-      const chart = barChartRef.current;
-      const gradient1 = chart.ctx.createLinearGradient(0, 0, 0, chart.chartArea.height);
-      gradient1.addColorStop(0, '#A5B4FC');
-      gradient1.addColorStop(1, '#93C5FD');
-      const gradient2 = chart.ctx.createLinearGradient(0, 0, 0, chart.chartArea.height);
-      gradient2.addColorStop(0, '#34D399');
-      gradient2.addColorStop(1, '#6EE7B7');
-      chart.data.datasets[0].backgroundColor = gradient1;
-      chart.data.datasets[1].backgroundColor = gradient2;
-      chart.update();
-    }
-    return () => {
-      if (barChartRef.current) barChartRef.current.destroy();
-      if (lineChartRef.current) lineChartRef.current.destroy();
-    };
-  }, []);
-
   return (
     <div>
-      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+      {/* <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
         <Col xs={24} sm={24} md={16} lg={16} xl={16}>
           <Overview />
         </Col>
@@ -122,7 +31,7 @@ const Dashboard = () => {
             <Line ref={lineChartRef} data={lineData} options={lineOptions} />
           </Card>
         </Col>
-      </Row>
+      </Row> */}
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
           <DashboardMilkProduction />

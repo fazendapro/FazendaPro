@@ -1,4 +1,4 @@
-import { ConfigProvider, theme as antTheme } from 'antd';
+import { ConfigProvider, theme as antTheme, App } from 'antd';
 import { useTheme } from '../useTheme';
 
 export const AntConfigWrapper = ({ children }: { children: React.ReactNode }) => {
@@ -38,7 +38,9 @@ export const AntConfigWrapper = ({ children }: { children: React.ReactNode }) =>
         },
       }}
     >
-      {children}
+      <App>
+        {children}
+      </App>
     </ConfigProvider>
   );
 };

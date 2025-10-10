@@ -2,7 +2,7 @@ import { forwardRef, useImperativeHandle, useState } from 'react';
 import { Table, Spin, Alert } from 'antd';
 import { useAnimals } from '../../hooks/useAnimals';
 import { useFarm } from '../../../../../hooks/useFarm';
-import { useAnimalColumnBuilder } from './column-builder';
+import { useAnimalColumnBuilder } from './column-builder.tsx';
 import { useResponsive } from '../../../../../hooks';
 import { CustomPagination } from '../../../../../components/lib/Pagination/custom-pagination';
 
@@ -101,7 +101,6 @@ const AnimalTable = forwardRef<AnimalTableRef, AnimalTableProps>((props, ref) =>
         onChange={handlePageChange}
         onShowSizeChange={handleShowSizeChange}
         showSizeChanger={!isMobile}
-        showQuickJumper={!isMobile}
         showTotal={!isMobile}
       />
     </>

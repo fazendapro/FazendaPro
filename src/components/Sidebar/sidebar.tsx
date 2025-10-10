@@ -1,7 +1,7 @@
 import { Menu, Layout, Grid, Button, Avatar, Card, Typography } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { HomeOutlined, UserOutlined, MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined, SettingOutlined } from "@ant-design/icons";
+import { HomeOutlined, UserOutlined, MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined, SettingOutlined, DollarOutlined } from "@ant-design/icons";
 import { useAuth } from "../../contexts/AuthContext";
 import { useSelectedFarm } from "../../hooks/useSelectedFarm";
 
@@ -32,6 +32,7 @@ export const Sidebar = () => {
   const menuItems = [
     { key: '/', icon: <HomeOutlined />, label: 'Dashboard' },
     { key: '/vacas', icon: <UserOutlined />, label: 'Vacas' },
+    { key: '/vendas', icon: <DollarOutlined />, label: 'Vendas' },
     { key: '/configuracoes', icon: <SettingOutlined />, label: 'Configurações' },
     { key: '/sair', icon: <LogoutOutlined />, label: 'Sair' },
   ];
@@ -82,7 +83,7 @@ export const Sidebar = () => {
             marginTop: '24px',
             textAlign: 'center'
           }}
-          bodyStyle={{ padding: '16px' }}
+          styles={{ body: { padding: '16px' } }}
         >
           {farmLogo && 
            farmLogo.trim() !== '' && 

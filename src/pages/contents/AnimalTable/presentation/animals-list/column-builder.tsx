@@ -1,5 +1,6 @@
 import { ColumnType } from 'antd/es/table';
 import { Animal } from '../../types/type';
+import { ActionButton } from './action-button';
 
 export interface AnimalColumn {
   key: string;
@@ -226,6 +227,15 @@ export class AnimalColumnBuilder {
         render: (date: unknown) => {
           if (!date || typeof date !== 'string') return '-';
           return new Date(date).toLocaleDateString('pt-BR');
+        }
+      },
+      {
+        key: 'actions',
+        title: 'Ações',
+        dataIndex: 'actions',
+        defaultVisible: true,
+        render: (_, record: Animal) => {
+          return <ActionButton animalId={record.id} />;
         }
       }
     ];

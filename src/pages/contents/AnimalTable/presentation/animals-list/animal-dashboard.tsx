@@ -122,8 +122,11 @@ const AnimalDashboard: React.FC<AnimalDashboardProps> = ({
     </Row>
   );
 
+  const isDeveloped = false;
+
   return (
     <div>
+      {isDeveloped ? (<>
       {isMobile ? (
         <Collapse
           activeKey={isDashboardExpanded ? ['dashboard'] : []}
@@ -147,6 +150,8 @@ const AnimalDashboard: React.FC<AnimalDashboardProps> = ({
           {dashboardContent}
         </Card>
       )}
+      </>
+    ) : (<></>)}
 
       <Card style={{ marginBottom: '16px' }}>
         <Space 

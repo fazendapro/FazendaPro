@@ -3,12 +3,12 @@ import { vi } from 'vitest';
 import { AnimalTable } from '../animal-table';
 import { useAnimals } from '../../../hooks/useAnimals';
 import { useFarm } from '../../../../../../hooks/useFarm';
-import { useAnimalColumnBuilder } from '../column-builder';
+import { useAnimalColumnBuilder } from '../column-builder.tsx';
 import { useResponsive } from '../../../../../../hooks';
 
 vi.mock('../../../hooks/useAnimals');
 vi.mock('../../../../../../hooks/useFarm');
-vi.mock('../column-builder');
+vi.mock('../column-builder.tsx');
 vi.mock('../../../../../../hooks');
 
 const mockUseAnimals = useAnimals as any;

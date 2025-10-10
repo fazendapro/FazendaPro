@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Checkbox, Button, Space, Divider } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useAnimalColumnBuilder } from './column-builder';
+import { useAnimalColumnBuilder } from './column-builder.tsx';
 
 export interface ColumnOption {
   key: string;

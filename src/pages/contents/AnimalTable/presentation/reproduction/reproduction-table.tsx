@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useImperativeHandle, useState, forwardRef } from 'react';
-import { Table, Button, Tag, Space, message, Popconfirm } from 'antd';
+import { Table, Button, Tag, Space, message, Popconfirm, Card } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useReproduction } from '../../hooks/useReproduction';
@@ -178,24 +178,25 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
 
   return (
     <div>
-      <div style={{ 
-        marginBottom: 16, 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        flexDirection: isMobile ? 'column' : 'row',
-        gap: isMobile ? '12px' : '0'
-      }}>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => setIsCreateModalVisible(true)}
-          size={'middle'}
-          block={isMobile}
-        >
-          {t('animalTable.reproduction.addReproduction')}
-        </Button>
-      </div>
+      <Card style={{ marginBottom: '16px' }}>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: isMobile ? '12px' : '0'
+        }}>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => setIsCreateModalVisible(true)}
+            size={'middle'}
+            block={isMobile}
+          >
+            {t('animalTable.reproduction.addReproduction')}
+          </Button>
+        </div>
+      </Card>
 
       <Table
         columns={columns}
@@ -220,7 +221,6 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
         onChange={handlePageChange}
         onShowSizeChange={handleShowSizeChange}
         showSizeChanger={!isMobile}
-        showQuickJumper={!isMobile}
         showTotal={!isMobile}
       />
 

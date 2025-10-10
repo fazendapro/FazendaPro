@@ -41,7 +41,44 @@ export const translations = {
     animalsRetrievedSuccessfully: "Animales cargados con éxito",
     tabs: {
       animalsList: "Lista de Animales",
-      milkProduction: "Producción de Leche"
+      milkProduction: "Producción de Leche",
+      reproduction: "Reproducción"
+    },
+    milkProductionContainer: {
+      animalName: "Nombre del Animal",
+      earTag: "Número de Arete",
+      liters: "Litros",
+      date: "Fecha",
+      addProduction: "Agregar Producción",
+      createTitle: "Registrar Producción de Leche",
+      selectAnimal: "Seleccionar Animal",
+      selectAnimalPlaceholder: "Seleccione un animal",
+      animalRequired: "Por favor seleccione un animal",
+      litersRequired: "Por favor ingrese la cantidad de litros",
+      litersFormat: "Formato inválido (ej: 25.5)",
+      litersPlaceholder: "Ej: 25.5",
+      dateRequired: "Por favor seleccione una fecha",
+      datePlaceholder: "Seleccione una fecha",
+      create: "Registrar",
+      update: "Actualizar",
+      editTitle: "Editar Producción de Leche",
+      createdSuccessfully: "Producción registrada con éxito",
+      updatedSuccessfully: "Producción actualizada con éxito",
+      createError: "Error al registrar producción",
+      updateError: "Error al actualizar producción",
+      filters: {
+        all: "Todos",
+        week: "Semana",
+        month: "Mes",
+        startDate: "Fecha inicial",
+        endDate: "Fecha final"
+      },
+      clearFilters: "Limpiar Filtros",
+      actions: "Acciones",
+      add: "Agregar",
+      edit: "Editar",
+      addProductionForAnimal: "Agregar producción para este animal",
+      editProduction: "Editar producción de leche"
     }
   }
 }; 

@@ -1,17 +1,15 @@
 import { forwardRef, useImperativeHandle, useState } from 'react'
-import { Table, Spin, Alert, Button, Space, DatePicker, Select } from 'antd'
-import { PlusOutlined, EditOutlined } from '@ant-design/icons'
+import { Table, Spin, Alert, Button, Space, DatePicker, Card } from 'antd'
+import { PlusOutlined, EditOutlined, ClearOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { useMilkProduction } from '../../hooks/useMilkProduction'
 import { useFarm } from '../../../../../hooks/useFarm'
 import { useResponsive } from '../../../../../hooks'
 import { MilkProduction, MilkProductionFilters } from '../../domain/model/milk-production'
 import { CustomPagination } from '../../../../../components/lib/Pagination/custom-pagination'
-import dayjs from 'dayjs'
+import dayjs from '../../../../../config/dayjs'
 
 const { RangePicker } = DatePicker
-const { Option } = Select
-
 interface MilkProductionTableRef {
   refetch: () => void
 }
@@ -84,12 +82,8 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
     }
   ]
 
-  const handlePeriodChange = (value: 'week' | 'month' | 'all') => {
-    setFilters(prev => ({ ...prev, period: value }))
-  }
-
   const handleDateRangeChange = (dates: [dayjs.Dayjs | null, dayjs.Dayjs | null] | null) => {
-    if (dates && dates.length === 2 && dates[0] && dates[1]) {
+    if (dates && dates[0] && dates[1]) {
       setFilters(prev => ({
         ...prev,
         startDate: dates[0]!.format('YYYY-MM-DD'),
@@ -102,6 +96,11 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
         endDate: undefined
       }))
     }
+  }
+
+  const handleClearFilters = () => {
+    setFilters({ period: 'all' })
+    setCurrentPage(1)
   }
 
   const handlePageChange = (page: number, size: number) => {
@@ -117,6 +116,10 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
   const startIndex = (currentPage - 1) * pageSize
   const endIndex = startIndex + pageSize
   const paginatedData = (milkProductions || []).slice(startIndex, endIndex)
+
+  const rangePickerValue: [dayjs.Dayjs, dayjs.Dayjs] | null = filters.startDate && filters.endDate 
+    ? [dayjs(filters.startDate), dayjs(filters.endDate)] 
+    : null
 
   if (loading) {
     return (
@@ -140,44 +143,51 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
 
   return (
     <div>
-      <div style={{ 
-        marginBottom: '16px', 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        flexDirection: isMobile ? 'column' : 'row',
-        gap: isMobile ? '12px' : '0'
-      }}>
-        <Space direction={isMobile ? 'vertical' : 'horizontal'} style={{ width: isMobile ? '100%' : 'auto' }}>
-          <Select
-            value={filters.period}
-            onChange={handlePeriodChange}
-            style={{ width: isMobile ? '100%' : 120 }}
-            size={'middle'}
-          >
-            <Option value="all">{t('animalTable.milkProductionContainer.filters.all')}</Option>
-            <Option value="week">{t('animalTable.milkProductionContainer.filters.week')}</Option>
-            <Option value="month">{t('animalTable.milkProductionContainer.filters.month')}</Option>
-          </Select>
-          
-          <RangePicker
-            onChange={handleDateRangeChange}
-            placeholder={[t('animalTable.milkProductionContainer.filters.startDate'), t('animalTable.milkProductionContainer.filters.endDate')]}
-            style={{ width: isMobile ? '100%' : 'auto' }}
-            size={'middle'}
-          />
-        </Space>
+      <Card style={{ marginBottom: '16px' }}>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: isMobile ? '12px' : '0'
+        }}>
+          <Space direction={isMobile ? 'vertical' : 'horizontal'} style={{ width: isMobile ? '100%' : 'auto' }}>
+            <RangePicker
+              value={rangePickerValue}
+              onChange={handleDateRangeChange}
+              placeholder={[t('animalTable.milkProductionContainer.filters.startDate'), t('animalTable.milkProductionContainer.filters.endDate')]}
+              style={{ width: isMobile ? '100%' : 'auto' }}
+              size={'middle'}
+              format="DD/MM/YYYY"
+              allowClear
+              showToday
+            />
+          </Space>
 
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={onAddProduction}
-          size={'middle'}
-          block={isMobile}
-        >
-          {t('animalTable.milkProductionContainer.addProduction')}
-        </Button>
-      </div>
+          <Space direction={isMobile ? 'vertical' : 'horizontal'} style={{ width: isMobile ? '100%' : 'auto' }}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={onAddProduction}
+              size={'middle'}
+              block={isMobile}
+            >
+              {t('animalTable.milkProductionContainer.addProduction')}
+            </Button>
+            
+            {(filters.startDate || filters.endDate || filters.period !== 'all') && (
+              <Button
+                icon={<ClearOutlined />}
+                onClick={handleClearFilters}
+                size={'middle'}
+                block={isMobile}
+              >
+                {t('animalTable.milkProductionContainer.clearFilters')}
+              </Button>
+            )}
+          </Space>
+        </div>
+      </Card>
 
       <Table
         columns={columns}
@@ -201,7 +211,6 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
         onChange={handlePageChange}
         onShowSizeChange={handleShowSizeChange}
         showSizeChanger={!isMobile}
-        showQuickJumper={!isMobile}
         showTotal={!isMobile}
       />
     </div>

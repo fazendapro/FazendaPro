@@ -7,7 +7,6 @@ interface CustomPaginationProps {
   total?: number;
   pageSize?: number;
   showSizeChanger?: boolean;
-  showQuickJumper?: boolean;
   showTotal?: boolean | ((total: number, range: [number, number]) => string);
   onChange?: (page: number, pageSize: number) => void;
   onShowSizeChange?: (current: number, size: number) => void;

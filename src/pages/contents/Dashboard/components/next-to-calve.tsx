@@ -1,21 +1,12 @@
 import React from 'react';
-import { Card, List, Avatar } from 'antd';
+import { Card, List, Avatar, Spin, Tooltip } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-
-interface CalveData {
-  name: string;
-  days: number;
-  image: string;
-  status: string;
-}
+import { useNextToCalve } from '../hooks/useNextToCalve';
 
 const NextToCalve: React.FC = () => {
   const { t } = useTranslation();
-  const data: CalveData[] = [
-    { name: 'Tata Salt', days: 15, image: 'src/assets/images/mocked/cows/tata.png', status: 'Alto' },
-    { name: 'Lays', days: 40, image: 'src/assets/images/mocked/cows/lays.png', status: 'Baixo' },
-    { name: 'Matilda', days: 20, image: 'src/assets/images/mocked/cows/matilda.png', status: 'Médio' },
-  ];
+  const { nextToCalve, loading, error } = useNextToCalve();
 
   const getStatusStyles = (status: string) => {
     switch (status) {
@@ -43,31 +34,119 @@ const NextToCalve: React.FC = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <Card title={t('dashboard.nextToCalve')}>
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+          <Spin size="large" />
+        </div>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card title={t('dashboard.nextToCalve')}>
+        <div style={{ textAlign: 'center', padding: '20px', color: 'red' }}>
+          {error}
+        </div>
+      </Card>
+    );
+  }
+
   return (
     <Card
-      title={t('dashboard.nextToCalve')}
+      title={
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {t('dashboard.nextToCalve')}
+          <Tooltip 
+            title="Uma vaca fica grávida por aproximadamente 9 meses, ou cerca de 280 a 290 dias, a partir do dia em que a prenhez é confirmada. O período de gestação pode variar ligeiramente dependendo da raça, da saúde do animal e de outros fatores, mas a média é de 283 dias."
+            placement="top"
+          >
+            <InfoCircleOutlined style={{ color: '#1890ff', cursor: 'help' }} />
+          </Tooltip>
+        </div>
+      }
     >
       <List
         itemLayout="horizontal"
-        dataSource={data}
+        dataSource={nextToCalve}
         renderItem={(item) => (
-          <List.Item>
+          <List.Item
+            style={{
+              padding: '12px 0',
+              borderBottom: '1px solid #f0f0f0'
+            }}
+          >
             <List.Item.Meta
-              avatar={<Avatar src={item.image} shape="square" size={100} />}
-              title={<span style={{ fontSize: 16, fontWeight: 'bold' }}>{item.name}</span>}
+              avatar={
+                <Avatar 
+                  src={item.photo} 
+                  shape="square" 
+                  size={{ xs: 60, sm: 80, md: 100 }}
+                  style={{ 
+                    minWidth: '60px',
+                    minHeight: '60px'
+                  }}
+                />
+              }
+              title={
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  gap: '4px'
+                }}>
+                  <span style={{ 
+                    fontSize: '16px', 
+                    fontWeight: 'bold',
+                    color: '#262626'
+                  }}>
+                    {item.animal_name}
+                  </span>
+                  <span style={{ 
+                    fontSize: '12px', 
+                    color: '#8c8c8c'
+                  }}>
+                    #{item.ear_tag_number_local}
+                  </span>
+                </div>
+              }
               description={
-                <>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <p>Última vez: {item.days} dias</p>
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  gap: '8px',
+                  marginTop: '8px'
+                }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '8px',
+                    flexWrap: 'wrap'
+                  }}>
+                    <span style={{ 
+                      fontSize: '14px',
+                      color: '#595959'
+                    }}>
+                      Faltam: <strong>{item.days_until_birth} dias</strong>
+                    </span>
                     <span style={{ 
                       ...getStatusStyles(item.status),
-                      padding: '4px', 
-                      borderRadius: '20px' 
+                      padding: '4px 8px', 
+                      borderRadius: '12px',
+                      fontSize: '12px',
+                      fontWeight: 'bold'
                     }}>
                       {item.status}
                     </span>
                   </div>
-                </>
+                  <div style={{ 
+                    fontSize: '12px',
+                    color: '#8c8c8c'
+                  }}>
+                    Data prevista: {item.expected_birth_date}
+                  </div>
+                </div>
               }
             />
           </List.Item>

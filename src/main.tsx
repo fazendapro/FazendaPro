@@ -6,6 +6,7 @@ import { AntConfigWrapper } from './styles/config/ant-design-config-wrapper';
 import { BrowserRouter } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import './locale/i18n';
+import './config/dayjs';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
