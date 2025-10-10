@@ -4,6 +4,12 @@ export interface Farm {
   ID: number;
   CompanyID: number;
   Logo: string;
+  Company?: {
+    ID: number;
+    CompanyName: string;
+    Location: string;
+    FarmCNPJ: string;
+  };
 }
 
 export interface GetUserFarmsResponse {

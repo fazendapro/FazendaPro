@@ -41,6 +41,16 @@ const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
   )
 }
 
+export const App = () => {
+  return (
+    <FarmProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </FarmProvider>
+  );
+};
+
 const AppContent = () => {
   const { isLoading, isAuthenticated } = useAuth();
 
@@ -114,15 +124,5 @@ const AppContent = () => {
       />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
-  );
-};
-
-export const App = () => {
-  return (
-    <FarmProvider>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </FarmProvider>
   );
 };

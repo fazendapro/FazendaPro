@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { HomeOutlined, UserOutlined, MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useAuth } from "../../contexts/AuthContext";
+import { useSelectedFarm } from "../../hooks/useSelectedFarm";
 
 const { Sider } = Layout;
 const { useBreakpoint } = Grid;
@@ -13,6 +14,7 @@ export const Sidebar = () => {
   const screens = useBreakpoint();
   const [collapsed, setCollapsed] = useState(screens.xs);
   const { logout } = useAuth();
+  const { farmName } = useSelectedFarm();
   const isAuthenticated = true;
 
   const handleMenuClick = (key: string) => {
@@ -83,7 +85,7 @@ export const Sidebar = () => {
         fontSize: '14px',
         color: '#333'
       }}>
-        FAZENDA BOM JARDIM
+        {farmName || 'FAZENDA BOM JARDIM'}
       </div>
       <Menu
         theme="light"
