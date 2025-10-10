@@ -109,8 +109,10 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 				r.Post("/", animalHandler.CreateAnimal)
 				r.Get("/", animalHandler.GetAnimal)
 				r.Get("/farm", animalHandler.GetAnimalsByFarm)
+				r.Get("/sex", animalHandler.GetAnimalsBySex)
 				r.Put("/", animalHandler.UpdateAnimal)
 				r.Delete("/", animalHandler.DeleteAnimal)
+				r.Post("/photo", animalHandler.UploadAnimalPhoto)
 			})
 
 			milkCollectionService := serviceFactory.CreateMilkCollectionService()

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -47,8 +48,16 @@ type CreateAnimalRequest struct {
 
 type AnimalResponse struct {
 	AnimalData
-	CreatedAt string `json:"createdAt"`
-	UpdatedAt string `json:"updatedAt"`
+	Father    *AnimalParent `json:"father,omitempty"`
+	Mother    *AnimalParent `json:"mother,omitempty"`
+	CreatedAt string        `json:"createdAt"`
+	UpdatedAt string        `json:"updatedAt"`
+}
+
+type AnimalParent struct {
+	ID                uint   `json:"id"`
+	AnimalName        string `json:"animal_name"`
+	EarTagNumberLocal int    `json:"ear_tag_number_local"`
 }
 
 func animalDataToModel(data AnimalData) models.Animal {
@@ -92,6 +101,24 @@ func modelToAnimalResponse(animal *models.Animal) AnimalResponse {
 		birthDate = animal.BirthDate.Format("2006-01-02")
 	}
 
+	var father *AnimalParent
+	if animal.Father != nil {
+		father = &AnimalParent{
+			ID:                animal.Father.ID,
+			AnimalName:        animal.Father.AnimalName,
+			EarTagNumberLocal: animal.Father.EarTagNumberLocal,
+		}
+	}
+
+	var mother *AnimalParent
+	if animal.Mother != nil {
+		mother = &AnimalParent{
+			ID:                animal.Mother.ID,
+			AnimalName:        animal.Mother.AnimalName,
+			EarTagNumberLocal: animal.Mother.EarTagNumberLocal,
+		}
+	}
+
 	return AnimalResponse{
 		AnimalData: AnimalData{
 			ID:                   animal.ID,
@@ -114,6 +141,8 @@ func modelToAnimalResponse(animal *models.Animal) AnimalResponse {
 			Purpose:              animal.Purpose,
 			CurrentBatch:         animal.CurrentBatch,
 		},
+		Father:    father,
+		Mother:    mother,
 		CreatedAt: animal.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt: animal.UpdatedAt.Format("2006-01-02 15:04:05"),
 	}
@@ -229,7 +258,14 @@ func (h *AnimalHandler) UpdateAnimal(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	SendSuccessResponse(w, nil, "Animal atualizado com sucesso", http.StatusOK)
+	updated, err := h.service.GetAnimalByID(animal.ID)
+	if err != nil || updated == nil {
+		SendSuccessResponse(w, nil, "Animal atualizado com sucesso", http.StatusOK)
+		return
+	}
+
+	response := modelToAnimalResponse(updated)
+	SendSuccessResponse(w, response, "Animal atualizado com sucesso", http.StatusOK)
 }
 
 func (h *AnimalHandler) DeleteAnimal(w http.ResponseWriter, r *http.Request) {
@@ -256,4 +292,118 @@ func (h *AnimalHandler) DeleteAnimal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	SendSuccessResponse(w, nil, "Animal deletado com sucesso", http.StatusOK)
+}
+
+func (h *AnimalHandler) GetAnimalsBySex(w http.ResponseWriter, r *http.Request) {
+	farmID := r.URL.Query().Get("farmId")
+	sex := r.URL.Query().Get("sex")
+
+	if farmID == "" {
+		SendErrorResponse(w, "ID da fazenda é obrigatório", http.StatusBadRequest)
+		return
+	}
+
+	if sex == "" {
+		SendErrorResponse(w, "Sexo é obrigatório", http.StatusBadRequest)
+		return
+	}
+
+	farmIDUint, err := strconv.ParseUint(farmID, 10, 32)
+	if err != nil {
+		SendErrorResponse(w, "ID da fazenda inválido", http.StatusBadRequest)
+		return
+	}
+
+	sexInt, err := strconv.Atoi(sex)
+	if err != nil {
+		SendErrorResponse(w, "Sexo inválido", http.StatusBadRequest)
+		return
+	}
+
+	animals, err := h.service.GetAnimalsByFarmIDAndSex(uint(farmIDUint), sexInt)
+	if err != nil {
+		SendErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	var responses []AnimalResponse
+	for _, animal := range animals {
+		responses = append(responses, modelToAnimalResponse(&animal))
+	}
+
+	SendSuccessResponse(w, responses, fmt.Sprintf("Animais encontrados com sucesso (%d animais)", len(animals)), http.StatusOK)
+}
+
+func (h *AnimalHandler) UploadAnimalPhoto(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		SendErrorResponse(w, "Método não permitido", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Parse multipart form first to get the animal_id
+	err := r.ParseMultipartForm(10 << 20) // 10 MB max
+	if err != nil {
+		SendErrorResponse(w, "Erro ao fazer parse do formulário: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	animalID := r.FormValue("animal_id")
+	if animalID == "" {
+		SendErrorResponse(w, "ID do animal é obrigatório", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.ParseUint(animalID, 10, 32)
+	if err != nil {
+		SendErrorResponse(w, "ID do animal inválido", http.StatusBadRequest)
+		return
+	}
+
+	file, _, err := r.FormFile("photo")
+	if err != nil {
+		SendErrorResponse(w, "Erro ao obter arquivo: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
+	// Read file content and convert to base64
+	fileBytes := make([]byte, 0)
+	buffer := make([]byte, 1024)
+	for {
+		n, err := file.Read(buffer)
+		if err != nil && err.Error() != "EOF" {
+			SendErrorResponse(w, "Erro ao ler arquivo: "+err.Error(), http.StatusBadRequest)
+			return
+		}
+		if n == 0 {
+			break
+		}
+		fileBytes = append(fileBytes, buffer[:n]...)
+	}
+
+	// Convert to base64
+	photoBase64 := fmt.Sprintf("data:image/jpeg;base64,%s", base64.StdEncoding.EncodeToString(fileBytes))
+
+	// Get the animal
+	animal, err := h.service.GetAnimalByID(uint(id))
+	if err != nil || animal == nil {
+		SendErrorResponse(w, "Animal não encontrado", http.StatusNotFound)
+		return
+	}
+
+	// Update the animal with the photo
+	animal.Photo = photoBase64
+	if err := h.service.UpdateAnimal(animal); err != nil {
+		SendErrorResponse(w, "Erro ao atualizar foto do animal: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	updatedAnimal, err := h.service.GetAnimalByID(uint(id))
+	if err != nil || updatedAnimal == nil {
+		SendErrorResponse(w, "Erro ao buscar animal atualizado", http.StatusInternalServerError)
+		return
+	}
+
+	response := modelToAnimalResponse(updatedAnimal)
+	SendSuccessResponse(w, response, "Foto do animal atualizada com sucesso", http.StatusOK)
 }
