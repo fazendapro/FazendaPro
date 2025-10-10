@@ -101,7 +101,6 @@ const AnimalTable = forwardRef<AnimalTableRef, AnimalTableProps>((props, ref) =>
         onChange={handlePageChange}
         onShowSizeChange={handleShowSizeChange}
         showSizeChanger={!isMobile}
-        showQuickJumper={!isMobile}
         showTotal={!isMobile}
       />
     </>

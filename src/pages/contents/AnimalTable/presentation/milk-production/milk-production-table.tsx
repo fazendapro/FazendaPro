@@ -201,7 +201,6 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
         onChange={handlePageChange}
         onShowSizeChange={handleShowSizeChange}
         showSizeChanger={!isMobile}
-        showQuickJumper={!isMobile}
         showTotal={!isMobile}
       />
     </div>
