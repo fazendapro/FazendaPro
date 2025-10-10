@@ -149,6 +149,25 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 				r.Get("/", farmHandler.GetFarm)
 				r.Put("/", farmHandler.UpdateFarm)
 			})
+
+			saleService := serviceFactory.CreateSaleService()
+			saleHandler := handlers.NewSaleChiHandler(saleService)
+
+			r.Route("/sales", func(r chi.Router) {
+				r.Use(middleware.Auth(cfg.JWTSecret))
+				r.Post("/", saleHandler.CreateSale)
+				r.Get("/", saleHandler.GetSalesByFarm)
+				r.Get("/history", saleHandler.GetSalesHistory)
+				r.Get("/date-range", saleHandler.GetSalesByDateRange)
+				r.Get("/{id}", saleHandler.GetSaleByID)
+				r.Put("/{id}", saleHandler.UpdateSale)
+				r.Delete("/{id}", saleHandler.DeleteSale)
+			})
+
+			r.Route("/animals/{animal_id}/sales", func(r chi.Router) {
+				r.Use(middleware.Auth(cfg.JWTSecret))
+				r.Get("/", saleHandler.GetSalesByAnimal)
+			})
 		})
 
 		app.Logger.Println("Rotas de animais configuradas: /api/v1/animals/farm")

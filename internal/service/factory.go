@@ -38,3 +38,9 @@ func (f *ServiceFactory) CreateFarmService() *FarmService {
 	farmRepo := f.repoFactory.CreateFarmRepository()
 	return NewFarmService(farmRepo)
 }
+
+func (f *ServiceFactory) CreateSaleService() SaleService {
+	saleRepo := f.repoFactory.CreateSaleRepository()
+	animalRepo := f.repoFactory.CreateAnimalRepository()
+	return NewSaleService(saleRepo, animalRepo)
+}

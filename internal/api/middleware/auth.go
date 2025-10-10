@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"strings"
@@ -45,6 +46,16 @@ func Auth(jwtSecret string) func(http.Handler) http.Handler {
 			if err != nil || !token.Valid {
 				SendErrorResponse(w, "Token inválido", http.StatusUnauthorized)
 				return
+			}
+
+			if claims, ok := token.Claims.(jwt.MapClaims); ok {
+				if farmID, exists := claims["farm_id"]; exists {
+					if farmIDFloat, ok := farmID.(float64); ok {
+						ctx := r.Context()
+						ctx = context.WithValue(ctx, "farm_id", uint(farmIDFloat))
+						r = r.WithContext(ctx)
+					}
+				}
 			}
 
 			next.ServeHTTP(w, r)

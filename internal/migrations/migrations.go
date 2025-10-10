@@ -44,6 +44,7 @@ func RunMigrations(db *gorm.DB) error {
 		{"017_seed_initial_data", seedInitialData},
 		{"018_create_user_farms_table", createUserFarmsTable},
 		{"019_migrate_users_to_user_farms", migrateUsersToUserFarms},
+		{"020_create_sales_table", createSalesTable},
 	}
 
 	for _, migration := range migrations {
@@ -358,5 +359,16 @@ func migrateUsersToUserFarms(db *gorm.DB) error {
 	}
 
 	log.Printf("Migration completed: %d users processed", len(users))
+	return nil
+}
+
+func createSalesTable(db *gorm.DB) error {
+	log.Printf("Creating sales table...")
+
+	if err := db.AutoMigrate(&models.Sale{}); err != nil {
+		return fmt.Errorf("error creating sales table: %w", err)
+	}
+
+	log.Printf("Sales table created successfully")
 	return nil
 }
