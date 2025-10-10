@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Input, Card, Row, Col, Statistic, Space } from 'antd';
-import { useModal } from '../../../../../hooks';
+import { useModal, useResponsive } from '../../../../../hooks';
 import { useTranslation } from 'react-i18next';
 import { CreateAnimalModal } from './create-animal-modal';
 import { FilterModal } from './filter-modal';
@@ -23,6 +23,7 @@ const AnimalDashboard: React.FC<AnimalDashboardProps> = ({
   const { isOpen, onOpen, onClose } = useModal();
   const { isOpen: isFilterOpen, onOpen: onFilterOpen, onClose: onFilterClose } = useModal();
   const { t } = useTranslation();
+  const { isMobile } = useResponsive();
 
   const [selectedColumns, setSelectedColumns] = useState<string[]>(
     externalSelectedColumns || [
@@ -59,83 +60,95 @@ const AnimalDashboard: React.FC<AnimalDashboardProps> = ({
   return (
     <div>
       <Card style={{ marginBottom: '16px' }}>
-        <Row gutter={16}>
-          <Col span={6}>
+        <Row gutter={[16, 16]}>
+          <Col xs={12} sm={6} md={6} lg={6} xl={6}>
             <Statistic 
               title={t('animalTable.categories')} 
               value={14} 
-              valueStyle={{ color: '#1890ff' }}
+              valueStyle={{ color: '#1890ff', fontSize: isMobile ? '16px' : '20px' }}
             />
           </Col>
-          <Col span={6}>
+          <Col xs={12} sm={6} md={6} lg={6} xl={6}>
             <Statistic 
               title={t('animalTable.totalAnimals')} 
               value={868} 
-              valueStyle={{ color: '#faad14' }}
+              valueStyle={{ color: '#faad14', fontSize: isMobile ? '16px' : '20px' }}
             />
           </Col>
-          <Col span={6}>
+          <Col xs={12} sm={6} md={6} lg={6} xl={6}>
             <Statistic 
               title={t('animalTable.revenue')} 
               value={25000} 
               prefix="R$"
-              valueStyle={{ color: '#000' }}
+              valueStyle={{ color: '#000', fontSize: isMobile ? '16px' : '20px' }}
             />
           </Col>
-          <Col span={6}>
+          <Col xs={12} sm={6} md={6} lg={6} xl={6}>
             <Statistic 
               title={t('animalTable.bestSales')} 
               value={5} 
-              valueStyle={{ color: '#722ed1' }}
+              valueStyle={{ color: '#722ed1', fontSize: isMobile ? '16px' : '20px' }}
             />
           </Col>
-        </Row>
-        <Row gutter={16} style={{ marginTop: '16px' }}>
-          <Col span={6}>
+          <Col xs={12} sm={6} md={6} lg={6} xl={6}>
             <Statistic 
               title={t('animalTable.cost')} 
               value={2500} 
               prefix="R$"
-              valueStyle={{ color: '#000' }}
+              valueStyle={{ color: '#000', fontSize: isMobile ? '16px' : '20px' }}
             />
           </Col>
-          <Col span={6}>
+          <Col xs={12} sm={6} md={6} lg={6} xl={6}>
             <Statistic 
               title={t('animalTable.lowProduction')} 
               value={12} 
-              valueStyle={{ color: '#ff4d4f' }}
+              valueStyle={{ color: '#ff4d4f', fontSize: isMobile ? '16px' : '20px' }}
             />
           </Col>
-          <Col span={6}>
+          <Col xs={12} sm={6} md={6} lg={6} xl={6}>
             <Statistic 
               title={t('animalTable.inseminated')} 
               value={2} 
-              valueStyle={{ color: '#000' }}
+              valueStyle={{ color: '#000', fontSize: isMobile ? '16px' : '20px' }}
             />
           </Col>
-          <Col span={6}>
+          <Col xs={12} sm={6} md={6} lg={6} xl={6}>
             <Statistic 
               title={t('animalTable.notInseminated')} 
               value={2} 
-              valueStyle={{ color: '#000' }}
+              valueStyle={{ color: '#000', fontSize: isMobile ? '16px' : '20px' }}
             />
           </Col>
         </Row>
       </Card>
 
       <Card style={{ marginBottom: '16px' }}>
-        <Space>
-          <Button type="primary" onClick={onOpen}>
+        <Space 
+          direction={isMobile ? 'vertical' : 'horizontal'} 
+          style={{ width: isMobile ? '100%' : 'auto' }}
+          size={isMobile ? 'small' : 'middle'}
+        >
+          <Button 
+            type="primary" 
+            onClick={onOpen}
+            size={isMobile ? 'small' : 'middle'}
+            block={isMobile}
+          >
             {t('animalTable.createCow')}
           </Button>
-          <Button onClick={onFilterOpen}>
+          <Button 
+            onClick={onFilterOpen}
+            size={isMobile ? 'small' : 'middle'}
+            block={isMobile}
+          >
             {t('animalTable.filter')}
           </Button>
           <Search 
             placeholder={t('animalTable.search')} 
-            style={{ width: 'auto' }}
+            style={{ width: isMobile ? '100%' : 'auto' }}
             onSearch={handleSearch}
             allowClear
+            size={isMobile ? 'small' : 'middle'}
           />
         </Space>
       </Card>
