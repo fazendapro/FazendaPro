@@ -77,7 +77,6 @@ func TestAnimalService_CreateAnimal(t *testing.T) {
 		CurrentBatch:         1,
 	}
 
-	// Mock the FindByEarTagNumber call that happens in CreateAnimal
 	mockRepo.On("FindByEarTagNumber", uint(1), 123).Return((*models.Animal)(nil), nil)
 	mockRepo.On("Create", animal).Return(nil)
 
@@ -95,7 +94,7 @@ func TestAnimalService_CreateAnimal_InvalidSex(t *testing.T) {
 		FarmID:            1,
 		EarTagNumberLocal: 123,
 		AnimalName:        "Vaca Teste",
-		Sex:               2, // Invalid sex
+		Sex:               2,
 		Breed:             "Holandesa",
 		Type:              "Bovino",
 		Confinement:       false,
@@ -125,7 +124,7 @@ func TestAnimalService_CreateAnimal_InvalidAnimalType(t *testing.T) {
 		Breed:             "Holandesa",
 		Type:              "Bovino",
 		Confinement:       false,
-		AnimalType:        15, // Invalid animal type
+		AnimalType:        15,
 		Status:            0,
 		Fertilization:     false,
 		Castrated:         false,
@@ -155,7 +154,7 @@ func TestAnimalService_CreateAnimal_InvalidPurpose(t *testing.T) {
 		Status:            0,
 		Fertilization:     false,
 		Castrated:         false,
-		Purpose:           5, // Invalid purpose
+		Purpose:           5,
 		CurrentBatch:      1,
 	}
 
@@ -355,10 +354,9 @@ func TestAnimalService_UpdateAnimal_InvalidSex(t *testing.T) {
 	animal := &models.Animal{
 		ID:     1,
 		FarmID: 1,
-		Sex:    2, // Invalid sex
+		Sex:    2,
 	}
 
-	// Mock the FindByID call that happens in UpdateAnimal
 	existingAnimal := &models.Animal{
 		ID:     1,
 		FarmID: 1,
@@ -419,7 +417,7 @@ func TestAnimalService_UpdateAnimal_InvalidID(t *testing.T) {
 	service := service.NewAnimalService(mockRepo)
 
 	animal := &models.Animal{
-		ID: 0, // Invalid ID
+		ID: 0,
 	}
 
 	err := service.UpdateAnimal(animal)

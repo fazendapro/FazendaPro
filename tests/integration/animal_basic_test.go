@@ -9,7 +9,6 @@ import (
 )
 
 func TestAnimalModel_Validation(t *testing.T) {
-	// Test animal model validation
 	animal := &models.Animal{
 		FarmID:               1,
 		EarTagNumberLocal:    123,
@@ -40,17 +39,14 @@ func TestAnimalModel_Validation(t *testing.T) {
 }
 
 func TestAnimalModel_InvalidSex(t *testing.T) {
-	// Test invalid sex values
 	invalidSexes := []int{-1, 2, 3, 10}
 
 	for _, sex := range invalidSexes {
-		// Sex should be 0 (Female) or 1 (Male)
 		assert.True(t, sex < 0 || sex > 1, "Sex %d should be invalid", sex)
 	}
 }
 
 func TestAnimalModel_ValidSex(t *testing.T) {
-	// Test valid sex values
 	validSexes := []int{0, 1}
 
 	for _, sex := range validSexes {
@@ -59,7 +55,6 @@ func TestAnimalModel_ValidSex(t *testing.T) {
 }
 
 func TestAnimalModel_Purpose(t *testing.T) {
-	// Test purpose values
 	purposes := map[int]string{
 		0: "Carne",
 		1: "Leite",
@@ -89,7 +84,6 @@ func TestAnimalModel_Purpose(t *testing.T) {
 }
 
 func TestAnimalModel_Status(t *testing.T) {
-	// Test status values
 	statuses := map[int]string{
 		0: "Vivo",
 		1: "Morto",
@@ -118,7 +112,6 @@ func TestAnimalModel_Status(t *testing.T) {
 }
 
 func TestAnimalModel_AnimalType(t *testing.T) {
-	// Test animal type values
 	animalTypes := map[int]string{
 		0:  "Bovino",
 		1:  "Suíno",
@@ -156,7 +149,6 @@ func TestAnimalModel_AnimalType(t *testing.T) {
 }
 
 func TestAnimalModel_BooleanFields(t *testing.T) {
-	// Test boolean fields
 	animal := &models.Animal{
 		FarmID:            1,
 		EarTagNumberLocal: 123,
@@ -179,7 +171,6 @@ func TestAnimalModel_BooleanFields(t *testing.T) {
 }
 
 func TestAnimalModel_JSONSerialization(t *testing.T) {
-	// Test JSON serialization
 	animal := &models.Animal{
 		ID:                   1,
 		FarmID:               1,
@@ -202,7 +193,6 @@ func TestAnimalModel_JSONSerialization(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEmpty(t, jsonData)
 
-	// Test JSON deserialization
 	var deserializedAnimal models.Animal
 	err = json.Unmarshal(jsonData, &deserializedAnimal)
 	assert.NoError(t, err)
@@ -212,7 +202,6 @@ func TestAnimalModel_JSONSerialization(t *testing.T) {
 }
 
 func TestAnimalModel_RequiredFields(t *testing.T) {
-	// Test that required fields are properly set
 	animal := &models.Animal{
 		FarmID:            1,
 		EarTagNumberLocal: 123,
@@ -225,7 +214,6 @@ func TestAnimalModel_RequiredFields(t *testing.T) {
 		Purpose:           1,
 	}
 
-	// Check required fields
 	assert.NotZero(t, animal.FarmID)
 	assert.NotZero(t, animal.EarTagNumberLocal)
 	assert.NotEmpty(t, animal.AnimalName)
@@ -234,25 +222,22 @@ func TestAnimalModel_RequiredFields(t *testing.T) {
 }
 
 func TestAnimalModel_OptionalFields(t *testing.T) {
-	// Test optional fields
 	animal := &models.Animal{
-		FarmID:            1,
-		EarTagNumberLocal: 123,
-		AnimalName:        "Vaca Teste",
-		Sex:               0,
-		Breed:             "Holandesa",
-		Type:              "Bovino",
-		AnimalType:        0,
-		Status:            0,
-		Purpose:           1,
-		// Optional fields can be zero values
+		FarmID:               1,
+		EarTagNumberLocal:    123,
+		AnimalName:           "Vaca Teste",
+		Sex:                  0,
+		Breed:                "Holandesa",
+		Type:                 "Bovino",
+		AnimalType:           0,
+		Status:               0,
+		Purpose:              1,
 		EarTagNumberRegister: 0,
 		Photo:                "",
 		FatherID:             nil,
 		MotherID:             nil,
 	}
 
-	// Optional fields should be allowed to be zero/empty
 	assert.Zero(t, animal.EarTagNumberRegister)
 	assert.Empty(t, animal.Photo)
 	assert.Nil(t, animal.FatherID)
