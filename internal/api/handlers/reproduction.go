@@ -369,3 +369,83 @@ func (h *ReproductionHandler) DeleteReproduction(w http.ResponseWriter, r *http.
 
 	SendSuccessResponse(w, nil, "Registro de reprodução deletado com sucesso", http.StatusOK)
 }
+
+type NextToCalveResponse struct {
+	ID                uint   `json:"id"`
+	AnimalName        string `json:"animal_name"`
+	EarTagNumberLocal int    `json:"ear_tag_number_local"`
+	Photo             string `json:"photo"`
+	PregnancyDate     string `json:"pregnancy_date"`
+	ExpectedBirthDate string `json:"expected_birth_date"`
+	DaysUntilBirth    int    `json:"days_until_birth"`
+	Status            string `json:"status"`
+}
+
+func (h *ReproductionHandler) GetNextToCalve(w http.ResponseWriter, r *http.Request) {
+	farmID := r.URL.Query().Get("farmId")
+	if farmID == "" {
+		SendErrorResponse(w, "ID da fazenda é obrigatório", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.ParseUint(farmID, 10, 32)
+	if err != nil {
+		SendErrorResponse(w, "ID da fazenda inválido", http.StatusBadRequest)
+		return
+	}
+
+	reproductions, err := h.service.GetReproductionsByPhase(models.PhasePrenhas)
+	if err != nil {
+		SendErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	var responses []NextToCalveResponse
+	now := time.Now()
+
+	for _, reproduction := range reproductions {
+		if reproduction.Animal.FarmID != uint(id) {
+			continue
+		}
+
+		if reproduction.PregnancyDate == nil {
+			continue
+		}
+
+		expectedBirth := reproduction.PregnancyDate.AddDate(0, 0, 283)
+
+		daysUntilBirth := int(expectedBirth.Sub(now).Hours() / 24)
+
+		var status string
+		if daysUntilBirth <= 30 {
+			status = "Alto"
+		} else if daysUntilBirth <= 60 {
+			status = "Médio"
+		} else {
+			status = "Baixo"
+		}
+
+		response := NextToCalveResponse{
+			ID:                reproduction.Animal.ID,
+			AnimalName:        reproduction.Animal.AnimalName,
+			EarTagNumberLocal: reproduction.Animal.EarTagNumberLocal,
+			Photo:             reproduction.Animal.Photo,
+			PregnancyDate:     reproduction.PregnancyDate.Format("2006-01-02"),
+			ExpectedBirthDate: expectedBirth.Format("2006-01-02"),
+			DaysUntilBirth:    daysUntilBirth,
+			Status:            status,
+		}
+
+		responses = append(responses, response)
+	}
+
+	for i := 0; i < len(responses); i++ {
+		for j := i + 1; j < len(responses); j++ {
+			if responses[i].DaysUntilBirth > responses[j].DaysUntilBirth {
+				responses[i], responses[j] = responses[j], responses[i]
+			}
+		}
+	}
+
+	SendSuccessResponse(w, responses, fmt.Sprintf("Próximas vacas a parir encontradas com sucesso (%d registros)", len(responses)), http.StatusOK)
+}

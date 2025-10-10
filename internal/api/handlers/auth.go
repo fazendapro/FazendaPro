@@ -188,10 +188,11 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 func (h *AuthHandler) generateJWT(user *models.User) (string, error) {
 	claims := jwt.MapClaims{
-		"sub":   user.ID,
-		"email": user.Person.Email,
-		"iat":   time.Now().Unix(),
-		"exp":   time.Now().Add(time.Hour * 24).Unix(),
+		"sub":     user.ID,
+		"email":   user.Person.Email,
+		"farm_id": user.FarmID,
+		"iat":     time.Now().Unix(),
+		"exp":     time.Now().Add(time.Hour * 24).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

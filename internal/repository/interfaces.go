@@ -11,6 +11,7 @@ type AnimalRepositoryInterface interface {
 	FindByID(id uint) (*models.Animal, error)
 	FindByFarmID(farmID uint) ([]models.Animal, error)
 	FindByEarTagNumber(farmID uint, earTagNumber int) (*models.Animal, error)
+	FindByFarmIDAndSex(farmID uint, sex int) ([]models.Animal, error)
 	Update(animal *models.Animal) error
 	Delete(id uint) error
 }

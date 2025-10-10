@@ -109,8 +109,10 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 				r.Post("/", animalHandler.CreateAnimal)
 				r.Get("/", animalHandler.GetAnimal)
 				r.Get("/farm", animalHandler.GetAnimalsByFarm)
+				r.Get("/sex", animalHandler.GetAnimalsBySex)
 				r.Put("/", animalHandler.UpdateAnimal)
 				r.Delete("/", animalHandler.DeleteAnimal)
+				r.Post("/photo", animalHandler.UploadAnimalPhoto)
 			})
 
 			milkCollectionService := serviceFactory.CreateMilkCollectionService()
@@ -122,6 +124,7 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 				r.Put("/{id}", milkCollectionHandler.UpdateMilkCollection)
 				r.Get("/farm/{farmId}", milkCollectionHandler.GetMilkCollectionsByFarmID)
 				r.Get("/animal/{animalId}", milkCollectionHandler.GetMilkCollectionsByAnimalID)
+				r.Get("/top-producers", milkCollectionHandler.GetTopMilkProducers)
 			})
 
 			reproductionService := serviceFactory.CreateReproductionService()
@@ -134,6 +137,7 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 				r.Get("/animal", reproductionHandler.GetReproductionByAnimal)
 				r.Get("/farm", reproductionHandler.GetReproductionsByFarm)
 				r.Get("/phase", reproductionHandler.GetReproductionsByPhase)
+				r.Get("/next-to-calve", reproductionHandler.GetNextToCalve)
 				r.Put("/", reproductionHandler.UpdateReproduction)
 				r.Put("/phase", reproductionHandler.UpdateReproductionPhase)
 				r.Delete("/", reproductionHandler.DeleteReproduction)
@@ -146,6 +150,25 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 				r.Use(middleware.Auth(cfg.JWTSecret))
 				r.Get("/", farmHandler.GetFarm)
 				r.Put("/", farmHandler.UpdateFarm)
+			})
+
+			saleService := serviceFactory.CreateSaleService()
+			saleHandler := handlers.NewSaleChiHandler(saleService)
+
+			r.Route("/sales", func(r chi.Router) {
+				r.Use(middleware.Auth(cfg.JWTSecret))
+				r.Post("/", saleHandler.CreateSale)
+				r.Get("/", saleHandler.GetSalesByFarm)
+				r.Get("/history", saleHandler.GetSalesHistory)
+				r.Get("/date-range", saleHandler.GetSalesByDateRange)
+				r.Get("/{id}", saleHandler.GetSaleByID)
+				r.Put("/{id}", saleHandler.UpdateSale)
+				r.Delete("/{id}", saleHandler.DeleteSale)
+			})
+
+			r.Route("/animals/{animal_id}/sales", func(r chi.Router) {
+				r.Use(middleware.Auth(cfg.JWTSecret))
+				r.Get("/", saleHandler.GetSalesByAnimal)
 			})
 		})
 

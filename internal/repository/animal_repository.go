@@ -24,7 +24,7 @@ func (r *AnimalRepository) Create(animal *models.Animal) error {
 
 func (r *AnimalRepository) FindByID(id uint) (*models.Animal, error) {
 	var animal models.Animal
-	if err := r.db.DB.Where("id = ?", id).First(&animal).Error; err != nil {
+	if err := r.db.DB.Preload("Father").Preload("Mother").Where("id = ?", id).First(&animal).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
 		}
@@ -64,4 +64,12 @@ func (r *AnimalRepository) Delete(id uint) error {
 		return fmt.Errorf("erro ao deletar animal: %w", err)
 	}
 	return nil
+}
+
+func (r *AnimalRepository) FindByFarmIDAndSex(farmID uint, sex int) ([]models.Animal, error) {
+	var animals []models.Animal
+	if err := r.db.DB.Where("farm_id = ? AND sex = ?", farmID, sex).Find(&animals).Error; err != nil {
+		return nil, fmt.Errorf("erro ao buscar animais por sexo: %w", err)
+	}
+	return animals, nil
 }

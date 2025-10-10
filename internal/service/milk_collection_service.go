@@ -8,15 +8,29 @@ import (
 )
 
 type MilkCollectionService struct {
-	repository repository.MilkCollectionRepositoryInterface
+	repository   repository.MilkCollectionRepositoryInterface
+	batchService *BatchService
 }
 
-func NewMilkCollectionService(repository repository.MilkCollectionRepositoryInterface) *MilkCollectionService {
-	return &MilkCollectionService{repository: repository}
+func NewMilkCollectionService(repository repository.MilkCollectionRepositoryInterface, batchService *BatchService) *MilkCollectionService {
+	return &MilkCollectionService{
+		repository:   repository,
+		batchService: batchService,
+	}
 }
 
 func (s *MilkCollectionService) CreateMilkCollection(milkCollection *models.MilkCollection) error {
-	return s.repository.Create(milkCollection)
+	err := s.repository.Create(milkCollection)
+	if err != nil {
+		return err
+	}
+
+	err = s.batchService.UpdateAnimalBatch(milkCollection.AnimalID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *MilkCollectionService) GetMilkCollectionByID(id uint) (*models.MilkCollection, error) {

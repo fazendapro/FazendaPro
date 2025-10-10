@@ -81,7 +81,7 @@ func (s *AnimalService) GetAnimalsByFarmID(farmID uint) ([]models.Animal, error)
 
 func (s *AnimalService) UpdateAnimal(animal *models.Animal) error {
 	if animal.ID == 0 {
-		return errors.New("ID do animal é obrigatório para atualização")
+		return errors.New("ID do animal é obrigatório")
 	}
 
 	existingAnimal, err := s.repository.FindByID(animal.ID)
@@ -93,12 +93,31 @@ func (s *AnimalService) UpdateAnimal(animal *models.Animal) error {
 		return errors.New("animal não encontrado")
 	}
 
-	animal.UpdatedAt = time.Now()
+	if animal.Sex != 0 && animal.Sex != 1 {
+		return errors.New("sexo deve ser 0 (Fêmea) ou 1 (Macho)")
+	}
+
+	if animal.AnimalType < 0 || animal.AnimalType > 10 {
+		return errors.New("tipo de animal inválido")
+	}
+
+	if animal.Purpose < 0 || animal.Purpose > 2 {
+		return errors.New("propósito deve ser 0 (Carne), 1 (Leite) ou 2 (Reprodução)")
+	}
+
+	animal.FarmID = existingAnimal.FarmID
+
+	now := time.Now()
+	animal.UpdatedAt = now
 
 	return s.repository.Update(animal)
 }
 
 func (s *AnimalService) DeleteAnimal(id uint) error {
+	if id == 0 {
+		return errors.New("ID do animal é obrigatório")
+	}
+
 	existingAnimal, err := s.repository.FindByID(id)
 	if err != nil {
 		return err
@@ -109,4 +128,8 @@ func (s *AnimalService) DeleteAnimal(id uint) error {
 	}
 
 	return s.repository.Delete(id)
+}
+
+func (s *AnimalService) GetAnimalsByFarmIDAndSex(farmID uint, sex int) ([]models.Animal, error) {
+	return s.repository.FindByFarmIDAndSex(farmID, sex)
 }

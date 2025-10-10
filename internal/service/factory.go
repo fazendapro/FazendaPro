@@ -24,7 +24,9 @@ func (f *ServiceFactory) CreateUserService() *UserService {
 
 func (f *ServiceFactory) CreateMilkCollectionService() *MilkCollectionService {
 	milkCollectionRepo := f.repoFactory.CreateMilkCollectionRepository()
-	return NewMilkCollectionService(milkCollectionRepo)
+	animalRepo := f.repoFactory.CreateAnimalRepository()
+	batchService := NewBatchService(animalRepo, milkCollectionRepo)
+	return NewMilkCollectionService(milkCollectionRepo, batchService)
 }
 
 func (f *ServiceFactory) CreateReproductionService() *ReproductionService {
@@ -35,4 +37,10 @@ func (f *ServiceFactory) CreateReproductionService() *ReproductionService {
 func (f *ServiceFactory) CreateFarmService() *FarmService {
 	farmRepo := f.repoFactory.CreateFarmRepository()
 	return NewFarmService(farmRepo)
+}
+
+func (f *ServiceFactory) CreateSaleService() SaleService {
+	saleRepo := f.repoFactory.CreateSaleRepository()
+	animalRepo := f.repoFactory.CreateAnimalRepository()
+	return NewSaleService(saleRepo, animalRepo)
 }
