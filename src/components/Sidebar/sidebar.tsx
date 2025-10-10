@@ -1,4 +1,4 @@
-import { Menu, Layout, Grid, Button } from "antd";
+import { Menu, Layout, Grid, Button, Avatar } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { HomeOutlined, UserOutlined, MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined, SettingOutlined } from "@ant-design/icons";
@@ -14,7 +14,7 @@ export const Sidebar = () => {
   const screens = useBreakpoint();
   const [collapsed, setCollapsed] = useState(screens.xs);
   const { logout } = useAuth();
-  const { farmName } = useSelectedFarm();
+  const { farmName, farmLogo } = useSelectedFarm();
   const isAuthenticated = true;
 
   const handleMenuClick = (key: string) => {
@@ -84,9 +84,29 @@ export const Sidebar = () => {
         justifyContent: 'center',
         fontWeight: 'bold',
         fontSize: '14px',
-        color: '#333'
+        color: '#333',
+        flexDirection: 'column',
+        gap: 8
       }}>
-        {farmName || 'FAZENDA BOM JARDIM'}
+        {farmLogo && 
+         farmLogo.trim() !== '' && 
+         (farmLogo.startsWith('data:') || farmLogo.startsWith('http')) ? (
+          <Avatar
+            size={100}
+            src={farmLogo}
+            shape="square"
+            style={{ marginBottom: 4 }}
+            onError={() => {
+              console.error('Erro ao carregar logo');
+              console.log('Logo URL:', farmLogo);
+              return false;
+            }}
+          />
+        ) : (
+          <span style={{ fontSize: farmLogo ? '12px' : '14px' }}>
+            {farmName || 'FAZENDA'}
+          </span>
+        )}
       </div>
       <Menu
         theme="light"

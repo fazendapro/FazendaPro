@@ -11,7 +11,7 @@ const { Title } = Typography;
 
 const Settings: React.FC = () => {
   const { t } = useTranslation();
-  const { farmId } = useSelectedFarm();
+  const { farmId, farmLogo } = useSelectedFarm();
   const { farm } = useFarm();
   const [form] = Form.useForm();
   const [farmData, setFarmData] = useState<FarmData | null>(null);
@@ -22,13 +22,13 @@ const Settings: React.FC = () => {
     try {
       const getFarmUseCase = GetFarmFactory.create();
       const response = await getFarmUseCase.get(farmId);
-      
+
       if (response.data) {
         const backendData = response.data as BackendFarmData;
-        
+
         const newFarmData = {
           id: backendData.ID,
-          logo: backendData.Logo || '',
+          logo: farmLogo || backendData.Logo || '',
           company_id: backendData.CompanyID,
           company: backendData.Company ? {
             id: backendData.Company.ID,
@@ -70,7 +70,7 @@ const Settings: React.FC = () => {
           name: farm?.name || 'Fazenda',
       });
     }
-  }, [farmId, farm, form]);
+  }, [farmId, farm, form, farmLogo]);
 
   useEffect(() => {
     loadFarmData();
