@@ -77,7 +77,7 @@ export const useReproduction = () => {
     }
   }, []);
 
-  const updateReproduction = useCallback(async (data: CreateReproductionRequest): Promise<boolean> => {
+  const updateReproduction = useCallback(async (data: CreateReproductionRequest & { id: number }): Promise<boolean> => {
     setLoading(true);
     setError(null);
 
