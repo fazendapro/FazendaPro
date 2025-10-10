@@ -26,7 +26,6 @@ const FilterModal: React.FC<FilterModalProps> = ({
   const [selectedColumns, setSelectedColumns] = useState<string[]>(currentColumns);
   const { getColumnOptions, getDefaultColumnKeys } = useAnimalColumnBuilder();
 
-  // Obter colunas disponíveis do builder
   const availableColumns: ColumnOption[] = getColumnOptions();
 
   const handleColumnToggle = (columnKey: string, checked: boolean) => {

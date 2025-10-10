@@ -54,8 +54,6 @@ export const CreateReproductionModal = ({
   }, [visible, preselectedAnimalId, editingReproduction, form]);
 
   const handleSubmit = async (values: any) => {
-    console.log('Form values:', values);
-    
     const data: CreateReproductionRequest = {
       animal_id: values.animal_id,
       current_phase: values.current_phase,
@@ -71,8 +69,6 @@ export const CreateReproductionModal = ({
       observations: values.observations,
     };
 
-    console.log('Data to send:', data);
-
     try {
       if (editingReproduction) {
         const updateData = { ...data, id: editingReproduction.id };
@@ -87,7 +83,6 @@ export const CreateReproductionModal = ({
         }
       } else {
         const result = await createReproduction(data);
-        console.log('Create result:', result);
         
         if (result) {
           message.success(t('animalTable.reproduction.createdSuccessfully'));
@@ -98,7 +93,6 @@ export const CreateReproductionModal = ({
         }
       }
     } catch (error) {
-      console.error('Error saving reproduction:', error);
       message.error(editingReproduction ? 'Erro ao atualizar registro de reprodução' : 'Erro ao criar registro de reprodução');
     }
   };
@@ -119,10 +113,12 @@ export const CreateReproductionModal = ({
       style={{
         top: isMobile ? '10px' : '50px'
       }}
-      bodyStyle={{
-        maxHeight: isMobile ? '70vh' : '80vh',
-        overflowY: 'auto',
-        padding: isMobile ? '16px' : '24px'
+      styles={{
+        body: {
+          maxHeight: isMobile ? '70vh' : '80vh',
+          overflowY: 'auto',
+          padding: isMobile ? '16px' : '24px'
+        }
       }}
     >
       <Form

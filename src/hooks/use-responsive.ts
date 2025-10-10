@@ -16,7 +16,6 @@ export const useResponsive = (): ResponsiveBreakpoints => {
       setScreenWidth(window.innerWidth);
     };
 
-    // Set initial value
     handleResize();
 
     window.addEventListener('resize', handleResize);

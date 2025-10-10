@@ -35,7 +35,7 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
     if (!farm?.id) return;
     
     const data = await getReproductionsByFarm();
-    setReproductions(data);
+    setReproductions(data || []);
   }, [farm?.id, getReproductionsByFarm]);
 
   useImperativeHandle(ref, () => ({
@@ -90,7 +90,7 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
 
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
-  const paginatedData = reproductions.slice(startIndex, endIndex);
+  const paginatedData = (reproductions || []).slice(startIndex, endIndex);
 
   const columns = [
     {
@@ -215,7 +215,7 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
 
       <CustomPagination
         current={currentPage}
-        total={reproductions.length}
+        total={(reproductions || []).length}
         pageSize={pageSize}
         onChange={handlePageChange}
         onShowSizeChange={handleShowSizeChange}

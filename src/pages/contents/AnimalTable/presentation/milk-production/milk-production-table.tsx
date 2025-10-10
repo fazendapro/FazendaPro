@@ -30,7 +30,7 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(isMobile ? 5 : isTablet ? 8 : 10)
   
-  const { milkProductions, loading, error, refetch } = useMilkProduction(farm.id, filters)
+  const { milkProductions, loading, error, refetch } = useMilkProduction(farm?.id || 0, filters)
 
   useImperativeHandle(ref, () => ({
     refetch
@@ -116,7 +116,7 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
 
   const startIndex = (currentPage - 1) * pageSize
   const endIndex = startIndex + pageSize
-  const paginatedData = milkProductions.slice(startIndex, endIndex)
+  const paginatedData = (milkProductions || []).slice(startIndex, endIndex)
 
   if (loading) {
     return (
@@ -196,7 +196,7 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
 
       <CustomPagination
         current={currentPage}
-        total={milkProductions.length}
+        total={(milkProductions || []).length}
         pageSize={pageSize}
         onChange={handlePageChange}
         onShowSizeChange={handleShowSizeChange}

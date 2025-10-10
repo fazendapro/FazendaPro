@@ -37,9 +37,9 @@ const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({ isOpen, onClose }
 
   const onSubmit = async (data: AnimalForm) => {
     try {
-      const farmId = 1; // TODO: get farmId from context
+      const farmId = 1;
 
-      const createAnimalUseCase = CreateAnimalFactory(); // TODO: add csrf token
+      const createAnimalUseCase = CreateAnimalFactory();
       const response = await createAnimalUseCase.create({ ...data, farm_id: farmId });
 
       if (response?.success) {
@@ -116,10 +116,12 @@ const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({ isOpen, onClose }
       style={{
         top: isMobile ? '10px' : '50px'
       }}
-      bodyStyle={{
-        maxHeight: isMobile ? '70vh' : '80vh',
-        overflowY: 'auto',
-        padding: isMobile ? '16px' : '24px'
+      styles={{
+        body: {
+          maxHeight: isMobile ? '70vh' : '80vh',
+          overflowY: 'auto',
+          padding: isMobile ? '16px' : '24px'
+        }
       }}
     >
       <CustomForm<AnimalForm>

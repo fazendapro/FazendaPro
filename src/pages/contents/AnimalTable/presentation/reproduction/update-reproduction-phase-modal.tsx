@@ -46,7 +46,6 @@ export const UpdateReproductionPhaseModal = ({
 
     const additionalData: any = {};
 
-    // Adicionar dados específicos baseados na nova fase
     if (values.insemination_date) {
       additionalData.insemination_date = values.insemination_date.format('YYYY-MM-DD');
     }

@@ -9,8 +9,6 @@ export class RemoteUpdateMilkProduction implements UpdateMilkProductionUseCase {
   ) {}
 
   async updateMilkProduction(data: UpdateMilkProductionRequest): Promise<MilkProduction> {
-    console.log('RemoteUpdateMilkProduction - Updating with data:', data)
-
     const headers: Record<string, string> = {
       'Content-Type': 'application/json'
     }
@@ -25,15 +23,9 @@ export class RemoteUpdateMilkProduction implements UpdateMilkProductionUseCase {
       date: data.date
     }
 
-    console.log('Request headers:', headers)
-    console.log('Request data:', requestData)
-    console.log('API domain:', this.domain)
-
     const response = await api(this.domain).put(`/api/v1/milk-collections/${data.id}`, requestData, {
       headers
     })
-
-    console.log('API response:', response.data)
 
     if (response.data.success) {
       return response.data.data

@@ -9,8 +9,6 @@ export class RemoteCreateMilkProduction implements CreateMilkProductionUseCase {
   ) {}
 
   async createMilkProduction(data: CreateMilkProductionRequest): Promise<MilkProduction> {
-    console.log('RemoteCreateMilkProduction - Creating with data:', data)
-    
     const headers: Record<string, string> = {
       'Content-Type': 'application/json'
     }
@@ -19,21 +17,14 @@ export class RemoteCreateMilkProduction implements CreateMilkProductionUseCase {
       headers['X-CSRF-Token'] = this.csrfToken
     }
     
-    // Garantir que liters seja um número
     const requestData = {
       ...data,
       liters: Number(data.liters)
     }
     
-    console.log('Request headers:', headers)
-    console.log('Request data:', requestData)
-    console.log('API domain:', this.domain)
-    
     const response = await api(this.domain).post('/api/v1/milk-collections', requestData, {
       headers
     })
-    
-    console.log('API response:', response.data)
     
     if (response.data.success) {
       return response.data.data

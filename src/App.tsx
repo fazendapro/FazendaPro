@@ -1,7 +1,10 @@
 import { Layout, Grid } from 'antd';
-import { useAuth, Login, Dashboard, Animals } from './pages';
+import { Login, Dashboard, Animals } from './pages';
 import { ResponsiveSidebar, Spinner } from './components';
 import { Routes, Route, Navigate } from 'react-router'
+import { FarmSelection } from './pages/FarmSelection';
+import { FarmProvider } from './contexts/FarmContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 const { useBreakpoint } = Grid;
 
@@ -38,7 +41,7 @@ const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
   )
 }
 
-export const App = () => {
+const AppContent = () => {
   const { isLoading, isAuthenticated } = useAuth();
 
   if (isLoading) return <Spinner />
@@ -48,6 +51,10 @@ export const App = () => {
       <Route
         path="/login"
         element={isAuthenticated ? <Navigate to="/" replace /> : <Login />}
+      />
+      <Route
+        path="/farm-selection"
+        element={isAuthenticated ? <FarmSelection /> : <Navigate to="/login" replace />}
       />
       <Route
         path="/"
@@ -107,5 +114,15 @@ export const App = () => {
       />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+  );
+};
+
+export const App = () => {
+  return (
+    <FarmProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </FarmProvider>
   );
 };

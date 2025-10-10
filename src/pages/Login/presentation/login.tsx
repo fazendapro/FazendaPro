@@ -7,7 +7,7 @@ import { FieldType } from '../../../types/field-types';
 import { loginSchema } from './login-schema';
 import { toast } from 'react-toastify';
 import { baseStyle } from './styles';
-import { useAuth } from '../hooks';
+import { useAuth } from '../../../contexts/AuthContext';
 import { useResponsive } from '../../../hooks';
 import logo from '../../../assets/images/logo.png';
 
@@ -22,7 +22,7 @@ interface LoginForm {
 const Login = () => {
   const { login } = useAuth();
   const { t } = useTranslation();
-  const { isMobile, isTablet } = useResponsive();
+  const { isMobile } = useResponsive();
 
   const methods = useForm<LoginForm>({
     resolver: yupResolver(loginSchema),

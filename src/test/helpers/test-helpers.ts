@@ -1,12 +1,12 @@
 import { vi } from 'vitest'
 
-export const createMockFunction = <T extends (...args: any[]) => any>( // eslint-disable-line @typescript-eslint/no-explicit-any
+export const createMockFunction = <T extends (...args: any[]) => any>(
   returnValue?: ReturnType<T>
 ) => {
   return vi.fn().mockReturnValue(returnValue)
 }
 
-export const createMockAsyncFunction = <T extends (...args: any[]) => Promise<any>>( // eslint-disable-line @typescript-eslint/no-explicit-any
+export const createMockAsyncFunction = <T extends (...args: any[]) => Promise<any>>(
   returnValue?: Awaited<ReturnType<T>>
 ) => {
   return vi.fn().mockResolvedValue(returnValue)
@@ -196,5 +196,5 @@ export const createMockDataTransfer = (files: File[] = []) => {
     getData: vi.fn(),
     setData: vi.fn(),
     setDragImage: vi.fn(),
-  } as any // eslint-disable-line @typescript-eslint/no-explicit-any
+  } as any
 }

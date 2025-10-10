@@ -1,20 +1,21 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-import { LoginFactory, AuthFactory } from '../factories';
-import { useCsrfTokenContext } from '../../../contexts';
-import { farmSelectionService } from '../../FarmSelection/services/farm-selection-service';
-import { useFarm } from '../../../contexts/FarmContext';
+import { LoginFactory, AuthFactory } from '../pages/Login/factories';
+import { useCsrfTokenContext } from './csrf-token';
+import { farmSelectionService } from '../pages/FarmSelection/services/farm-selection-service';
+import { useFarm } from './FarmContext';
+import { DecodedToken, AuthContextType } from './AuthContext.types';
 
-interface DecodedToken {
-  exp: number;
-  iat: number;
-  sub: string;
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+interface AuthProviderProps {
+  children: ReactNode;
 }
 
-export const useAuth = () => {
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { csrfToken } = useCsrfTokenContext();
@@ -45,8 +46,6 @@ export const useAuth = () => {
     setUser(null);
     setIsLoading(false);
   }, []);
-
-
 
   useEffect(() => {
     if (initialized) return;
@@ -188,7 +187,7 @@ export const useAuth = () => {
     }
   }, [navigate, refreshToken, csrfToken, setSelectedFarm]);
 
-  return {
+  const value: AuthContextType = {
     isAuthenticated: !!token && !!user,
     isLoading,
     user,
@@ -196,4 +195,18 @@ export const useAuth = () => {
     logout,
     token,
   };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
+  }
+  return context;
 };

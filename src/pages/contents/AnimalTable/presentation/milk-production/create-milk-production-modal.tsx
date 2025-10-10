@@ -60,12 +60,10 @@ export const CreateMilkProductionModal: React.FC<MilkProductionModalProps> = ({
     liters: number
     date: dayjs.Dayjs
   }) => {
-    console.log('Form values:', values)
     setLoading(true)
     
     try {
       if (isEditing && editingProduction) {
-        // Modo edição
         const data: UpdateMilkProductionRequest = {
           id: editingProduction.id,
           animal_id: values.animalId,
@@ -73,28 +71,22 @@ export const CreateMilkProductionModal: React.FC<MilkProductionModalProps> = ({
           date: values.date.format('YYYY-MM-DD')
         }
 
-        console.log('Updating data:', data)
         const result = await updateMilkProduction(data)
-        console.log('Update success result:', result)
         message.success(t('animalTable.milkProductionContainer.updatedSuccessfully'))
       } else {
-        // Modo criação
         const data: CreateMilkProductionRequest = {
           animal_id: values.animalId,
           liters: values.liters,
           date: values.date.format('YYYY-MM-DD')
         }
 
-        console.log('Creating data:', data)
         const result = await createMilkProduction(data)
-        console.log('Create success result:', result)
         message.success(t('animalTable.milkProductionContainer.createdSuccessfully'))
       }
       
       onSuccess()
       form.resetFields()
     } catch (error) {
-      console.error('Error with milk production:', error)
       const errorMessage = isEditing 
         ? t('animalTable.milkProductionContainer.updateError')
         : t('animalTable.milkProductionContainer.createError')
@@ -122,10 +114,12 @@ export const CreateMilkProductionModal: React.FC<MilkProductionModalProps> = ({
       style={{
         top: isMobile ? '10px' : '50px'
       }}
-      bodyStyle={{
-        maxHeight: isMobile ? '70vh' : '80vh',
-        overflowY: 'auto',
-        padding: isMobile ? '16px' : '24px'
+      styles={{
+        body: {
+          maxHeight: isMobile ? '70vh' : '80vh',
+          overflowY: 'auto',
+          padding: isMobile ? '16px' : '24px'
+        }
       }}
     >
       <Form

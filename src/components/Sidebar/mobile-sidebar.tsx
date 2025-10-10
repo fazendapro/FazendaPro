@@ -1,7 +1,7 @@
 import { Button } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import { HomeOutlined, UserOutlined, LogoutOutlined } from "@ant-design/icons";
-import { useAuth } from "../../pages/Login/hooks/useAuth";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface MenuItem {
   key: string;
@@ -17,7 +17,6 @@ export const MobileSidebar = () => {
   const handleMenuClick = (key: string) => {
     if (key === '/sair') {
       logout();
-      navigate('/login');
     } else {
       navigate(key);
     }

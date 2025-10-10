@@ -11,7 +11,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend,
 const Dashboard = () => {
   const { t } = useTranslation();
   const barChartRef = useRef<ChartJS<"bar", number[], unknown>>(null);
-  const lineChartRef = useRef<ChartJS<"line", number[], unknown>>(null); // Updated ref type for line chart
+  const lineChartRef = useRef<ChartJS<"line", number[], unknown>>(null);
 
   const barData = {
     labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Mai', 'Jun'],

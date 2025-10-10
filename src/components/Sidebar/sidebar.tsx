@@ -2,7 +2,7 @@ import { Menu, Layout, Grid, Button } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { HomeOutlined, UserOutlined, MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined } from "@ant-design/icons";
-import { useAuth } from "../../pages/Login/hooks/useAuth";
+import { useAuth } from "../../contexts/AuthContext";
 
 const { Sider } = Layout;
 const { useBreakpoint } = Grid;
@@ -13,12 +13,11 @@ export const Sidebar = () => {
   const screens = useBreakpoint();
   const [collapsed, setCollapsed] = useState(screens.xs);
   const { logout } = useAuth();
-  const isAuthenticated = true; // TODO: remove this and remove useAuth
+  const isAuthenticated = true;
 
   const handleMenuClick = (key: string) => {
     if (key === '/sair') {
       logout();
-      navigate('/login');
     } else {
       navigate(key);
       if (screens.xs) {
@@ -30,11 +29,6 @@ export const Sidebar = () => {
   const menuItems = [
     { key: '/', icon: <HomeOutlined />, label: 'Dashboard' },
     { key: '/vacas', icon: <UserOutlined />, label: 'Vacas' },
-    // { key: '/relatorios', icon: <FileTextOutlined />, label: 'Relatórios' },
-    // { key: '/fornecedores', icon: <ShoppingCartOutlined />, label: 'Fornecedores' },
-    // { key: '/vendas', icon: <ShoppingCartOutlined />, label: 'Vendas' },
-    // { key: '/estoque', icon: <FileTextOutlined />, label: 'Estoque' },
-    // { key: '/configuracoes', icon: <SettingOutlined />, label: 'Configurações' },
     { key: '/sair', icon: <LogoutOutlined />, label: 'Sair' },
   ];
 
