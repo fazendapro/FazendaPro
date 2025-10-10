@@ -8,6 +8,7 @@ import (
 
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
+	"github.com/go-chi/chi/v5"
 )
 
 type SaleChiHandler struct {
@@ -218,7 +219,7 @@ func (h *SaleChiHandler) GetSalesByDateRange(w http.ResponseWriter, r *http.Requ
 }
 
 func (h *SaleChiHandler) GetSaleByID(w http.ResponseWriter, r *http.Request) {
-	idStr := r.URL.Path[len("/sales/"):]
+	idStr := chi.URLParam(r, "id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
 		http.Error(w, "Invalid sale ID", http.StatusBadRequest)
@@ -249,7 +250,7 @@ func (h *SaleChiHandler) GetSaleByID(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *SaleChiHandler) UpdateSale(w http.ResponseWriter, r *http.Request) {
-	idStr := r.URL.Path[len("/sales/"):]
+	idStr := chi.URLParam(r, "id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
 		http.Error(w, "Invalid sale ID", http.StatusBadRequest)
@@ -307,7 +308,7 @@ func (h *SaleChiHandler) UpdateSale(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *SaleChiHandler) DeleteSale(w http.ResponseWriter, r *http.Request) {
-	idStr := r.URL.Path[len("/sales/"):]
+	idStr := chi.URLParam(r, "id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
 		http.Error(w, "Invalid sale ID", http.StatusBadRequest)
@@ -325,7 +326,35 @@ func (h *SaleChiHandler) DeleteSale(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *SaleChiHandler) GetSalesByAnimal(w http.ResponseWriter, r *http.Request) {
-	// Extract animal_id from URL path
-	// This would need to be implemented based on your routing pattern
-	http.Error(w, "Not implemented", http.StatusNotImplemented)
+	animalIDStr := chi.URLParam(r, "animal_id")
+	animalID, err := strconv.ParseUint(animalIDStr, 10, 32)
+	if err != nil {
+		http.Error(w, "Invalid animal ID", http.StatusBadRequest)
+		return
+	}
+
+	sales, err := h.service.GetSalesByAnimalID(r.Context(), uint(animalID))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	responses := make([]SaleResponse, len(sales))
+	for i, sale := range sales {
+		responses[i] = SaleResponse{
+			ID:        sale.ID,
+			AnimalID:  sale.AnimalID,
+			FarmID:    sale.FarmID,
+			BuyerName: sale.BuyerName,
+			Price:     sale.Price,
+			SaleDate:  sale.SaleDate,
+			Notes:     sale.Notes,
+			CreatedAt: sale.CreatedAt,
+			UpdatedAt: sale.UpdatedAt,
+			Animal:    &sale.Animal,
+		}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(responses)
 }
