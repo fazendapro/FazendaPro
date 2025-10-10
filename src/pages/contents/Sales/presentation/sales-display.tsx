@@ -261,7 +261,7 @@ export const SalesDisplay: React.FC = () => {
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
               border: 'none'
             }}
-            bodyStyle={{ padding: '16px' }}
+            styles={{ body: { padding: '16px' } }}
           >
             <div style={{ marginBottom: '16px' }}>
               <Row gutter={[8, 8]}>
@@ -345,7 +345,7 @@ export const SalesDisplay: React.FC = () => {
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
               border: 'none'
             }}
-            bodyStyle={{ padding: '16px' }}
+            styles={{ body: { padding: '16px' } }}
           >
             <div style={{ textAlign: 'center', marginBottom: '16px' }}>
               <Text type="secondary" style={{ fontSize: '14px' }}>

@@ -83,7 +83,7 @@ export const Sidebar = () => {
             marginTop: '24px',
             textAlign: 'center'
           }}
-          bodyStyle={{ padding: '16px' }}
+          styles={{ body: { padding: '16px' } }}
         >
           {farmLogo && 
            farmLogo.trim() !== '' && 

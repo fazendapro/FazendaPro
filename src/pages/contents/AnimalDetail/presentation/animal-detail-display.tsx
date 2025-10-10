@@ -88,7 +88,7 @@ export const AnimalDetailDisplay: React.FC<AnimalDetailDisplayProps> = ({ onEdit
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
               border: 'none'
             }}
-            bodyStyle={{ padding: '24px' }}
+            styles={{ body: { padding: '24px' } }}
           >
             <Row gutter={[16, 16]}>
               <Col xs={24} sm={12}>
@@ -193,7 +193,7 @@ export const AnimalDetailDisplay: React.FC<AnimalDetailDisplayProps> = ({ onEdit
               border: 'none',
               marginTop: '24px'
             }}
-            bodyStyle={{ padding: '24px' }}
+            styles={{ body: { padding: '24px' } }}
           >
             <Row gutter={[24, 24]}>
               <Col xs={24} sm={12}>
@@ -242,7 +242,7 @@ export const AnimalDetailDisplay: React.FC<AnimalDetailDisplayProps> = ({ onEdit
               border: 'none',
               textAlign: 'center'
             }}
-            bodyStyle={{ padding: '24px' }}
+            styles={{ body: { padding: '24px' } }}
           >
             {animal.photo ? (
               <Image
