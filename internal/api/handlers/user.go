@@ -69,11 +69,7 @@ func (h *UserHandler) GetUserWithPerson(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	// Converter string para uint (você pode usar strconv)
-	// Por simplicidade, vou assumir que já é um número
-	// userIDUint, _ := strconv.ParseUint(userID, 10, 32)
-
-	user, err := h.service.GetUserWithPerson(1) // Placeholder - implemente a extração do ID
+	user, err := h.service.GetUserWithPerson(1)
 	if err != nil {
 		SendErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -99,8 +95,7 @@ func (h *UserHandler) UpdatePersonData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Extrair userID da URL ou query params
-	userID := uint(1) // Placeholder - implemente a extração do ID
+	userID := uint(1)
 
 	if err := h.service.UpdatePersonData(userID, &personData); err != nil {
 		SendErrorResponse(w, "Erro ao atualizar dados da pessoa: "+err.Error(), http.StatusBadRequest)

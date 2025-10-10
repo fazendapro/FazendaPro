@@ -41,7 +41,7 @@ func (r *RefreshTokenRepository) Create(userID uint, expiresAt time.Time) (*mode
 
 func (r *RefreshTokenRepository) FindByToken(token string) (*models.RefreshToken, error) {
 	var refreshToken models.RefreshToken
-	if err := r.db.DB.Preload("User").Where("token = ? AND expires_at > ?", token, time.Now()).First(&refreshToken).Error; err != nil {
+	if err := r.db.DB.Preload("User.Person").Where("token = ? AND expires_at > ?", token, time.Now()).First(&refreshToken).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
 		}

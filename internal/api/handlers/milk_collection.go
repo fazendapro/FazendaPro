@@ -20,7 +20,6 @@ func NewMilkCollectionHandler(service *service.MilkCollectionService) *MilkColle
 	return &MilkCollectionHandler{service: service}
 }
 
-// MilkCollectionData representa os dados de uma coleta de leite
 type MilkCollectionData struct {
 	ID        uint       `json:"id"`
 	AnimalID  uint       `json:"animal_id"`
@@ -49,7 +48,6 @@ type MilkCollectionsResponse struct {
 	Message string               `json:"message,omitempty"`
 }
 
-// CreateMilkCollection cria uma nova coleta de leite
 func (h *MilkCollectionHandler) CreateMilkCollection(w http.ResponseWriter, r *http.Request) {
 	var req CreateMilkCollectionRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -57,7 +55,6 @@ func (h *MilkCollectionHandler) CreateMilkCollection(w http.ResponseWriter, r *h
 		return
 	}
 
-	// Parse da data
 	date, err := time.Parse("2006-01-02", req.Date)
 	if err != nil {
 		http.Error(w, "Invalid date format. Use YYYY-MM-DD", http.StatusBadRequest)
@@ -75,7 +72,6 @@ func (h *MilkCollectionHandler) CreateMilkCollection(w http.ResponseWriter, r *h
 		return
 	}
 
-	// Buscar a coleta criada com os dados do animal
 	createdMilkCollection, err := h.service.GetMilkCollectionByID(milkCollection.ID)
 	if err != nil {
 		http.Error(w, "Failed to retrieve created milk collection", http.StatusInternalServerError)
@@ -93,7 +89,6 @@ func (h *MilkCollectionHandler) CreateMilkCollection(w http.ResponseWriter, r *h
 	json.NewEncoder(w).Encode(response)
 }
 
-// UpdateMilkCollection atualiza uma coleta de leite existente
 func (h *MilkCollectionHandler) UpdateMilkCollection(w http.ResponseWriter, r *http.Request) {
 	milkCollectionIDStr := chi.URLParam(r, "id")
 	milkCollectionID, err := strconv.ParseUint(milkCollectionIDStr, 10, 32)
@@ -108,7 +103,6 @@ func (h *MilkCollectionHandler) UpdateMilkCollection(w http.ResponseWriter, r *h
 		return
 	}
 
-	// Parse da data
 	date, err := time.Parse("2006-01-02", req.Date)
 	if err != nil {
 		http.Error(w, "Invalid date format. Use YYYY-MM-DD", http.StatusBadRequest)
@@ -133,7 +127,6 @@ func (h *MilkCollectionHandler) UpdateMilkCollection(w http.ResponseWriter, r *h
 
 	fmt.Printf("DEBUG: Milk collection updated successfully\n")
 
-	// Buscar a coleta atualizada com os dados do animal
 	updatedMilkCollection, err := h.service.GetMilkCollectionByID(milkCollection.ID)
 	if err != nil {
 		fmt.Printf("DEBUG: Error retrieving updated milk collection: %v\n", err)
@@ -155,7 +148,6 @@ func (h *MilkCollectionHandler) UpdateMilkCollection(w http.ResponseWriter, r *h
 	json.NewEncoder(w).Encode(response)
 }
 
-// GetMilkCollectionsByFarmID obtém todas as coletas de leite de uma fazenda
 func (h *MilkCollectionHandler) GetMilkCollectionsByFarmID(w http.ResponseWriter, r *http.Request) {
 	farmIDStr := chi.URLParam(r, "farmId")
 	farmID, err := strconv.ParseUint(farmIDStr, 10, 32)
@@ -164,7 +156,6 @@ func (h *MilkCollectionHandler) GetMilkCollectionsByFarmID(w http.ResponseWriter
 		return
 	}
 
-	// Verificar se há filtros de data
 	startDateStr := r.URL.Query().Get("start_date")
 	endDateStr := r.URL.Query().Get("end_date")
 
@@ -209,7 +200,6 @@ func (h *MilkCollectionHandler) GetMilkCollectionsByFarmID(w http.ResponseWriter
 	json.NewEncoder(w).Encode(response)
 }
 
-// GetMilkCollectionsByAnimalID obtém todas as coletas de leite de um animal específico
 func (h *MilkCollectionHandler) GetMilkCollectionsByAnimalID(w http.ResponseWriter, r *http.Request) {
 	animalIDStr := chi.URLParam(r, "animalId")
 	animalID, err := strconv.ParseUint(animalIDStr, 10, 32)
@@ -239,7 +229,6 @@ func (h *MilkCollectionHandler) GetMilkCollectionsByAnimalID(w http.ResponseWrit
 	json.NewEncoder(w).Encode(response)
 }
 
-// mapToMilkCollectionData converte um modelo para a estrutura de resposta
 func (h *MilkCollectionHandler) mapToMilkCollectionData(mc *models.MilkCollection) MilkCollectionData {
 	return MilkCollectionData{
 		ID:       mc.ID,

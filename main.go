@@ -16,7 +16,6 @@ import (
 )
 
 func main() {
-	// Verificar se é um comando de migração
 	if len(os.Args) > 1 && os.Args[1] == "migrate" {
 		runMigrations()
 		return
@@ -42,7 +41,6 @@ func main() {
 	if err != nil {
 		app.Logger.Printf("WARNING: Erro ao conectar ao banco: %v", err)
 		app.Logger.Println("Continuando sem conexão com banco de dados...")
-		// Don't fail the application if DB is not available
 	} else {
 		defer db.Close()
 

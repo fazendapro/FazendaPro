@@ -25,6 +25,10 @@ type UserRepositoryInterface interface {
 	Create(user *models.User) error
 	FarmExists(farmID uint) (bool, error)
 	CreateDefaultFarm(farmID uint) error
+	GetUserFarms(userID uint) ([]models.Farm, error)
+	GetUserFarmCount(userID uint) (int64, error)
+	GetUserFarmByID(userID, farmID uint) (*models.Farm, error)
+	CreateUserFarm(userFarm *models.UserFarm) error
 }
 
 type MilkCollectionRepositoryInterface interface {
@@ -45,4 +49,10 @@ type ReproductionRepositoryInterface interface {
 	FindByPhase(phase models.ReproductionPhase) ([]models.Reproduction, error)
 	Update(reproduction *models.Reproduction) error
 	Delete(id uint) error
+}
+
+type FarmRepositoryInterface interface {
+	FindByID(id uint) (*models.Farm, error)
+	Update(farm *models.Farm) error
+	LoadCompanyData(farm *models.Farm) error
 }

@@ -98,8 +98,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Gerar refresh token
-	refreshToken, err := h.refreshTokenRepo.Create(user.ID, time.Now().Add(time.Hour*24*7)) // 7 dias
+	refreshToken, err := h.refreshTokenRepo.Create(user.ID, time.Now().Add(time.Hour*24*7))
 	if err != nil {
 		SendErrorResponse(w, "Erro ao gerar refresh token", http.StatusInternalServerError)
 		return
@@ -160,7 +159,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	refreshToken, err := h.refreshTokenRepo.Create(user.ID, time.Now().Add(time.Hour*24*7)) // 7 dias
+	refreshToken, err := h.refreshTokenRepo.Create(user.ID, time.Now().Add(time.Hour*24*7))
 	if err != nil {
 		SendErrorResponse(w, "Erro ao gerar refresh token", http.StatusInternalServerError)
 		return
@@ -192,7 +191,7 @@ func (h *AuthHandler) generateJWT(user *models.User) (string, error) {
 		"sub":   user.ID,
 		"email": user.Person.Email,
 		"iat":   time.Now().Unix(),
-		"exp":   time.Now().Add(time.Hour * 24).Unix(), // Token válido por 24 horas
+		"exp":   time.Now().Add(time.Hour * 24).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

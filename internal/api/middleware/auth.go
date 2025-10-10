@@ -8,7 +8,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// ErrorResponse representa uma resposta de erro padronizada
 type ErrorResponse struct {
 	Success bool   `json:"success"`
 	Error   string `json:"error"`
@@ -16,7 +15,6 @@ type ErrorResponse struct {
 	Code    int    `json:"code"`
 }
 
-// SendErrorResponse envia uma resposta de erro padronizada
 func SendErrorResponse(w http.ResponseWriter, message string, statusCode int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)

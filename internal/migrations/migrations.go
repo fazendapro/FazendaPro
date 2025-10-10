@@ -42,6 +42,8 @@ func RunMigrations(db *gorm.DB) error {
 		{"015_update_animals_table", updateAnimalsTable},
 		{"016_update_reproductions_table", updateReproductionsTable},
 		{"017_seed_initial_data", seedInitialData},
+		{"018_create_user_farms_table", createUserFarmsTable},
+		{"019_migrate_users_to_user_farms", migrateUsersToUserFarms},
 	}
 
 	for _, migration := range migrations {
@@ -320,5 +322,41 @@ func seedInitialData(db *gorm.DB) error {
 	}
 
 	log.Printf("Dados iniciais criados: Company ID=%d, Farm ID=%d", company.ID, farm.ID)
+	return nil
+}
+
+func createUserFarmsTable(db *gorm.DB) error {
+	return db.AutoMigrate(&models.UserFarm{})
+}
+
+func migrateUsersToUserFarms(db *gorm.DB) error {
+	var users []models.User
+	if err := db.Find(&users).Error; err != nil {
+		return fmt.Errorf("error finding users: %w", err)
+	}
+
+	for _, user := range users {
+		userFarm := &models.UserFarm{
+			UserID:    user.ID,
+			FarmID:    user.FarmID,
+			IsPrimary: true,
+		}
+
+		var existingUserFarm models.UserFarm
+		if err := db.Where("user_id = ? AND farm_id = ?", user.ID, user.FarmID).First(&existingUserFarm).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				if err := db.Create(userFarm).Error; err != nil {
+					return fmt.Errorf("error creating user farm for user %d: %w", user.ID, err)
+				}
+				log.Printf("Migrated user %d to farm %d", user.ID, user.FarmID)
+			} else {
+				return fmt.Errorf("error checking existing user farm: %w", err)
+			}
+		} else {
+			log.Printf("User %d already has farm %d, skipping", user.ID, user.FarmID)
+		}
+	}
+
+	log.Printf("Migration completed: %d users processed", len(users))
 	return nil
 }

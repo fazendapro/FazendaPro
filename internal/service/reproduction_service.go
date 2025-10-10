@@ -24,7 +24,6 @@ func (s *ReproductionService) CreateReproduction(reproduction *models.Reproducti
 		return errors.New("ID do animal é obrigatório")
 	}
 
-	// Verificar se já existe um registro de reprodução para este animal
 	existingReproduction, err := s.repository.FindByAnimalID(reproduction.AnimalID)
 	if err != nil {
 		return err
@@ -34,12 +33,10 @@ func (s *ReproductionService) CreateReproduction(reproduction *models.Reproducti
 		return errors.New("já existe um registro de reprodução para este animal")
 	}
 
-	// Definir valores padrão
 	if reproduction.CurrentPhase == 0 {
-		reproduction.CurrentPhase = models.PhaseVazias // Vazias por padrão
+		reproduction.CurrentPhase = models.PhaseVazias
 	}
 
-	// Definir timestamps
 	now := time.Now()
 	reproduction.CreatedAt = now
 	reproduction.UpdatedAt = now
@@ -68,7 +65,6 @@ func (s *ReproductionService) UpdateReproduction(reproduction *models.Reproducti
 		return errors.New("ID do registro de reprodução é obrigatório para atualização")
 	}
 
-	// Verificar se o registro existe
 	existingReproduction, err := s.repository.FindByID(reproduction.ID)
 	if err != nil {
 		return err
@@ -78,7 +74,6 @@ func (s *ReproductionService) UpdateReproduction(reproduction *models.Reproducti
 		return errors.New("registro de reprodução não encontrado")
 	}
 
-	// Atualizar timestamp
 	reproduction.UpdatedAt = time.Now()
 
 	return s.repository.Update(reproduction)
@@ -94,16 +89,13 @@ func (s *ReproductionService) UpdateReproductionPhase(animalID uint, newPhase mo
 		return errors.New("registro de reprodução não encontrado para este animal")
 	}
 
-	// Atualizar a fase
 	reproduction.CurrentPhase = newPhase
 	now := time.Now()
 
-	// Atualizar datas específicas baseadas na nova fase
 	switch newPhase {
 	case models.PhasePrenhas:
 		if pregnancyDate, ok := additionalData["pregnancy_date"].(time.Time); ok {
 			reproduction.PregnancyDate = &pregnancyDate
-			// Calcular data prevista do parto (aproximadamente 280 dias)
 			expectedBirth := pregnancyDate.AddDate(0, 0, 280)
 			reproduction.ExpectedBirthDate = &expectedBirth
 		}
@@ -138,7 +130,6 @@ func (s *ReproductionService) UpdateReproductionPhase(animalID uint, newPhase mo
 		}
 
 	case models.PhaseVazias:
-		// Resetar algumas datas quando voltar para vazias
 		reproduction.PregnancyDate = nil
 		reproduction.ExpectedBirthDate = nil
 		reproduction.ActualBirthDate = nil
@@ -157,7 +148,6 @@ func (s *ReproductionService) UpdateReproductionPhase(animalID uint, newPhase mo
 }
 
 func (s *ReproductionService) DeleteReproduction(id uint) error {
-	// Verificar se o registro existe
 	existingReproduction, err := s.repository.FindByID(id)
 	if err != nil {
 		return err
@@ -169,4 +159,3 @@ func (s *ReproductionService) DeleteReproduction(id uint) error {
 
 	return s.repository.Delete(id)
 }
-

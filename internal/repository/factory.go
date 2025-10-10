@@ -27,3 +27,7 @@ func (f *RepositoryFactory) CreateReproductionRepository() ReproductionRepositor
 func (f *RepositoryFactory) CreateRefreshTokenRepository() RefreshTokenRepositoryInterface {
 	return NewRefreshTokenRepository(f.db)
 }
+
+func (f *RepositoryFactory) CreateFarmRepository() FarmRepositoryInterface {
+	return NewFarmRepository(f.db)
+}

@@ -31,3 +31,8 @@ func (f *ServiceFactory) CreateReproductionService() *ReproductionService {
 	reproductionRepo := f.repoFactory.CreateReproductionRepository()
 	return NewReproductionService(reproductionRepo)
 }
+
+func (f *ServiceFactory) CreateFarmService() *FarmService {
+	farmRepo := f.repoFactory.CreateFarmRepository()
+	return NewFarmService(farmRepo)
+}
