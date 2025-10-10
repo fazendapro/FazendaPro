@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Fundo verde -->
+  <rect width="32" height="32" fill="#52c41a" rx="6"/>
+  
+  <!-- Ícone de fazenda simplificado -->
+  <g fill="white" opacity="0.95">
+    <!-- Casa/fazenda -->
+    <path d="M8 20 L16 12 L24 20 L24 26 L8 26 Z"/>
+    <!-- Telhado -->
+    <path d="M6 20 L16 8 L26 20 Z"/>
+    <!-- Porta -->
+    <rect x="14" y="22" width="4" height="4" fill="#52c41a"/>
+    <!-- Janela -->
+    <rect x="10" y="18" width="3" height="3" fill="#52c41a"/>
+    <rect x="19" y="18" width="3" height="3" fill="#52c41a"/>
+  </g>
+</svg>
