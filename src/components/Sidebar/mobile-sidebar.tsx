@@ -1,6 +1,6 @@
 import { Button } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
-import { HomeOutlined, UserOutlined, LogoutOutlined } from "@ant-design/icons";
+import { HomeOutlined, UserOutlined, LogoutOutlined, SettingOutlined } from "@ant-design/icons";
 import { useAuth } from "../../contexts/AuthContext";
 
 interface MenuItem {
@@ -25,6 +25,7 @@ export const MobileSidebar = () => {
   const menuItems: MenuItem[] = [
     { key: '/', icon: <HomeOutlined />, label: 'Dashboard' },
     { key: '/vacas', icon: <UserOutlined />, label: 'Vacas' },
+    { key: '/configuracoes', icon: <SettingOutlined />, label: 'Configurações' },
     { key: '/sair', icon: <LogoutOutlined />, label: 'Sair' },
   ];
 
