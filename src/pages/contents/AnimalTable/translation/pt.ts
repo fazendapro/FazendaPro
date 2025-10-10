@@ -87,6 +87,7 @@ export const translations = {
         startDate: "Data inicial",
         endDate: "Data final"
       },
+      clearFilters: "Limpar Filtros",
       actions: "Ações",
       add: "Adicionar",
       edit: "Editar",
