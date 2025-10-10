@@ -111,9 +111,8 @@ export const SaleProvider: React.FC<SaleProviderProps> = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-      const history = await saleService.getSalesHistory();
-      console.log('Raw sales data from API:', history);
-      setSales(history);
+        const history = await saleService.getSalesHistory();
+        setSales(history);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error && 'response' in err 
         ? (err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Erro ao carregar histórico de vendas'
@@ -131,8 +130,8 @@ export const SaleProvider: React.FC<SaleProviderProps> = ({ children }) => {
     try {
       setError(null);
       return await saleService.getSalesByAnimal(animalId);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Erro ao carregar vendas do animal';
+    } catch (err: unknown) {
+      const errorMessage = getErrorMessage(err, 'Erro ao carregar vendas do animal');
       setError(errorMessage);
       toast.error(errorMessage);
       return [];
@@ -143,8 +142,8 @@ export const SaleProvider: React.FC<SaleProviderProps> = ({ children }) => {
     try {
       setError(null);
       return await saleService.getSalesByDateRange(filters);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Erro ao carregar vendas por período';
+    } catch (err: unknown) {
+      const errorMessage = getErrorMessage(err, 'Erro ao carregar vendas por período');
       setError(errorMessage);
       toast.error(errorMessage);
       return [];

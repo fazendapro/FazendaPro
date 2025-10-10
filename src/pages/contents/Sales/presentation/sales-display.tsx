@@ -8,29 +8,30 @@ import {
   Row, 
   Col, 
   DatePicker, 
-  Modal,
   message,
   Tooltip,
-  Tag
+  Tag,
+  App
 } from 'antd';
 import { 
   PlusOutlined, 
   EditOutlined, 
   DeleteOutlined, 
   SearchOutlined,
-  FilterOutlined,
-  ExportOutlined
+  FilterOutlined
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useSaleList } from '../../../../hooks/useSale';
 import { SaleModal } from '../../../../components/SaleModal/SaleModal';
 import { Sale, SaleFilters } from '../../../../types/sale';
+import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
 
 export const SalesDisplay: React.FC = () => {
   const { t } = useTranslation();
+  const { modal } = App.useApp();
   const {
     sales,
     loading,
@@ -48,17 +49,10 @@ export const SalesDisplay: React.FC = () => {
 
   useEffect(() => {
     getSalesHistory();
-  }, []);
+  }, [getSalesHistory]);
 
   useEffect(() => {
     setFilteredSales(sales);
-  }, [sales]);
-
-  useEffect(() => {
-    if (sales.length > 0) {
-      console.log('Sales data:', sales);
-      console.log('First sale animal:', sales[0]?.animal);
-    }
   }, [sales]);
 
   useEffect(() => {
@@ -78,21 +72,6 @@ export const SalesDisplay: React.FC = () => {
     setModalVisible(true);
   };
 
-  const handleDeleteSale = (sale: Sale) => {
-    Modal.confirm({
-      title: t('sales.confirmDelete.title'),
-      content: t('sales.confirmDelete.content', { buyer: sale.buyer_name }),
-      okText: t('common.yes'),
-      cancelText: t('common.no'),
-      onOk: async () => {
-        try {
-          await deleteSale(sale.id);
-        } catch {
-        }
-      },
-    });
-  };
-
   const handleModalSuccess = () => {
     setModalVisible(false);
     setEditingSale(null);
@@ -103,6 +82,9 @@ export const SalesDisplay: React.FC = () => {
     if (filters.start_date && filters.end_date) {
       getSalesByDateRange(filters).then(filteredData => {
         setFilteredSales(filteredData);
+      }).catch(error => {
+        console.error('Error filtering sales:', error);
+        message.error('Erro ao filtrar vendas');
       });
     } else {
       setFilteredSales(sales);
@@ -114,9 +96,22 @@ export const SalesDisplay: React.FC = () => {
     setFilteredSales(sales);
   };
 
-  const handleExport = () => {
-    // TODO: Implement export functionality
-    message.info(t('sales.export.comingSoon'));
+  const handleDeleteSale = (sale: Sale) => {
+    modal.confirm({
+      title: t('sales.confirmDelete.title'),
+      content: t('sales.confirmDelete.content', { buyer: sale.buyer_name }),
+      okText: t('common.yes'),
+      cancelText: t('common.no'),
+      onOk: async () => {
+        try {
+          await deleteSale(sale.id);
+          message.success('Venda excluída com sucesso!');
+        } catch (error) {
+          console.error('Error deleting sale:', error);
+          message.error('Erro ao excluir venda');
+        }
+      }
+    });
   };
 
   const columns = [
@@ -125,7 +120,6 @@ export const SalesDisplay: React.FC = () => {
       dataIndex: ['animal', 'AnimalName'],
       key: 'animal_name',
       render: (_: string, record: Sale) => {
-        console.log('Animal data for record:', record.id, record.animal);
         return (
           <div>
             <Text strong>{record.animal?.AnimalName || 'N/A'}</Text>
@@ -232,23 +226,7 @@ export const SalesDisplay: React.FC = () => {
           <Col xs={24} sm={12}>
             <Space direction="vertical" size="middle" style={{ width: '100%' }}>
               <Row gutter={[8, 8]}>
-                <Col xs={12}>
-                  <Button 
-                    icon={<ExportOutlined />}
-                    onClick={handleExport}
-                    style={{ 
-                      backgroundColor: '#f0f0f0',
-                      borderColor: '#d9d9d9',
-                      color: '#262626',
-                      borderRadius: '6px',
-                      width: '100%'
-                    }}
-                    size="middle"
-                  >
-                    {t('sales.export.title')}
-                  </Button>
-                </Col>
-                <Col xs={12}>
+                <Col xs={24}>
                   <Button 
                     type="primary" 
                     icon={<PlusOutlined />} 
@@ -291,13 +269,18 @@ export const SalesDisplay: React.FC = () => {
                   <RangePicker
                     style={{ width: '100%' }}
                     placeholder={[t('sales.filters.startDate'), t('sales.filters.endDate')]}
+                    value={filters.start_date && filters.end_date ? [
+                      dayjs(filters.start_date),
+                      dayjs(filters.end_date)
+                    ] : null}
                     onChange={(dates) => {
-                      if (dates) {
-                        setFilters({
+                      if (dates && dates[0] && dates[1]) {
+                        const newFilters = {
                           ...filters,
-                          start_date: dates[0]?.format('YYYY-MM-DD'),
-                          end_date: dates[1]?.format('YYYY-MM-DD'),
-                        });
+                          start_date: dates[0].format('YYYY-MM-DD'),
+                          end_date: dates[1].format('YYYY-MM-DD'),
+                        };
+                        setFilters(newFilters);
                       } else {
                         setFilters({
                           ...filters,

@@ -14,7 +14,6 @@ export const saleService = {
 
   async getSalesHistory(): Promise<Sale[]> {
     const response = await api.get('/sales/history');
-    console.log('API Response:', response.data);
     return response.data;
   },
 
@@ -27,8 +26,9 @@ export const saleService = {
     const params = new URLSearchParams();
     if (filters.start_date) params.append('start_date', filters.start_date);
     if (filters.end_date) params.append('end_date', filters.end_date);
-    
-    const response = await api.get(`/sales/date-range?${params.toString()}`);
+
+    const url = `/sales/date-range?${params.toString()}`;
+    const response = await api.get(url);
     return response.data;
   },
 
