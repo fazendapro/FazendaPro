@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { useReproduction } from '../../hooks/useReproduction';
 import { useAnimals } from '../../hooks/useAnimals';
+import { useResponsive } from '../../../../../hooks';
 import { CreateReproductionRequest, Reproduction, ReproductionPhase, ReproductionPhaseLabels } from '../../domain/model/reproduction';
 
 const { TextArea } = Input;
@@ -26,12 +27,12 @@ export const CreateReproductionModal = ({
   const { t } = useTranslation();
   const { createReproduction, updateReproduction, loading } = useReproduction();
   const { animals = [], loading: animalsLoading } = useAnimals();
+  const { isMobile, isTablet } = useResponsive();
   const [form] = Form.useForm();
 
   useEffect(() => {
     if (visible) {
       if (editingReproduction) {
-        // Preencher formulário para edição
         form.setFieldsValue({
           animal_id: editingReproduction.animal_id,
           current_phase: editingReproduction.current_phase,
@@ -74,7 +75,6 @@ export const CreateReproductionModal = ({
 
     try {
       if (editingReproduction) {
-        // Atualizar reprodução existente
         const updateData = { ...data, id: editingReproduction.id };
         const success = await updateReproduction(updateData);
         
@@ -86,7 +86,6 @@ export const CreateReproductionModal = ({
           message.error('Erro ao atualizar registro de reprodução');
         }
       } else {
-        // Criar nova reprodução
         const result = await createReproduction(data);
         console.log('Create result:', result);
         
@@ -116,7 +115,15 @@ export const CreateReproductionModal = ({
       onCancel={handleCancel}
       onOk={() => form.submit()}
       confirmLoading={loading}
-      width={600}
+      width={isMobile ? '95%' : isTablet ? '80%' : 600}
+      style={{
+        top: isMobile ? '10px' : '50px'
+      }}
+      bodyStyle={{
+        maxHeight: isMobile ? '70vh' : '80vh',
+        overflowY: 'auto',
+        padding: isMobile ? '16px' : '24px'
+      }}
     >
       <Form
         form={form}

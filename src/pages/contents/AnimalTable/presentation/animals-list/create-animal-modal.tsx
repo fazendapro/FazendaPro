@@ -9,6 +9,7 @@ import { CreateAnimalFactory } from '../../factories';
 import { Form as CustomForm } from '../../../../../components';
 import { FieldType } from '../../../../../types/field-types';
 import { AnimalForm, AnimalSex } from '../../types/type';
+import { useResponsive } from '../../../../../hooks';
 
 const { Option } = Select;
 
@@ -19,6 +20,7 @@ interface CreateAnimalModalProps {
 
 const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
+  const { isMobile, isTablet } = useResponsive();
 
   const methods = useForm<AnimalForm>({
     resolver: yupResolver(animalSchema),
@@ -110,7 +112,15 @@ const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({ isOpen, onClose }
           {t('animalTable.addCattle')}
         </Button>,
       ]}
-      width={600}
+      width={isMobile ? '95%' : isTablet ? '80%' : 600}
+      style={{
+        top: isMobile ? '10px' : '50px'
+      }}
+      bodyStyle={{
+        maxHeight: isMobile ? '70vh' : '80vh',
+        overflowY: 'auto',
+        padding: isMobile ? '16px' : '24px'
+      }}
     >
       <CustomForm<AnimalForm>
         onSubmit={onSubmit}
