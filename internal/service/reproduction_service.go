@@ -96,7 +96,7 @@ func (s *ReproductionService) UpdateReproductionPhase(animalID uint, newPhase mo
 	case models.PhasePrenhas:
 		if pregnancyDate, ok := additionalData["pregnancy_date"].(time.Time); ok {
 			reproduction.PregnancyDate = &pregnancyDate
-			expectedBirth := pregnancyDate.AddDate(0, 0, 280)
+			expectedBirth := pregnancyDate.AddDate(0, 0, 283)
 			reproduction.ExpectedBirthDate = &expectedBirth
 		}
 		if inseminationDate, ok := additionalData["insemination_date"].(time.Time); ok {

@@ -136,6 +136,7 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 				r.Get("/animal", reproductionHandler.GetReproductionByAnimal)
 				r.Get("/farm", reproductionHandler.GetReproductionsByFarm)
 				r.Get("/phase", reproductionHandler.GetReproductionsByPhase)
+				r.Get("/next-to-calve", reproductionHandler.GetNextToCalve)
 				r.Put("/", reproductionHandler.UpdateReproduction)
 				r.Put("/phase", reproductionHandler.UpdateReproductionPhase)
 				r.Delete("/", reproductionHandler.DeleteReproduction)
