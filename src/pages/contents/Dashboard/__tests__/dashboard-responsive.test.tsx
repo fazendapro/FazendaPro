@@ -15,8 +15,8 @@ vi.mock('react-i18next', () => ({
 }))
 
 vi.mock('react-chartjs-2', () => ({
-  Bar: ({ data, options }: any) => <div data-testid="bar-chart">{JSON.stringify(data)}</div>,
-  Line: ({ data, options }: any) => <div data-testid="line-chart">{JSON.stringify(data)}</div>,
+  Bar: ({ data, options }: { data: unknown; options: unknown }) => <div data-testid="bar-chart">{JSON.stringify(data)}</div>,
+  Line: ({ data, options }: { data: unknown; options: unknown }) => <div data-testid="line-chart">{JSON.stringify(data)}</div>,
 }))
 
 vi.mock('../components/overview', () => ({
