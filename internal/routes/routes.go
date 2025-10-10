@@ -124,6 +124,7 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 				r.Put("/{id}", milkCollectionHandler.UpdateMilkCollection)
 				r.Get("/farm/{farmId}", milkCollectionHandler.GetMilkCollectionsByFarmID)
 				r.Get("/animal/{animalId}", milkCollectionHandler.GetMilkCollectionsByAnimalID)
+				r.Get("/top-producers", milkCollectionHandler.GetTopMilkProducers)
 			})
 
 			reproductionService := serviceFactory.CreateReproductionService()
