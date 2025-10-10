@@ -5,9 +5,6 @@ import { AxiosError } from 'axios';
 import { t } from 'i18next';
 
 export class RemoteCreateAnimal implements CreateAnimalDomain {
-  // constructor(
-  //   private readonly csrfToken?: string
-  // ) {} // TODO: add csrf token
 
   async create(params: CreateAnimalParams): Promise<CreateAnimalResponse> {
     try {

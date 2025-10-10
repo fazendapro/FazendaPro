@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useAnimals } from '../../hooks/useAnimals'
 import { useMilkProduction } from '../../hooks/useMilkProduction'
 import { useFarm } from '../../../../../hooks/useFarm'
+import { useResponsive } from '../../../../../hooks'
 import { CreateMilkProductionRequest, MilkProduction } from '../../domain/model/milk-production'
 import { UpdateMilkProductionRequest } from '../../domain/usecases/update-milk-production-use-case'
 import dayjs from 'dayjs'
@@ -27,6 +28,7 @@ export const CreateMilkProductionModal: React.FC<MilkProductionModalProps> = ({
 }) => {
   const { t } = useTranslation()
   const { farm } = useFarm()
+  const { isMobile, isTablet } = useResponsive()
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
   
@@ -58,12 +60,10 @@ export const CreateMilkProductionModal: React.FC<MilkProductionModalProps> = ({
     liters: number
     date: dayjs.Dayjs
   }) => {
-    console.log('Form values:', values)
     setLoading(true)
     
     try {
       if (isEditing && editingProduction) {
-        // Modo edição
         const data: UpdateMilkProductionRequest = {
           id: editingProduction.id,
           animal_id: values.animalId,
@@ -71,28 +71,22 @@ export const CreateMilkProductionModal: React.FC<MilkProductionModalProps> = ({
           date: values.date.format('YYYY-MM-DD')
         }
 
-        console.log('Updating data:', data)
         const result = await updateMilkProduction(data)
-        console.log('Update success result:', result)
         message.success(t('animalTable.milkProductionContainer.updatedSuccessfully'))
       } else {
-        // Modo criação
         const data: CreateMilkProductionRequest = {
           animal_id: values.animalId,
           liters: values.liters,
           date: values.date.format('YYYY-MM-DD')
         }
 
-        console.log('Creating data:', data)
         const result = await createMilkProduction(data)
-        console.log('Create success result:', result)
         message.success(t('animalTable.milkProductionContainer.createdSuccessfully'))
       }
       
       onSuccess()
       form.resetFields()
     } catch (error) {
-      console.error('Error with milk production:', error)
       const errorMessage = isEditing 
         ? t('animalTable.milkProductionContainer.updateError')
         : t('animalTable.milkProductionContainer.createError')
@@ -116,7 +110,17 @@ export const CreateMilkProductionModal: React.FC<MilkProductionModalProps> = ({
       open={visible}
       onCancel={handleCancel}
       footer={null}
-      width={500}
+      width={isMobile ? '95%' : isTablet ? '80%' : 500}
+      style={{
+        top: isMobile ? '10px' : '50px'
+      }}
+      styles={{
+        body: {
+          maxHeight: isMobile ? '70vh' : '80vh',
+          overflowY: 'auto',
+          padding: isMobile ? '16px' : '24px'
+        }
+      }}
     >
       <Form
         form={form}

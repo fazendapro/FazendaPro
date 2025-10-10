@@ -267,7 +267,6 @@ export class AnimalColumnBuilder {
   }
 }
 
-// Hook para usar o builder
 export const useAnimalColumnBuilder = () => {
   const builder = new AnimalColumnBuilder();
   

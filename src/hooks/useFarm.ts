@@ -1,48 +1,23 @@
-// import { useState, useEffect } from 'react';
-// import { GetFarmFactory } from '../factories/usecases/get-farm-factory';
-// import { Farm } from '../types/farm';
+import { useMemo } from 'react';
+import { useSelectedFarm } from './useSelectedFarm';
 
 export const useFarm = () => {
-  // const [farm, setFarm] = useState<Farm | null>(null);
-  // const [loading, setLoading] = useState(false);
-  // const [error, setError] = useState<string | null>(null);
+  const { selectedFarm, farmName } = useSelectedFarm();
 
-  // const fetchFarm = async () => {
-  //   setLoading(true);
-  //   setError(null);
-    
-  //   try {
-  //     const getFarm = GetFarmFactory();
-  //     const response = await getFarm.getFarm({ farm_id: farmId });
-      
-  //     if (response.success) {
-  //       setFarm(response.data || null);
-  //     } else {
-  //       setError(response.message || 'Erro ao buscar informações da fazenda');
-  //     }
-  //   } catch (err) {
-  //     setError(err instanceof Error ? err.message : 'Erro desconhecido');
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchFarm();
-  // }, [farmId]);
-
-  const farm = {
-    id: 1,
-    name: 'Fazenda 1',
-    location: 'Rua 1, 123',
-    created_at: '2021-01-01',
-    updated_at: '2021-01-01'
-  }
+  const farm = useMemo(() => {
+    return selectedFarm ? {
+      id: selectedFarm.ID,
+      name: farmName || `Fazenda ${selectedFarm.ID}`,
+      location: 'Localização não disponível',
+      created_at: '2021-01-01',
+      updated_at: '2021-01-01'
+    } : null;
+  }, [selectedFarm, farmName]);
 
   return {
     farm,
-    // loading,
-    // error,
-    // refetch: fetchFarm
+    loading: false,
+    error: null,
+    refetch: () => {}
   };
 }; 

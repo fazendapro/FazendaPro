@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '../../../test/test-utils'
 import { Sidebar } from '../sidebar'
 
-vi.mock('../../../pages/Login/hooks/useAuth', () => ({
+vi.mock('../../../contexts/AuthContext', () => ({
   useAuth: () => ({
     logout: vi.fn(),
   }),

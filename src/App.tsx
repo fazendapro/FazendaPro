@@ -1,7 +1,10 @@
 import { Layout, Grid } from 'antd';
-import { useAuth, Login, Dashboard, Animals } from './pages';
-import { Sidebar, Spinner } from './components';
+import { Login, Dashboard, Animals, Settings } from './pages';
+import { ResponsiveSidebar, Spinner } from './components';
 import { Routes, Route, Navigate } from 'react-router'
+import { FarmSelection } from './pages/FarmSelection';
+import { FarmProvider } from './contexts/FarmContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 const { useBreakpoint } = Grid;
 
@@ -15,19 +18,20 @@ const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sidebar />
+      <ResponsiveSidebar />
       <Layout style={{
         marginLeft: screens.xs ? 0 : 280,
+        marginBottom: screens.xs ? '60px' : 0,
         transition: 'all 0.2s'
       }}>
         <Layout.Content style={{ 
-          height: '100vh',
+          height: screens.xs ? 'calc(100vh - 60px)' : '100vh',
           overflow: 'auto',
           background: '#f5f5f5'
         }}>
           <div style={{
             padding: '24px',
-            minHeight: 'calc(100vh - 48px)'
+            minHeight: screens.xs ? 'calc(100vh - 84px)' : 'calc(100vh - 48px)'
           }}>
             {children}
           </div>
@@ -38,6 +42,16 @@ const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
 }
 
 export const App = () => {
+  return (
+    <FarmProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </FarmProvider>
+  );
+};
+
+const AppContent = () => {
   const { isLoading, isAuthenticated } = useAuth();
 
   if (isLoading) return <Spinner />
@@ -47,6 +61,10 @@ export const App = () => {
       <Route
         path="/login"
         element={isAuthenticated ? <Navigate to="/" replace /> : <Login />}
+      />
+      <Route
+        path="/farm-selection"
+        element={isAuthenticated ? <FarmSelection /> : <Navigate to="/login" replace />}
       />
       <Route
         path="/"
@@ -100,7 +118,7 @@ export const App = () => {
         path="/configuracoes"
         element={
           <ProtectedLayout>
-            <h1>Página de Configurações</h1>
+            <Settings />
           </ProtectedLayout>
         }
       />

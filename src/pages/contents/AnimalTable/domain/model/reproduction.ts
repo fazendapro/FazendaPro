@@ -64,8 +64,8 @@ export const ReproductionPhaseLabels = {
 };
 
 export const ReproductionPhaseColors = {
-  [ReproductionPhase.LACTACAO]: '#52c41a', // Verde
-  [ReproductionPhase.SECANDO]: '#faad14', // Amarelo
-  [ReproductionPhase.VAZIAS]: '#1890ff', // Azul
-  [ReproductionPhase.PRENHAS]: '#f5222d' // Vermelho
+  [ReproductionPhase.LACTACAO]: '#52c41a',
+  [ReproductionPhase.SECANDO]: '#faad14',
+  [ReproductionPhase.VAZIAS]: '#1890ff',
+  [ReproductionPhase.PRENHAS]: '#f5222d'
 };

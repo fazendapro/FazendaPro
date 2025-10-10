@@ -53,8 +53,10 @@ export const useMilkProduction = (farmId: number, filters?: MilkProductionFilter
   }
 
   useEffect(() => {
-    if (farmId) {
+    if (farmId && farmId > 0) {
       fetchMilkProductions()
+    } else {
+      setMilkProductions([])
     }
   }, [farmId, filters, fetchMilkProductions])
 

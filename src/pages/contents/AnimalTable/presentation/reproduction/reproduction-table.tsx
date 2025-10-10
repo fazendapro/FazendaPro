@@ -4,9 +4,11 @@ import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useReproduction } from '../../hooks/useReproduction';
 import { useFarm } from '../../../../../hooks/useFarm';
+import { useResponsive } from '../../../../../hooks';
 import { Reproduction, ReproductionPhase, ReproductionPhaseLabels, ReproductionPhaseColors } from '../../domain/model/reproduction';
 import { CreateReproductionModal } from './create-reproduction-modal';
 import { UpdateReproductionPhaseModal } from './update-reproduction-phase-modal';
+import { CustomPagination } from '../../../../../components/lib/Pagination/custom-pagination';
 
 interface ReproductionTableRef {
   refetch: () => void;
@@ -17,20 +19,23 @@ interface ReproductionTableProps {
   onEditReproduction: (reproduction: Reproduction) => void;
 }
 
-export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTableProps>(({ onAddReproduction: _onAddReproduction, onEditReproduction: _onEditReproduction }, ref) => {
+export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTableProps>((_, ref) => {
   const { t } = useTranslation();
   const { farm } = useFarm();
   const { getReproductionsByFarm, deleteReproduction, loading, error } = useReproduction();
+  const { isMobile, isTablet } = useResponsive();
   const [reproductions, setReproductions] = useState<Reproduction[]>([]);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [isUpdatePhaseModalVisible, setIsUpdatePhaseModalVisible] = useState(false);
   const [selectedReproduction, setSelectedReproduction] = useState<Reproduction | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(isMobile ? 5 : isTablet ? 8 : 10);
 
   const fetchReproductions = useCallback(async () => {
     if (!farm?.id) return;
     
     const data = await getReproductionsByFarm();
-    setReproductions(data);
+    setReproductions(data || []);
   }, [farm?.id, getReproductionsByFarm]);
 
   useImperativeHandle(ref, () => ({
@@ -73,6 +78,20 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
     fetchReproductions();
   };
 
+  const handlePageChange = (page: number, size: number) => {
+    setCurrentPage(page);
+    setPageSize(size);
+  };
+
+  const handleShowSizeChange = (_: number, size: number) => {
+    setCurrentPage(1);
+    setPageSize(size);
+  };
+
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const paginatedData = (reproductions || []).slice(startIndex, endIndex);
+
   const columns = [
     {
       title: t('animalTable.reproduction.animalName'),
@@ -98,7 +117,7 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
         text,
         value: parseInt(value),
       })),
-      onFilter: (value: any, record: Reproduction) => record.current_phase === value,
+      onFilter: (value: boolean | React.Key, record: Reproduction) => record.current_phase === Number(value),
     },
     {
       title: t('animalTable.reproduction.inseminationDate'),
@@ -131,7 +150,7 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
     {
       title: t('animalTable.reproduction.actions'),
       key: 'actions',
-      render: (_: any, record: Reproduction) => (
+      render: (_: unknown, record: Reproduction) => (
         <Space size="middle">
           <Button
             type="link"
@@ -159,12 +178,20 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
 
   return (
     <div>
-      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h3>{t('animalTable.reproduction.title')}</h3>
+      <div style={{ 
+        marginBottom: 16, 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        flexDirection: isMobile ? 'column' : 'row',
+        gap: isMobile ? '12px' : '0'
+      }}>
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => setIsCreateModalVisible(true)}
+          size={'middle'}
+          block={isMobile}
         >
           {t('animalTable.reproduction.addReproduction')}
         </Button>
@@ -172,17 +199,29 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
 
       <Table
         columns={columns}
-        dataSource={reproductions}
+        dataSource={paginatedData}
         rowKey="id"
         loading={loading}
-        pagination={{
-          pageSize: 10,
-          showSizeChanger: true,
-          showQuickJumper: true,
-          showTotal: (total, range) =>
-            `${range[0]}-${range[1]} de ${total} registros`,
+        pagination={false}
+        scroll={{ 
+          x: isMobile ? 600 : isTablet ? 700 : 800,
+          y: isMobile ? 400 : undefined
         }}
-        scroll={{ x: 800 }}
+        size={isMobile ? 'small' : 'middle'}
+        style={{
+          fontSize: isMobile ? '12px' : '14px'
+        }}
+      />
+
+      <CustomPagination
+        current={currentPage}
+        total={(reproductions || []).length}
+        pageSize={pageSize}
+        onChange={handlePageChange}
+        onShowSizeChange={handleShowSizeChange}
+        showSizeChanger={!isMobile}
+        showQuickJumper={!isMobile}
+        showTotal={!isMobile}
       />
 
       <CreateReproductionModal

@@ -1,4 +1,3 @@
-// @ts-ignore
 import axios from 'axios'
 import { apiConfig } from '../../../config/api'
 
@@ -9,7 +8,6 @@ export function baseAxios(baseUrl: string) {
   })
 
   instance.interceptors.request.use(
-    // @ts-ignore
     (config) => {
       const token = localStorage.getItem('token')
       if (token) {
@@ -18,16 +16,13 @@ export function baseAxios(baseUrl: string) {
       }
       return config
     },
-    // @ts-ignore
     (error) => {
       return Promise.reject(error)
     }
   )
 
   instance.interceptors.response.use(
-    // @ts-ignore
     (response) => response,
-    // @ts-ignore
     async (error) => {
       const originalRequest = error.config
 
@@ -48,7 +43,6 @@ export function baseAxios(baseUrl: string) {
               return instance(originalRequest)
             }
           } catch (refreshError) {
-            console.error('Erro ao renovar token:', refreshError)
           }
         }
 

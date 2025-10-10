@@ -13,11 +13,7 @@ export const useReproduction = () => {
   const [error, setError] = useState<string | null>(null);
 
   const createReproduction = useCallback(async (data: CreateReproductionRequest): Promise<Reproduction | null> => {
-    console.log('useReproduction - createReproduction called with:', data);
-    console.log('useReproduction - farm:', farm);
-    
     if (!farm?.id) {
-      console.error('useReproduction - Farm not found');
       setError('Fazenda não encontrada');
       return null;
     }
@@ -26,12 +22,9 @@ export const useReproduction = () => {
     setError(null);
 
     try {
-      console.log('useReproduction - Calling remoteCreateReproduction...');
       const result = await remoteCreateReproduction(data);
-      console.log('useReproduction - Result received:', result);
       return result;
     } catch (err: any) {
-      console.error('useReproduction - Error:', err);
       const errorMessage = err.response?.data?.message || 'Erro ao criar registro de reprodução';
       setError(errorMessage);
       return null;
@@ -77,7 +70,7 @@ export const useReproduction = () => {
     }
   }, []);
 
-  const updateReproduction = useCallback(async (data: CreateReproductionRequest): Promise<boolean> => {
+  const updateReproduction = useCallback(async (data: CreateReproductionRequest & { id: number }): Promise<boolean> => {
     setLoading(true);
     setError(null);
 

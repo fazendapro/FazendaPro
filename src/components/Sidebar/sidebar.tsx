@@ -1,24 +1,26 @@
-import { Menu, Layout, Grid, Button } from "antd";
+import { Menu, Layout, Grid, Button, Avatar, Card, Typography } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { HomeOutlined, UserOutlined, MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined } from "@ant-design/icons";
-import { useAuth } from "../../pages/Login/hooks/useAuth";
+import { HomeOutlined, UserOutlined, MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined, SettingOutlined } from "@ant-design/icons";
+import { useAuth } from "../../contexts/AuthContext";
+import { useSelectedFarm } from "../../hooks/useSelectedFarm";
 
 const { Sider } = Layout;
 const { useBreakpoint } = Grid;
+const { Text } = Typography;
 
 export const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const screens = useBreakpoint();
   const [collapsed, setCollapsed] = useState(screens.xs);
-  const { logout } = useAuth();
-  const isAuthenticated = true; // TODO: remove this and remove useAuth
+  const { logout, user } = useAuth();
+  const { farmName, farmLogo } = useSelectedFarm();
+  const isAuthenticated = true;
 
   const handleMenuClick = (key: string) => {
     if (key === '/sair') {
       logout();
-      navigate('/login');
     } else {
       navigate(key);
       if (screens.xs) {
@@ -30,11 +32,7 @@ export const Sidebar = () => {
   const menuItems = [
     { key: '/', icon: <HomeOutlined />, label: 'Dashboard' },
     { key: '/vacas', icon: <UserOutlined />, label: 'Vacas' },
-    // { key: '/relatorios', icon: <FileTextOutlined />, label: 'Relatórios' },
-    // { key: '/fornecedores', icon: <ShoppingCartOutlined />, label: 'Fornecedores' },
-    // { key: '/vendas', icon: <ShoppingCartOutlined />, label: 'Vendas' },
-    // { key: '/estoque', icon: <FileTextOutlined />, label: 'Estoque' },
-    // { key: '/configuracoes', icon: <SettingOutlined />, label: 'Configurações' },
+    { key: '/configuracoes', icon: <SettingOutlined />, label: 'Configurações' },
     { key: '/sair', icon: <LogoutOutlined />, label: 'Sair' },
   ];
 
@@ -76,21 +74,37 @@ export const Sidebar = () => {
         />
       ) : null}
     >
-      <div style={{
-        height: 64,
-        margin: 16,
-        marginTop: 24,
-        textAlign: 'center',
-        background: 'rgba(255, 255, 255, 0.2)',
-        display: collapsed ? 'none' : 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontWeight: 'bold',
-        fontSize: '14px',
-        color: '#333'
-      }}>
-        FAZENDA BOM JARDIM
-      </div>
+      {!collapsed && (
+        <Card 
+          size="small" 
+          style={{ 
+            margin: '16px', 
+            marginTop: '24px',
+            textAlign: 'center'
+          }}
+          bodyStyle={{ padding: '16px' }}
+        >
+          {farmLogo && 
+           farmLogo.trim() !== '' && 
+           (farmLogo.startsWith('data:') || farmLogo.startsWith('http')) ? (
+            <Avatar
+              size={100}
+              src={farmLogo}
+              shape="square"
+              style={{ marginBottom: 8 }}
+            />
+          ) : (
+            <Text
+              strong
+              style={{ fontSize: farmLogo ? '12px' : '14px' }}
+            >
+              {farmName || 'FAZENDA'}
+            </Text>
+          )}
+
+        </Card>
+      )}
+
       <Menu
         theme="light"
         mode="inline"
@@ -102,6 +116,26 @@ export const Sidebar = () => {
         }}
         onClick={({ key }) => handleMenuClick(key)}
       />
+
+      {user && !collapsed && (
+        <div style={{
+          position: 'absolute',
+          bottom: '16px',
+          left: '16px',
+          right: '16px'
+        }}>
+          <Card
+            size="small"
+            style={{
+              textAlign: 'center'
+            }}
+          >
+            <Text strong style={{ fontSize: '14px' }}>
+              {user.email}
+            </Text>
+          </Card>
+        </div>
+      )}
     </Sider>
   );
 };

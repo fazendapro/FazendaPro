@@ -5,6 +5,8 @@ import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { LoginFactory, AuthFactory } from '../factories';
 import { useCsrfTokenContext } from '../../../contexts';
+import { farmSelectionService } from '../../FarmSelection/services/farm-selection-service';
+import { useFarm } from '../../../contexts/FarmContext';
 
 interface DecodedToken {
   exp: number;
@@ -16,10 +18,12 @@ export const useAuth = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { csrfToken } = useCsrfTokenContext();
+  const { setSelectedFarm } = useFarm();
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
   const [refreshToken, setRefreshToken] = useState<string | null>(() => localStorage.getItem('refreshToken'));
   const [user, setUser] = useState<DecodedToken | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
 
   const validateToken = useCallback((tokenToValidate: string) => {
     try {
@@ -42,54 +46,64 @@ export const useAuth = () => {
     setIsLoading(false);
   }, []);
 
-  const refreshAccessToken = useCallback(async (refreshTokenValue: string) => {
-    try {
-      const authUseCase = AuthFactory(csrfToken);
-      const response = await authUseCase.refreshToken({ refresh_token: refreshTokenValue });
 
-      if (response.success && response.access_token) {
-        localStorage.setItem('token', response.access_token);
-        setToken(response.access_token);
-        
-        const decoded = validateToken(response.access_token);
-        if (decoded) {
-          setUser(decoded);
-        }
-      } else {
-        clearAuth();
-      }
-    } catch (error) {
-      console.error('Erro ao renovar token:', error);
-      clearAuth();
-    }
-    setIsLoading(false);
-  }, [validateToken, clearAuth, csrfToken]);
-
-  const initializeAuth = useCallback(() => {
-    const savedToken = localStorage.getItem('token');
-    const savedRefreshToken = localStorage.getItem('refreshToken');
-    
-    if (savedToken) {
-      const decoded = validateToken(savedToken);
-      if (decoded) {
-        setToken(savedToken);
-        setUser(decoded);
-        if (savedRefreshToken) {
-          setRefreshToken(savedRefreshToken);
-        }
-        setIsLoading(false);
-      } else {
-        if (savedRefreshToken) return refreshAccessToken(savedRefreshToken);
-        return clearAuth();
-      }
-    } else {
-      setIsLoading(false);
-    }
-  }, [validateToken, refreshAccessToken, clearAuth]);
 
   useEffect(() => {
+    if (initialized) return;
+    
+    const initializeAuth = async () => {
+      const savedToken = localStorage.getItem('token');
+      const savedRefreshToken = localStorage.getItem('refreshToken');
+      
+      if (savedToken) {
+        const decoded = validateToken(savedToken);
+        if (decoded) {
+          setToken(savedToken);
+          setUser(decoded);
+          if (savedRefreshToken) {
+            setRefreshToken(savedRefreshToken);
+          }
+          setIsLoading(false);
+          setInitialized(true);
+        } else {
+          if (savedRefreshToken) {
+            try {
+              const authUseCase = AuthFactory(csrfToken);
+              const response = await authUseCase.refreshToken({ refresh_token: savedRefreshToken });
+
+              if (response.success && response.access_token) {
+                localStorage.setItem('token', response.access_token);
+                setToken(response.access_token);
+                
+                const decoded = validateToken(response.access_token);
+                if (decoded) {
+                  setUser(decoded);
+                }
+              } else {
+                clearAuth();
+              }
+            } catch {
+              clearAuth();
+            }
+          } else {
+            localStorage.removeItem('token');
+            localStorage.removeItem('refreshToken');
+            setToken(null);
+            setRefreshToken(null);
+            setUser(null);
+          }
+          setIsLoading(false);
+          setInitialized(true);
+        }
+      } else {
+        setIsLoading(false);
+        setInitialized(true);
+      }
+    };
+
     initializeAuth();
-  }, [initializeAuth]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const login = useCallback(
     async (email: string, password: string) => {
@@ -118,30 +132,61 @@ export const useAuth = () => {
         }
 
         toast.success(t('loginSuccess'));
-        navigate('/', { replace: true });
+        
+        try {
+          const farmResponse = await farmSelectionService.getUserFarms();
+          
+          if (farmResponse.success) {
+            if (farmResponse.auto_select) {
+              if (farmResponse.farms && farmResponse.farms.length > 0) {
+                setSelectedFarm(farmResponse.farms[0]);
+              }
+              navigate('/', { replace: true });
+            } else {
+              navigate('/farm-selection', { replace: true });
+              
+              setTimeout(() => {
+                if (window.location.pathname === '/login') {
+                  window.location.href = '/farm-selection';
+                }
+              }, 100);
+            }
+          } else {
+            navigate('/', { replace: true });
+          }
+        } catch {
+          navigate('/', { replace: true });
+        }
+        
         return true;
       } catch (error) {
         toast.error(`Erro no login: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
         return false;
       }
     },
-    [navigate, validateToken, t, csrfToken]
+    [navigate, validateToken, t, csrfToken, setSelectedFarm]
   );
 
   const logout = useCallback(async () => {
-    // Tentar invalidar refresh token no backend
-    if (refreshToken) {
-      try {
+    try {
+      if (refreshToken) {
         const authUseCase = AuthFactory(csrfToken);
         await authUseCase.logout({ refresh_token: refreshToken });
-      } catch (error) {
-        console.error('Erro ao fazer logout no backend:', error);
       }
+    } catch {
+      // Ignore logout errors
+    } finally {
+      // Clear all auth data
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
+      setToken(null);
+      setRefreshToken(null);
+      setUser(null);
+      setIsLoading(false);
+      setSelectedFarm(null);
+      navigate('/login', { replace: true });
     }
-    
-    clearAuth();
-    navigate('/login', { replace: true });
-  }, [navigate, refreshToken, clearAuth, csrfToken]);
+  }, [navigate, refreshToken, csrfToken, setSelectedFarm]);
 
   return {
     isAuthenticated: !!token && !!user,

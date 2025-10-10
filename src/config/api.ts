@@ -19,10 +19,3 @@ export const apiConfig: ApiConfig = {
   retryAttempts: 3
 }
 
-if ((import.meta as any).env?.DEV) {
-  console.log('🔧 API Configuration:', {
-    baseUrl: apiConfig.baseUrl,
-    environment: (import.meta as any).env?.MODE,
-    isDev: (import.meta as any).env?.DEV
-  })
-}

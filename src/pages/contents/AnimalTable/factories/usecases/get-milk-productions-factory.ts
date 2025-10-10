@@ -2,6 +2,6 @@ import { RemoteGetMilkProductions } from '../../data/usecases/remote-get-milk-pr
 
 export const getMilkProductionsFactory = () => {
   return new RemoteGetMilkProductions(
-    undefined, // domain - pode ser passado como parâmetro se necessário
+    undefined,
   )
 }

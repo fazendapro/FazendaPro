@@ -9,6 +9,8 @@ import { CreateAnimalFactory } from '../../factories';
 import { Form as CustomForm } from '../../../../../components';
 import { FieldType } from '../../../../../types/field-types';
 import { AnimalForm, AnimalSex } from '../../types/type';
+import { useResponsive } from '../../../../../hooks';
+import { useSelectedFarm } from '../../../../../hooks/useSelectedFarm';
 
 const { Option } = Select;
 
@@ -19,6 +21,8 @@ interface CreateAnimalModalProps {
 
 const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
+  const { isMobile, isTablet } = useResponsive();
+  const { farmId } = useSelectedFarm();
 
   const methods = useForm<AnimalForm>({
     resolver: yupResolver(animalSchema),
@@ -35,9 +39,12 @@ const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({ isOpen, onClose }
 
   const onSubmit = async (data: AnimalForm) => {
     try {
-      const farmId = 1; // TODO: get farmId from context
+      if (!farmId) {
+        toast.error('Nenhuma fazenda selecionada');
+        return;
+      }
 
-      const createAnimalUseCase = CreateAnimalFactory(); // TODO: add csrf token
+      const createAnimalUseCase = CreateAnimalFactory();
       const response = await createAnimalUseCase.create({ ...data, farm_id: farmId });
 
       if (response?.success) {
@@ -110,7 +117,17 @@ const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({ isOpen, onClose }
           {t('animalTable.addCattle')}
         </Button>,
       ]}
-      width={600}
+      width={isMobile ? '95%' : isTablet ? '80%' : 600}
+      style={{
+        top: isMobile ? '10px' : '50px'
+      }}
+      styles={{
+        body: {
+          maxHeight: isMobile ? '70vh' : '80vh',
+          overflowY: 'auto',
+          padding: isMobile ? '16px' : '24px'
+        }
+      }}
     >
       <CustomForm<AnimalForm>
         onSubmit={onSubmit}
