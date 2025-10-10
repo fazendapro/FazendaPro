@@ -2,12 +2,11 @@ import React from 'react';
 import { Button, message } from 'antd';
 import { ExportOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-import { Animal } from '../../types/animal';
+import { Animal } from '../../pages/contents/AnimalTable/types/type';
 import { Sale } from '../../types/sale';
 import { MilkCollection } from '../../types/milk-collection';
 import { Reproduction } from '../../types/reproduction';
+import { generateAnimalHistoryPDF } from './pdfGenerator';
 
 interface AnimalHistoryExportProps {
   animal: Animal;
@@ -26,151 +25,81 @@ export const AnimalHistoryExport: React.FC<AnimalHistoryExportProps> = ({
 
   const generatePDF = () => {
     try {
-      const doc = new jsPDF();
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const margin = 20;
-
-      // Header
-      doc.setFontSize(20);
-      doc.setFont('helvetica', 'bold');
-      doc.text(t('animalHistoryExport.title'), pageWidth / 2, 30, { align: 'center' });
-
-      // Animal Info
-      doc.setFontSize(14);
-      doc.setFont('helvetica', 'bold');
-      doc.text(t('animalHistoryExport.animalInfo'), margin, 50);
-
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(12);
-      let yPosition = 60;
-
-      const animalInfo = [
-        [t('animalHistoryExport.fields.name'), animal.animal_name],
-        [t('animalHistoryExport.fields.earTag'), animal.ear_tag_number_local.toString()],
-        [t('animalHistoryExport.fields.breed'), animal.breed],
-        [t('animalHistoryExport.fields.type'), animal.type],
-        [t('animalHistoryExport.fields.birthDate'), animal.birth_date ? new Date(animal.birth_date).toLocaleDateString('pt-BR') : t('common.notInformed')],
-      ];
-
-      animalInfo.forEach(([label, value]) => {
-        doc.text(`${label}: ${value}`, margin, yPosition);
-        yPosition += 8;
+      generateAnimalHistoryPDF({
+        animal,
+        sales,
+        milkCollections,
+        reproductions,
+        animalImage: animal.photo,
+        translations: {
+          animalHistoryExport: {
+            title: t('animalHistoryExport.title'),
+            animalInfo: t('animalHistoryExport.animalInfo'),
+            fields: {
+              name: t('animalHistoryExport.fields.name'),
+              earTag: t('animalHistoryExport.fields.earTag'),
+              breed: t('animalHistoryExport.fields.breed'),
+              type: t('animalHistoryExport.fields.type'),
+              birthDate: t('animalHistoryExport.fields.birthDate'),
+              sex: t('animalHistoryExport.fields.sex'),
+              status: t('animalHistoryExport.fields.status'),
+              confinement: t('animalHistoryExport.fields.confinement'),
+              fertilization: t('animalHistoryExport.fields.fertilization'),
+              castrated: t('animalHistoryExport.fields.castrated'),
+              currentWeight: t('animalHistoryExport.fields.currentWeight'),
+              idealWeight: t('animalHistoryExport.fields.idealWeight'),
+              milkProduction: t('animalHistoryExport.fields.milkProduction')
+            },
+            sex: {
+              male: t('animalHistoryExport.sex.male'),
+              female: t('animalHistoryExport.sex.female')
+            },
+            status: {
+              active: t('animalHistoryExport.status.active'),
+              inactive: t('animalHistoryExport.status.inactive'),
+              sold: t('animalHistoryExport.status.sold'),
+              deceased: t('animalHistoryExport.status.deceased')
+            },
+            statistics: t('animalHistoryExport.statistics'),
+            stats: {
+              totalSales: t('animalHistoryExport.stats.totalSales'),
+              totalSalesValue: t('animalHistoryExport.stats.totalSalesValue'),
+              totalMilkCollections: t('animalHistoryExport.stats.totalMilkCollections'),
+              totalMilkQuantity: t('animalHistoryExport.stats.totalMilkQuantity'),
+              totalReproductions: t('animalHistoryExport.stats.totalReproductions')
+            },
+            salesHistory: t('animalHistoryExport.salesHistory'),
+            salesTable: {
+              date: t('animalHistoryExport.salesTable.date'),
+              buyer: t('animalHistoryExport.salesTable.buyer'),
+              price: t('animalHistoryExport.salesTable.price'),
+              notes: t('animalHistoryExport.salesTable.notes')
+            },
+            milkHistory: t('animalHistoryExport.milkHistory'),
+            milkTable: {
+              date: t('animalHistoryExport.milkTable.date'),
+              quantity: t('animalHistoryExport.milkTable.quantity'),
+              quality: t('animalHistoryExport.milkTable.quality'),
+              notes: t('animalHistoryExport.milkTable.notes')
+            },
+            reproductionHistory: t('animalHistoryExport.reproductionHistory'),
+            reproductionTable: {
+              date: t('animalHistoryExport.reproductionTable.date'),
+              phase: t('animalHistoryExport.reproductionTable.phase'),
+              notes: t('animalHistoryExport.reproductionTable.notes')
+            },
+            footer: {
+              page: t('animalHistoryExport.footer.page'),
+              of: t('animalHistoryExport.footer.of')
+            }
+          },
+          common: {
+            notInformed: t('common.notInformed'),
+            yes: t('common.yes'),
+            no: t('common.no')
+          }
+        }
       });
-
-      yPosition += 10;
-
-      // Sales History
-      if (sales.length > 0) {
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(14);
-        doc.text(t('animalHistoryExport.salesHistory'), margin, yPosition);
-        yPosition += 10;
-
-        const salesData = sales.map(sale => [
-          new Date(sale.sale_date).toLocaleDateString('pt-BR'),
-          sale.buyer_name,
-          `R$ ${sale.price.toFixed(2)}`,
-          sale.notes || '-'
-        ]);
-
-        (doc as any).autoTable({
-          startY: yPosition,
-          head: [[
-            t('animalHistoryExport.salesTable.date'),
-            t('animalHistoryExport.salesTable.buyer'),
-            t('animalHistoryExport.salesTable.price'),
-            t('animalHistoryExport.salesTable.notes')
-          ]],
-          body: salesData,
-          styles: { fontSize: 10 },
-          headStyles: { fillColor: [66, 139, 202] },
-          margin: { left: margin, right: margin }
-        });
-
-        yPosition = (doc as any).lastAutoTable.finalY + 10;
-      }
-
-      // Milk Collections History
-      if (milkCollections.length > 0) {
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(14);
-        doc.text(t('animalHistoryExport.milkHistory'), margin, yPosition);
-        yPosition += 10;
-
-        const milkData = milkCollections.map((collection: MilkCollection) => [
-          new Date(collection.collection_date).toLocaleDateString('pt-BR'),
-          `${collection.quantity}L`,
-          collection.quality || '-',
-          collection.notes || '-'
-        ]);
-
-        (doc as any).autoTable({
-          startY: yPosition,
-          head: [[
-            t('animalHistoryExport.milkTable.date'),
-            t('animalHistoryExport.milkTable.quantity'),
-            t('animalHistoryExport.milkTable.quality'),
-            t('animalHistoryExport.milkTable.notes')
-          ]],
-          body: milkData,
-          styles: { fontSize: 10 },
-          headStyles: { fillColor: [34, 139, 34] },
-          margin: { left: margin, right: margin }
-        });
-
-        yPosition = (doc as any).lastAutoTable.finalY + 10;
-      }
-
-      // Reproduction History
-      if (reproductions.length > 0) {
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(14);
-        doc.text(t('animalHistoryExport.reproductionHistory'), margin, yPosition);
-        yPosition += 10;
-
-        const reproductionData = reproductions.map((reproduction: Reproduction) => [
-          new Date(reproduction.date).toLocaleDateString('pt-BR'),
-          reproduction.phase,
-          reproduction.notes || '-'
-        ]);
-
-        (doc as any).autoTable({
-          startY: yPosition,
-          head: [[
-            t('animalHistoryExport.reproductionTable.date'),
-            t('animalHistoryExport.reproductionTable.phase'),
-            t('animalHistoryExport.reproductionTable.notes')
-          ]],
-          body: reproductionData,
-          styles: { fontSize: 10 },
-          headStyles: { fillColor: [255, 140, 0] },
-          margin: { left: margin, right: margin }
-        });
-      }
-
-      // Footer
-      const pageCount = doc.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setFont('helvetica', 'normal');
-        doc.text(
-          `${t('animalHistoryExport.footer.page')} ${i} ${t('animalHistoryExport.footer.of')} ${pageCount}`,
-          pageWidth / 2,
-          doc.internal.pageSize.getHeight() - 10,
-          { align: 'center' }
-        );
-        doc.text(
-          new Date().toLocaleDateString('pt-BR'),
-          pageWidth - margin,
-          doc.internal.pageSize.getHeight() - 10,
-          { align: 'right' }
-        );
-      }
-
-      // Save the PDF
-      const fileName = `${animal.animal_name}_historico_${new Date().toISOString().split('T')[0]}.pdf`;
-      doc.save(fileName);
 
       message.success(t('animalHistoryExport.success'));
     } catch (error) {

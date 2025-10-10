@@ -26,6 +26,15 @@ export class AnimalColumnBuilder {
         defaultVisible: true
       },
       {
+        key: 'actions',
+        title: 'Ações',
+        dataIndex: 'actions',
+        defaultVisible: true,
+        render: (_, record: Animal) => {
+          return <ActionButton animalId={record.id} />;
+        }
+      },
+      {
         key: 'type',
         title: 'Tipo',
         dataIndex: 'type',
@@ -227,15 +236,6 @@ export class AnimalColumnBuilder {
         render: (date: unknown) => {
           if (!date || typeof date !== 'string') return '-';
           return new Date(date).toLocaleDateString('pt-BR');
-        }
-      },
-      {
-        key: 'actions',
-        title: 'Ações',
-        dataIndex: 'actions',
-        defaultVisible: true,
-        render: (_, record: Animal) => {
-          return <ActionButton animalId={record.id} />;
         }
       }
     ];

@@ -15,6 +15,7 @@
     "rememberPassword": "Lembrar da senha",
     "forgotPassword": "Esqueceu a senha?",
     "access": "Acessar",
-    "loginSuccess": "Login realizado com sucesso"
+    "loginSuccess": "Login realizado com sucesso",
+    "notInformed": "Não informado"
   }
 }
