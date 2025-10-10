@@ -7,7 +7,7 @@ vi.mock('../../../../hooks', () => ({
   useResponsive: vi.fn()
 }));
 
-const mockUseResponsive = useResponsive as any;
+const mockUseResponsive = useResponsive as jest.MockedFunction<typeof useResponsive>;
 
 describe('CustomPagination', () => {
   const defaultProps = {
@@ -25,7 +25,6 @@ describe('CustomPagination', () => {
       isTablet: false,
       isDesktop: true,
       isLargeDesktop: false,
-      screenWidth: 1200,
       screenWidth: 1200
     });
   });
@@ -85,7 +84,9 @@ describe('CustomPagination', () => {
       mockUseResponsive.mockReturnValue({
         isMobile: false,
         isTablet: false,
-        isDesktop: true
+        isDesktop: true,
+        isLargeDesktop: false,
+        screenWidth: 1200
       });
 
       render(<CustomPagination {...defaultProps} />);
@@ -177,7 +178,9 @@ describe('CustomPagination', () => {
       mockUseResponsive.mockReturnValue({
         isMobile: false,
         isTablet: false,
-        isDesktop: true
+        isDesktop: true,
+        isLargeDesktop: false,
+        screenWidth: 1200
       });
 
       render(<CustomPagination {...defaultProps} showSizeChanger={true} />);
@@ -203,7 +206,9 @@ describe('CustomPagination', () => {
       mockUseResponsive.mockReturnValue({
         isMobile: false,
         isTablet: false,
-        isDesktop: true
+        isDesktop: true,
+        isLargeDesktop: false,
+        screenWidth: 1200
       });
 
       render(<CustomPagination {...defaultProps} showTotal={true} />);

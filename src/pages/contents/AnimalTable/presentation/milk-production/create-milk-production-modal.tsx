@@ -32,8 +32,8 @@ export const CreateMilkProductionModal: React.FC<MilkProductionModalProps> = ({
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
   
-  const { animals = [], loading: animalsLoading } = useAnimals(farm?.id)
-  const { createMilkProduction, updateMilkProduction } = useMilkProduction(farm?.id)
+  const { animals = [], loading: animalsLoading } = useAnimals(farm?.id || 0)
+  const { createMilkProduction, updateMilkProduction } = useMilkProduction(farm?.id || 0)
   
   const isEditing = !!editingProduction
 
@@ -71,7 +71,7 @@ export const CreateMilkProductionModal: React.FC<MilkProductionModalProps> = ({
           date: values.date.format('YYYY-MM-DD')
         }
 
-        const result = await updateMilkProduction(data)
+        await updateMilkProduction(data)
         message.success(t('animalTable.milkProductionContainer.updatedSuccessfully'))
       } else {
         const data: CreateMilkProductionRequest = {
@@ -80,7 +80,7 @@ export const CreateMilkProductionModal: React.FC<MilkProductionModalProps> = ({
           date: values.date.format('YYYY-MM-DD')
         }
 
-        const result = await createMilkProduction(data)
+        await createMilkProduction(data)
         message.success(t('animalTable.milkProductionContainer.createdSuccessfully'))
       }
       

@@ -276,7 +276,7 @@ describe('ReproductionTable Pagination Integration', () => {
         error: null
       });
       
-      const { rerender } = render(<ReproductionTable onAddReproduction={vi.fn()} onEditReproduction={vi.fn()} />);
+      render(<ReproductionTable onAddReproduction={vi.fn()} onEditReproduction={vi.fn()} />);
       
       await waitFor(() => {
         expect(screen.getByText('Animal 1')).toBeInTheDocument();

@@ -17,12 +17,13 @@ describe('useFarmSelection', () => {
 
   it('deve carregar fazendas do usuário ao inicializar', async () => {
     const mockFarms = [
-      { id: 1, name: 'Fazenda 1', logo: 'logo1.png' },
-      { id: 2, name: 'Fazenda 2', logo: 'logo2.png' },
+      { ID: 1, CompanyID: 1, Logo: 'logo1.png' },
+      { ID: 2, CompanyID: 2, Logo: 'logo2.png' },
     ];
 
     mockFarmSelectionService.getUserFarms.mockResolvedValue({
       success: true,
+      message: 'Fazendas carregadas com sucesso',
       farms: mockFarms,
       auto_select: false,
     });
@@ -40,11 +41,12 @@ describe('useFarmSelection', () => {
 
   it('deve auto-selecionar quando há apenas uma fazenda', async () => {
     const mockFarms = [
-      { id: 1, name: 'Fazenda 1', logo: 'logo1.png' },
+      { ID: 1, CompanyID: 1, Logo: 'logo1.png' },
     ];
 
     mockFarmSelectionService.getUserFarms.mockResolvedValue({
       success: true,
+      message: 'Fazendas carregadas com sucesso',
       farms: mockFarms,
       auto_select: true,
       selected_farm_id: 1,
@@ -62,18 +64,20 @@ describe('useFarmSelection', () => {
 
   it('deve selecionar uma fazenda quando selectFarm é chamado', async () => {
     const mockFarms = [
-      { id: 1, name: 'Fazenda 1', logo: 'logo1.png' },
-      { id: 2, name: 'Fazenda 2', logo: 'logo2.png' },
+      { ID: 1, CompanyID: 1, Logo: 'logo1.png' },
+      { ID: 2, CompanyID: 2, Logo: 'logo2.png' },
     ];
 
     mockFarmSelectionService.getUserFarms.mockResolvedValue({
       success: true,
+      message: 'Fazendas carregadas com sucesso',
       farms: mockFarms,
       auto_select: false,
     });
 
     mockFarmSelectionService.selectFarm.mockResolvedValue({
       success: true,
+      message: 'Fazenda selecionada com sucesso',
       farm_id: 2,
     });
 
@@ -106,11 +110,12 @@ describe('useFarmSelection', () => {
 
   it('deve tratar erro ao selecionar fazenda', async () => {
     const mockFarms = [
-      { id: 1, name: 'Fazenda 1', logo: 'logo1.png' },
+      { ID: 1, CompanyID: 1, Logo: 'logo1.png' },
     ];
 
     mockFarmSelectionService.getUserFarms.mockResolvedValue({
       success: true,
+      message: 'Fazendas carregadas com sucesso',
       farms: mockFarms,
       auto_select: false,
     });

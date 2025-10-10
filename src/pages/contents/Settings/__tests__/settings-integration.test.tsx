@@ -94,7 +94,8 @@ describe('Settings Integration Tests', () => {
       setSelectedFarm: vi.fn(),
       clearSelectedFarm: vi.fn(),
       farmId: 1,
-      farmName: 'Fazenda Teste'
+      farmName: 'Fazenda Teste',
+      farmLogo: 'logo.png'
     })
     
     vi.mocked(useFarm).mockReturnValue({
@@ -234,7 +235,8 @@ describe('Settings Integration Tests', () => {
         setSelectedFarm: vi.fn(),
         clearSelectedFarm: vi.fn(),
         farmId: null,
-        farmName: null
+        farmName: null,
+        farmLogo: ''
       })
 
       renderSettings()

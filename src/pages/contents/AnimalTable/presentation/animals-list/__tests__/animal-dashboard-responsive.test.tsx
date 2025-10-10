@@ -31,7 +31,7 @@ describe('AnimalDashboard - Responsive', () => {
       isTablet: false,
       isDesktop: false,
       isLargeDesktop: false,
-      screenWidth: 0
+      screenWidth: 400
     })
 
     render(<AnimalDashboard {...mockProps} />)
@@ -45,7 +45,9 @@ describe('AnimalDashboard - Responsive', () => {
     vi.mocked(useResponsive).mockReturnValue({
       isMobile: false,
       isTablet: true,
-      isDesktop: false
+      isDesktop: false,
+      isLargeDesktop: false,
+      screenWidth: 800
     })
 
     render(<AnimalDashboard {...mockProps} />)
@@ -58,7 +60,9 @@ describe('AnimalDashboard - Responsive', () => {
     vi.mocked(useResponsive).mockReturnValue({
       isMobile: false,
       isTablet: false,
-      isDesktop: true
+      isDesktop: true,
+      isLargeDesktop: false,
+      screenWidth: 1200
     })
 
     render(<AnimalDashboard {...mockProps} />)
@@ -71,7 +75,9 @@ describe('AnimalDashboard - Responsive', () => {
     vi.mocked(useResponsive).mockReturnValue({
       isMobile: true,
       isTablet: false,
-      isDesktop: false
+      isDesktop: false,
+      isLargeDesktop: false,
+      screenWidth: 400
     })
 
     render(<AnimalDashboard {...mockProps} />)
@@ -83,7 +89,9 @@ describe('AnimalDashboard - Responsive', () => {
     vi.mocked(useResponsive).mockReturnValue({
       isMobile: true,
       isTablet: false,
-      isDesktop: false
+      isDesktop: false,
+      isLargeDesktop: false,
+      screenWidth: 400
     })
 
     render(<AnimalDashboard {...mockProps} />)
@@ -96,7 +104,9 @@ describe('AnimalDashboard - Responsive', () => {
     vi.mocked(useResponsive).mockReturnValue({
       isMobile: true,
       isTablet: false,
-      isDesktop: false
+      isDesktop: false,
+      isLargeDesktop: false,
+      screenWidth: 400
     })
 
     render(<AnimalDashboard {...mockProps} />)
@@ -108,7 +118,9 @@ describe('AnimalDashboard - Responsive', () => {
     vi.mocked(useResponsive).mockReturnValue({
       isMobile: false,
       isTablet: false,
-      isDesktop: true
+      isDesktop: true,
+      isLargeDesktop: false,
+      screenWidth: 1200
     })
 
     render(<AnimalDashboard {...mockProps} />)
@@ -121,7 +133,9 @@ describe('AnimalDashboard - Responsive', () => {
     vi.mocked(useResponsive).mockReturnValue({
       isMobile: false,
       isTablet: false,
-      isDesktop: true
+      isDesktop: true,
+      isLargeDesktop: false,
+      screenWidth: 1200
     })
 
     render(<AnimalDashboard {...mockProps} />)
@@ -134,7 +148,9 @@ describe('AnimalDashboard - Responsive', () => {
     vi.mocked(useResponsive).mockReturnValue({
       isMobile: true,
       isTablet: false,
-      isDesktop: false
+      isDesktop: false,
+      isLargeDesktop: false,
+      screenWidth: 400
     })
 
     render(<AnimalDashboard {...mockProps} />)
@@ -150,7 +166,9 @@ describe('AnimalDashboard - Responsive', () => {
     vi.mocked(useResponsive).mockReturnValue({
       isMobile: true,
       isTablet: false,
-      isDesktop: false
+      isDesktop: false,
+      isLargeDesktop: false,
+      screenWidth: 400
     })
 
     render(<AnimalDashboard {...mockProps} />)

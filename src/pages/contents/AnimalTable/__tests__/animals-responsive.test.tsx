@@ -15,12 +15,12 @@ vi.mock('react-i18next', () => ({
 }))
 
 vi.mock('../../../../components/tabs', () => ({
-  DesktopTabs: ({ tabs, defaultTabIndex, onChange }: { tabs: unknown; defaultTabIndex: number; onChange: unknown }) => (
+  DesktopTabs: ({ defaultTabIndex }: { defaultTabIndex: number }) => (
     <div data-testid="desktop-tabs">
       Desktop Tabs - Tab {defaultTabIndex}
     </div>
   ),
-  MobileTabs: ({ tabs, defaultTabIndex, onChange }: { tabs: unknown; defaultTabIndex: number; onChange: unknown }) => (
+  MobileTabs: ({ defaultTabIndex }: { defaultTabIndex: number }) => (
     <div data-testid="mobile-tabs">
       Mobile Tabs - Tab {defaultTabIndex}
     </div>

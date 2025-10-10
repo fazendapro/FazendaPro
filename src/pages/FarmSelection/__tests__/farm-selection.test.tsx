@@ -27,8 +27,8 @@ describe('FarmSelection', () => {
 
   it('deve renderizar a tela de seleção quando há múltiplas fazendas', () => {
     const mockFarms = [
-      { id: 1, name: 'Fazenda 1', logo: 'logo1.png' },
-      { id: 2, name: 'Fazenda 2', logo: 'logo2.png' },
+      { ID: 1, CompanyID: 1, Logo: 'logo1.png' },
+      { ID: 2, CompanyID: 2, Logo: 'logo2.png' },
     ];
 
     mockUseFarmSelection.mockReturnValue({
@@ -80,8 +80,8 @@ describe('FarmSelection', () => {
   it('deve chamar selectFarm quando uma fazenda é selecionada', async () => {
     const mockSelectFarm = jest.fn();
     const mockFarms = [
-      { id: 1, name: 'Fazenda 1', logo: 'logo1.png' },
-      { id: 2, name: 'Fazenda 2', logo: 'logo2.png' },
+      { ID: 1, CompanyID: 1, Logo: 'logo1.png' },
+      { ID: 2, CompanyID: 2, Logo: 'logo2.png' },
     ];
 
     mockUseFarmSelection.mockReturnValue({
@@ -105,7 +105,7 @@ describe('FarmSelection', () => {
 
   it('deve redirecionar automaticamente quando há apenas uma fazenda', () => {
     const mockFarms = [
-      { id: 1, name: 'Fazenda 1', logo: 'logo1.png' },
+      { ID: 1, CompanyID: 1, Logo: 'logo1.png' },
     ];
 
     mockUseFarmSelection.mockReturnValue({
