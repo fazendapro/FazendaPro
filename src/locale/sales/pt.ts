@@ -65,14 +65,40 @@ export const translations = {
     }
   },
   animalHistoryExport: {
-    title: "Histórico do Animal",
+    title: "Histórico Completo do Animal",
     animalInfo: "Informações do Animal",
     fields: {
       name: "Nome",
       earTag: "Brinco",
       breed: "Raça",
       type: "Tipo",
-      birthDate: "Data de Nascimento"
+      birthDate: "Data de Nascimento",
+      sex: "Sexo",
+      status: "Status",
+      confinement: "Confinamento",
+      fertilization: "Fertilização",
+      castrated: "Castrado",
+      currentWeight: "Peso Atual",
+      idealWeight: "Peso Ideal",
+      milkProduction: "Produção de Leite"
+    },
+    sex: {
+      male: "Macho",
+      female: "Fêmea"
+    },
+    status: {
+      active: "Ativo",
+      inactive: "Inativo",
+      sold: "Vendido",
+      deceased: "Falecido"
+    },
+    statistics: "Estatísticas",
+    stats: {
+      totalSales: "Total de Vendas",
+      totalSalesValue: "Valor Total das Vendas",
+      totalMilkCollections: "Total de Ordenhas",
+      totalMilkQuantity: "Quantidade Total de Leite",
+      totalReproductions: "Total de Reproduções"
     },
     salesHistory: "Histórico de Vendas",
     salesTable: {
@@ -110,6 +136,7 @@ export const translations = {
     cancel: "Cancelar",
     save: "Salvar",
     create: "Criar",
-    update: "Atualizar"
+    update: "Atualizar",
+    notInformed: "Não informado"
   }
 };

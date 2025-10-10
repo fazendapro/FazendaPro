@@ -34,6 +34,7 @@ export interface Animal extends AnimalForm {
   ideal_weight?: string;
   last_update?: string;
   milk_production?: string;
+  photo?: string;
 }
 
 export interface GetAnimalsByFarmParams {
