@@ -1,6 +1,8 @@
 import { Layout, Grid } from 'antd';
 import { Login, Dashboard, Animals, Settings } from './pages';
 import { AnimalDetailComponent as AnimalDetail, AnimalDetailProvider } from './pages/contents/AnimalDetail';
+import { SalesDisplay } from './pages/contents/Sales/presentation/sales-display';
+import { SaleProvider } from './contexts/SaleContext';
 import { ResponsiveSidebar, Spinner } from './components';
 import { Routes, Route, Navigate, useParams } from 'react-router'
 import { FarmSelection } from './pages/FarmSelection';
@@ -122,7 +124,9 @@ const AppContent = () => {
         path="/vendas"
         element={
           <ProtectedLayout>
-            <h1>Página de Vendas</h1>
+            <SaleProvider>
+              <SalesDisplay />
+            </SaleProvider>
           </ProtectedLayout>
         }
       />

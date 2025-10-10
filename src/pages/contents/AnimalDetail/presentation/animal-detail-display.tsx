@@ -1,9 +1,10 @@
 import React from 'react';
 import { Card, Button, Image, Tag, Space, Spin, Avatar, Row, Col, Typography, Divider } from 'antd';
-import { EditOutlined, CameraOutlined, ExportOutlined, UserOutlined } from '@ant-design/icons';
+import { EditOutlined, CameraOutlined, UserOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useAnimalDetailContext } from '../hooks';
 import { SEX_OPTIONS } from '../types';
+import { AnimalHistoryExport } from '../../../../components/AnimalHistoryExport/AnimalHistoryExport';
 
 const { Title, Text } = Typography;
 
@@ -65,17 +66,12 @@ export const AnimalDetailDisplay: React.FC<AnimalDetailDisplayProps> = ({ onEdit
           >
             {t('common.edit')}
           </Button>
-          <Button 
-            icon={<ExportOutlined />}
-            style={{ 
-              backgroundColor: '#f0f0f0',
-              borderColor: '#d9d9d9',
-              color: '#262626',
-              borderRadius: '6px'
-            }}
-          >
-            {t('animalDetail.exportHistory')}
-          </Button>
+          <AnimalHistoryExport
+            animal={animal}
+            sales={[]}
+            milkCollections={[]}
+            reproductions={[]}
+          />
         </Space>
       </div>
 

@@ -6,6 +6,7 @@ import en from "./en.json";
 import { translations as dashboardTranslations } from "../pages/contents/Dashboard/translation/pt";
 import { animalTableTranslations } from "../pages/contents/AnimalTable/translation";
 import { settingsTranslations } from "../pages/contents/Settings/translation";
+import { translations as salesTranslations } from "./sales/pt";
 
 const resources = {
   pt: {
@@ -13,7 +14,8 @@ const resources = {
       ...pt.translation,
       ...dashboardTranslations,
       ...animalTableTranslations,
-      ...settingsTranslations
+      ...settingsTranslations,
+      ...salesTranslations
     }
   },
   es: {
@@ -21,7 +23,8 @@ const resources = {
       ...es.translation,
       ...dashboardTranslations,
       ...animalTableTranslations,
-      ...settingsTranslations
+      ...settingsTranslations,
+      ...salesTranslations
     }
   },
   en: {
@@ -29,7 +32,8 @@ const resources = {
       ...en.translation,
       ...dashboardTranslations,
       ...animalTableTranslations,
-      ...settingsTranslations
+      ...settingsTranslations,
+      ...salesTranslations
     }
   }
 };
