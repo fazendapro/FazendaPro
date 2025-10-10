@@ -133,7 +133,7 @@ const AnimalDashboard: React.FC<AnimalDashboardProps> = ({
           </Button>
           <Search 
             placeholder={t('animalTable.search')} 
-            style={{ width: 200 }}
+            style={{ width: 'auto' }}
             onSearch={handleSearch}
             allowClear
           />

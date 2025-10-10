@@ -15,9 +15,9 @@ export const mockRouter = {
   Routes: ({ children }: { children: React.ReactNode }) => children,
   Route: ({ children }: { children: React.ReactNode }) => children,
   Navigate: () => null,
-  Link: ({ children, to, ...props }: any) => 
+  Link: ({ children, to, ...props }: { children: React.ReactNode; to: string; [key: string]: unknown }) => 
     React.createElement('a', { href: to, ...props }, children),
-  NavLink: ({ children, to, ...props }: any) => 
+  NavLink: ({ children, to, ...props }: { children: React.ReactNode; to: string; [key: string]: unknown }) => 
     React.createElement('a', { href: to, ...props }, children),
 }
 

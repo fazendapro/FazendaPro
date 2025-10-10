@@ -3,6 +3,7 @@ import { Table, Spin, Alert } from 'antd';
 import { useAnimals } from '../../hooks/useAnimals';
 import { useFarm } from '../../../../../hooks/useFarm';
 import { useAnimalColumnBuilder } from './column-builder';
+import { useResponsive } from '../../../../../hooks';
 
 interface AnimalTableRef {
   refetch: () => void;
@@ -18,6 +19,7 @@ const AnimalTable = forwardRef<AnimalTableRef, AnimalTableProps>((props, ref) =>
   const { farm } = useFarm();
   const { animals, loading, error, refetch } = useAnimals(farm?.id);
   const { buildTableColumns } = useAnimalColumnBuilder();
+  const { isMobile, isTablet } = useResponsive();
 
   useImperativeHandle(ref, () => ({
     refetch
@@ -62,9 +64,22 @@ const AnimalTable = forwardRef<AnimalTableRef, AnimalTableProps>((props, ref) =>
     <Table 
       columns={filteredColumns} 
       dataSource={filteredAnimals} 
-      pagination={{ showSizeChanger: true }}
+      pagination={{ 
+        showSizeChanger: !isMobile,
+        showQuickJumper: !isMobile,
+        showTotal: !isMobile ? (total, range) => `${range[0]}-${range[1]} de ${total} registros` : undefined,
+        pageSize: isMobile ? 5 : isTablet ? 10 : 20,
+        size: isMobile ? 'small' : 'default'
+      }}
       rowKey="id"
-      scroll={{ x: 1500 }}
+      scroll={{ 
+        x: isMobile ? 800 : isTablet ? 1200 : 1500,
+        y: isMobile ? 400 : undefined
+      }}
+      size={isMobile ? 'small' : 'middle'}
+      style={{
+        fontSize: isMobile ? '12px' : '14px'
+      }}
     />
   );
 });
