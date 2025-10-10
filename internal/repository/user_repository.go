@@ -123,7 +123,7 @@ func (r *UserRepository) CreateDefaultFarm(farmID uint) error {
 
 func (r *UserRepository) GetUserFarms(userID uint) ([]models.Farm, error) {
 	var userFarms []models.UserFarm
-	if err := r.db.DB.Preload("Farm").Where("user_id = ?", userID).Find(&userFarms).Error; err != nil {
+	if err := r.db.DB.Preload("Farm.Company").Where("user_id = ?", userID).Find(&userFarms).Error; err != nil {
 		return nil, fmt.Errorf("error finding user farms: %w", err)
 	}
 
@@ -146,7 +146,7 @@ func (r *UserRepository) GetUserFarmCount(userID uint) (int64, error) {
 
 func (r *UserRepository) GetUserFarmByID(userID, farmID uint) (*models.Farm, error) {
 	var userFarm models.UserFarm
-	if err := r.db.DB.Preload("Farm").Where("user_id = ? AND farm_id = ?", userID, farmID).First(&userFarm).Error; err != nil {
+	if err := r.db.DB.Preload("Farm.Company").Where("user_id = ? AND farm_id = ?", userID, farmID).First(&userFarm).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, gorm.ErrRecordNotFound
 		}
