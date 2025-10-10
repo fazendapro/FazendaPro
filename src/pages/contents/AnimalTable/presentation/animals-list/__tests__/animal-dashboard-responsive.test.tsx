@@ -29,12 +29,14 @@ describe('AnimalDashboard - Responsive', () => {
     vi.mocked(useResponsive).mockReturnValue({
       isMobile: true,
       isTablet: false,
-      isDesktop: false
+      isDesktop: false,
+      isLargeDesktop: false,
+      screenWidth: 0
     })
 
     render(<AnimalDashboard {...mockProps} />)
     
-    expect(screen.getByText('animalTable.categories')).toBeInTheDocument()
+    expect(screen.getByText('animalTable.dashboard')).toBeInTheDocument()
     expect(screen.getByText('animalTable.createCow')).toBeInTheDocument()
     expect(screen.getByText('animalTable.filter')).toBeInTheDocument()
   })
@@ -74,10 +76,7 @@ describe('AnimalDashboard - Responsive', () => {
 
     render(<AnimalDashboard {...mockProps} />)
     
-    expect(screen.getByText('animalTable.categories')).toBeInTheDocument()
-    expect(screen.getByText('animalTable.totalAnimals')).toBeInTheDocument()
-    expect(screen.getByText('animalTable.revenue')).toBeInTheDocument()
-    expect(screen.getByText('animalTable.bestSales')).toBeInTheDocument()
+    expect(screen.getByText('animalTable.dashboard')).toBeInTheDocument()
   })
 
   it('deve aplicar layout vertical em mobile', () => {
@@ -91,6 +90,31 @@ describe('AnimalDashboard - Responsive', () => {
     
     expect(screen.getByText('animalTable.createCow')).toBeInTheDocument()
     expect(screen.getByText('animalTable.filter')).toBeInTheDocument()
+  })
+
+  it('deve renderizar dropdown em mobile', () => {
+    vi.mocked(useResponsive).mockReturnValue({
+      isMobile: true,
+      isTablet: false,
+      isDesktop: false
+    })
+
+    render(<AnimalDashboard {...mockProps} />)
+    
+    expect(screen.getByText('animalTable.dashboard')).toBeInTheDocument()
+  })
+
+  it('deve renderizar card normal em desktop', () => {
+    vi.mocked(useResponsive).mockReturnValue({
+      isMobile: false,
+      isTablet: false,
+      isDesktop: true
+    })
+
+    render(<AnimalDashboard {...mockProps} />)
+    
+    expect(screen.getByText('animalTable.categories')).toBeInTheDocument()
+    expect(screen.getByText('animalTable.totalAnimals')).toBeInTheDocument()
   })
 
   it('deve aplicar layout horizontal em desktop', () => {

@@ -1,5 +1,6 @@
 export const translations = {
   animalTable: {
+    dashboard: "Dashboard",
     categories: "Categorias",
     totalAnimals: "Total de animais",
     revenue: "Receita",
