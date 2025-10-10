@@ -72,23 +72,81 @@ const NextToCalve: React.FC = () => {
         itemLayout="horizontal"
         dataSource={nextToCalve}
         renderItem={(item) => (
-          <List.Item>
+          <List.Item
+            style={{
+              padding: '12px 0',
+              borderBottom: '1px solid #f0f0f0'
+            }}
+          >
             <List.Item.Meta
-              avatar={<Avatar src={item.photo} shape="square" size={100} />}
-              title={<span style={{ fontSize: 16, fontWeight: 'bold' }}>{item.animal_name}</span>}
+              avatar={
+                <Avatar 
+                  src={item.photo} 
+                  shape="square" 
+                  size={{ xs: 60, sm: 80, md: 100 }}
+                  style={{ 
+                    minWidth: '60px',
+                    minHeight: '60px'
+                  }}
+                />
+              }
+              title={
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  gap: '4px'
+                }}>
+                  <span style={{ 
+                    fontSize: '16px', 
+                    fontWeight: 'bold',
+                    color: '#262626'
+                  }}>
+                    {item.animal_name}
+                  </span>
+                  <span style={{ 
+                    fontSize: '12px', 
+                    color: '#8c8c8c'
+                  }}>
+                    #{item.ear_tag_number_local}
+                  </span>
+                </div>
+              }
               description={
-                <>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <p>Última vez: {item.days_until_birth} dias</p>
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  gap: '8px',
+                  marginTop: '8px'
+                }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '8px',
+                    flexWrap: 'wrap'
+                  }}>
+                    <span style={{ 
+                      fontSize: '14px',
+                      color: '#595959'
+                    }}>
+                      Faltam: <strong>{item.days_until_birth} dias</strong>
+                    </span>
                     <span style={{ 
                       ...getStatusStyles(item.status),
-                      padding: '4px', 
-                      borderRadius: '20px' 
+                      padding: '4px 8px', 
+                      borderRadius: '12px',
+                      fontSize: '12px',
+                      fontWeight: 'bold'
                     }}>
                       {item.status}
                     </span>
                   </div>
-                </>
+                  <div style={{ 
+                    fontSize: '12px',
+                    color: '#8c8c8c'
+                  }}>
+                    Data prevista: {item.expected_birth_date}
+                  </div>
+                </div>
               }
             />
           </List.Item>

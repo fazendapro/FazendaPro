@@ -25,6 +25,7 @@ export const translations = {
     price: "Preço",
     salesAndPurchases: "Vendas & Compras",
     semenation: "Seminação",
-    topMilkProducers: "Top Produtoras de Leite"
+    topMilkProducers: "Top Produtoras de Leite",
+    daysInLactation: "Dias em Lactação"
   }
 };

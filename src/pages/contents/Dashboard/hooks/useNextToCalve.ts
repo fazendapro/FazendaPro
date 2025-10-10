@@ -24,8 +24,8 @@ export const useNextToCalve = (farmId?: number) => {
       const nextToCalveData = result.data || [];
       setNextToCalve(nextToCalveData);
       return nextToCalveData;
-    } catch (err: any) {
-      const errorMessage = err.message || 'Erro ao buscar próximas vacas a parir';
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao buscar próximas vacas a parir';
       setError(errorMessage);
       return [];
     } finally {

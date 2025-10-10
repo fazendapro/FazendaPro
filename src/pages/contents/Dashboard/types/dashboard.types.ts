@@ -19,3 +19,28 @@ export interface GetNextToCalveResponse {
   message: string;
   status: number;
 }
+
+export interface TopMilkProducer {
+  id: number;
+  animal_name: string;
+  ear_tag_number_local: number;
+  photo?: string;
+  total_production: number;
+  average_daily_production: number;
+  fat_content: number;
+  last_collection_date: string;
+  days_in_lactation: number;
+}
+
+export interface GetTopMilkProducersParams {
+  farm_id: number;
+  limit?: number;
+  period_days?: number;
+}
+
+export interface GetTopMilkProducersResponse {
+  data: TopMilkProducer[];
+  success: boolean;
+  message: string;
+  status: number;
+}
