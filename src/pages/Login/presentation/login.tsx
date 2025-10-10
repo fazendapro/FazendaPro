@@ -8,6 +8,7 @@ import { loginSchema } from './login-schema';
 import { toast } from 'react-toastify';
 import { baseStyle } from './styles';
 import { useAuth } from '../hooks';
+import { useResponsive } from '../../../hooks';
 import logo from '../../../assets/images/logo.png';
 
 const { Title } = Typography;
@@ -21,6 +22,7 @@ interface LoginForm {
 const Login = () => {
   const { login } = useAuth();
   const { t } = useTranslation();
+  const { isMobile, isTablet } = useResponsive();
 
   const methods = useForm<LoginForm>({
     resolver: yupResolver(loginSchema),
@@ -62,19 +64,72 @@ const Login = () => {
   ];
 
   return (
-    <Flex style={{ padding: '50px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }} vertical className="login-container">
-      <Row gutter={16}>
-        <Col className='logo-container' xs={24} md={12} style={{ textAlign: 'center' }}>
+    <Flex 
+      style={{ 
+        padding: isMobile ? '20px' : '50px', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        justifyContent: 'center', 
+        alignItems: 'center',
+        minHeight: '100vh'
+      }} 
+      vertical 
+      className="login-container"
+    >
+      <Row gutter={[16, 32]} style={{ width: '100%', maxWidth: '1200px' }}>
+        <Col 
+          className='logo-container' 
+          xs={24} 
+          sm={24} 
+          md={12} 
+          lg={12} 
+          xl={12} 
+          style={{ 
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+        >
           <div className="logo-placeholder">
-            <div style={{ fontSize: '200px' }}>
-              <Image src={logo} preview={false} alt="logo" />
+            <div style={{ 
+              fontSize: isMobile ? '120px' : '200px',
+              maxWidth: '100%',
+              height: 'auto'
+            }}>
+              <Image 
+                src={logo} 
+                preview={false} 
+                alt="logo" 
+                style={{ 
+                  maxWidth: '100%', 
+                  height: 'auto',
+                  objectFit: 'contain'
+                }}
+              />
             </div>
           </div>
         </Col>
 
-        <Col xs={24} md={12} style={baseStyle}>
-          <div className="form-container">
-            <Title level={3}>{t('loginTitle')}</Title>
+        <Col 
+          xs={24} 
+          sm={24} 
+          md={12} 
+          lg={12} 
+          xl={12} 
+          style={{
+            ...baseStyle,
+            padding: isMobile ? '20px' : '150px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center'
+          }}
+        >
+          <div className="form-container" style={{ width: '100%' }}>
+            <Title level={3} style={{ textAlign: 'center', marginBottom: '24px' }}>
+              {t('loginTitle')}
+            </Title>
             <Form<LoginForm>
               onSubmit={onSubmit}
               fields={loginFields}
@@ -87,6 +142,7 @@ const Login = () => {
                 htmlType="submit"
                 block
                 loading={methods.formState.isSubmitting}
+                size="large"
               >
                 {t('access')}
               </Button>

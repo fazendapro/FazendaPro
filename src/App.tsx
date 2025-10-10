@@ -1,6 +1,6 @@
 import { Layout, Grid } from 'antd';
 import { useAuth, Login, Dashboard, Animals } from './pages';
-import { Sidebar, Spinner } from './components';
+import { ResponsiveSidebar, Spinner } from './components';
 import { Routes, Route, Navigate } from 'react-router'
 
 const { useBreakpoint } = Grid;
@@ -15,19 +15,20 @@ const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sidebar />
+      <ResponsiveSidebar />
       <Layout style={{
         marginLeft: screens.xs ? 0 : 280,
+        marginBottom: screens.xs ? '60px' : 0,
         transition: 'all 0.2s'
       }}>
         <Layout.Content style={{ 
-          height: '100vh',
+          height: screens.xs ? 'calc(100vh - 60px)' : '100vh',
           overflow: 'auto',
           background: '#f5f5f5'
         }}>
           <div style={{
             padding: '24px',
-            minHeight: 'calc(100vh - 48px)'
+            minHeight: screens.xs ? 'calc(100vh - 84px)' : 'calc(100vh - 48px)'
           }}>
             {children}
           </div>
