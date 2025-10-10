@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { AnimalDashboard } from "./animal-dashboard";
 import { AnimalTable } from "./animal-table";
-import { useAnimalColumnBuilder } from "./column-builder";
+import { useAnimalColumnBuilder } from "./column-builder.tsx";
 
 const Animals = () => {
   const tableRef = useRef<{ refetch: () => void }>(null);

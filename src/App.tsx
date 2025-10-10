@@ -1,12 +1,24 @@
 import { Layout, Grid } from 'antd';
 import { Login, Dashboard, Animals, Settings } from './pages';
+import { AnimalDetailComponent as AnimalDetail, AnimalDetailProvider } from './pages/contents/AnimalDetail';
 import { ResponsiveSidebar, Spinner } from './components';
-import { Routes, Route, Navigate } from 'react-router'
+import { Routes, Route, Navigate, useParams } from 'react-router'
 import { FarmSelection } from './pages/FarmSelection';
 import { FarmProvider } from './contexts/FarmContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 const { useBreakpoint } = Grid;
+
+const AnimalDetailWrapper = () => {
+  const { id } = useParams<{ id: string }>();
+  const animalId = parseInt(id || '0');
+  
+  return (
+    <AnimalDetailProvider animalId={animalId}>
+      <AnimalDetail />
+    </AnimalDetailProvider>
+  );
+};
 
 const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
   const { isLoading, isAuthenticated } = useAuth()
@@ -79,6 +91,14 @@ const AppContent = () => {
         element={
           <ProtectedLayout>
             <Animals />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/animal/:id"
+        element={
+          <ProtectedLayout>
+            <AnimalDetailWrapper />
           </ProtectedLayout>
         }
       />

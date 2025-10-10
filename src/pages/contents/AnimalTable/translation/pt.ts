@@ -132,5 +132,36 @@ export const translations = {
       no: "Não",
       actions: "Ações"
     },
+  },
+  animalDetail: {
+    title: "Ficha do Animal",
+    notFound: "Animal não encontrado",
+    information: "Informações",
+    parents: "Pais",
+    name: "Nome",
+    localEarTag: "Brinca Local",
+    registerEarTag: "Brinca Registro",
+    type: "Tipo",
+    sex: "Sexo",
+    breed: "Raça",
+    birthDate: "Data de Nascimento",
+    animalType: "Tipo de Animal",
+    status: "Status",
+    purpose: "Propósito",
+    currentBatch: "Lote Atual",
+    father: "Pai",
+    mother: "Mãe",
+    earTag: "Brinca",
+    characteristics: "Características",
+    confinement: "Confinamento",
+    fertilization: "Fertilização",
+    castrated: "Castrado",
+    photoAlt: "Foto do {name}",
+    noPhoto: "Sem foto",
+    exportHistory: "Exportar Histórico"
+  },
+  common: {
+    edit: "Editar",
+    notInformed: "Não informado"
   }
 }; 
