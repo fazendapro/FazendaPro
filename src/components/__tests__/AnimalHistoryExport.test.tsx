@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { AnimalHistoryExport } from '../AnimalHistoryExport/AnimalHistoryExport';
-import { Animal } from '../../types/animal';
+import { Animal } from '../../pages/contents/AnimalTable/types/type';
 import { Sale } from '../../types/sale';
 import { MilkCollection } from '../../types/milk-collection';
 import { Reproduction } from '../../types/reproduction';
@@ -40,20 +40,16 @@ jest.mock('antd', () => ({
 
 describe('AnimalHistoryExport', () => {
   const mockAnimal: Animal = {
-    id: 1,
+    id: '1',
     farm_id: 1,
     ear_tag_number_local: 123,
     ear_tag_number_register: 456,
     animal_name: 'Test Animal',
     sex: 0,
     breed: 'Holstein',
-    type: 'Cattle',
+    type: 'vaca',
     birth_date: '2020-01-01',
     photo: '',
-    father_id: undefined,
-    father: undefined,
-    mother_id: undefined,
-    mother: undefined,
     confinement: false,
     animal_type: 0,
     status: 0,
@@ -61,8 +57,8 @@ describe('AnimalHistoryExport', () => {
     castrated: false,
     purpose: 0,
     current_batch: 1,
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
   };
 
   const mockSales: Sale[] = [

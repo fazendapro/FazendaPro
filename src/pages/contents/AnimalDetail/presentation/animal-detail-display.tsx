@@ -67,7 +67,14 @@ export const AnimalDetailDisplay: React.FC<AnimalDetailDisplayProps> = ({ onEdit
             {t('common.edit')}
           </Button>
           <AnimalHistoryExport
-            animal={animal}
+            animal={{
+              ...animal,
+              id: animal.id.toString(),
+              type: animal.type as 'vaca' | 'bezerro' | 'touro' | 'novilho',
+              birth_date: animal.birth_date || '',
+              createdAt: animal.created_at,
+              updatedAt: animal.updated_at
+            }}
             sales={[]}
             milkCollections={[]}
             reproductions={[]}
