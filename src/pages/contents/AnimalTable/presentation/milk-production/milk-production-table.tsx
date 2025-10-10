@@ -4,6 +4,7 @@ import { PlusOutlined, EditOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { useMilkProduction } from '../../hooks/useMilkProduction'
 import { useFarm } from '../../../../../hooks/useFarm'
+import { useResponsive } from '../../../../../hooks'
 import { MilkProduction, MilkProductionFilters } from '../../domain/model/milk-production'
 import dayjs from 'dayjs'
 
@@ -23,6 +24,7 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
   const { onAddProduction, onEditProduction } = props
   const { t } = useTranslation()
   const { farm } = useFarm()
+  const { isMobile, isTablet } = useResponsive()
   const [filters, setFilters] = useState<MilkProductionFilters>({ period: 'all' })
   
   const { milkProductions, loading, error, refetch } = useMilkProduction(farm.id, filters)
@@ -64,16 +66,16 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
     {
       title: t('animalTable.milkProductionContainer.actions'),
       key: 'actions',
-      width: 120,
+      width: isMobile ? 80 : 120,
       render: (record: MilkProduction) => (
         <Button
           type="primary"
-          size="small"
+          size={isMobile ? 'small' : 'small'}
           icon={<EditOutlined />}
           onClick={() => onEditProduction?.(record)}
           title={t('animalTable.milkProductionContainer.editProduction')}
         >
-          {t('animalTable.milkProductionContainer.edit')}
+          {!isMobile && t('animalTable.milkProductionContainer.edit')}
         </Button>
       )
     }
@@ -121,12 +123,20 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
 
   return (
     <div>
-      <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Space>
+      <div style={{ 
+        marginBottom: '16px', 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        flexDirection: isMobile ? 'column' : 'row',
+        gap: isMobile ? '12px' : '0'
+      }}>
+        <Space direction={isMobile ? 'vertical' : 'horizontal'} style={{ width: isMobile ? '100%' : 'auto' }}>
           <Select
             value={filters.period}
             onChange={handlePeriodChange}
-            style={{ width: 120 }}
+            style={{ width: isMobile ? '100%' : 120 }}
+            size={'middle'}
           >
             <Option value="all">{t('animalTable.milkProductionContainer.filters.all')}</Option>
             <Option value="week">{t('animalTable.milkProductionContainer.filters.week')}</Option>
@@ -136,6 +146,8 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
           <RangePicker
             onChange={handleDateRangeChange}
             placeholder={[t('animalTable.milkProductionContainer.filters.startDate'), t('animalTable.milkProductionContainer.filters.endDate')]}
+            style={{ width: isMobile ? '100%' : 'auto' }}
+            size={'middle'}
           />
         </Space>
 
@@ -143,6 +155,8 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
           type="primary"
           icon={<PlusOutlined />}
           onClick={onAddProduction}
+          size={'middle'}
+          block={isMobile}
         >
           {t('animalTable.milkProductionContainer.addProduction')}
         </Button>
@@ -153,11 +167,19 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
         dataSource={milkProductions}
         rowKey="id"
         pagination={{
-          pageSize: 10,
-          showSizeChanger: true,
-          showQuickJumper: true,
-          showTotal: (total, range) =>
-            `${range[0]}-${range[1]} de ${total} registros`
+          pageSize: isMobile ? 5 : isTablet ? 8 : 10,
+          showSizeChanger: !isMobile,
+          showQuickJumper: !isMobile,
+          showTotal: !isMobile ? (total, range) =>
+            `${range[0]}-${range[1]} de ${total} registros` : undefined,
+        }}
+        scroll={{
+          x: isMobile ? 600 : isTablet ? 700 : 800,
+          y: isMobile ? 400 : undefined
+        }}
+        size={isMobile ? 'small' : 'middle'}
+        style={{
+          fontSize: isMobile ? '12px' : '14px'
         }}
       />
     </div>

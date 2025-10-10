@@ -169,17 +169,11 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
         flexDirection: isMobile ? 'column' : 'row',
         gap: isMobile ? '12px' : '0'
       }}>
-        <h3 style={{ 
-          margin: 0,
-          fontSize: isMobile ? '16px' : '18px'
-        }}>
-          {t('animalTable.reproduction.title')}
-        </h3>
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => setIsCreateModalVisible(true)}
-          size={isMobile ? 'small' : 'middle'}
+          size={'middle'}
           block={isMobile}
         >
           {t('animalTable.reproduction.addReproduction')}
