@@ -9,13 +9,13 @@ export interface Sale {
   created_at: string;
   updated_at: string;
   animal?: {
-    id: number;
-    animal_name: string;
-    ear_tag_number_local: number;
-    breed: string;
-    type: string;
-    sex: number;
-    status: number;
+    ID: number;
+    AnimalName: string;
+    EarTagNumberLocal: number;
+    Breed: string;
+    Type: string;
+    Sex: number;
+    Status: number;
   };
 }
 

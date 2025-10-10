@@ -3,6 +3,17 @@ import { Sale, CreateSaleRequest, UpdateSaleRequest, SaleFilters } from '../type
 import { saleService } from '../components/services/saleService';
 import { toast } from 'react-toastify';
 
+const getErrorMessage = (err: unknown, defaultMessage: string): string => {
+  if (err instanceof Error && 'response' in err) {
+    const axiosError = err as { response?: { data?: { message?: string } } };
+    return axiosError.response?.data?.message || defaultMessage;
+  }
+  if (err instanceof Error) {
+    return err.message;
+  }
+  return defaultMessage;
+};
+
 interface SaleContextType {
   sales: Sale[];
   loading: boolean;
@@ -37,8 +48,8 @@ export const SaleProvider: React.FC<SaleProviderProps> = ({ children }) => {
       const newSale = await saleService.createSale(saleData);
       setSales(prev => [newSale, ...prev]);
       toast.success('Venda registrada com sucesso!');
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Erro ao registrar venda';
+    } catch (err: unknown) {
+      const errorMessage = getErrorMessage(err, 'Erro ao registrar venda');
       setError(errorMessage);
       toast.error(errorMessage);
       throw err;
@@ -54,8 +65,8 @@ export const SaleProvider: React.FC<SaleProviderProps> = ({ children }) => {
       const updatedSale = await saleService.updateSale(id, saleData);
       setSales(prev => prev.map(sale => sale.id === id ? updatedSale : sale));
       toast.success('Venda atualizada com sucesso!');
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Erro ao atualizar venda';
+    } catch (err: unknown) {
+      const errorMessage = getErrorMessage(err, 'Erro ao atualizar venda');
       setError(errorMessage);
       toast.error(errorMessage);
       throw err;
@@ -71,8 +82,8 @@ export const SaleProvider: React.FC<SaleProviderProps> = ({ children }) => {
       await saleService.deleteSale(id);
       setSales(prev => prev.filter(sale => sale.id !== id));
       toast.success('Venda excluída com sucesso!');
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Erro ao excluir venda';
+    } catch (err: unknown) {
+      const errorMessage = getErrorMessage(err, 'Erro ao excluir venda');
       setError(errorMessage);
       toast.error(errorMessage);
       throw err;
@@ -87,8 +98,8 @@ export const SaleProvider: React.FC<SaleProviderProps> = ({ children }) => {
       setError(null);
       const farmSales = await saleService.getSalesByFarm();
       setSales(farmSales);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Erro ao carregar vendas';
+    } catch (err: unknown) {
+      const errorMessage = getErrorMessage(err, 'Erro ao carregar vendas');
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -101,9 +112,14 @@ export const SaleProvider: React.FC<SaleProviderProps> = ({ children }) => {
       setLoading(true);
       setError(null);
       const history = await saleService.getSalesHistory();
+      console.log('Raw sales data from API:', history);
       setSales(history);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Erro ao carregar histórico de vendas';
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error && 'response' in err 
+        ? (err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Erro ao carregar histórico de vendas'
+        : err instanceof Error 
+          ? err.message 
+          : 'Erro ao carregar histórico de vendas';
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {

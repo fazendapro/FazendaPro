@@ -14,6 +14,7 @@ export const saleService = {
 
   async getSalesHistory(): Promise<Sale[]> {
     const response = await api.get('/sales/history');
+    console.log('API Response:', response.data);
     return response.data;
   },
 

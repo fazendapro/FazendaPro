@@ -122,16 +122,16 @@ export const SalesDisplay: React.FC = () => {
   const columns = [
     {
       title: t('sales.table.animal'),
-      dataIndex: ['animal', 'animal_name'],
+      dataIndex: ['animal', 'AnimalName'],
       key: 'animal_name',
       render: (_: string, record: Sale) => {
         console.log('Animal data for record:', record.id, record.animal);
         return (
           <div>
-            <Text strong>{record.animal?.animal_name || 'N/A'}</Text>
+            <Text strong>{record.animal?.AnimalName || 'N/A'}</Text>
             <br />
             <Text type="secondary" style={{ fontSize: '12px' }}>
-              {t('sales.table.earTag')}: {record.animal?.ear_tag_number_local || 'N/A'}
+              {t('sales.table.earTag')}: {record.animal?.EarTagNumberLocal || 'N/A'}
             </Text>
           </div>
         );
@@ -139,10 +139,10 @@ export const SalesDisplay: React.FC = () => {
     },
     {
       title: t('sales.table.status'),
-      dataIndex: ['animal', 'status'],
+      dataIndex: ['animal', 'Status'],
       key: 'status',
       render: (status: number, record: Sale) => {
-        const animalStatus = record.animal?.status ?? status;
+        const animalStatus = record.animal?.Status ?? status;
         const statusConfig = {
           0: { text: 'Ativo', color: '#52c41a' },
           1: { text: 'Vendido', color: '#ff4d4f' },
