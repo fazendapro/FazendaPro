@@ -5,10 +5,10 @@ import (
 )
 
 type Farm struct {
-	ID        uint      `gorm:"primaryKey"`
-	CompanyID uint      `gorm:"not null"`
-	Company   Company   `gorm:"foreignKey:CompanyID"`
-	Logo      string    // URL or path to farm logo
+	ID        uint    `gorm:"primaryKey"`
+	CompanyID uint    `gorm:"not null"`
+	Company   Company `gorm:"foreignKey:CompanyID"`
+	Logo      string
 	Users     []User    `gorm:"foreignKey:FarmID"`
 	Animals   []Animal  `gorm:"foreignKey:FarmID"`
 	Expenses  []Expense `gorm:"foreignKey:FarmID"`
@@ -16,9 +16,6 @@ type Farm struct {
 	UpdatedAt time.Time
 }
 
-// ChangeFarm allows a user to change farms
 func (f *Farm) ChangeFarm(userID uint, newFarmID uint) error {
-	// Implementation of farm change logic
-	// Here you can add validations and business rules
 	return nil
 }

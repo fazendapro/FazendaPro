@@ -94,6 +94,13 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 				r.Get("/", userHandler.GetUser)
 			})
 
+			farmSelectionHandler := handlers.NewFarmSelectionHandler(userService, cfg.JWTSecret)
+			r.Route("/farms", func(r chi.Router) {
+				r.Use(middleware.Auth(cfg.JWTSecret))
+				r.Get("/user", farmSelectionHandler.GetUserFarms)
+				r.Post("/select", farmSelectionHandler.SelectFarm)
+			})
+
 			animalService := serviceFactory.CreateAnimalService()
 			animalHandler := handlers.NewAnimalHandler(animalService)
 

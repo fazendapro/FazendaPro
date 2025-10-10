@@ -75,7 +75,6 @@ func (r *MilkCollectionRepository) Update(milkCollection *models.MilkCollection)
 	fmt.Printf("DEBUG: Repository Update - ID: %d, AnimalID: %d, Liters: %.2f\n",
 		milkCollection.ID, milkCollection.AnimalID, milkCollection.Liters)
 
-	// Verificar se o registro existe
 	var existingMilkCollection models.MilkCollection
 	err := r.db.Where("id = ?", milkCollection.ID).First(&existingMilkCollection).Error
 	if err != nil {
@@ -86,7 +85,6 @@ func (r *MilkCollectionRepository) Update(milkCollection *models.MilkCollection)
 	fmt.Printf("DEBUG: Found existing record - ID: %d, Liters: %.2f\n",
 		existingMilkCollection.ID, existingMilkCollection.Liters)
 
-	// Atualizar apenas os campos necessários
 	result := r.db.Model(&models.MilkCollection{}).Where("id = ?", milkCollection.ID).Updates(map[string]interface{}{
 		"animal_id": milkCollection.AnimalID,
 		"liters":    milkCollection.Liters,

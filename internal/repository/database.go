@@ -16,7 +16,6 @@ type Database struct {
 func NewDatabase(cfg *config.Config) (*Database, error) {
 	sslMode := "disable"
 
-	// Check if DB_SSL_MODE is explicitly set
 	if os.Getenv("DB_SSL_MODE") != "" {
 		sslMode = os.Getenv("DB_SSL_MODE")
 	} else {

@@ -19,7 +19,6 @@ func NewAnimalHandler(service *service.AnimalService) *AnimalHandler {
 	return &AnimalHandler{service: service}
 }
 
-// AnimalData representa os dados base de um animal
 type AnimalData struct {
 	ID                   uint   `json:"id"`
 	FarmID               uint   `json:"farm_id"`

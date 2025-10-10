@@ -19,7 +19,6 @@ func NewReproductionHandler(service *service.ReproductionService) *ReproductionH
 	return &ReproductionHandler{service: service}
 }
 
-// ReproductionData representa os dados de reprodução
 type ReproductionData struct {
 	ID                     uint    `json:"id"`
 	AnimalID               uint    `json:"animal_id"`
@@ -64,7 +63,6 @@ func reproductionDataToModel(data ReproductionData) models.Reproduction {
 		Observations:           data.Observations,
 	}
 
-	// Parse dates
 	if data.InseminationDate != nil && *data.InseminationDate != "" {
 		if parsedDate, err := time.Parse("2006-01-02", *data.InseminationDate); err == nil {
 			reproduction.InseminationDate = &parsedDate
@@ -126,7 +124,6 @@ func modelToReproductionResponse(reproduction *models.Reproduction) Reproduction
 		UpdatedAt: reproduction.UpdatedAt.Format("2006-01-02 15:04:05"),
 	}
 
-	// Format dates
 	if reproduction.InseminationDate != nil {
 		dateStr := reproduction.InseminationDate.Format("2006-01-02")
 		response.InseminationDate = &dateStr
@@ -334,7 +331,6 @@ func (h *ReproductionHandler) UpdateReproductionPhase(w http.ResponseWriter, r *
 		return
 	}
 
-	// Converter additionalData para o formato correto
 	additionalData := make(map[string]interface{})
 	for key, value := range req.AdditionalData {
 		additionalData[key] = value

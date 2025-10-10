@@ -5,27 +5,27 @@ import (
 )
 
 type Animal struct {
-	ID                   uint   `gorm:"primaryKey"`
-	FarmID               uint   `gorm:"not null"`
-	Farm                 Farm   `gorm:"foreignKey:FarmID"`
-	EarTagNumberLocal    int    `gorm:"not null"` // Número da brinca local
-	EarTagNumberRegister int    // Número da brinca registrado
+	ID                   uint `gorm:"primaryKey"`
+	FarmID               uint `gorm:"not null"`
+	Farm                 Farm `gorm:"foreignKey:FarmID"`
+	EarTagNumberLocal    int  `gorm:"not null"`
+	EarTagNumberRegister int
 	AnimalName           string `gorm:"not null"`
-	Sex                  int    `gorm:"not null"` // 0 = Female, 1 = Male
+	Sex                  int    `gorm:"not null"`
 	Breed                string `gorm:"not null"`
 	Type                 string `gorm:"not null"`
 	BirthDate            *time.Time
-	Photo                string  // URL or path to animal photo
-	FatherID             *uint   // FK para Animal (pai)
+	Photo                string
+	FatherID             *uint
 	Father               *Animal `gorm:"foreignKey:FatherID"`
-	MotherID             *uint   // FK para Animal (mãe)
+	MotherID             *uint
 	Mother               *Animal `gorm:"foreignKey:MotherID"`
 	Confinement          bool    `gorm:"default:false"`
-	AnimalType           int     `gorm:"not null"`  // 0 = Cattle, 1 = Buffalo, etc.
-	Status               int     `gorm:"default:0"` // 0 = Active, 1 = Inactive, 2 = Sold, 3 = Dead
+	AnimalType           int     `gorm:"not null"`
+	Status               int     `gorm:"default:0"`
 	Fertilization        bool    `gorm:"default:false"`
 	Castrated            bool    `gorm:"default:false"`
-	Purpose              int     `gorm:"default:0"` // 0 = Meat, 1 = Milk, 2 = Breeding
+	Purpose              int     `gorm:"default:0"`
 	CurrentBatch         int
 	CreatedAt            time.Time
 	UpdatedAt            time.Time

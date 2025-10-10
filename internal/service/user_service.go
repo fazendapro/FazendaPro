@@ -69,7 +69,28 @@ func (s *UserService) CreateUser(user *models.User, personData *models.Person) e
 		return fmt.Errorf("error ensuring farm exists: %w", err)
 	}
 
-	return s.repository.CreateWithPerson(user, personData)
+	if err := s.repository.CreateWithPerson(user, personData); err != nil {
+		return err
+	}
+
+	userFarm := &models.UserFarm{
+		UserID:    user.ID,
+		FarmID:    user.FarmID,
+		IsPrimary: true,
+	}
+
+	if err := s.repository.CreateUserFarm(userFarm); err != nil {
+		return err
+	}
+
+	userWithPerson, err := s.repository.FindByIDWithPerson(user.ID)
+	if err != nil {
+		return err
+	}
+
+	*user = *userWithPerson
+
+	return nil
 }
 
 func (s *UserService) GetUserWithPerson(userID uint) (*models.User, error) {
@@ -107,4 +128,25 @@ func (s *UserService) ensureFarmExists(farmID uint) error {
 	}
 
 	return s.repository.CreateDefaultFarm(farmID)
+}
+
+func (s *UserService) GetUserFarms(userID uint) ([]models.Farm, error) {
+	return s.repository.GetUserFarms(userID)
+}
+
+func (s *UserService) GetUserFarmCount(userID uint) (int64, error) {
+	return s.repository.GetUserFarmCount(userID)
+}
+
+func (s *UserService) GetUserFarmByID(userID, farmID uint) (*models.Farm, error) {
+	return s.repository.GetUserFarmByID(userID, farmID)
+}
+
+func (s *UserService) ShouldAutoSelectFarm(userID uint) (bool, error) {
+	count, err := s.GetUserFarmCount(userID)
+	if err != nil {
+		return false, err
+	}
+
+	return count == 1, nil
 }

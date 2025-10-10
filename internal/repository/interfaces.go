@@ -25,6 +25,10 @@ type UserRepositoryInterface interface {
 	Create(user *models.User) error
 	FarmExists(farmID uint) (bool, error)
 	CreateDefaultFarm(farmID uint) error
+	GetUserFarms(userID uint) ([]models.Farm, error)
+	GetUserFarmCount(userID uint) (int64, error)
+	GetUserFarmByID(userID, farmID uint) (*models.Farm, error)
+	CreateUserFarm(userFarm *models.UserFarm) error
 }
 
 type MilkCollectionRepositoryInterface interface {
