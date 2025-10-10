@@ -8,6 +8,7 @@ import { useResponsive } from '../../../../../hooks';
 import { Reproduction, ReproductionPhase, ReproductionPhaseLabels, ReproductionPhaseColors } from '../../domain/model/reproduction';
 import { CreateReproductionModal } from './create-reproduction-modal';
 import { UpdateReproductionPhaseModal } from './update-reproduction-phase-modal';
+import { CustomPagination } from '../../../../../components/lib/Pagination/custom-pagination';
 
 interface ReproductionTableRef {
   refetch: () => void;
@@ -27,6 +28,8 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [isUpdatePhaseModalVisible, setIsUpdatePhaseModalVisible] = useState(false);
   const [selectedReproduction, setSelectedReproduction] = useState<Reproduction | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(isMobile ? 5 : isTablet ? 8 : 10);
 
   const fetchReproductions = useCallback(async () => {
     if (!farm?.id) return;
@@ -74,6 +77,20 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
     setSelectedReproduction(null);
     fetchReproductions();
   };
+
+  const handlePageChange = (page: number, size: number) => {
+    setCurrentPage(page);
+    setPageSize(size);
+  };
+
+  const handleShowSizeChange = (_: number, size: number) => {
+    setCurrentPage(1);
+    setPageSize(size);
+  };
+
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const paginatedData = reproductions.slice(startIndex, endIndex);
 
   const columns = [
     {
@@ -182,16 +199,10 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
 
       <Table
         columns={columns}
-        dataSource={reproductions}
+        dataSource={paginatedData}
         rowKey="id"
         loading={loading}
-        pagination={{
-          pageSize: isMobile ? 5 : isTablet ? 8 : 10,
-          showSizeChanger: !isMobile,
-          showQuickJumper: !isMobile,
-          showTotal: !isMobile ? (total, range) =>
-            `${range[0]}-${range[1]} de ${total} registros` : undefined,
-        }}
+        pagination={false}
         scroll={{ 
           x: isMobile ? 600 : isTablet ? 700 : 800,
           y: isMobile ? 400 : undefined
@@ -200,6 +211,17 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
         style={{
           fontSize: isMobile ? '12px' : '14px'
         }}
+      />
+
+      <CustomPagination
+        current={currentPage}
+        total={reproductions.length}
+        pageSize={pageSize}
+        onChange={handlePageChange}
+        onShowSizeChange={handleShowSizeChange}
+        showSizeChanger={!isMobile}
+        showQuickJumper={!isMobile}
+        showTotal={!isMobile}
       />
 
       <CreateReproductionModal

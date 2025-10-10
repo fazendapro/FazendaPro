@@ -6,6 +6,7 @@ import { useMilkProduction } from '../../hooks/useMilkProduction'
 import { useFarm } from '../../../../../hooks/useFarm'
 import { useResponsive } from '../../../../../hooks'
 import { MilkProduction, MilkProductionFilters } from '../../domain/model/milk-production'
+import { CustomPagination } from '../../../../../components/lib/Pagination/custom-pagination'
 import dayjs from 'dayjs'
 
 const { RangePicker } = DatePicker
@@ -26,6 +27,8 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
   const { farm } = useFarm()
   const { isMobile, isTablet } = useResponsive()
   const [filters, setFilters] = useState<MilkProductionFilters>({ period: 'all' })
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(isMobile ? 5 : isTablet ? 8 : 10)
   
   const { milkProductions, loading, error, refetch } = useMilkProduction(farm.id, filters)
 
@@ -101,6 +104,20 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
     }
   }
 
+  const handlePageChange = (page: number, size: number) => {
+    setCurrentPage(page)
+    setPageSize(size)
+  }
+
+  const handleShowSizeChange = (_: number, size: number) => {
+    setCurrentPage(1)
+    setPageSize(size)
+  }
+
+  const startIndex = (currentPage - 1) * pageSize
+  const endIndex = startIndex + pageSize
+  const paginatedData = milkProductions.slice(startIndex, endIndex)
+
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '50px' }}>
@@ -164,15 +181,9 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
 
       <Table
         columns={columns}
-        dataSource={milkProductions}
+        dataSource={paginatedData}
         rowKey="id"
-        pagination={{
-          pageSize: isMobile ? 5 : isTablet ? 8 : 10,
-          showSizeChanger: !isMobile,
-          showQuickJumper: !isMobile,
-          showTotal: !isMobile ? (total, range) =>
-            `${range[0]}-${range[1]} de ${total} registros` : undefined,
-        }}
+        pagination={false}
         scroll={{
           x: isMobile ? 600 : isTablet ? 700 : 800,
           y: isMobile ? 400 : undefined
@@ -181,6 +192,17 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
         style={{
           fontSize: isMobile ? '12px' : '14px'
         }}
+      />
+
+      <CustomPagination
+        current={currentPage}
+        total={milkProductions.length}
+        pageSize={pageSize}
+        onChange={handlePageChange}
+        onShowSizeChange={handleShowSizeChange}
+        showSizeChanger={!isMobile}
+        showQuickJumper={!isMobile}
+        showTotal={!isMobile}
       />
     </div>
   )
