@@ -1,0 +1,91 @@
+package handlers
+
+import (
+	"encoding/json"
+	"net/http"
+	"strconv"
+
+	"github.com/fazendapro/FazendaPro-api/internal/models"
+	"github.com/fazendapro/FazendaPro-api/internal/service"
+)
+
+type FarmHandler struct {
+	service *service.FarmService
+}
+
+func NewFarmHandler(service *service.FarmService) *FarmHandler {
+	return &FarmHandler{service: service}
+}
+
+type UpdateFarmRequest struct {
+	Logo string `json:"logo"`
+}
+
+func (h *FarmHandler) GetFarm(w http.ResponseWriter, r *http.Request) {
+	farmIDStr := r.URL.Query().Get("id")
+	if farmIDStr == "" {
+		SendErrorResponse(w, "ID da fazenda é obrigatório", http.StatusBadRequest)
+		return
+	}
+
+	farmID, err := strconv.ParseUint(farmIDStr, 10, 32)
+	if err != nil {
+		SendErrorResponse(w, "ID da fazenda inválido", http.StatusBadRequest)
+		return
+	}
+
+	farm, err := h.service.GetFarmByID(uint(farmID))
+	if err != nil {
+		SendErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if farm == nil {
+		SendErrorResponse(w, "Fazenda não encontrada", http.StatusNotFound)
+		return
+	}
+
+	if err := h.service.LoadCompanyData(farm); err != nil {
+		SendErrorResponse(w, "Erro ao carregar dados da empresa: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	SendSuccessResponse(w, farm, "Fazenda encontrada com sucesso", http.StatusOK)
+}
+
+func (h *FarmHandler) UpdateFarm(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPut {
+		SendErrorResponse(w, "Método não permitido", http.StatusMethodNotAllowed)
+		return
+	}
+
+	farmIDStr := r.URL.Query().Get("id")
+	if farmIDStr == "" {
+		SendErrorResponse(w, "ID da fazenda é obrigatório", http.StatusBadRequest)
+		return
+	}
+
+	farmID, err := strconv.ParseUint(farmIDStr, 10, 32)
+	if err != nil {
+		SendErrorResponse(w, "ID da fazenda inválido", http.StatusBadRequest)
+		return
+	}
+
+	var req UpdateFarmRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		SendErrorResponse(w, "Erro ao decodificar JSON: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	farm := &models.Farm{
+		ID:   uint(farmID),
+		Logo: req.Logo,
+	}
+
+	if err := h.service.UpdateFarm(farm); err != nil {
+		SendErrorResponse(w, "Erro ao atualizar fazenda: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	SendSuccessResponse(w, farm, "Fazenda atualizada com sucesso", http.StatusOK)
+}

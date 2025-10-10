@@ -50,3 +50,9 @@ type ReproductionRepositoryInterface interface {
 	Update(reproduction *models.Reproduction) error
 	Delete(id uint) error
 }
+
+type FarmRepositoryInterface interface {
+	FindByID(id uint) (*models.Farm, error)
+	Update(farm *models.Farm) error
+	LoadCompanyData(farm *models.Farm) error
+}

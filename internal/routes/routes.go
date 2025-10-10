@@ -138,6 +138,15 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 				r.Put("/phase", reproductionHandler.UpdateReproductionPhase)
 				r.Delete("/", reproductionHandler.DeleteReproduction)
 			})
+
+			farmService := serviceFactory.CreateFarmService()
+			farmHandler := handlers.NewFarmHandler(farmService)
+
+			r.Route("/farm", func(r chi.Router) {
+				r.Use(middleware.Auth(cfg.JWTSecret))
+				r.Get("/", farmHandler.GetFarm)
+				r.Put("/", farmHandler.UpdateFarm)
+			})
 		})
 
 		app.Logger.Println("Rotas de animais configuradas: /api/v1/animals/farm")
