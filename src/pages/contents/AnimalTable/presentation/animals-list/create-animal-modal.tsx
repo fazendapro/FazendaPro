@@ -10,6 +10,7 @@ import { Form as CustomForm } from '../../../../../components';
 import { FieldType } from '../../../../../types/field-types';
 import { AnimalForm, AnimalSex } from '../../types/type';
 import { useResponsive } from '../../../../../hooks';
+import { useSelectedFarm } from '../../../../../hooks/useSelectedFarm';
 
 const { Option } = Select;
 
@@ -21,6 +22,7 @@ interface CreateAnimalModalProps {
 const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
   const { isMobile, isTablet } = useResponsive();
+  const { farmId } = useSelectedFarm();
 
   const methods = useForm<AnimalForm>({
     resolver: yupResolver(animalSchema),
@@ -37,7 +39,10 @@ const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({ isOpen, onClose }
 
   const onSubmit = async (data: AnimalForm) => {
     try {
-      const farmId = 1;
+      if (!farmId) {
+        toast.error('Nenhuma fazenda selecionada');
+        return;
+      }
 
       const createAnimalUseCase = CreateAnimalFactory();
       const response = await createAnimalUseCase.create({ ...data, farm_id: farmId });
