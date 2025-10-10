@@ -1,14 +1,12 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextToCalve } from '../next-to-calve';
 import { useNextToCalve } from '../../hooks/useNextToCalve';
 
-// Mock do hook
 vi.mock('../../hooks/useNextToCalve', () => ({
   useNextToCalve: vi.fn()
 }));
 
-// Mock do react-i18next
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,

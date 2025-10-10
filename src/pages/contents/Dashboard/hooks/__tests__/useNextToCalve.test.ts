@@ -8,7 +8,6 @@ vi.mock('../../../../../hooks/useFarm', () => ({
   useFarm: vi.fn()
 }));
 
-// Mock da factory
 vi.mock('../../factories/usecases/get-next-to-calve-factory', () => ({
   GetNextToCalveFactory: vi.fn(() => ({
     getNextToCalve: vi.fn()
@@ -18,7 +17,13 @@ vi.mock('../../factories/usecases/get-next-to-calve-factory', () => ({
 const mockUseFarm = vi.mocked(useFarm);
 
 describe('useNextToCalve', () => {
-  const mockFarm = { id: 1, name: 'Test Farm' };
+  const mockFarm = { 
+    id: 1, 
+    name: 'Test Farm', 
+    location: 'Test Location',
+    created_at: '2021-01-01',
+    updated_at: '2021-01-01'
+  };
   const mockNextToCalveData = [
     {
       id: 1,
@@ -46,15 +51,15 @@ describe('useNextToCalve', () => {
     vi.clearAllMocks();
     mockUseFarm.mockReturnValue({
       farm: mockFarm,
-      setFarm: vi.fn(),
-      clearFarm: vi.fn()
+      loading: false,
+      error: null,
+      refetch: vi.fn()
     });
   });
 
   it('deve retornar dados iniciais corretos', async () => {
     const { result } = renderHook(() => useNextToCalve());
 
-    // Inicialmente loading deve ser true porque o useEffect dispara automaticamente
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
     });
@@ -111,8 +116,9 @@ describe('useNextToCalve', () => {
   it('deve lidar com erro quando farm não for encontrada', async () => {
     mockUseFarm.mockReturnValue({
       farm: null,
-      setFarm: vi.fn(),
-      clearFarm: vi.fn()
+      loading: false,
+      error: null,
+      refetch: vi.fn()
     });
 
     const { result } = renderHook(() => useNextToCalve());

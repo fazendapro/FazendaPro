@@ -45,7 +45,7 @@ describe('RemoteGetNextToCalve', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockResolvedValue(mockResponse)
-    };
+    } as any;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -78,7 +78,7 @@ describe('RemoteGetNextToCalve', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockResolvedValue(mockResponse)
-    };
+    } as any;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -104,7 +104,7 @@ describe('RemoteGetNextToCalve', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockRejectedValue(mockError)
-    };
+    } as any;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -118,7 +118,7 @@ describe('RemoteGetNextToCalve', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockRejectedValue(mockError)
-    };
+    } as any;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -129,7 +129,7 @@ describe('RemoteGetNextToCalve', () => {
   it('deve lidar com erro desconhecido', async () => {
     const mockApiInstance = {
       get: vi.fn().mockRejectedValue(new Error('Unknown error'))
-    };
+    } as any;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -147,7 +147,7 @@ describe('RemoteGetNextToCalve', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockResolvedValue(mockResponse)
-    };
+    } as any;
 
     mockApi.mockReturnValue(mockApiInstance);
 
