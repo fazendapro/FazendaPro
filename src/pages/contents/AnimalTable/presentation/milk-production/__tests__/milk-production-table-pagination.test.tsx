@@ -95,7 +95,7 @@ describe('MilkProductionTable Pagination Integration', () => {
       fireEvent.click(weekOption);
       
       mockUseMilkProduction.mockReturnValue({
-        milkProductions: mockMilkProductions.slice(0, 7), // Apenas 7 registros
+        milkProductions: mockMilkProductions.slice(0, 7),
         loading: false,
         error: null,
         refetch: vi.fn()
@@ -104,7 +104,6 @@ describe('MilkProductionTable Pagination Integration', () => {
       rerender(<MilkProductionTable />);
       
       await waitFor(() => {
-        // Deve mostrar apenas 7 registros
         expect(screen.getByText('1-7 de 7 registros')).toBeInTheDocument();
       });
     });
@@ -112,7 +111,6 @@ describe('MilkProductionTable Pagination Integration', () => {
     it('deve resetar paginação ao alterar filtros', async () => {
       render(<MilkProductionTable />);
       
-      // Navegar para página 2
       const nextButton = screen.getByRole('button', { name: /next/i });
       fireEvent.click(nextButton);
       
@@ -120,25 +118,22 @@ describe('MilkProductionTable Pagination Integration', () => {
         expect(screen.getByText('Animal 11')).toBeInTheDocument();
       });
       
-      // Alterar filtro
       const periodSelect = screen.getByRole('combobox');
       fireEvent.click(periodSelect);
       
       const monthOption = screen.getByText('Mês');
       fireEvent.click(monthOption);
       
-      // Simular dados filtrados
       mockUseMilkProduction.mockReturnValue({
-        milkProductions: mockMilkProductions.slice(0, 15), // 15 registros
+        milkProductions: mockMilkProductions.slice(0, 15),
         loading: false,
         error: null,
         refetch: vi.fn()
       });
       
-      const { rerender } = render(<MilkProductionTable />);
+      render(<MilkProductionTable />);
       
       await waitFor(() => {
-        // Deve voltar para primeira página
         expect(screen.getByText('Animal 1')).toBeInTheDocument();
         expect(screen.getByText('1-10 de 15 registros')).toBeInTheDocument();
       });
@@ -149,19 +144,17 @@ describe('MilkProductionTable Pagination Integration', () => {
     it('deve aplicar filtro de intervalo de datas', async () => {
       render(<MilkProductionTable />);
       
-      // Simular seleção de intervalo de datas
       const dateRangePicker = screen.getByPlaceholderText('Data inicial');
       fireEvent.click(dateRangePicker);
       
-      // Simular dados filtrados por data
       mockUseMilkProduction.mockReturnValue({
-        milkProductions: mockMilkProductions.slice(0, 12), // 12 registros
+        milkProductions: mockMilkProductions.slice(0, 12),
         loading: false,
         error: null,
         refetch: vi.fn()
       });
       
-      const { rerender } = render(<MilkProductionTable />);
+      render(<MilkProductionTable />);
       
       await waitFor(() => {
         expect(screen.getByText('1-10 de 12 registros')).toBeInTheDocument();
@@ -179,12 +172,10 @@ describe('MilkProductionTable Pagination Integration', () => {
 
       render(<MilkProductionTable />);
       
-      // Em mobile, deve mostrar apenas 5 itens por página
       expect(screen.getByText('Animal 1')).toBeInTheDocument();
       expect(screen.getByText('Animal 5')).toBeInTheDocument();
       expect(screen.queryByText('Animal 6')).not.toBeInTheDocument();
       
-      // Não deve mostrar controles de tamanho
       expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
     });
 
@@ -197,7 +188,6 @@ describe('MilkProductionTable Pagination Integration', () => {
 
       render(<MilkProductionTable />);
       
-      // Em tablet, deve mostrar 8 itens por página
       expect(screen.getByText('Animal 1')).toBeInTheDocument();
       expect(screen.getByText('Animal 8')).toBeInTheDocument();
       expect(screen.queryByText('Animal 9')).not.toBeInTheDocument();
@@ -254,7 +244,6 @@ describe('MilkProductionTable Pagination Integration', () => {
       const onEditProduction = vi.fn();
       render(<MilkProductionTable onEditProduction={onEditProduction} />);
       
-      // Navegar para página 2
       const nextButton = screen.getByRole('button', { name: /next/i });
       fireEvent.click(nextButton);
       
@@ -262,11 +251,9 @@ describe('MilkProductionTable Pagination Integration', () => {
         expect(screen.getByText('Animal 11')).toBeInTheDocument();
       });
       
-      // Clicar em editar
       const editButton = screen.getAllByRole('button', { name: /edit/i })[0];
       fireEvent.click(editButton);
-      
-      // Deve manter a página atual
+
       expect(screen.getByText('Animal 11')).toBeInTheDocument();
       expect(onEditProduction).toHaveBeenCalled();
     });

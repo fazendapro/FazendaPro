@@ -1,11 +1,11 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { useAuth } from '../../../pages/Login/hooks/useAuth'
+import { useAuth } from '../../../contexts/AuthContext'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { MobileSidebar } from '../mobile-sidebar'
 
-vi.mock('../../../pages/Login/hooks/useAuth', () => ({
+vi.mock('../../../contexts/AuthContext', () => ({
   useAuth: vi.fn()
 }))
 

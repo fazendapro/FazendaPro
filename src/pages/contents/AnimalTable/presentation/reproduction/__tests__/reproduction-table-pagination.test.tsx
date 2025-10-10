@@ -5,7 +5,6 @@ import { useReproduction } from '../../../hooks/useReproduction';
 import { useFarm } from '../../../../../../hooks/useFarm';
 import { useResponsive } from '../../../../../../hooks';
 
-// Mocks
 vi.mock('../../../hooks/useReproduction');
 vi.mock('../../../../../../hooks/useFarm');
 vi.mock('../../../../../../hooks');
@@ -53,12 +52,10 @@ describe('ReproductionTable Pagination Integration', () => {
       render(<ReproductionTable onAddReproduction={vi.fn()} onEditReproduction={vi.fn()} />);
       
       await waitFor(() => {
-        // Deve mostrar apenas os primeiros 10 registros
         expect(screen.getByText('Animal 1')).toBeInTheDocument();
         expect(screen.getByText('Animal 10')).toBeInTheDocument();
         expect(screen.queryByText('Animal 11')).not.toBeInTheDocument();
         
-        // Deve mostrar contador correto
         expect(screen.getByText('1-10 de 35 registros')).toBeInTheDocument();
       });
     });
@@ -74,7 +71,6 @@ describe('ReproductionTable Pagination Integration', () => {
       fireEvent.click(nextButton);
       
       await waitFor(() => {
-        // Deve mostrar registros 11-20
         expect(screen.getByText('Animal 11')).toBeInTheDocument();
         expect(screen.getByText('Animal 20')).toBeInTheDocument();
         expect(screen.queryByText('Animal 1')).not.toBeInTheDocument();
@@ -92,7 +88,6 @@ describe('ReproductionTable Pagination Integration', () => {
       fireEvent.click(page4Button);
       
       await waitFor(() => {
-        // Deve mostrar registros 31-35 (última página)
         expect(screen.getByText('Animal 31')).toBeInTheDocument();
         expect(screen.getByText('Animal 35')).toBeInTheDocument();
         expect(screen.queryByText('Animal 30')).not.toBeInTheDocument();
@@ -108,12 +103,10 @@ describe('ReproductionTable Pagination Integration', () => {
         expect(screen.getByText('Animal 1')).toBeInTheDocument();
       });
       
-      // Simular filtro por fase
       const phaseFilter = screen.getByRole('button', { name: /vazias/i });
       fireEvent.click(phaseFilter);
       
       await waitFor(() => {
-        // Deve mostrar apenas registros da fase selecionada
         expect(screen.getByText('1-10 de 35 registros')).toBeInTheDocument();
       });
     });
@@ -127,7 +120,6 @@ describe('ReproductionTable Pagination Integration', () => {
         expect(screen.getByText('Animal 1')).toBeInTheDocument();
       });
       
-      // Navegar para página 2
       const nextButton = screen.getByRole('button', { name: /next/i });
       fireEvent.click(nextButton);
       
@@ -135,11 +127,9 @@ describe('ReproductionTable Pagination Integration', () => {
         expect(screen.getByText('Animal 11')).toBeInTheDocument();
       });
       
-      // Clicar em editar fase
       const editButton = screen.getAllByRole('button', { name: /edit/i })[0];
       fireEvent.click(editButton);
       
-      // Deve manter a página atual
       expect(screen.getByText('Animal 11')).toBeInTheDocument();
     });
 
@@ -150,7 +140,6 @@ describe('ReproductionTable Pagination Integration', () => {
         expect(screen.getByText('Animal 1')).toBeInTheDocument();
       });
       
-      // Navegar para página 2
       const nextButton = screen.getByRole('button', { name: /next/i });
       fireEvent.click(nextButton);
       
@@ -158,16 +147,13 @@ describe('ReproductionTable Pagination Integration', () => {
         expect(screen.getByText('Animal 11')).toBeInTheDocument();
       });
       
-      // Clicar em excluir
       const deleteButton = screen.getAllByRole('button', { name: /delete/i })[0];
       fireEvent.click(deleteButton);
       
-      // Confirmar exclusão
       const confirmButton = screen.getByRole('button', { name: /sim/i });
       fireEvent.click(confirmButton);
       
       await waitFor(() => {
-        // Deve manter a página atual após exclusão
         expect(screen.getByText('Animal 11')).toBeInTheDocument();
       });
     });
@@ -184,12 +170,10 @@ describe('ReproductionTable Pagination Integration', () => {
       render(<ReproductionTable onAddReproduction={vi.fn()} onEditReproduction={vi.fn()} />);
       
       await waitFor(() => {
-        // Em mobile, deve mostrar apenas 5 itens por página
         expect(screen.getByText('Animal 1')).toBeInTheDocument();
         expect(screen.getByText('Animal 5')).toBeInTheDocument();
         expect(screen.queryByText('Animal 6')).not.toBeInTheDocument();
         
-        // Não deve mostrar controles de tamanho
         expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
       });
     });
@@ -204,7 +188,6 @@ describe('ReproductionTable Pagination Integration', () => {
       render(<ReproductionTable onAddReproduction={vi.fn()} onEditReproduction={vi.fn()} />);
       
       await waitFor(() => {
-        // Em tablet, deve mostrar 8 itens por página
         expect(screen.getByText('Animal 1')).toBeInTheDocument();
         expect(screen.getByText('Animal 8')).toBeInTheDocument();
         expect(screen.queryByText('Animal 9')).not.toBeInTheDocument();
@@ -267,7 +250,6 @@ describe('ReproductionTable Pagination Integration', () => {
         expect(screen.getByText('Animal 1')).toBeInTheDocument();
       });
       
-      // Navegar para página 2
       const nextButton = screen.getByRole('button', { name: /next/i });
       fireEvent.click(nextButton);
       
@@ -275,7 +257,6 @@ describe('ReproductionTable Pagination Integration', () => {
         expect(screen.getByText('Animal 11')).toBeInTheDocument();
       });
       
-      // Simular adição de novo registro
       const newReproduction = {
         id: 36,
         animal_id: 36,
@@ -298,7 +279,6 @@ describe('ReproductionTable Pagination Integration', () => {
       const { rerender } = render(<ReproductionTable onAddReproduction={vi.fn()} onEditReproduction={vi.fn()} />);
       
       await waitFor(() => {
-        // Deve voltar para primeira página
         expect(screen.getByText('Animal 1')).toBeInTheDocument();
         expect(screen.getByText('1-10 de 36 registros')).toBeInTheDocument();
       });
