@@ -44,3 +44,8 @@ func (f *ServiceFactory) CreateSaleService() SaleService {
 	animalRepo := f.repoFactory.CreateAnimalRepository()
 	return NewSaleService(saleRepo, animalRepo)
 }
+
+func (f *ServiceFactory) CreateDebtService() *DebtService {
+	debtRepo := f.repoFactory.CreateDebtRepository()
+	return NewDebtService(debtRepo)
+}

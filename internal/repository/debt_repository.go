@@ -1,0 +1,69 @@
+package repository
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/fazendapro/FazendaPro-api/internal/models"
+	"gorm.io/gorm"
+)
+
+type DebtRepository struct {
+	db *gorm.DB
+}
+
+func NewDebtRepository(db *gorm.DB) DebtRepositoryInterface {
+	return &DebtRepository{db: db}
+}
+
+func (r *DebtRepository) Create(debt *models.Debt) error {
+	return r.db.Create(debt).Error
+}
+
+func (r *DebtRepository) FindByID(id uint) (*models.Debt, error) {
+	var debt models.Debt
+	err := r.db.First(&debt, id).Error
+	if err != nil {
+		return nil, err
+	}
+	return &debt, nil
+}
+
+func (r *DebtRepository) FindAllWithPagination(page, limit int, year, month *int) ([]models.Debt, int64, error) {
+	var debts []models.Debt
+	var total int64
+
+	query := r.db.Model(&models.Debt{})
+
+	if year != nil {
+		startOfYear := time.Date(*year, 1, 1, 0, 0, 0, 0, time.UTC)
+		endOfYear := time.Date(*year+1, 1, 1, 0, 0, 0, 0, time.UTC)
+		query = query.Where("created_at >= ? AND created_at < ?", startOfYear, endOfYear)
+	}
+
+	if month != nil && year != nil {
+		startOfMonth := time.Date(*year, time.Month(*month), 1, 0, 0, 0, 0, time.UTC)
+		var endOfMonth time.Time
+		if *month == 12 {
+			endOfMonth = time.Date(*year+1, 1, 1, 0, 0, 0, 0, time.UTC)
+		} else {
+			endOfMonth = time.Date(*year, time.Month(*month+1), 1, 0, 0, 0, 0, time.UTC)
+		}
+		query = query.Where("created_at >= ? AND created_at < ?", startOfMonth, endOfMonth)
+	}
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, fmt.Errorf("error counting debts: %w", err)
+	}
+
+	offset := (page - 1) * limit
+	if err := query.Order("created_at DESC").Offset(offset).Limit(limit).Find(&debts).Error; err != nil {
+		return nil, 0, fmt.Errorf("error finding debts: %w", err)
+	}
+
+	return debts, total, nil
+}
+
+func (r *DebtRepository) Delete(id uint) error {
+	return r.db.Delete(&models.Debt{}, id).Error
+}

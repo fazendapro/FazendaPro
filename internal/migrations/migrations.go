@@ -45,6 +45,7 @@ func RunMigrations(db *gorm.DB) error {
 		{"018_create_user_farms_table", createUserFarmsTable},
 		{"019_migrate_users_to_user_farms", migrateUsersToUserFarms},
 		{"020_create_sales_table", createSalesTable},
+		{"021_create_debts_table", createDebtsTable},
 	}
 
 	for _, migration := range migrations {
@@ -370,5 +371,16 @@ func createSalesTable(db *gorm.DB) error {
 	}
 
 	log.Printf("Sales table created successfully")
+	return nil
+}
+
+func createDebtsTable(db *gorm.DB) error {
+	log.Printf("Creating debts table...")
+
+	if err := db.AutoMigrate(&models.Debt{}); err != nil {
+		return fmt.Errorf("error creating debts table: %w", err)
+	}
+
+	log.Printf("Debts table created successfully")
 	return nil
 }

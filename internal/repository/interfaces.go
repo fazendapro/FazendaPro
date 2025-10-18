@@ -57,3 +57,10 @@ type FarmRepositoryInterface interface {
 	Update(farm *models.Farm) error
 	LoadCompanyData(farm *models.Farm) error
 }
+
+type DebtRepositoryInterface interface {
+	Create(debt *models.Debt) error
+	FindByID(id uint) (*models.Debt, error)
+	FindAllWithPagination(page, limit int, year, month *int) ([]models.Debt, int64, error)
+	Delete(id uint) error
+}

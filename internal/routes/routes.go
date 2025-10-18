@@ -32,6 +32,19 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 		w.Write([]byte("FazendaPro API is running!"))
 	})
 
+	if db != nil && db.DB != nil {
+		repoFactory := repository.NewRepositoryFactory(db)
+		serviceFactory := service.NewServiceFactory(repoFactory)
+		debtService := serviceFactory.CreateDebtService()
+		debtHandler := handlers.NewDebtHandler(debtService)
+
+		r.Route("/debts", func(r chi.Router) {
+			r.Post("/", debtHandler.CreateDebt)
+			r.Get("/", debtHandler.GetDebts)
+			r.Delete("/", debtHandler.DeleteDebt)
+		})
+	}
+
 	r.Post("/init-data", func(w http.ResponseWriter, r *http.Request) {
 		if db == nil || db.DB == nil {
 			http.Error(w, "Database not available", http.StatusInternalServerError)

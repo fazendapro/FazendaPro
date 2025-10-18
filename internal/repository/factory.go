@@ -35,3 +35,7 @@ func (f *RepositoryFactory) CreateFarmRepository() FarmRepositoryInterface {
 func (f *RepositoryFactory) CreateSaleRepository() SaleRepository {
 	return NewSaleRepository(f.db.DB)
 }
+
+func (f *RepositoryFactory) CreateDebtRepository() DebtRepositoryInterface {
+	return NewDebtRepository(f.db.DB)
+}
