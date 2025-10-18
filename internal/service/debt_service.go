@@ -63,3 +63,15 @@ func (s *DebtService) DeleteDebt(id uint) error {
 
 	return s.repository.Delete(id)
 }
+
+func (s *DebtService) GetTotalByPersonInMonth(year, month int) ([]repository.PersonTotal, error) {
+	if year < 2000 || year > 3000 {
+		return nil, errors.New("ano deve estar entre 2000 e 3000")
+	}
+
+	if month < 1 || month > 12 {
+		return nil, errors.New("mês deve estar entre 1 e 12")
+	}
+
+	return s.repository.GetTotalByPersonInMonth(year, month)
+}

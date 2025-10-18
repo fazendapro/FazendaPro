@@ -63,4 +63,5 @@ type DebtRepositoryInterface interface {
 	FindByID(id uint) (*models.Debt, error)
 	FindAllWithPagination(page, limit int, year, month *int) ([]models.Debt, int64, error)
 	Delete(id uint) error
+	GetTotalByPersonInMonth(year, month int) ([]PersonTotal, error)
 }

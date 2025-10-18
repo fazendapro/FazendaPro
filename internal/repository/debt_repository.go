@@ -8,6 +8,11 @@ import (
 	"gorm.io/gorm"
 )
 
+type PersonTotal struct {
+	Person string  `json:"person"`
+	Total  float64 `json:"total"`
+}
+
 type DebtRepository struct {
 	db *gorm.DB
 }
@@ -66,4 +71,29 @@ func (r *DebtRepository) FindAllWithPagination(page, limit int, year, month *int
 
 func (r *DebtRepository) Delete(id uint) error {
 	return r.db.Delete(&models.Debt{}, id).Error
+}
+
+func (r *DebtRepository) GetTotalByPersonInMonth(year, month int) ([]PersonTotal, error) {
+	var results []PersonTotal
+
+	startOfMonth := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
+	var endOfMonth time.Time
+	if month == 12 {
+		endOfMonth = time.Date(year+1, 1, 1, 0, 0, 0, 0, time.UTC)
+	} else {
+		endOfMonth = time.Date(year, time.Month(month+1), 1, 0, 0, 0, 0, time.UTC)
+	}
+
+	err := r.db.Model(&models.Debt{}).
+		Select("person, SUM(value) as total").
+		Where("created_at >= ? AND created_at < ?", startOfMonth, endOfMonth).
+		Group("person").
+		Order("total DESC").
+		Scan(&results).Error
+
+	if err != nil {
+		return nil, fmt.Errorf("error calculating total by person: %w", err)
+	}
+
+	return results, nil
 }

@@ -158,3 +158,40 @@ func (h *DebtHandler) DeleteDebt(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Dívida deletada com sucesso"})
 }
+
+func (h *DebtHandler) GetTotalByPerson(w http.ResponseWriter, r *http.Request) {
+	yearStr := r.URL.Query().Get("year")
+	monthStr := r.URL.Query().Get("month")
+
+	if yearStr == "" || monthStr == "" {
+		http.Error(w, "Parâmetros 'year' e 'month' são obrigatórios", http.StatusBadRequest)
+		return
+	}
+
+	year, err := strconv.Atoi(yearStr)
+	if err != nil {
+		http.Error(w, "Ano deve ser um número válido", http.StatusBadRequest)
+		return
+	}
+
+	month, err := strconv.Atoi(monthStr)
+	if err != nil {
+		http.Error(w, "Mês deve ser um número válido", http.StatusBadRequest)
+		return
+	}
+
+	totals, err := h.service.GetTotalByPersonInMonth(year, month)
+	if err != nil {
+		http.Error(w, "Erro ao calcular total por pessoa: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	response := map[string]interface{}{
+		"year":   year,
+		"month":  month,
+		"totals": totals,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
