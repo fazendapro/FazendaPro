@@ -8,7 +8,7 @@ export class RemoteUpdateFarm implements UpdateFarmDomain {
   async update(farmId: number, params: UpdateFarmParams): Promise<UpdateFarmResponse> {
     try {
       const { data, status } = await api().put(
-        `/api/v1/farm?id=${farmId}`,
+        `/farm?id=${farmId}`,
         params,
         {
           headers: {
@@ -36,7 +36,7 @@ export class RemoteGetFarm implements GetFarmDomain {
   async get(farmId: number): Promise<GetFarmResponse> {
     try {
       const { data, status } = await api().get(
-        `/api/v1/farm?id=${farmId}`,
+        `/farm?id=${farmId}`,
         {
           headers: {
             'Content-Type': 'application/json'

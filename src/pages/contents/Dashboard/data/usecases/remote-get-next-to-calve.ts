@@ -9,7 +9,7 @@ export class RemoteGetNextToCalve implements GetNextToCalveDomain {
   async getNextToCalve(params: GetNextToCalveParams): Promise<GetNextToCalveResponse> {
     try {
       const { data, status } = await api().get(
-        '/api/v1/reproductions/next-to-calve',
+        '/reproductions/next-to-calve',
         {
           params: {
             farmId: params.farm_id

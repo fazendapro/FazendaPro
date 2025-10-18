@@ -55,12 +55,7 @@ const Login = () => {
       type: 'password',
       placeholder: t('passwordPlaceholder'),
       isRequired: true,
-    },
-    {
-      name: 'forgotPassword',
-      label: t('forgotPassword'),
-      type: 'link',
-    },
+    }
   ];
 
   return (

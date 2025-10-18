@@ -22,7 +22,7 @@ export class RemoteCreateMilkProduction implements CreateMilkProductionUseCase {
       liters: Number(data.liters)
     }
     
-    const response = await api(this.domain).post('/api/v1/milk-collections', requestData, {
+    const response = await api(this.domain).post('/milk-collections', requestData, {
       headers
     })
     

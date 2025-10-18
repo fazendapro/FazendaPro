@@ -17,7 +17,7 @@ export class RemoteGetMilkProductions implements GetMilkProductionsUseCase {
       params.end_date = filters.endDate
     }
 
-    const response = await api(this.domain).get(`/api/v1/milk-collections/farm/${farmId}`, { params })
+    const response = await api(this.domain).get(`/milk-collections/farm/${farmId}`, { params })
 
     if (response.data.success) {
       return response.data.data
