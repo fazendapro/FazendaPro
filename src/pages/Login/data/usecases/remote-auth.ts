@@ -12,7 +12,7 @@ export class RemoteAuth implements AuthDomain {
   async refreshToken({ refresh_token }: RefreshTokenParams): Promise<RefreshTokenResponse> {
     try {
       const { data, status } = await axiosInstance.post(
-        '/api/v1/auth/refresh',
+        '/auth/refresh',
         { refresh_token },
         {
           headers: {
@@ -40,7 +40,7 @@ export class RemoteAuth implements AuthDomain {
   async logout({ refresh_token }: LogoutParams): Promise<LogoutResponse> {
     try {
       const { data, status } = await axiosInstance.post(
-        '/api/v1/auth/logout',
+        '/auth/logout',
         { refresh_token },
         {
           headers: {

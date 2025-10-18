@@ -9,7 +9,7 @@ export class RemoteCreateAnimal implements CreateAnimalDomain {
   async create(params: CreateAnimalParams): Promise<CreateAnimalResponse> {
     try {
       const { data, status } = await api().post(
-        '/api/v1/animals',
+        '/animals',
         params,
         {
           headers: {

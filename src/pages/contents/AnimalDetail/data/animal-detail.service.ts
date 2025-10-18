@@ -1,19 +1,4 @@
-import axios from 'axios';
-
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+import { api } from '../../../../../src/components/services/axios/api';
 import { 
   AnimalDetailResponse, 
   AnimalDetailUpdateRequest, 
@@ -31,7 +16,7 @@ interface ApiError {
 export class AnimalDetailService {
   async getAnimalById(id: number): Promise<AnimalDetailResponse> {
     try {
-      const response = await api.get(`/animals?id=${id}`);
+      const response = await api().get(`/animals?id=${id}`);
       return {
         success: true,
         data: response.data.data,
@@ -47,7 +32,7 @@ export class AnimalDetailService {
 
   async updateAnimal(animalData: AnimalDetailUpdateRequest): Promise<AnimalDetailResponse> {
     try {
-      const response = await api.put('/animals', animalData);
+      const response = await api().put('/animals', animalData);
       return {
         success: true,
         data: response.data.data,
@@ -63,7 +48,7 @@ export class AnimalDetailService {
 
   async getAnimalsBySex(farmId: number, sex: number): Promise<AnimalParentsResponse> {
     try {
-      const response = await api.get(`/animals/sex?farmId=${farmId}&sex=${sex}`);
+      const response = await api().get(`/animals/sex?farmId=${farmId}&sex=${sex}`);
       return {
         success: true,
         data: response.data.data,
@@ -83,7 +68,7 @@ export class AnimalDetailService {
       formData.append('photo', photo);
       formData.append('animal_id', animalId.toString());
 
-      const response = await api.post('/animals/photo', formData, {
+      const response = await api().post('/animals/photo', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

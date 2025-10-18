@@ -12,7 +12,7 @@ export class RemoteLogin implements LoginDomain {
   async authenticate({ email, password }: LoginParams): Promise<LoginResponse> {
     try {
       const { data, status } = await axiosInstance.post(
-        '/api/v1/auth/login',
+        '/auth/login',
         { email, password },
         {
           headers: {

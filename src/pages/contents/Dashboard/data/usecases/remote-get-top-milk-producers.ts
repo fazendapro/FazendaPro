@@ -21,7 +21,7 @@ export class RemoteGetTopMilkProducers implements GetTopMilkProducersDomain {
       }
 
       const { data, status } = await api().get(
-        '/api/v1/milk-collections/top-producers',
+        '/milk-collections/top-producers',
         {
           params: queryParams,
           headers: {

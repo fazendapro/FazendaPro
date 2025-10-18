@@ -9,7 +9,7 @@ export class RemoteGetAnimalsByFarm implements GetAnimalsByFarmDomain {
   async getAnimalsByFarm(params: GetAnimalsByFarmParams): Promise<GetAnimalsByFarmResponse> {
     try {
       const { data, status } = await api().get(
-        '/api/v1/animals/farm',
+        '/animals/farm',
         {
           params: {
             farmId: params.farm_id

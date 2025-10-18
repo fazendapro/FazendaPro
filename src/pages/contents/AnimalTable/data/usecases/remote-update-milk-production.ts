@@ -23,7 +23,7 @@ export class RemoteUpdateMilkProduction implements UpdateMilkProductionUseCase {
       date: data.date
     }
 
-    const response = await api(this.domain).put(`/api/v1/milk-collections/${data.id}`, requestData, {
+    const response = await api(this.domain).put(`/milk-collections/${data.id}`, requestData, {
       headers
     })
 

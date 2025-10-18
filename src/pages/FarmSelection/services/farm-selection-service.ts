@@ -33,7 +33,7 @@ export interface SelectFarmResponse {
 export const farmSelectionService = {
   async getUserFarms(): Promise<GetUserFarmsResponse> {
     try {
-      const response = await api().get<GetUserFarmsResponse>('/api/v1/farms/user');
+      const response = await api().get<GetUserFarmsResponse>('/farms/user');
       return response.data;
     } catch (error) {
       throw new Error('Erro ao buscar fazendas do usuário');
@@ -42,7 +42,7 @@ export const farmSelectionService = {
 
   async selectFarm(farmId: number): Promise<SelectFarmResponse> {
     try {
-      const response = await api().post<SelectFarmResponse>('/api/v1/farms/select', {
+      const response = await api().post<SelectFarmResponse>('/farms/select', {
         farm_id: farmId,
       });
       return response.data;
