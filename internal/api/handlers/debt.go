@@ -7,6 +7,7 @@ import (
 
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
+	"github.com/go-chi/chi/v5"
 )
 
 type DebtHandler struct {
@@ -68,39 +69,33 @@ func (h *DebtHandler) CreateDebt(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *DebtHandler) GetDebts(w http.ResponseWriter, r *http.Request) {
-	// Parse query parameters
 	pageStr := r.URL.Query().Get("page")
 	limitStr := r.URL.Query().Get("limit")
 	yearStr := r.URL.Query().Get("year")
 	monthStr := r.URL.Query().Get("month")
 
-	// Default values
 	page := 1
 	limit := 10
 	var year, month *int
 
-	// Parse page
 	if pageStr != "" {
 		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
 			page = p
 		}
 	}
 
-	// Parse limit
 	if limitStr != "" {
 		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
 			limit = l
 		}
 	}
 
-	// Parse year
 	if yearStr != "" {
 		if y, err := strconv.Atoi(yearStr); err == nil {
 			year = &y
 		}
 	}
 
-	// Parse month
 	if monthStr != "" {
 		if m, err := strconv.Atoi(monthStr); err == nil && m >= 1 && m <= 12 {
 			month = &m
@@ -113,7 +108,6 @@ func (h *DebtHandler) GetDebts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Convert to response format
 	debtResponses := make([]DebtResponse, len(debts))
 	for i, debt := range debts {
 		debtResponses[i] = DebtResponse{
@@ -137,7 +131,7 @@ func (h *DebtHandler) GetDebts(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *DebtHandler) DeleteDebt(w http.ResponseWriter, r *http.Request) {
-	idStr := r.URL.Query().Get("id")
+	idStr := chi.URLParam(r, "id")
 	if idStr == "" {
 		http.Error(w, "ID é obrigatório", http.StatusBadRequest)
 		return

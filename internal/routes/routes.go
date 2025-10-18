@@ -41,7 +41,7 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 		r.Route("/debts", func(r chi.Router) {
 			r.Post("/", debtHandler.CreateDebt)
 			r.Get("/", debtHandler.GetDebts)
-			r.Delete("/", debtHandler.DeleteDebt)
+			r.Delete("/{id}", debtHandler.DeleteDebt)
 			r.Get("/total-by-person", debtHandler.GetTotalByPerson)
 		})
 	}
