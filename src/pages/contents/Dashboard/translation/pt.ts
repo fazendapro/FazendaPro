@@ -12,7 +12,7 @@ export const translations = {
     revenue: "Receita",
     profit: "Lucro",
     cost: "Custo",
-    salesOverview: "Vendas Visão Geral",
+    salesOverview: "Visão Geral",
     suppliers: "Fornecedores",
     categories: "Categorias",
     weekly: "Semanalmente",
