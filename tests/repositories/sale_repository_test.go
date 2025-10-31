@@ -17,7 +17,6 @@ func setupSaleTestDB(t *testing.T) *gorm.DB {
 	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 	require.NoError(t, err)
 
-	// Auto migrate tables
 	err = db.AutoMigrate(&models.Farm{}, &models.Animal{}, &models.Sale{})
 	require.NoError(t, err)
 
@@ -28,8 +27,7 @@ func TestSaleRepository_Create(t *testing.T) {
 	db := setupSaleTestDB(t)
 	repo := repository.NewSaleRepository(db)
 
-	// Create test data
-	farm := &models.Farm{Name: "Test Farm"}
+	farm := &models.Farm{FarmName: "Test Farm"}
 	db.Create(farm)
 
 	animal := &models.Animal{
@@ -59,8 +57,7 @@ func TestSaleRepository_GetByID(t *testing.T) {
 	db := setupSaleTestDB(t)
 	repo := repository.NewSaleRepository(db)
 
-	// Create test data
-	farm := &models.Farm{Name: "Test Farm"}
+	farm := &models.Farm{FarmName: "Test Farm"}
 	db.Create(farm)
 
 	animal := &models.Animal{
@@ -93,8 +90,7 @@ func TestSaleRepository_GetByFarmID(t *testing.T) {
 	db := setupSaleTestDB(t)
 	repo := repository.NewSaleRepository(db)
 
-	// Create test data
-	farm := &models.Farm{Name: "Test Farm"}
+	farm := &models.Farm{FarmName: "Test Farm"}
 	db.Create(farm)
 
 	animal := &models.Animal{
@@ -129,7 +125,7 @@ func TestSaleRepository_GetByFarmID(t *testing.T) {
 	sales, err := repo.GetByFarmID(context.Background(), farm.ID)
 	assert.NoError(t, err)
 	assert.Len(t, sales, 2)
-	assert.Equal(t, sale2.ID, sales[0].ID) // Should be ordered by sale_date DESC
+	assert.Equal(t, sale2.ID, sales[0].ID)
 	assert.Equal(t, sale1.ID, sales[1].ID)
 }
 
@@ -137,8 +133,7 @@ func TestSaleRepository_GetByAnimalID(t *testing.T) {
 	db := setupSaleTestDB(t)
 	repo := repository.NewSaleRepository(db)
 
-	// Create test data
-	farm := &models.Farm{Name: "Test Farm"}
+	farm := &models.Farm{FarmName: "Test Farm"}
 	db.Create(farm)
 
 	animal := &models.Animal{
@@ -170,7 +165,6 @@ func TestSaleRepository_GetByDateRange(t *testing.T) {
 	db := setupSaleTestDB(t)
 	repo := repository.NewSaleRepository(db)
 
-	// Create test data
 	farm := &models.Farm{Name: "Test Farm"}
 	db.Create(farm)
 
@@ -192,7 +186,7 @@ func TestSaleRepository_GetByDateRange(t *testing.T) {
 		FarmID:    farm.ID,
 		BuyerName: "João Silva",
 		Price:     1500.50,
-		SaleDate:  now.Add(-3 * 24 * time.Hour), // Within range
+		SaleDate:  now.Add(-3 * 24 * time.Hour),
 		Notes:     "Within range",
 	}
 	db.Create(sale1)
@@ -202,7 +196,7 @@ func TestSaleRepository_GetByDateRange(t *testing.T) {
 		FarmID:    farm.ID,
 		BuyerName: "Maria Santos",
 		Price:     2000.00,
-		SaleDate:  now.Add(-10 * 24 * time.Hour), // Outside range
+		SaleDate:  now.Add(-10 * 24 * time.Hour),
 		Notes:     "Outside range",
 	}
 	db.Create(sale2)
@@ -217,7 +211,6 @@ func TestSaleRepository_Update(t *testing.T) {
 	db := setupSaleTestDB(t)
 	repo := repository.NewSaleRepository(db)
 
-	// Create test data
 	farm := &models.Farm{Name: "Test Farm"}
 	db.Create(farm)
 
@@ -240,7 +233,6 @@ func TestSaleRepository_Update(t *testing.T) {
 	}
 	db.Create(sale)
 
-	// Update sale
 	sale.BuyerName = "Updated Buyer"
 	sale.Price = 2000.00
 	sale.Notes = "Updated notes"
@@ -248,7 +240,6 @@ func TestSaleRepository_Update(t *testing.T) {
 	err := repo.Update(context.Background(), sale)
 	assert.NoError(t, err)
 
-	// Verify update
 	updatedSale, err := repo.GetByID(context.Background(), sale.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, "Updated Buyer", updatedSale.BuyerName)
@@ -260,7 +251,6 @@ func TestSaleRepository_Delete(t *testing.T) {
 	db := setupSaleTestDB(t)
 	repo := repository.NewSaleRepository(db)
 
-	// Create test data
 	farm := &models.Farm{Name: "Test Farm"}
 	db.Create(farm)
 
@@ -286,7 +276,61 @@ func TestSaleRepository_Delete(t *testing.T) {
 	err := repo.Delete(context.Background(), sale.ID)
 	assert.NoError(t, err)
 
-	// Verify deletion
 	_, err = repo.GetByID(context.Background(), sale.ID)
 	assert.Error(t, err)
+}
+
+func TestSaleRepository_GetMonthlySalesCount(t *testing.T) {
+	db := setupSaleTestDB(t)
+	repo := repository.NewSaleRepository(db)
+
+	farm := &models.Farm{Name: "Test Farm"}
+	db.Create(farm)
+
+	animal := &models.Animal{
+		FarmID:     farm.ID,
+		AnimalName: "Test Animal",
+		Sex:        0,
+		Breed:      "Holstein",
+		Type:       "Cattle",
+	}
+	db.Create(animal)
+
+	now := time.Now()
+	startOfMonth := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+	endOfMonth := startOfMonth.AddDate(0, 1, 0).Add(-time.Nanosecond)
+
+	sale1 := &models.Sale{
+		AnimalID:  animal.ID,
+		FarmID:    farm.ID,
+		BuyerName: "João Silva",
+		Price:     1500.50,
+		SaleDate:  startOfMonth.Add(5 * 24 * time.Hour),
+		Notes:     "Sale in current month",
+	}
+	db.Create(sale1)
+
+	sale2 := &models.Sale{
+		AnimalID:  animal.ID,
+		FarmID:    farm.ID,
+		BuyerName: "Maria Santos",
+		Price:     2000.00,
+		SaleDate:  startOfMonth.Add(10 * 24 * time.Hour),
+		Notes:     "Sale in current month",
+	}
+	db.Create(sale2)
+
+	sale3 := &models.Sale{
+		AnimalID:  animal.ID,
+		FarmID:    farm.ID,
+		BuyerName: "Pedro Costa",
+		Price:     1800.00,
+		SaleDate:  startOfMonth.AddDate(0, -1, 0),
+		Notes:     "Sale in previous month",
+	}
+	db.Create(sale3)
+
+	count, err := repo.GetMonthlySalesCount(context.Background(), farm.ID, startOfMonth, endOfMonth)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(2), count)
 }
