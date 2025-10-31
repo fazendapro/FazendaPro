@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/fazendapro/FazendaPro-api/internal/models"
+	"github.com/fazendapro/FazendaPro-api/internal/repository"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -58,6 +59,22 @@ func (m *MockSaleRepository) GetMonthlySalesCount(ctx context.Context, farmID ui
 	return args.Get(0).(int64), args.Error(1)
 }
 
+func (m *MockSaleRepository) GetMonthlySalesData(ctx context.Context, farmID uint, months int) ([]repository.MonthlySalesData, error) {
+	args := m.Called(ctx, farmID, months)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]repository.MonthlySalesData), args.Error(1)
+}
+
+func (m *MockSaleRepository) GetOverviewStats(ctx context.Context, farmID uint) (*repository.OverviewStats, error) {
+	args := m.Called(ctx, farmID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*repository.OverviewStats), args.Error(1)
+}
+
 func (m *MockSaleRepository) Update(ctx context.Context, sale *models.Sale) error {
 	args := m.Called(ctx, sale)
 	return args.Error(0)
@@ -72,34 +89,55 @@ type MockAnimalRepository struct {
 	mock.Mock
 }
 
-func (m *MockAnimalRepository) GetByID(ctx context.Context, id uint) (*models.Animal, error) {
-	args := m.Called(ctx, id)
+func (m *MockAnimalRepository) FindByID(id uint) (*models.Animal, error) {
+	args := m.Called(id)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
 	return args.Get(0).(*models.Animal), args.Error(1)
 }
 
-func (m *MockAnimalRepository) Update(ctx context.Context, animal *models.Animal) error {
-	args := m.Called(ctx, animal)
-	return args.Error(0)
-}
-
-func (m *MockAnimalRepository) Create(ctx context.Context, animal *models.Animal) error {
-	args := m.Called(ctx, animal)
-	return args.Error(0)
-}
-
-func (m *MockAnimalRepository) GetByFarmID(ctx context.Context, farmID uint) ([]*models.Animal, error) {
-	args := m.Called(ctx, farmID)
+func (m *MockAnimalRepository) FindByFarmID(farmID uint) ([]models.Animal, error) {
+	args := m.Called(farmID)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).([]*models.Animal), args.Error(1)
+	return args.Get(0).([]models.Animal), args.Error(1)
 }
 
-func (m *MockAnimalRepository) Delete(ctx context.Context, id uint) error {
-	args := m.Called(ctx, id)
+func (m *MockAnimalRepository) FindByEarTagNumber(farmID uint, earTagNumber int) (*models.Animal, error) {
+	args := m.Called(farmID, earTagNumber)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.Animal), args.Error(1)
+}
+
+func (m *MockAnimalRepository) FindByFarmIDAndSex(farmID uint, sex int) ([]models.Animal, error) {
+	args := m.Called(farmID, sex)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]models.Animal), args.Error(1)
+}
+
+func (m *MockAnimalRepository) CountBySex(farmID uint, sex int) (int64, error) {
+	args := m.Called(farmID, sex)
+	return args.Get(0).(int64), args.Error(1)
+}
+
+func (m *MockAnimalRepository) Update(animal *models.Animal) error {
+	args := m.Called(animal)
+	return args.Error(0)
+}
+
+func (m *MockAnimalRepository) Create(animal *models.Animal) error {
+	args := m.Called(animal)
+	return args.Error(0)
+}
+
+func (m *MockAnimalRepository) Delete(id uint) error {
+	args := m.Called(id)
 	return args.Error(0)
 }
 
@@ -549,6 +587,51 @@ func TestSaleService_GetSalesHistory(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, sales, 1)
 	assert.Equal(t, expectedSales[0].ID, sales[0].ID)
+	mockSaleRepo.AssertExpectations(t)
+}
+
+func TestSaleService_GetOverviewStats_Success(t *testing.T) {
+	mockSaleRepo := new(MockSaleRepository)
+	mockAnimalRepo := new(MockAnimalRepository)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+
+	ctx := context.Background()
+	farmID := uint(1)
+
+	expectedStats := &repository.OverviewStats{
+		MalesCount:   10,
+		FemalesCount: 15,
+		TotalSold:    5,
+		TotalRevenue: 15000.50,
+	}
+
+	mockSaleRepo.On("GetOverviewStats", ctx, farmID).Return(expectedStats, nil)
+
+	stats, err := saleService.GetOverviewStats(ctx, farmID)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, stats)
+	assert.Equal(t, int64(10), stats.MalesCount)
+	assert.Equal(t, int64(15), stats.FemalesCount)
+	assert.Equal(t, int64(5), stats.TotalSold)
+	assert.Equal(t, 15000.50, stats.TotalRevenue)
+	mockSaleRepo.AssertExpectations(t)
+}
+
+func TestSaleService_GetOverviewStats_RepositoryError(t *testing.T) {
+	mockSaleRepo := new(MockSaleRepository)
+	mockAnimalRepo := new(MockAnimalRepository)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+
+	ctx := context.Background()
+	farmID := uint(1)
+
+	mockSaleRepo.On("GetOverviewStats", ctx, farmID).Return(nil, assert.AnError)
+
+	stats, err := saleService.GetOverviewStats(ctx, farmID)
+
+	assert.Error(t, err)
+	assert.Nil(t, stats)
 	mockSaleRepo.AssertExpectations(t)
 }
 
