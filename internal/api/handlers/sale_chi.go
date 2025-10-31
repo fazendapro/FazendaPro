@@ -60,7 +60,6 @@ func (h *SaleChiHandler) CreateSale(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get farm ID from context (set by auth middleware)
 	farmID, ok := r.Context().Value("farm_id").(uint)
 	if !ok {
 		http.Error(w, "Farm ID not found in context", http.StatusUnauthorized)
@@ -357,4 +356,71 @@ func (h *SaleChiHandler) GetSalesByAnimal(w http.ResponseWriter, r *http.Request
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(responses)
+}
+
+func (h *SaleChiHandler) GetMonthlySalesStats(w http.ResponseWriter, r *http.Request) {
+	farmID, ok := r.Context().Value("farm_id").(uint)
+	if !ok {
+		SendErrorResponse(w, "Farm ID not found in context", http.StatusUnauthorized)
+		return
+	}
+
+	now := time.Now()
+	startOfMonth := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+	endOfMonth := startOfMonth.AddDate(0, 1, 0).Add(-time.Nanosecond)
+
+	count, err := h.service.GetMonthlySalesCount(r.Context(), farmID, startOfMonth, endOfMonth)
+	if err != nil {
+		SendErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data := map[string]interface{}{
+		"count": count,
+	}
+
+	SendSuccessResponse(w, data, "Estatísticas mensais de vendas recuperadas com sucesso", http.StatusOK)
+}
+
+func (h *SaleChiHandler) GetMonthlySalesAndPurchases(w http.ResponseWriter, r *http.Request) {
+	farmID, ok := r.Context().Value("farm_id").(uint)
+	if !ok {
+		SendErrorResponse(w, "Farm ID not found in context", http.StatusUnauthorized)
+		return
+	}
+
+	monthsStr := r.URL.Query().Get("months")
+	months := 12
+	if monthsStr != "" {
+		var err error
+		if parsed, err := strconv.Atoi(monthsStr); err == nil && parsed > 0 && parsed <= 24 {
+			months = parsed
+		}
+		if err != nil {
+			SendErrorResponse(w, "Invalid months parameter", http.StatusBadRequest)
+			return
+		}
+	}
+
+	salesData, err := h.service.GetMonthlySalesData(r.Context(), farmID, months)
+	if err != nil {
+		SendErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	purchasesData := make([]map[string]interface{}, len(salesData))
+	for i := range purchasesData {
+		purchasesData[i] = map[string]interface{}{
+			"month": salesData[i].Month,
+			"year":  salesData[i].Year,
+			"total": 0.0,
+		}
+	}
+
+	data := map[string]interface{}{
+		"sales":     salesData,
+		"purchases": purchasesData,
+	}
+
+	SendSuccessResponse(w, data, "Dados mensais de vendas e compras recuperados com sucesso", http.StatusOK)
 }
