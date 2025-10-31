@@ -29,6 +29,7 @@ export const translations = {
     daysInLactation: "Dias em Lactação",
     monthly: "Vendas realizadas no mês",
     monthlySalesStatsRetrievedSuccessfully: "Estatísticas mensais de vendas recuperadas com sucesso",
-    salesAndPurchasesTooltip: "Gráfico mostrando o valor total de vendas realizadas nos últimos 12 meses, baseado nas vendas de animais registradas no sistema."
+    salesAndPurchasesTooltip: "Gráfico mostrando o valor total de vendas realizadas nos últimos 12 meses, baseado nas vendas de animais registradas no sistema.",
+    overviewStatsRetrievedSuccessfully: "Estatísticas gerais recuperadas com sucesso"
   }
 };
