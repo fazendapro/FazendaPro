@@ -44,3 +44,28 @@ export interface GetTopMilkProducersResponse {
   message: string;
   status: number;
 }
+
+export interface MonthlyDataPoint {
+  month: string;
+  year: number;
+  sales?: number;
+  total?: number;
+  count?: number;
+}
+
+export interface MonthlySalesAndPurchasesData {
+  sales: MonthlyDataPoint[];
+  purchases: MonthlyDataPoint[];
+}
+
+export interface GetMonthlySalesAndPurchasesParams {
+  farm_id: number;
+  months?: number;
+}
+
+export interface GetMonthlySalesAndPurchasesResponse {
+  data: MonthlySalesAndPurchasesData;
+  success: boolean;
+  message: string;
+  status: number;
+}

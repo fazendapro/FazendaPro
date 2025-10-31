@@ -4,3 +4,4 @@ export * from './overview';
 export * from './cattle-quantity';
 export * from './rations';
 export * from './shopping-overview';
+export * from './sales-and-purchases';

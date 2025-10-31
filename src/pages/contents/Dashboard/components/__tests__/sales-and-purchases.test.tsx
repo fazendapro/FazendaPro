@@ -162,9 +162,6 @@ describe('SalesAndPurchases', () => {
 
     const infoIcon = document.querySelector('.anticon-info-circle');
     expect(infoIcon).toBeInTheDocument();
-    
-    const tooltipWrapper = infoIcon?.closest('.ant-tooltip-open');
-    expect(infoIcon).toBeTruthy();
   });
 });
 
