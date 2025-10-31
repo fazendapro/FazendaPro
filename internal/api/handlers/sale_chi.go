@@ -424,3 +424,26 @@ func (h *SaleChiHandler) GetMonthlySalesAndPurchases(w http.ResponseWriter, r *h
 
 	SendSuccessResponse(w, data, "Dados mensais de vendas e compras recuperados com sucesso", http.StatusOK)
 }
+
+func (h *SaleChiHandler) GetOverviewStats(w http.ResponseWriter, r *http.Request) {
+	farmID, ok := r.Context().Value("farm_id").(uint)
+	if !ok {
+		SendErrorResponse(w, "Farm ID not found in context", http.StatusUnauthorized)
+		return
+	}
+
+	stats, err := h.service.GetOverviewStats(r.Context(), farmID)
+	if err != nil {
+		SendErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data := map[string]interface{}{
+		"males_count":   stats.MalesCount,
+		"females_count": stats.FemalesCount,
+		"total_sold":    stats.TotalSold,
+		"total_revenue": stats.TotalRevenue,
+	}
+
+	SendSuccessResponse(w, data, "Estatísticas gerais recuperadas com sucesso", http.StatusOK)
+}

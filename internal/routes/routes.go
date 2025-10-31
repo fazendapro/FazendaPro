@@ -176,6 +176,7 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 				r.Get("/history", saleHandler.GetSalesHistory)
 				r.Get("/monthly-stats", saleHandler.GetMonthlySalesStats)
 				r.Get("/monthly-data", saleHandler.GetMonthlySalesAndPurchases)
+				r.Get("/overview", saleHandler.GetOverviewStats)
 				r.Get("/date-range", saleHandler.GetSalesByDateRange)
 				r.Get("/{id}", saleHandler.GetSaleByID)
 				r.Put("/{id}", saleHandler.UpdateSale)

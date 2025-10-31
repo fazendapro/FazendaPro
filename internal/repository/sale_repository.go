@@ -17,6 +17,13 @@ type MonthlySalesData struct {
 	Count int64   `json:"count"`
 }
 
+type OverviewStats struct {
+	MalesCount   int64   `json:"males_count"`
+	FemalesCount int64   `json:"females_count"`
+	TotalSold    int64   `json:"total_sold"`
+	TotalRevenue float64 `json:"total_revenue"`
+}
+
 type SaleRepository interface {
 	Create(ctx context.Context, sale *models.Sale) error
 	GetByID(ctx context.Context, id uint) (*models.Sale, error)
@@ -25,6 +32,7 @@ type SaleRepository interface {
 	GetByDateRange(ctx context.Context, farmID uint, startDate, endDate time.Time) ([]*models.Sale, error)
 	GetMonthlySalesCount(ctx context.Context, farmID uint, startDate, endDate time.Time) (int64, error)
 	GetMonthlySalesData(ctx context.Context, farmID uint, months int) ([]MonthlySalesData, error)
+	GetOverviewStats(ctx context.Context, farmID uint) (*OverviewStats, error)
 	Update(ctx context.Context, sale *models.Sale) error
 	Delete(ctx context.Context, id uint) error
 }
@@ -156,4 +164,41 @@ func (r *saleRepository) Update(ctx context.Context, sale *models.Sale) error {
 
 func (r *saleRepository) Delete(ctx context.Context, id uint) error {
 	return r.db.WithContext(ctx).Delete(&models.Sale{}, id).Error
+}
+
+func (r *saleRepository) GetOverviewStats(ctx context.Context, farmID uint) (*OverviewStats, error) {
+	stats := &OverviewStats{}
+
+	var malesCount int64
+	err := r.db.WithContext(ctx).Model(&models.Animal{}).Where("farm_id = ? AND sex = ?", farmID, 1).Count(&malesCount).Error
+	if err != nil {
+		return nil, fmt.Errorf("error counting males: %w", err)
+	}
+	stats.MalesCount = malesCount
+
+	var femalesCount int64
+	err = r.db.WithContext(ctx).Model(&models.Animal{}).Where("farm_id = ? AND sex = ?", farmID, 0).Count(&femalesCount).Error
+	if err != nil {
+		return nil, fmt.Errorf("error counting females: %w", err)
+	}
+	stats.FemalesCount = femalesCount
+
+	var totalSold int64
+	err = r.db.WithContext(ctx).Model(&models.Sale{}).Where("farm_id = ?", farmID).Count(&totalSold).Error
+	if err != nil {
+		return nil, fmt.Errorf("error counting total sold: %w", err)
+	}
+	stats.TotalSold = totalSold
+
+	var totalRevenue float64
+	err = r.db.WithContext(ctx).Model(&models.Sale{}).
+		Where("farm_id = ?", farmID).
+		Select("COALESCE(SUM(price), 0)").
+		Scan(&totalRevenue).Error
+	if err != nil {
+		return nil, fmt.Errorf("error calculating total revenue: %w", err)
+	}
+	stats.TotalRevenue = totalRevenue
+
+	return stats, nil
 }

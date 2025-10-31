@@ -12,6 +12,7 @@ import (
 
 	"github.com/fazendapro/FazendaPro-api/internal/api/handlers"
 	"github.com/fazendapro/FazendaPro-api/internal/models"
+	"github.com/fazendapro/FazendaPro-api/internal/repository"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/stretchr/testify/assert"
@@ -82,6 +83,14 @@ func (m *MockSaleService) GetSalesHistory(ctx context.Context, farmID uint) ([]*
 	return args.Get(0).([]*models.Sale), args.Error(1)
 }
 
+func (m *MockSaleService) GetOverviewStats(ctx context.Context, farmID uint) (*repository.OverviewStats, error) {
+	args := m.Called(ctx, farmID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*repository.OverviewStats), args.Error(1)
+}
+
 func setupSaleTestRouter() (*chi.Mux, *MockSaleService) {
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
@@ -105,6 +114,7 @@ func setupSaleTestRouter() (*chi.Mux, *MockSaleService) {
 	router.Delete("/sales/{id}", saleHandler.DeleteSale)
 	router.Get("/sales/history", saleHandler.GetSalesHistory)
 	router.Get("/sales/monthly-stats", saleHandler.GetMonthlySalesStats)
+	router.Get("/sales/overview", saleHandler.GetOverviewStats)
 
 	return router, mockSaleService
 }
@@ -624,6 +634,52 @@ func TestSaleHandler_GetMonthlySalesStats_ServiceError(t *testing.T) {
 	mockService.On("GetMonthlySalesCount", mock.Anything, uint(1), startOfMonth, endOfMonth).Return(int64(0), errors.New("database error"))
 
 	req, _ := http.NewRequest("GET", "/sales/monthly-stats", nil)
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+
+	mockService.AssertExpectations(t)
+}
+
+func TestSaleHandler_GetOverviewStats_Success(t *testing.T) {
+	router, mockService := setupSaleTestRouter()
+
+	expectedStats := &repository.OverviewStats{
+		MalesCount:   10,
+		FemalesCount: 15,
+		TotalSold:    5,
+		TotalRevenue: 15000.50,
+	}
+
+	mockService.On("GetOverviewStats", mock.Anything, uint(1)).Return(expectedStats, nil)
+
+	req, _ := http.NewRequest("GET", "/sales/overview", nil)
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var response map[string]interface{}
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Equal(t, true, response["success"])
+	assert.NotNil(t, response["data"])
+	data := response["data"].(map[string]interface{})
+	assert.Equal(t, float64(10), data["males_count"])
+	assert.Equal(t, float64(15), data["females_count"])
+	assert.Equal(t, float64(5), data["total_sold"])
+	assert.Equal(t, 15000.50, data["total_revenue"])
+
+	mockService.AssertExpectations(t)
+}
+
+func TestSaleHandler_GetOverviewStats_ServiceError(t *testing.T) {
+	router, mockService := setupSaleTestRouter()
+
+	mockService.On("GetOverviewStats", mock.Anything, uint(1)).Return(nil, errors.New("database error"))
+
+	req, _ := http.NewRequest("GET", "/sales/overview", nil)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 

@@ -17,6 +17,7 @@ type SaleService interface {
 	GetSalesByDateRange(ctx context.Context, farmID uint, startDate, endDate time.Time) ([]*models.Sale, error)
 	GetMonthlySalesCount(ctx context.Context, farmID uint, startDate, endDate time.Time) (int64, error)
 	GetMonthlySalesData(ctx context.Context, farmID uint, months int) ([]repository.MonthlySalesData, error)
+	GetOverviewStats(ctx context.Context, farmID uint) (*repository.OverviewStats, error)
 	UpdateSale(ctx context.Context, sale *models.Sale) error
 	DeleteSale(ctx context.Context, id uint) error
 	GetSalesHistory(ctx context.Context, farmID uint) ([]*models.Sale, error)
@@ -112,6 +113,10 @@ func (s *saleService) GetMonthlySalesData(ctx context.Context, farmID uint, mont
 		months = 24
 	}
 	return s.saleRepo.GetMonthlySalesData(ctx, farmID, months)
+}
+
+func (s *saleService) GetOverviewStats(ctx context.Context, farmID uint) (*repository.OverviewStats, error) {
+	return s.saleRepo.GetOverviewStats(ctx, farmID)
 }
 
 func (s *saleService) UpdateSale(ctx context.Context, sale *models.Sale) error {

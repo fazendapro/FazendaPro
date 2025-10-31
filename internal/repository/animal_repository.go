@@ -73,3 +73,11 @@ func (r *AnimalRepository) FindByFarmIDAndSex(farmID uint, sex int) ([]models.An
 	}
 	return animals, nil
 }
+
+func (r *AnimalRepository) CountBySex(farmID uint, sex int) (int64, error) {
+	var count int64
+	if err := r.db.DB.Model(&models.Animal{}).Where("farm_id = ? AND sex = ?", farmID, sex).Count(&count).Error; err != nil {
+		return 0, fmt.Errorf("erro ao contar animais por sexo: %w", err)
+	}
+	return count, nil
+}
