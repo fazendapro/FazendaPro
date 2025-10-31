@@ -22,9 +22,13 @@ export const translations = {
     production: "Producción",
     fat: "Grasa",
     price: "Precio",
-    salesAndPurchases: "Ventas & Compras",
+    salesAndPurchases: "Ventas",
     semenation: "Semenación",
     title: "Panel de control",
-    topMilkProducers: "Top Produtores de Leite"
+    topMilkProducers: "Top Produtores de Leite",
+    daysInLactation: "Días en Lactación",
+    monthly: "Ventas realizadas en el mes",
+    monthlySalesStatsRetrievedSuccessfully: "Estadísticas mensuales de ventas recuperadas con éxito",
+    salesAndPurchasesTooltip: "Gráfico que muestra el valor total de ventas realizadas en los últimos 12 meses, basado en las ventas de animales registradas en el sistema."
   }
 }
