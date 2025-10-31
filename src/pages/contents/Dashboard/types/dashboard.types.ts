@@ -69,3 +69,21 @@ export interface GetMonthlySalesAndPurchasesResponse {
   message: string;
   status: number;
 }
+
+export interface OverviewStats {
+  males_count: number;
+  females_count: number;
+  total_sold: number;
+  total_revenue: number;
+}
+
+export interface GetOverviewStatsParams {
+  farm_id: number;
+}
+
+export interface GetOverviewStatsResponse {
+  data: OverviewStats;
+  success: boolean;
+  message: string;
+  status: number;
+}
