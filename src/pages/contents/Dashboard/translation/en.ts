@@ -11,7 +11,7 @@ export const translations = {
     revenue: "Revenue",
     profit: "Profit",
     cost: "Cost",
-    salesOverview: "Sales Overview",
+    salesOverview: "Overview",
     suppliers: "Suppliers",
     categories: "Categories",
     weekly: "Weekly",
@@ -25,6 +25,11 @@ export const translations = {
     salesAndPurchases: "Sales & Purchases",
     semenation: "Semenation",
     title: "Dashboard",
-    topMilkProducers: "Top Milk Producers"
+    topMilkProducers: "Top Milk Producers",
+    daysInLactation: "Days in Lactation",
+    monthly: "Sales made in the month",
+    monthlySalesStatsRetrievedSuccessfully: "Monthly sales statistics retrieved successfully",
+    salesAndPurchasesTooltip: "Chart showing the total value of sales made in the last 12 months, based on animal sales registered in the system.",
+    overviewStatsRetrievedSuccessfully: "Overview statistics retrieved successfully"
   }
 }

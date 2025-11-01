@@ -12,7 +12,7 @@ export const translations = {
     revenue: "Receita",
     profit: "Lucro",
     cost: "Custo",
-    salesOverview: "Vendas Visão Geral",
+    salesOverview: "Visão Geral",
     suppliers: "Fornecedores",
     categories: "Categorias",
     weekly: "Semanalmente",
@@ -23,9 +23,13 @@ export const translations = {
     production: "Produção de Leite",
     fat: "Gordura",
     price: "Preço",
-    salesAndPurchases: "Vendas & Compras",
+    salesAndPurchases: "Vendas",
     semenation: "Seminação",
     topMilkProducers: "Top Produtoras de Leite",
-    daysInLactation: "Dias em Lactação"
+    daysInLactation: "Dias em Lactação",
+    monthly: "Vendas realizadas no mês",
+    monthlySalesStatsRetrievedSuccessfully: "Estatísticas mensais de vendas recuperadas com sucesso",
+    salesAndPurchasesTooltip: "Gráfico mostrando o valor total de vendas realizadas nos últimos 12 meses, baseado nas vendas de animais registradas no sistema.",
+    overviewStatsRetrievedSuccessfully: "Estatísticas gerais recuperadas com sucesso"
   }
 };
