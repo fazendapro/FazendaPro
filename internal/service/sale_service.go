@@ -15,6 +15,9 @@ type SaleService interface {
 	GetSalesByFarmID(ctx context.Context, farmID uint) ([]*models.Sale, error)
 	GetSalesByAnimalID(ctx context.Context, animalID uint) ([]*models.Sale, error)
 	GetSalesByDateRange(ctx context.Context, farmID uint, startDate, endDate time.Time) ([]*models.Sale, error)
+	GetMonthlySalesCount(ctx context.Context, farmID uint, startDate, endDate time.Time) (int64, error)
+	GetMonthlySalesData(ctx context.Context, farmID uint, months int) ([]repository.MonthlySalesData, error)
+	GetOverviewStats(ctx context.Context, farmID uint) (*repository.OverviewStats, error)
 	UpdateSale(ctx context.Context, sale *models.Sale) error
 	DeleteSale(ctx context.Context, id uint) error
 	GetSalesHistory(ctx context.Context, farmID uint) ([]*models.Sale, error)
@@ -93,6 +96,27 @@ func (s *saleService) GetSalesByDateRange(ctx context.Context, farmID uint, star
 		return nil, errors.New("start date cannot be after end date")
 	}
 	return s.saleRepo.GetByDateRange(ctx, farmID, startDate, endDate)
+}
+
+func (s *saleService) GetMonthlySalesCount(ctx context.Context, farmID uint, startDate, endDate time.Time) (int64, error) {
+	if startDate.After(endDate) {
+		return 0, errors.New("start date cannot be after end date")
+	}
+	return s.saleRepo.GetMonthlySalesCount(ctx, farmID, startDate, endDate)
+}
+
+func (s *saleService) GetMonthlySalesData(ctx context.Context, farmID uint, months int) ([]repository.MonthlySalesData, error) {
+	if months <= 0 {
+		months = 12
+	}
+	if months > 24 {
+		months = 24
+	}
+	return s.saleRepo.GetMonthlySalesData(ctx, farmID, months)
+}
+
+func (s *saleService) GetOverviewStats(ctx context.Context, farmID uint) (*repository.OverviewStats, error) {
+	return s.saleRepo.GetOverviewStats(ctx, farmID)
 }
 
 func (s *saleService) UpdateSale(ctx context.Context, sale *models.Sale) error {
