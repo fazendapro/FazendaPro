@@ -83,7 +83,7 @@
 \section*{Resumo}
 \addcontentsline{toc}{section}{Resumo}
 \begin{spacing}{1.5}
-O projeto FazendaPro é uma plataforma desenvolvida para otimizar a gestão de rebanhos bovinos, com ênfase na pecuária leiteira. O sistema propõe uma interface técnica e funcional para o gerenciamento integrado de animais, pastagens e produção de leite, fornecendo ferramentas para monitoramento detalhado e análise de dados. Suas principais funcionalidades incluem o registro do histórico genético, sanitário e produtivo do gado, com foco especial no acompanhamento de vacas em lactação para otimizar a produção leiteira e identificar anomalias. O projeto visa atender às necessidades de pequenos e médios produtores, promovendo eficiência operacional e rastreabilidade no setor agropecuário.
+O projeto FazendaPro é uma plataforma desenvolvida como projeto para otimizar a gestão de rebanhos bovinos, com ênfase na pecuária leiteira. O sistema propõe uma interface técnica e funcional para o gerenciamento integrado de animais, pastagens e produção de leite, fornecendo ferramentas para monitoramento detalhado e análise de dados. Suas principais funcionalidades incluem o registro do histórico genético, sanitário e produtivo do gado, com foco especial no acompanhamento de vacas em lactação para otimizar a produção leiteira e identificar anomalias. O projeto visa atender às necessidades de pequenos e médios produtores, promovendo eficiência operacional e rastreabilidade no setor agropecuário.
 \end{spacing}
 \vspace{0.5cm}
 \textbf{Palavras-chave:} Gestão pecuária, Pecuária leiteira, Rastreabilidade, Produção de leite, Tecnologia agropecuária.
@@ -99,7 +99,7 @@ O projeto FazendaPro é desenvolvido no âmbito da pecuária brasileira, com foc
 
 \subsection{Justificativa}
 \begin{spacing}{1.5}
-O desenvolvimento do FazendaPro justifica-se pela necessidade de modernizar a gestão pecuária, com foco na pecuária leiteira, para pequenos e médios produtores que enfrentam barreiras no acesso à tecnologias avançadas. A pecuária leiteira é uma atividade econômica essencial, empregando cerca de 4 milhões de pessoas no Brasil \cite{4milhao}. Um produtor do norte de Minas Gerais relatou perdas na comercialização de animais devido à ausência de registros detalhados sobre genética e saúde, conforme destacado em reportagem do G1 \cite{g12022}. Além disso, sistemas comerciais existentes frequentemente apresentam custos elevados e interfaces inadequadas às necessidades rurais, conforme apontado em análise pelo blog Agrolink \cite{agropec2024}. O FazendaPro, como projeto acadêmico, propõe uma solução técnica, acessível e escalável, com ênfase na rastreabilidade de rebanhos e no monitoramento da produção leiteira, contribuindo para a eficiência operacional, a valorização do gado e a sustentabilidade do setor.
+O desenvolvimento do FazendaPro justifica-se pela necessidade de modernizar a gestão pecuária, com foco na pecuária leiteira, para pequenos e médios produtores que enfrentam barreiras no acesso à tecnologias avançadas. A pecuária leiteira é uma atividade econômica essencial, empregando cerca de 4 milhões de pessoas no Brasil \cite{4milhao}. Um produtor do norte de Minas Gerais relatou perdas na comercialização de animais devido à ausência de registros detalhados sobre genética e saúde, conforme destacado em reportagem do G1 \cite{g12022}. Além disso, sistemas comerciais existentes frequentemente apresentam custos elevados e interfaces inadequadas às necessidades rurais, conforme apontado análise pelo blog Agrolink \cite{agropec2024}. O FazendaPro, como projeto acadêmico, propõe uma solução técnica, acessível e escalável, com ênfase na rastreabilidade de rebanhos e no monitoramento da produção leiteira, contribuindo para a eficiência operacional, a valorização do gado e a sustentabilidade do setor.
 \end{spacing}
 
 \subsection{Objetivos}
@@ -123,7 +123,7 @@ Desenvolver uma plataforma digital para a gestão integrada de rebanhos bovinos,
 \subsubsection{Problemas a Resolver}
 \begin{enumerate}[label=\alph*)]
     \item \textbf{Falta de rastreabilidade}: ausência de registros estruturados sobre o histórico dos animais (nascimento, vacinação, produção etc.).
-    \item \textbf{Falta de eficiência na gestão}: controle manual ou informal dificulta decisões baseadas em dados.
+    \item \textbf{Baixa eficiência na gestão}: controle manual ou informal dificulta decisões baseadas em dados.
 \end{enumerate}
 
 \subsection{Limitações}
@@ -131,9 +131,8 @@ Desenvolver uma plataforma digital para a gestão integrada de rebanhos bovinos,
 O projeto FazendaPro apresenta as seguintes limitações, identificadas com base no escopo e nos requisitos definidos:
 
 \begin{enumerate}[label=\alph*)]
-    \item \textbf{Dependência de Conectividade à Internet}: A aplicação web requer conexão estável, o que pode ser um desafio em áreas rurais com acesso limitado à internet, impactando funcionalidades como monitoramento em tempo real e notificações via WhatsApp.
     \item \textbf{Foco Primário na Pecuária Leiteira}: Embora o sistema contemple a gestão geral de rebanhos bovinos, seu foco principal é a pecuária leiteira, limitando a aplicabilidade a outros tipos de pecuária ou atividades agrícolas.
-    \item \textbf{Dependência de Serviços de Terceiros}: A utilização de Google Cloud, Cloud SQL e WhatsApp introduz riscos relacionados a custos e disponibilidade.
+    \item \textbf{Dependência de Serviços de Terceiros}: A utilização da hospedagem introduz riscos relacionados a custos e disponibilidade.
 \end{enumerate}
 \end{spacing}
 
@@ -175,7 +174,6 @@ O projeto FazendaPro apresenta as seguintes limitações, identificadas com base
     \item \textbf{Definir Data de Prenhez}
     \begin{enumerate}[label=RF07.0\arabic{*}]
         \item O sistema deve permitir que o usuário registre a data de prenhez de uma vaca.
-        \item O sistema deve notificar o usuário (via WhatsApp) quando a data de prenhez estiver próxima do parto, 20 dias antes.
     \end{enumerate}
     \item \textbf{Vender o Animal}
     \begin{enumerate}[label=RF8.0\arabic{*}]
@@ -217,11 +215,11 @@ O projeto FazendaPro apresenta as seguintes limitações, identificadas com base
         \item O idioma principal será PT-BR, com possibilidade de implementação futura de EN-US e ES-ES.
     \end{enumerate}
     \item \textbf{Separar Módulo}
-    \begin{enumerate}[label=RNF04.0\arabic{*}]
+    \begin{enumerate}[label=RF04.0\arabic{*}]
         \item O sistema deve organizar as informações em módulos acessíveis via menu lateral (Dashboard, Animais, Fornecedores, Vendas, Estoque).
     \end{enumerate}
     \item \textbf{Analisar Dashboards}
-    \begin{enumerate}[label=RNF05.0\arabic{*}]
+    \begin{enumerate}[label=RF05.0\arabic{*}]
         \item O sistema deve fornecer dashboards com informações analíticas sobre os animais, como produção de leite, saúde geral e tendências de desempenho.
     \end{enumerate}
     \item \textbf{Desempenho}
@@ -252,7 +250,7 @@ O projeto FazendaPro apresenta as seguintes limitações, identificadas com base
 
 \subsection{Diagrama de Casos de Uso}
 \begin{spacing}{1.5}
-O diagrama de casos de uso está apresentado na Figuras 1, 2, 3, 4 e 5. Nela busca-se explicar um pouco da história do usuário através das principais funcionalidade e ideais do sistema. Nesse exemplo, o usuário acessará o sistema e poderá gerenciar ou cadastrar o animal, independente da decisão ele terá que fornecer as informações do animal, como idade, raça, etc.
+O diagrama de casos de uso está apresentado na Figuras 1, 2, 3, 4 e 5. Nela busca-se explicar um pouca da história do usuário através das principais funcionalidade e ideais do sistema. Nesse exemplo, o usuário acessará o sistema e poderá gerenciar ou cadastrar o animal, independente da decisão ele terá que fornecer as informações do animal, como idade, raça, etc.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{diagrams/cases-of-use-8-new.drawio.png}
@@ -319,7 +317,7 @@ O modelo lógico está apresentado na Figura \ref{fig:entity-relationship}, e re
 \subsection{Considerações de Design}
 \subsubsection{Visão Inicial da Arquitetura}
 \begin{spacing}{1.5}
-O projeto adota uma arquitetura modular, equilibrando a simplicidade de um monolito com a flexibilidade de serviços. O NestJS facilita a organização em módulos, permitindo escalabilidade futura para extração de serviços, como notificações. Essa escolha, juntamente com Go, suporta a gestão eficiente de rebanhos, com foco na pecuária leiteira, mantendo a robustez para expansão.
+O projeto adota uma arquitetura modular, equilibrando a simplicidade de um monolito com a flexibilidade de serviços. O NestJS facilita a organização em módulos, permitindo escalabilidade futura para extração de serviços, como notificações. Essa escolha, juntamento com Go, suporta a gestão eficiente de rebanhos, com foco na pecuária leiteira, mantendo a robustez para expansão.
 \end{spacing}
 
 \subsubsection{Padrões de Arquitetura}
@@ -366,11 +364,11 @@ fazendapro-api/
 
 \subsubsection{Modelo C4 — Diagrama de Contexto, Containers e Componentes}
 \begin{spacing}{1.5}
-Na Figura \ref{fig:C4-Contexto} é apresentado o Diagrama de Contexto, ilustrando as interações do sistema FazendaPro com atores externos, como o usuário (produtor) e serviços de notificações (WhatsApp).
+Na Figura \ref{fig:C4-Contexto} é apresentado o Diagrama de Contexto, ilustrando as interações do sistema FazendaPro com atores externos, como o usuário (produtor).
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.2\textwidth]{images/c1.drawio.png}
+    \includegraphics[width=0.2\textwidth]{images/c1-new.drawio.png}
     \caption{Modelo C4 — Diagrama de Contexto do sistema FazendaPro}
     \label{fig:C4-Contexto}
 \end{figure}
@@ -381,7 +379,7 @@ Na Figura \ref{fig:C4-Containers} é detalhado o Diagrama de Containers, descrev
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{diagrams/c2.drawio.png}
+    \includegraphics[width=0.8\textwidth]{images/c2-new.drawio.png}
     \caption{Modelo C4 — Diagrama de Containers do sistema FazendaPro}
     \label{fig:C4-Containers}
 \end{figure}
@@ -392,7 +390,7 @@ Na Figura \ref{fig:C4-Componentes} é apresentado o Diagrama de Componentes, det
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{diagrams/c3.drawio.png}
+    \includegraphics[width=1\textwidth]{images/c3-new.drawio.png}
     \caption{Modelo C4 — Diagrama de Componentes do sistema FazendaPro}
     \label{fig:C4-Componentes}
 \end{figure}
@@ -400,12 +398,12 @@ Na Figura \ref{fig:C4-Componentes} é apresentado o Diagrama de Componentes, det
 
 \subsubsection{Aplicação Web}
 \begin{spacing}{1.5}
-A aplicação web será desenvolvida com React, enquanto o API Server, hospedado em container no Google Cloud Run, utilizará NestJS, Go com Memcached para caching em memória, garantindo desempenho na gestão de dados pecuários.
+A aplicação web será desenvolvida com React, enquanto o API Server, hospedado em containers via Dokploy, utilizará NestJS, Go com Memcached para caching em memória, garantindo desempenho na gestão de dados pecuários.
 \end{spacing}
 
 \subsubsection{Armazenamento Persistente de Dados}
 \begin{spacing}{1.5}
-O armazenamento utiliza Cloud SQL (PostgreSQL). A aplicação web realiza requisições HTTP (REST) ao API Server, que consulta o Cloud SQL via conexão SQL e utiliza Memcached para caching, otimizando o acesso a dados de rebanhos e produção leiteira.
+O armazenamento utiliza PostgreSQL gerenciado via Dokploy. A aplicação web realiza requisições HTTP (REST) ao API Server, que consulta o banco de dados PostgreSQL via conexão SQL e utiliza Memcached para caching, otimizando o acesso a dados de rebanhos e produção leiteira.
 \end{spacing}
 
 
@@ -443,12 +441,11 @@ As linguagens Go, TypeScript e JavaScript foram escolhidas para serem padrões n
 \subsubsection{Ferramentas de Desenvolvimento e Gestão de Projeto}
 \begin{enumerate}[label=\alph*)]
 \item \textbf{Podman} – Plataforma de conteinerização para empacotar e executar aplicações sem daemon.
-\item \textbf{PostgreSQL} – Sistema de gerenciamento de banco de dados relacional avançado.
+\item \textbf{PostgreSQL} – Sistema de gerenciamento de banco de dados relacional avançado, gerenciado via Dokploy.
 \item \textbf{Podman Compose} – Ferramenta para definir e executar múltiplos containers Podman.
 \item \textbf{Figma} – Ferramenta colaborativa de design de interfaces e prototipação.
 \item \textbf{GitHub Projects} – Ferramenta de gerenciamento de tarefas integrada ao GitHub.
-\item \textbf{Google Cloud Platform} – Plataforma em nuvem para deploy escalável de aplicações.
-\item \textbf{Cloud SQL} – Serviço de banco de dados PostgreSQL gerenciado na Google Cloud.
+\item \textbf{Dokploy} – Plataforma de deploy self-hosted para aplicações containerizadas.
 \item \textbf{Memcached} – Sistema de cache distribuído em memória de alta performance.
 \item \textbf{New Relic} – Plataforma de observabilidade e monitoramento de performance de apps.
 \item \textbf{Sentry} – Ferramenta para monitoramento de erros e exceções em tempo real.
@@ -466,7 +463,7 @@ A escolha das tecnologias foi baseada em critérios de performance, escalabilida
 \item \textbf{Memcached}: Cache distribuído em memória com baixa latência, otimizando consultas frequentes de dashboards. Escolhido por sua simplicidade, menor overhead de memória e excelente performance em cenários de cache distribuído.
 \item \textbf{Podman}: Ferramenta de containerização sem daemon que oferece maior segurança e compatibilidade OCI, permitindo execução rootless e melhor integração com systemd.
 \item \textbf{PostgreSQL}: SGBD avançado com suporte a JSON, índices GIN/GiST, transações ACID robustas e melhor conformidade com padrões SQL comparado ao MySQL.
-\item \textbf{Google Cloud}: Infraestrutura escalável com auto-scaling, integração nativa com CI/CD, monitoramento avançado e SLA de 99.9%.
+\item \textbf{Dokploy}: Plataforma de deploy self-hosted que oferece controle total sobre a infraestrutura, facilitando o gerenciamento de containers e bancos de dados, com suporte a CI/CD e monitoramento.
 \end{enumerate}
 \end{spacing}
 
@@ -474,11 +471,10 @@ A escolha das tecnologias foi baseada em critérios de performance, escalabilida
 \begin{spacing}{1.5}
 \textbf{Custos Estimados (mensal):}
 \begin{enumerate}[label=\alph*)]
-\item \textbf{Google Cloud Run}: \$18/mês (2 vCPU, 4GB RAM, 1M requests)
-\item \textbf{Cloud SQL}: \$7/mês (PostgreSQL db-f1-micro, 10GB)
-\item \textbf{Memorystore}: \$13/mês (Memcached 1GB)
-\item \textbf{WhatsApp Business API}: \$0.005 por mensagem (estimativa 1000 mensagens/mês = \$5)
-\item \textbf{Total estimado}: \$43/mês para até 100 usuários
+\item \textbf{Servidor VPS}: \$20-40/mês (2-4 vCPU, 4-8GB RAM, dependendo do provedor)
+\item \textbf{PostgreSQL}: Incluído no servidor (self-hosted via Dokploy)
+\item \textbf{Memcached}: Incluído no servidor (self-hosted via Dokploy)
+\item \textbf{Total estimado}: \$20-40/mês para até 100 usuários (dependendo do provedor de VPS escolhido)
 \end{enumerate}
 
 \subsection{Considerações de Segurança}
@@ -609,17 +605,14 @@ ANPD - Autoridade Nacional de Proteção de Dados. \textit{Guia de boas prática
     \item PODMAN COMPOSE. \textit{Podman Compose Documentation}. Disponível em: \url{https://docs.podman.io/en/latest/markdown/podman-compose.1.html}. Acesso em: 17 jun. 2025.
     \item FIGMA. \textit{Figma Documentation}. Disponível em: \url{https://www.figma.com}. Acesso em: 17 jun. 2025.
     \item GITHUB PROJECTS. \textit{FazendaPro Project}. Disponível em: \url{https://github.com/orgs/fazendapro/projects/1}. Acesso em: 17 jun. 2025.
-    \item GOOGLE CLOUD. \textit{Google Cloud Documentation}. Disponível em: \url{https://cloud.google.com/docs}. Acesso em: 17 jun. 2025.
-    \item CLOUD RUN. \textit{Cloud Run Documentation}. Disponível em: \url{https://cloud.google.com/run/docs}. Acesso em: 17 jun. 2025.
-    \item CLOUD SQL. \textit{Cloud SQL Documentation}. Disponível em: \url{https://cloud.google.com/sql/docs}. Acesso em: 17 jun. 2025.
-    \item MEMORYSTORE. \textit{Memorystore Documentation}. Disponível em: \url{https://cloud.google.com/memorystore/docs}. Acesso em: 17 jun. 2025.
+    \item DOKPLOY. \textit{Dokploy Documentation}. Disponível em: \url{https://dokploy.com}. Acesso em: 17 jun. 2025.
     \item MEMCACHED. \textit{Memcached Documentation}. Disponível em: \url{https://memcached.org}. Acesso em: 17 jun. 2025.
     \item NEW RELIC. \textit{New Relic Documentation}. Disponível em: \url{https://newrelic.com}. Acesso em: 17 jun. 2025.
     \item SENTRY. \textit{Sentry Documentation}. Disponível em: \url{https://sentry.io}. Acesso em: 17 jun. 2025.
     \item MERMAID. \textit{Mermaid Documentation}. Disponível em: \url{https://mermaid.js.org}. Acesso em: 17 jun. 2025.
     \item C4 MODEL. \textit{C4 Model Documentation}. Disponível em: \url{https://c4model.com}. Acesso em: 17 jun. 2025.
     \item NESTJS THROTTLER. \textit{NestJS Throttler Documentation}. Disponível em: \url{https://docs.nestjs.com/techniques/throttler}. Acesso em: 17 jun. 2025.
-    \item WHATSAPP WEB JS. \textit{WhatsApp Web.js Documentation}. Disponível em: \url{https://wwebjs.dev}. Acesso em: 17 jun. 2025.
+    Disponível em: \url{https://wwebjs.dev}. Acesso em: 17 jun. 2025.
 \end{enumerate}
 
 \clearpage
