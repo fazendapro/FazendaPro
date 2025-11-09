@@ -1,9 +1,9 @@
 package models
 
 const (
-	AnimalStatusActive   = 0 // Animal ativo (não vendido)
-	AnimalStatusSold     = 1 // Animal vendido
-	AnimalStatusDeceased = 2 // Animal falecido
+	AnimalStatusActive   = 0
+	AnimalStatusSold     = 1
+	AnimalStatusDeceased = 2
 )
 
 func GetStatusName(status int) string {

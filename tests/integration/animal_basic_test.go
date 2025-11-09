@@ -26,7 +26,6 @@ func TestAnimalModel_Validation(t *testing.T) {
 		CurrentBatch:         1,
 	}
 
-	// Test valid animal
 	assert.Equal(t, uint(1), animal.FarmID)
 	assert.Equal(t, 123, animal.EarTagNumberLocal)
 	assert.Equal(t, "Vaca Teste", animal.AnimalName)
