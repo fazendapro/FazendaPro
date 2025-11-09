@@ -202,16 +202,12 @@ func (h *AnimalHandler) GetAnimal(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AnimalHandler) GetAnimalsByFarm(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("GetAnimalsByFarm chamado - URL: %s, Query: %s\n", r.URL.Path, r.URL.RawQuery)
-
 	farmID := r.URL.Query().Get("farmId")
 	if farmID == "" {
 		fmt.Printf("Erro: farmId não fornecido\n")
 		SendErrorResponse(w, "ID da fazenda é obrigatório", http.StatusBadRequest)
 		return
 	}
-
-	fmt.Printf("FarmID recebido: %s\n", farmID)
 
 	id, err := strconv.ParseUint(farmID, 10, 32)
 	if err != nil {
@@ -340,8 +336,7 @@ func (h *AnimalHandler) UploadAnimalPhoto(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	// Parse multipart form first to get the animal_id
-	err := r.ParseMultipartForm(10 << 20) // 10 MB max
+	err := r.ParseMultipartForm(10 << 20)
 	if err != nil {
 		SendErrorResponse(w, "Erro ao fazer parse do formulário: "+err.Error(), http.StatusBadRequest)
 		return
@@ -366,7 +361,6 @@ func (h *AnimalHandler) UploadAnimalPhoto(w http.ResponseWriter, r *http.Request
 	}
 	defer file.Close()
 
-	// Read file content and convert to base64
 	fileBytes := make([]byte, 0)
 	buffer := make([]byte, 1024)
 	for {
@@ -381,17 +375,14 @@ func (h *AnimalHandler) UploadAnimalPhoto(w http.ResponseWriter, r *http.Request
 		fileBytes = append(fileBytes, buffer[:n]...)
 	}
 
-	// Convert to base64
 	photoBase64 := fmt.Sprintf("data:image/jpeg;base64,%s", base64.StdEncoding.EncodeToString(fileBytes))
 
-	// Get the animal
 	animal, err := h.service.GetAnimalByID(uint(id))
 	if err != nil || animal == nil {
 		SendErrorResponse(w, "Animal não encontrado", http.StatusNotFound)
 		return
 	}
 
-	// Update the animal with the photo
 	animal.Photo = photoBase64
 	if err := h.service.UpdateAnimal(animal); err != nil {
 		SendErrorResponse(w, "Erro ao atualizar foto do animal: "+err.Error(), http.StatusInternalServerError)

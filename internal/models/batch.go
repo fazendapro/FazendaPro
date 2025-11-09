@@ -1,9 +1,9 @@
 package models
 
 const (
-	Batch1 = 1 // >30 L
-	Batch2 = 2 // 20-30 L
-	Batch3 = 3 // <20 L
+	Batch1 = 1
+	Batch2 = 2
+	Batch3 = 3
 )
 
 const (

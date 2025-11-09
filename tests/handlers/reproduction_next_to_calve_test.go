@@ -8,22 +8,18 @@ import (
 	"time"
 
 	"github.com/fazendapro/FazendaPro-api/internal/models"
-	"github.com/fazendapro/FazendaPro-api/internal/repository"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetNextToCalve(t *testing.T) {
-	// Setup
-	mockRepo := &repository.MockReproductionRepository{}
 	mockService := &service.MockReproductionService{}
 	handler := NewReproductionHandler(mockService)
 
-	// Mock data
 	farmID := uint(1)
 	now := time.Now()
-	pregnancyDate := now.AddDate(0, 0, -200)              // 200 dias atrás
-	expectedBirthDate := pregnancyDate.AddDate(0, 0, 283) // 283 dias após a prenhez (período médio de gestação)
+	pregnancyDate := now.AddDate(0, 0, -200)
+	expectedBirthDate := pregnancyDate.AddDate(0, 0, 283)
 
 	mockReproductions := []models.Reproduction{
 		{
@@ -54,20 +50,15 @@ func TestGetNextToCalve(t *testing.T) {
 		},
 	}
 
-	// Mock service call
 	mockService.On("GetReproductionsByPhase", models.PhasePrenhas).Return(mockReproductions, nil)
 
-	// Create request
 	req, err := http.NewRequest("GET", "/api/v1/reproductions/next-to-calve?farmId=1", nil)
 	assert.NoError(t, err)
 
-	// Create response recorder
 	rr := httptest.NewRecorder()
 
-	// Call handler
 	handler.GetNextToCalve(rr, req)
 
-	// Assertions
 	assert.Equal(t, http.StatusOK, rr.Code)
 
 	var response map[string]interface{}
@@ -77,11 +68,9 @@ func TestGetNextToCalve(t *testing.T) {
 	assert.True(t, response["success"].(bool))
 	assert.Contains(t, response["message"], "Próximas vacas a parir encontradas com sucesso")
 
-	// Verify data structure
 	data := response["data"].([]interface{})
 	assert.Len(t, data, 2)
 
-	// Verify first animal
 	firstAnimal := data[0].(map[string]interface{})
 	assert.Equal(t, float64(1), firstAnimal["id"])
 	assert.Equal(t, "Tata Salt", firstAnimal["animal_name"])
@@ -90,11 +79,9 @@ func TestGetNextToCalve(t *testing.T) {
 	assert.Equal(t, pregnancyDate.Format("2006-01-02"), firstAnimal["pregnancy_date"])
 	assert.Equal(t, expectedBirthDate.Format("2006-01-02"), firstAnimal["expected_birth_date"])
 
-	// Verify days until birth calculation
 	daysUntilBirth := int(expectedBirthDate.Sub(now).Hours() / 24)
 	assert.Equal(t, float64(daysUntilBirth), firstAnimal["days_until_birth"])
 
-	// Verify status calculation
 	var expectedStatus string
 	if daysUntilBirth <= 30 {
 		expectedStatus = "Alto"
@@ -109,21 +96,16 @@ func TestGetNextToCalve(t *testing.T) {
 }
 
 func TestGetNextToCalve_MissingFarmID(t *testing.T) {
-	// Setup
 	mockService := &service.MockReproductionService{}
 	handler := NewReproductionHandler(mockService)
 
-	// Create request without farmId
 	req, err := http.NewRequest("GET", "/api/v1/reproductions/next-to-calve", nil)
 	assert.NoError(t, err)
 
-	// Create response recorder
 	rr := httptest.NewRecorder()
 
-	// Call handler
 	handler.GetNextToCalve(rr, req)
 
-	// Assertions
 	assert.Equal(t, http.StatusBadRequest, rr.Code)
 
 	var response map[string]interface{}
@@ -135,21 +117,16 @@ func TestGetNextToCalve_MissingFarmID(t *testing.T) {
 }
 
 func TestGetNextToCalve_InvalidFarmID(t *testing.T) {
-	// Setup
 	mockService := &service.MockReproductionService{}
 	handler := NewReproductionHandler(mockService)
 
-	// Create request with invalid farmId
 	req, err := http.NewRequest("GET", "/api/v1/reproductions/next-to-calve?farmId=invalid", nil)
 	assert.NoError(t, err)
 
-	// Create response recorder
 	rr := httptest.NewRecorder()
 
-	// Call handler
 	handler.GetNextToCalve(rr, req)
 
-	// Assertions
 	assert.Equal(t, http.StatusBadRequest, rr.Code)
 
 	var response map[string]interface{}
@@ -161,24 +138,18 @@ func TestGetNextToCalve_InvalidFarmID(t *testing.T) {
 }
 
 func TestGetNextToCalve_ServiceError(t *testing.T) {
-	// Setup
 	mockService := &service.MockReproductionService{}
 	handler := NewReproductionHandler(mockService)
 
-	// Mock service error
 	mockService.On("GetReproductionsByPhase", models.PhasePrenhas).Return(nil, assert.AnError)
 
-	// Create request
 	req, err := http.NewRequest("GET", "/api/v1/reproductions/next-to-calve?farmId=1", nil)
 	assert.NoError(t, err)
 
-	// Create response recorder
 	rr := httptest.NewRecorder()
 
-	// Call handler
 	handler.GetNextToCalve(rr, req)
 
-	// Assertions
 	assert.Equal(t, http.StatusInternalServerError, rr.Code)
 
 	var response map[string]interface{}
@@ -192,24 +163,18 @@ func TestGetNextToCalve_ServiceError(t *testing.T) {
 }
 
 func TestGetNextToCalve_EmptyResults(t *testing.T) {
-	// Setup
 	mockService := &service.MockReproductionService{}
 	handler := NewReproductionHandler(mockService)
 
-	// Mock empty results
 	mockService.On("GetReproductionsByPhase", models.PhasePrenhas).Return([]models.Reproduction{}, nil)
 
-	// Create request
 	req, err := http.NewRequest("GET", "/api/v1/reproductions/next-to-calve?farmId=1", nil)
 	assert.NoError(t, err)
 
-	// Create response recorder
 	rr := httptest.NewRecorder()
 
-	// Call handler
 	handler.GetNextToCalve(rr, req)
 
-	// Assertions
 	assert.Equal(t, http.StatusOK, rr.Code)
 
 	var response map[string]interface{}
@@ -219,7 +184,6 @@ func TestGetNextToCalve_EmptyResults(t *testing.T) {
 	assert.True(t, response["success"].(bool))
 	assert.Contains(t, response["message"], "Próximas vacas a parir encontradas com sucesso (0 registros)")
 
-	// Verify empty data
 	data := response["data"].([]interface{})
 	assert.Len(t, data, 0)
 
@@ -227,11 +191,9 @@ func TestGetNextToCalve_EmptyResults(t *testing.T) {
 }
 
 func TestGetNextToCalve_FiltersByFarm(t *testing.T) {
-	// Setup
 	mockService := &service.MockReproductionService{}
 	handler := NewReproductionHandler(mockService)
 
-	// Mock data with different farms
 	now := time.Now()
 	pregnancyDate := now.AddDate(0, 0, -200)
 
@@ -243,7 +205,7 @@ func TestGetNextToCalve_FiltersByFarm(t *testing.T) {
 			PregnancyDate: &pregnancyDate,
 			Animal: models.Animal{
 				ID:                1,
-				FarmID:            1, // Target farm
+				FarmID:            1,
 				AnimalName:        "Tata Salt",
 				EarTagNumberLocal: 123,
 				Photo:             "src/assets/images/mocked/cows/tata.png",
@@ -256,7 +218,7 @@ func TestGetNextToCalve_FiltersByFarm(t *testing.T) {
 			PregnancyDate: &pregnancyDate,
 			Animal: models.Animal{
 				ID:                2,
-				FarmID:            2, // Different farm
+				FarmID:            2,
 				AnimalName:        "Lays",
 				EarTagNumberLocal: 124,
 				Photo:             "src/assets/images/mocked/cows/lays.png",
@@ -264,20 +226,15 @@ func TestGetNextToCalve_FiltersByFarm(t *testing.T) {
 		},
 	}
 
-	// Mock service call
 	mockService.On("GetReproductionsByPhase", models.PhasePrenhas).Return(mockReproductions, nil)
 
-	// Create request for farm 1
 	req, err := http.NewRequest("GET", "/api/v1/reproductions/next-to-calve?farmId=1", nil)
 	assert.NoError(t, err)
 
-	// Create response recorder
 	rr := httptest.NewRecorder()
 
-	// Call handler
 	handler.GetNextToCalve(rr, req)
 
-	// Assertions
 	assert.Equal(t, http.StatusOK, rr.Code)
 
 	var response map[string]interface{}
@@ -286,7 +243,6 @@ func TestGetNextToCalve_FiltersByFarm(t *testing.T) {
 
 	assert.True(t, response["success"].(bool))
 
-	// Verify only farm 1 animals are returned
 	data := response["data"].([]interface{})
 	assert.Len(t, data, 1)
 
@@ -297,15 +253,13 @@ func TestGetNextToCalve_FiltersByFarm(t *testing.T) {
 }
 
 func TestGetNextToCalve_SortsByDaysUntilBirth(t *testing.T) {
-	// Setup
 	mockService := &service.MockReproductionService{}
 	handler := NewReproductionHandler(mockService)
 
-	// Mock data with different pregnancy dates
 	now := time.Now()
-	pregnancyDate1 := now.AddDate(0, 0, -250) // 30 days until birth
-	pregnancyDate2 := now.AddDate(0, 0, -220) // 60 days until birth
-	pregnancyDate3 := now.AddDate(0, 0, -200) // 80 days until birth
+	pregnancyDate1 := now.AddDate(0, 0, -250)
+	pregnancyDate2 := now.AddDate(0, 0, -220)
+	pregnancyDate3 := now.AddDate(0, 0, -200)
 
 	mockReproductions := []models.Reproduction{
 		{
@@ -349,20 +303,15 @@ func TestGetNextToCalve_SortsByDaysUntilBirth(t *testing.T) {
 		},
 	}
 
-	// Mock service call
 	mockService.On("GetReproductionsByPhase", models.PhasePrenhas).Return(mockReproductions, nil)
 
-	// Create request
 	req, err := http.NewRequest("GET", "/api/v1/reproductions/next-to-calve?farmId=1", nil)
 	assert.NoError(t, err)
 
-	// Create response recorder
 	rr := httptest.NewRecorder()
 
-	// Call handler
 	handler.GetNextToCalve(rr, req)
 
-	// Assertions
 	assert.Equal(t, http.StatusOK, rr.Code)
 
 	var response map[string]interface{}
@@ -371,19 +320,15 @@ func TestGetNextToCalve_SortsByDaysUntilBirth(t *testing.T) {
 
 	assert.True(t, response["success"].(bool))
 
-	// Verify sorting by days until birth (ascending)
 	data := response["data"].([]interface{})
 	assert.Len(t, data, 3)
 
-	// First should be Tata Salt (30 days)
 	firstAnimal := data[0].(map[string]interface{})
 	assert.Equal(t, "Tata Salt", firstAnimal["animal_name"])
 
-	// Second should be Lays (60 days)
 	secondAnimal := data[1].(map[string]interface{})
 	assert.Equal(t, "Lays", secondAnimal["animal_name"])
 
-	// Third should be Matilda (80 days)
 	thirdAnimal := data[2].(map[string]interface{})
 	assert.Equal(t, "Matilda", thirdAnimal["animal_name"])
 

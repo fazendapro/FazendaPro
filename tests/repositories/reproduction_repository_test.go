@@ -12,13 +12,11 @@ import (
 )
 
 func TestReproductionRepository_FindByPhase(t *testing.T) {
-	// Setup
 	mockDB := &MockGormDB{}
 	reproductionRepo := repository.NewReproductionRepository(mockDB)
 
-	// Mock data
 	now := time.Now()
-	pregnancyDate := now.AddDate(0, 0, -200) // 200 dias atrás
+	pregnancyDate := now.AddDate(0, 0, -200)
 
 	mockReproductions := []models.Reproduction{
 		{
@@ -49,22 +47,18 @@ func TestReproductionRepository_FindByPhase(t *testing.T) {
 		},
 	}
 
-	// Mock GORM calls
 	mockDB.On("Preload", "Animal").Return(mockDB)
 	mockDB.On("Where", "current_phase = ?", models.PhasePrenhas).Return(mockDB)
 	mockDB.On("Find", &[]models.Reproduction{}).Return(mockDB)
 	mockDB.On("Error").Return(nil)
 
-	// Mock the Find method to populate the slice
 	mockDB.On("Find", mock.AnythingOfType("*[]models.Reproduction")).Run(func(args mock.Arguments) {
 		reproductions := args.Get(0).(*[]models.Reproduction)
 		*reproductions = mockReproductions
 	}).Return(mockDB)
 
-	// Test
 	result, err := reproductionRepo.FindByPhase(models.PhasePrenhas)
 
-	// Assertions
 	assert.NoError(t, err)
 	assert.Len(t, result, 2)
 	assert.Equal(t, models.PhasePrenhas, result[0].CurrentPhase)
@@ -76,20 +70,16 @@ func TestReproductionRepository_FindByPhase(t *testing.T) {
 }
 
 func TestReproductionRepository_FindByPhase_Error(t *testing.T) {
-	// Setup
 	mockDB := &MockGormDB{}
 	reproductionRepo := repository.NewReproductionRepository(mockDB)
 
-	// Mock GORM calls with error
 	mockDB.On("Preload", "Animal").Return(mockDB)
 	mockDB.On("Where", "current_phase = ?", models.PhasePrenhas).Return(mockDB)
 	mockDB.On("Find", mock.AnythingOfType("*[]models.Reproduction")).Return(mockDB)
 	mockDB.On("Error").Return(errors.New("database error"))
 
-	// Test
 	result, err := reproductionRepo.FindByPhase(models.PhasePrenhas)
 
-	// Assertions
 	assert.Error(t, err)
 	assert.Nil(t, result)
 	assert.Contains(t, err.Error(), "database error")
@@ -98,11 +88,9 @@ func TestReproductionRepository_FindByPhase_Error(t *testing.T) {
 }
 
 func TestReproductionRepository_FindByPhase_EmptyResults(t *testing.T) {
-	// Setup
 	mockDB := &MockGormDB{}
 	reproductionRepo := repository.NewReproductionRepository(mockDB)
 
-	// Mock GORM calls with empty results
 	mockDB.On("Preload", "Animal").Return(mockDB)
 	mockDB.On("Where", "current_phase = ?", models.PhasePrenhas).Return(mockDB)
 	mockDB.On("Find", mock.AnythingOfType("*[]models.Reproduction")).Run(func(args mock.Arguments) {
@@ -111,10 +99,8 @@ func TestReproductionRepository_FindByPhase_EmptyResults(t *testing.T) {
 	}).Return(mockDB)
 	mockDB.On("Error").Return(nil)
 
-	// Test
 	result, err := reproductionRepo.FindByPhase(models.PhasePrenhas)
 
-	// Assertions
 	assert.NoError(t, err)
 	assert.Len(t, result, 0)
 
@@ -122,11 +108,9 @@ func TestReproductionRepository_FindByPhase_EmptyResults(t *testing.T) {
 }
 
 func TestReproductionRepository_FindByPhase_DifferentPhases(t *testing.T) {
-	// Setup
 	mockDB := &MockGormDB{}
 	reproductionRepo := repository.NewReproductionRepository(mockDB)
 
-	// Mock data for different phases
 	mockReproductions := []models.Reproduction{
 		{
 			ID:           1,
@@ -141,7 +125,6 @@ func TestReproductionRepository_FindByPhase_DifferentPhases(t *testing.T) {
 		},
 	}
 
-	// Mock GORM calls
 	mockDB.On("Preload", "Animal").Return(mockDB)
 	mockDB.On("Where", "current_phase = ?", models.PhaseLactacao).Return(mockDB)
 	mockDB.On("Find", mock.AnythingOfType("*[]models.Reproduction")).Run(func(args mock.Arguments) {
@@ -150,10 +133,8 @@ func TestReproductionRepository_FindByPhase_DifferentPhases(t *testing.T) {
 	}).Return(mockDB)
 	mockDB.On("Error").Return(nil)
 
-	// Test
 	result, err := reproductionRepo.FindByPhase(models.PhaseLactacao)
 
-	// Assertions
 	assert.NoError(t, err)
 	assert.Len(t, result, 1)
 	assert.Equal(t, models.PhaseLactacao, result[0].CurrentPhase)
@@ -162,13 +143,11 @@ func TestReproductionRepository_FindByPhase_DifferentPhases(t *testing.T) {
 }
 
 func TestReproductionRepository_FindByPhase_WithAnimalData(t *testing.T) {
-	// Setup
 	mockDB := &MockGormDB{}
 	reproductionRepo := repository.NewReproductionRepository(mockDB)
 
-	// Mock data with complete animal information
 	now := time.Now()
-	pregnancyDate := now.AddDate(0, 0, -200) // 200 dias atrás
+	pregnancyDate := now.AddDate(0, 0, -200)
 
 	mockReproductions := []models.Reproduction{
 		{
@@ -190,7 +169,6 @@ func TestReproductionRepository_FindByPhase_WithAnimalData(t *testing.T) {
 		},
 	}
 
-	// Mock GORM calls
 	mockDB.On("Preload", "Animal").Return(mockDB)
 	mockDB.On("Where", "current_phase = ?", models.PhasePrenhas).Return(mockDB)
 	mockDB.On("Find", mock.AnythingOfType("*[]models.Reproduction")).Run(func(args mock.Arguments) {
@@ -199,10 +177,8 @@ func TestReproductionRepository_FindByPhase_WithAnimalData(t *testing.T) {
 	}).Return(mockDB)
 	mockDB.On("Error").Return(nil)
 
-	// Test
 	result, err := reproductionRepo.FindByPhase(models.PhasePrenhas)
 
-	// Assertions
 	assert.NoError(t, err)
 	assert.Len(t, result, 1)
 
@@ -212,7 +188,6 @@ func TestReproductionRepository_FindByPhase_WithAnimalData(t *testing.T) {
 	assert.NotNil(t, reproduction.PregnancyDate)
 	assert.Equal(t, pregnancyDate, *reproduction.PregnancyDate)
 
-	// Verify animal data
 	animal := reproduction.Animal
 	assert.Equal(t, uint(1), animal.ID)
 	assert.Equal(t, uint(1), animal.FarmID)
@@ -228,17 +203,15 @@ func TestReproductionRepository_FindByPhase_WithAnimalData(t *testing.T) {
 }
 
 func TestReproductionRepository_FindByPhase_WithNullPregnancyDate(t *testing.T) {
-	// Setup
 	mockDB := &MockGormDB{}
 	reproductionRepo := repository.NewReproductionRepository(mockDB)
 
-	// Mock data with null pregnancy date
 	mockReproductions := []models.Reproduction{
 		{
 			ID:            1,
 			AnimalID:      1,
 			CurrentPhase:  models.PhasePrenhas,
-			PregnancyDate: nil, // Null pregnancy date
+			PregnancyDate: nil,
 			Animal: models.Animal{
 				ID:                1,
 				FarmID:            1,
@@ -248,7 +221,6 @@ func TestReproductionRepository_FindByPhase_WithNullPregnancyDate(t *testing.T) 
 		},
 	}
 
-	// Mock GORM calls
 	mockDB.On("Preload", "Animal").Return(mockDB)
 	mockDB.On("Where", "current_phase = ?", models.PhasePrenhas).Return(mockDB)
 	mockDB.On("Find", mock.AnythingOfType("*[]models.Reproduction")).Run(func(args mock.Arguments) {
@@ -257,10 +229,8 @@ func TestReproductionRepository_FindByPhase_WithNullPregnancyDate(t *testing.T) 
 	}).Return(mockDB)
 	mockDB.On("Error").Return(nil)
 
-	// Test
 	result, err := reproductionRepo.FindByPhase(models.PhasePrenhas)
 
-	// Assertions
 	assert.NoError(t, err)
 	assert.Len(t, result, 1)
 
@@ -272,13 +242,11 @@ func TestReproductionRepository_FindByPhase_WithNullPregnancyDate(t *testing.T) 
 }
 
 func TestReproductionRepository_FindByPhase_WithMultipleFarms(t *testing.T) {
-	// Setup
 	mockDB := &MockGormDB{}
 	reproductionRepo := repository.NewReproductionRepository(mockDB)
 
-	// Mock data with animals from different farms
 	now := time.Now()
-	pregnancyDate := now.AddDate(0, 0, -200) // 200 dias atrás
+	pregnancyDate := now.AddDate(0, 0, -200)
 
 	mockReproductions := []models.Reproduction{
 		{
@@ -319,7 +287,6 @@ func TestReproductionRepository_FindByPhase_WithMultipleFarms(t *testing.T) {
 		},
 	}
 
-	// Mock GORM calls
 	mockDB.On("Preload", "Animal").Return(mockDB)
 	mockDB.On("Where", "current_phase = ?", models.PhasePrenhas).Return(mockDB)
 	mockDB.On("Find", mock.AnythingOfType("*[]models.Reproduction")).Run(func(args mock.Arguments) {
@@ -328,20 +295,16 @@ func TestReproductionRepository_FindByPhase_WithMultipleFarms(t *testing.T) {
 	}).Return(mockDB)
 	mockDB.On("Error").Return(nil)
 
-	// Test
 	result, err := reproductionRepo.FindByPhase(models.PhasePrenhas)
 
-	// Assertions
 	assert.NoError(t, err)
 	assert.Len(t, result, 3)
 
-	// Verify all reproductions are in PhasePrenhas
 	for _, reproduction := range result {
 		assert.Equal(t, models.PhasePrenhas, reproduction.CurrentPhase)
 		assert.NotNil(t, reproduction.PregnancyDate)
 	}
 
-	// Verify farm distribution
 	farm1Count := 0
 	farm2Count := 0
 	for _, reproduction := range result {
@@ -357,7 +320,6 @@ func TestReproductionRepository_FindByPhase_WithMultipleFarms(t *testing.T) {
 	mockDB.AssertExpectations(t)
 }
 
-// MockGormDB is a mock implementation of gorm.DB for testing
 type MockGormDB struct {
 	mock.Mock
 }

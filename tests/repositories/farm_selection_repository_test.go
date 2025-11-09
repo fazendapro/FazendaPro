@@ -43,11 +43,10 @@ func TestUserRepository_GetUserFarms(t *testing.T) {
 	}
 	db.Create(user)
 
-
 	farms, err := userRepo.GetUserFarms(user.ID)
 
 	assert.NoError(t, err)
-	assert.Len(t, farms, 1) // Por enquanto, apenas a fazenda principal
+	assert.Len(t, farms, 1)
 	assert.Equal(t, farm1.ID, farms[0].ID)
 }
 
@@ -139,7 +138,7 @@ func TestUserRepository_GetUserFarmByID_NotFound(t *testing.T) {
 	}
 	db.Create(user)
 
-	foundFarm, err := userRepo.GetUserFarmByID(user.ID, 999) // ID inexistente
+	foundFarm, err := userRepo.GetUserFarmByID(user.ID, 999)
 
 	assert.Error(t, err)
 	assert.Nil(t, foundFarm)

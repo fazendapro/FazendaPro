@@ -12,13 +12,11 @@ import (
 )
 
 func TestReproductionService_GetReproductionsByPhase(t *testing.T) {
-	// Setup
 	mockRepo := &repository.MockReproductionRepository{}
 	reproductionService := service.NewReproductionService(mockRepo)
 
-	// Mock data
 	now := time.Now()
-	pregnancyDate := now.AddDate(0, 0, -200) // 200 dias atrás
+	pregnancyDate := now.AddDate(0, 0, -200)
 
 	mockReproductions := []models.Reproduction{
 		{
@@ -49,13 +47,10 @@ func TestReproductionService_GetReproductionsByPhase(t *testing.T) {
 		},
 	}
 
-	// Mock repository call
 	mockRepo.On("FindByPhase", models.PhasePrenhas).Return(mockReproductions, nil)
 
-	// Test
 	result, err := reproductionService.GetReproductionsByPhase(models.PhasePrenhas)
 
-	// Assertions
 	assert.NoError(t, err)
 	assert.Len(t, result, 2)
 	assert.Equal(t, models.PhasePrenhas, result[0].CurrentPhase)
@@ -67,17 +62,13 @@ func TestReproductionService_GetReproductionsByPhase(t *testing.T) {
 }
 
 func TestReproductionService_GetReproductionsByPhase_Error(t *testing.T) {
-	// Setup
 	mockRepo := &repository.MockReproductionRepository{}
 	reproductionService := service.NewReproductionService(mockRepo)
 
-	// Mock repository error
 	mockRepo.On("FindByPhase", models.PhasePrenhas).Return(nil, errors.New("database error"))
 
-	// Test
 	result, err := reproductionService.GetReproductionsByPhase(models.PhasePrenhas)
 
-	// Assertions
 	assert.Error(t, err)
 	assert.Nil(t, result)
 	assert.Contains(t, err.Error(), "database error")
@@ -86,17 +77,13 @@ func TestReproductionService_GetReproductionsByPhase_Error(t *testing.T) {
 }
 
 func TestReproductionService_GetReproductionsByPhase_EmptyResults(t *testing.T) {
-	// Setup
 	mockRepo := &repository.MockReproductionRepository{}
 	reproductionService := service.NewReproductionService(mockRepo)
 
-	// Mock empty results
 	mockRepo.On("FindByPhase", models.PhasePrenhas).Return([]models.Reproduction{}, nil)
 
-	// Test
 	result, err := reproductionService.GetReproductionsByPhase(models.PhasePrenhas)
 
-	// Assertions
 	assert.NoError(t, err)
 	assert.Len(t, result, 0)
 
@@ -104,11 +91,9 @@ func TestReproductionService_GetReproductionsByPhase_EmptyResults(t *testing.T) 
 }
 
 func TestReproductionService_GetReproductionsByPhase_DifferentPhases(t *testing.T) {
-	// Setup
 	mockRepo := &repository.MockReproductionRepository{}
 	reproductionService := service.NewReproductionService(mockRepo)
 
-	// Mock data for different phases
 	mockReproductions := []models.Reproduction{
 		{
 			ID:           1,
@@ -123,13 +108,10 @@ func TestReproductionService_GetReproductionsByPhase_DifferentPhases(t *testing.
 		},
 	}
 
-	// Mock repository call
 	mockRepo.On("FindByPhase", models.PhaseLactacao).Return(mockReproductions, nil)
 
-	// Test
 	result, err := reproductionService.GetReproductionsByPhase(models.PhaseLactacao)
 
-	// Assertions
 	assert.NoError(t, err)
 	assert.Len(t, result, 1)
 	assert.Equal(t, models.PhaseLactacao, result[0].CurrentPhase)
@@ -138,13 +120,11 @@ func TestReproductionService_GetReproductionsByPhase_DifferentPhases(t *testing.
 }
 
 func TestReproductionService_GetReproductionsByPhase_WithAnimalData(t *testing.T) {
-	// Setup
 	mockRepo := &repository.MockReproductionRepository{}
 	reproductionService := service.NewReproductionService(mockRepo)
 
-	// Mock data with complete animal information
 	now := time.Now()
-	pregnancyDate := now.AddDate(0, 0, -200) // 200 dias atrás
+	pregnancyDate := now.AddDate(0, 0, -200)
 
 	mockReproductions := []models.Reproduction{
 		{
@@ -166,13 +146,10 @@ func TestReproductionService_GetReproductionsByPhase_WithAnimalData(t *testing.T
 		},
 	}
 
-	// Mock repository call
 	mockRepo.On("FindByPhase", models.PhasePrenhas).Return(mockReproductions, nil)
 
-	// Test
 	result, err := reproductionService.GetReproductionsByPhase(models.PhasePrenhas)
 
-	// Assertions
 	assert.NoError(t, err)
 	assert.Len(t, result, 1)
 
@@ -182,7 +159,6 @@ func TestReproductionService_GetReproductionsByPhase_WithAnimalData(t *testing.T
 	assert.NotNil(t, reproduction.PregnancyDate)
 	assert.Equal(t, pregnancyDate, *reproduction.PregnancyDate)
 
-	// Verify animal data
 	animal := reproduction.Animal
 	assert.Equal(t, uint(1), animal.ID)
 	assert.Equal(t, uint(1), animal.FarmID)
@@ -198,13 +174,11 @@ func TestReproductionService_GetReproductionsByPhase_WithAnimalData(t *testing.T
 }
 
 func TestReproductionService_GetReproductionsByPhase_WithMultipleFarms(t *testing.T) {
-	// Setup
 	mockRepo := &repository.MockReproductionRepository{}
 	reproductionService := service.NewReproductionService(mockRepo)
 
-	// Mock data with animals from different farms
 	now := time.Now()
-	pregnancyDate := now.AddDate(0, 0, -200) // 200 dias atrás
+	pregnancyDate := now.AddDate(0, 0, -200)
 
 	mockReproductions := []models.Reproduction{
 		{
@@ -245,23 +219,18 @@ func TestReproductionService_GetReproductionsByPhase_WithMultipleFarms(t *testin
 		},
 	}
 
-	// Mock repository call
 	mockRepo.On("FindByPhase", models.PhasePrenhas).Return(mockReproductions, nil)
 
-	// Test
 	result, err := reproductionService.GetReproductionsByPhase(models.PhasePrenhas)
 
-	// Assertions
 	assert.NoError(t, err)
 	assert.Len(t, result, 3)
 
-	// Verify all reproductions are in PhasePrenhas
 	for _, reproduction := range result {
 		assert.Equal(t, models.PhasePrenhas, reproduction.CurrentPhase)
 		assert.NotNil(t, reproduction.PregnancyDate)
 	}
 
-	// Verify farm distribution
 	farm1Count := 0
 	farm2Count := 0
 	for _, reproduction := range result {
@@ -278,17 +247,15 @@ func TestReproductionService_GetReproductionsByPhase_WithMultipleFarms(t *testin
 }
 
 func TestReproductionService_GetReproductionsByPhase_WithNullPregnancyDate(t *testing.T) {
-	// Setup
 	mockRepo := &repository.MockReproductionRepository{}
 	reproductionService := service.NewReproductionService(mockRepo)
 
-	// Mock data with null pregnancy date
 	mockReproductions := []models.Reproduction{
 		{
 			ID:            1,
 			AnimalID:      1,
 			CurrentPhase:  models.PhasePrenhas,
-			PregnancyDate: nil, // Null pregnancy date
+			PregnancyDate: nil,
 			Animal: models.Animal{
 				ID:                1,
 				FarmID:            1,
@@ -298,13 +265,10 @@ func TestReproductionService_GetReproductionsByPhase_WithNullPregnancyDate(t *te
 		},
 	}
 
-	// Mock repository call
 	mockRepo.On("FindByPhase", models.PhasePrenhas).Return(mockReproductions, nil)
 
-	// Test
 	result, err := reproductionService.GetReproductionsByPhase(models.PhasePrenhas)
 
-	// Assertions
 	assert.NoError(t, err)
 	assert.Len(t, result, 1)
 
