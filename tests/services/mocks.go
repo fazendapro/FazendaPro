@@ -2,6 +2,7 @@ package services
 
 import (
 	"github.com/fazendapro/FazendaPro-api/internal/models"
+	"github.com/fazendapro/FazendaPro-api/internal/repository"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -196,3 +197,62 @@ func (m *MockReproductionRepository) Delete(id uint) error {
 	return args.Error(0)
 }
 
+type MockDebtRepository struct {
+	mock.Mock
+}
+
+func (m *MockDebtRepository) Create(debt *models.Debt) error {
+	args := m.Called(debt)
+	return args.Error(0)
+}
+
+func (m *MockDebtRepository) FindByID(id uint) (*models.Debt, error) {
+	args := m.Called(id)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.Debt), args.Error(1)
+}
+
+func (m *MockDebtRepository) FindAllWithPagination(page, limit int, year, month *int) ([]models.Debt, int64, error) {
+	args := m.Called(page, limit, year, month)
+	if args.Get(0) == nil {
+		return nil, args.Get(1).(int64), args.Error(2)
+	}
+	return args.Get(0).([]models.Debt), args.Get(1).(int64), args.Error(2)
+}
+
+func (m *MockDebtRepository) Delete(id uint) error {
+	args := m.Called(id)
+	return args.Error(0)
+}
+
+func (m *MockDebtRepository) GetTotalByPersonInMonth(year, month int) ([]repository.PersonTotal, error) {
+	args := m.Called(year, month)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]repository.PersonTotal), args.Error(1)
+}
+
+type MockFarmRepository struct {
+	mock.Mock
+}
+
+func (m *MockFarmRepository) FindByID(id uint) (*models.Farm, error) {
+	args := m.Called(id)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.Farm), args.Error(1)
+}
+
+func (m *MockFarmRepository) Update(farm *models.Farm) error {
+	args := m.Called(farm)
+	return args.Error(0)
+}
+
+func (m *MockFarmRepository) LoadCompanyData(farm *models.Farm) error {
+	args := m.Called(farm)
+	return args.Error(0)
+}

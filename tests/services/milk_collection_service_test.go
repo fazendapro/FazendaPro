@@ -137,3 +137,200 @@ func TestMilkCollectionService_CreateMilkCollection_BatchUpdateError(t *testing.
 	mockMilkRepo.AssertExpectations(t)
 	mockAnimalRepo.AssertExpectations(t)
 }
+
+func TestMilkCollectionService_GetMilkCollectionByID_Success(t *testing.T) {
+	mockMilkRepo := new(mocks.MockMilkCollectionRepository)
+	mockAnimalRepo := new(mocks.MockAnimalRepository)
+
+	batchService := service.NewBatchService(mockAnimalRepo, mockMilkRepo)
+	milkService := service.NewMilkCollectionService(mockMilkRepo, batchService)
+
+	expectedMilkCollection := &models.MilkCollection{
+		ID:       1,
+		AnimalID: 1,
+		Liters:   35.0,
+		Date:     time.Now(),
+	}
+
+	mockMilkRepo.On("FindByID", uint(1)).Return(expectedMilkCollection, nil)
+
+	result, err := milkService.GetMilkCollectionByID(1)
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedMilkCollection, result)
+	mockMilkRepo.AssertExpectations(t)
+}
+
+func TestMilkCollectionService_GetMilkCollectionByID_NotFound(t *testing.T) {
+	mockMilkRepo := new(mocks.MockMilkCollectionRepository)
+	mockAnimalRepo := new(mocks.MockAnimalRepository)
+
+	batchService := service.NewBatchService(mockAnimalRepo, mockMilkRepo)
+	milkService := service.NewMilkCollectionService(mockMilkRepo, batchService)
+
+	mockMilkRepo.On("FindByID", uint(1)).Return(nil, errors.New("not found"))
+
+	result, err := milkService.GetMilkCollectionByID(1)
+
+	assert.Error(t, err)
+	assert.Nil(t, result)
+	mockMilkRepo.AssertExpectations(t)
+}
+
+func TestMilkCollectionService_GetMilkCollectionsByFarmID_Success(t *testing.T) {
+	mockMilkRepo := new(mocks.MockMilkCollectionRepository)
+	mockAnimalRepo := new(mocks.MockAnimalRepository)
+
+	batchService := service.NewBatchService(mockAnimalRepo, mockMilkRepo)
+	milkService := service.NewMilkCollectionService(mockMilkRepo, batchService)
+
+	expectedCollections := []models.MilkCollection{
+		{
+			ID:       1,
+			AnimalID: 1,
+			Liters:   35.0,
+			Date:     time.Now(),
+		},
+		{
+			ID:       2,
+			AnimalID: 2,
+			Liters:   30.0,
+			Date:     time.Now(),
+		},
+	}
+
+	mockMilkRepo.On("FindByFarmID", uint(1)).Return(expectedCollections, nil)
+
+	result, err := milkService.GetMilkCollectionsByFarmID(1)
+
+	assert.NoError(t, err)
+	assert.Len(t, result, 2)
+	mockMilkRepo.AssertExpectations(t)
+}
+
+func TestMilkCollectionService_GetMilkCollectionsByFarmIDWithDateRange_Success(t *testing.T) {
+	mockMilkRepo := new(mocks.MockMilkCollectionRepository)
+	mockAnimalRepo := new(mocks.MockAnimalRepository)
+
+	batchService := service.NewBatchService(mockAnimalRepo, mockMilkRepo)
+	milkService := service.NewMilkCollectionService(mockMilkRepo, batchService)
+
+	startDate := time.Now().AddDate(0, 0, -30)
+	endDate := time.Now()
+
+	expectedCollections := []models.MilkCollection{
+		{
+			ID:       1,
+			AnimalID: 1,
+			Liters:   35.0,
+			Date:     time.Now(),
+		},
+	}
+
+	mockMilkRepo.On("FindByFarmIDWithDateRange", uint(1), &startDate, &endDate).Return(expectedCollections, nil)
+
+	result, err := milkService.GetMilkCollectionsByFarmIDWithDateRange(1, &startDate, &endDate)
+
+	assert.NoError(t, err)
+	assert.Len(t, result, 1)
+	mockMilkRepo.AssertExpectations(t)
+}
+
+func TestMilkCollectionService_GetMilkCollectionsByAnimalID_Success(t *testing.T) {
+	mockMilkRepo := new(mocks.MockMilkCollectionRepository)
+	mockAnimalRepo := new(mocks.MockAnimalRepository)
+
+	batchService := service.NewBatchService(mockAnimalRepo, mockMilkRepo)
+	milkService := service.NewMilkCollectionService(mockMilkRepo, batchService)
+
+	expectedCollections := []models.MilkCollection{
+		{
+			ID:       1,
+			AnimalID: 1,
+			Liters:   35.0,
+			Date:     time.Now(),
+		},
+	}
+
+	mockMilkRepo.On("FindByAnimalID", uint(1)).Return(expectedCollections, nil)
+
+	result, err := milkService.GetMilkCollectionsByAnimalID(1)
+
+	assert.NoError(t, err)
+	assert.Len(t, result, 1)
+	mockMilkRepo.AssertExpectations(t)
+}
+
+func TestMilkCollectionService_UpdateMilkCollection_Success(t *testing.T) {
+	mockMilkRepo := new(mocks.MockMilkCollectionRepository)
+	mockAnimalRepo := new(mocks.MockAnimalRepository)
+
+	batchService := service.NewBatchService(mockAnimalRepo, mockMilkRepo)
+	milkService := service.NewMilkCollectionService(mockMilkRepo, batchService)
+
+	milkCollection := &models.MilkCollection{
+		ID:       1,
+		AnimalID: 1,
+		Liters:   40.0,
+		Date:     time.Now(),
+	}
+
+	mockMilkRepo.On("Update", milkCollection).Return(nil)
+
+	err := milkService.UpdateMilkCollection(milkCollection)
+
+	assert.NoError(t, err)
+	mockMilkRepo.AssertExpectations(t)
+}
+
+func TestMilkCollectionService_UpdateMilkCollection_Error(t *testing.T) {
+	mockMilkRepo := new(mocks.MockMilkCollectionRepository)
+	mockAnimalRepo := new(mocks.MockAnimalRepository)
+
+	batchService := service.NewBatchService(mockAnimalRepo, mockMilkRepo)
+	milkService := service.NewMilkCollectionService(mockMilkRepo, batchService)
+
+	milkCollection := &models.MilkCollection{
+		ID:       1,
+		AnimalID: 1,
+		Liters:   40.0,
+		Date:     time.Now(),
+	}
+
+	mockMilkRepo.On("Update", milkCollection).Return(errors.New("database error"))
+
+	err := milkService.UpdateMilkCollection(milkCollection)
+
+	assert.Error(t, err)
+	mockMilkRepo.AssertExpectations(t)
+}
+
+func TestMilkCollectionService_DeleteMilkCollection_Success(t *testing.T) {
+	mockMilkRepo := new(mocks.MockMilkCollectionRepository)
+	mockAnimalRepo := new(mocks.MockAnimalRepository)
+
+	batchService := service.NewBatchService(mockAnimalRepo, mockMilkRepo)
+	milkService := service.NewMilkCollectionService(mockMilkRepo, batchService)
+
+	mockMilkRepo.On("Delete", uint(1)).Return(nil)
+
+	err := milkService.DeleteMilkCollection(1)
+
+	assert.NoError(t, err)
+	mockMilkRepo.AssertExpectations(t)
+}
+
+func TestMilkCollectionService_DeleteMilkCollection_Error(t *testing.T) {
+	mockMilkRepo := new(mocks.MockMilkCollectionRepository)
+	mockAnimalRepo := new(mocks.MockAnimalRepository)
+
+	batchService := service.NewBatchService(mockAnimalRepo, mockMilkRepo)
+	milkService := service.NewMilkCollectionService(mockMilkRepo, batchService)
+
+	mockMilkRepo.On("Delete", uint(1)).Return(errors.New("database error"))
+
+	err := milkService.DeleteMilkCollection(1)
+
+	assert.Error(t, err)
+	mockMilkRepo.AssertExpectations(t)
+}

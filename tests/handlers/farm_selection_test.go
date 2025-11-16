@@ -187,3 +187,137 @@ func TestSelectFarm_InvalidFarm(t *testing.T) {
 	assert.False(t, response["success"].(bool))
 	assert.Contains(t, response["message"], "Fazenda não encontrada")
 }
+
+func TestGetUserFarms_InvalidMethod(t *testing.T) {
+	mockRepo := new(MockUserRepository)
+	userService := service.NewUserService(mockRepo)
+	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+
+	req := httptest.NewRequest("POST", "/api/v1/farms/user", nil)
+	req.Header.Set("Authorization", "Bearer "+generateTestToken(1))
+	w := httptest.NewRecorder()
+
+	farmHandler.GetUserFarms(w, req)
+
+	assert.Equal(t, http.StatusMethodNotAllowed, w.Code)
+}
+
+func TestGetUserFarms_InvalidToken(t *testing.T) {
+	mockRepo := new(MockUserRepository)
+	userService := service.NewUserService(mockRepo)
+	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+
+	req := httptest.NewRequest("GET", "/api/v1/farms/user", nil)
+	req.Header.Set("Authorization", "Bearer invalid-token")
+	w := httptest.NewRecorder()
+
+	farmHandler.GetUserFarms(w, req)
+
+	assert.Equal(t, http.StatusUnauthorized, w.Code)
+}
+
+func TestGetUserFarms_MissingToken(t *testing.T) {
+	mockRepo := new(MockUserRepository)
+	userService := service.NewUserService(mockRepo)
+	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+
+	req := httptest.NewRequest("GET", "/api/v1/farms/user", nil)
+	w := httptest.NewRecorder()
+
+	farmHandler.GetUserFarms(w, req)
+
+	assert.Equal(t, http.StatusUnauthorized, w.Code)
+}
+
+func TestGetUserFarms_ServiceError(t *testing.T) {
+	mockRepo := new(MockUserRepository)
+	userService := service.NewUserService(mockRepo)
+	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+
+	userID := uint(1)
+	mockRepo.On("GetUserFarms", userID).Return(nil, gorm.ErrRecordNotFound)
+
+	req := httptest.NewRequest("GET", "/api/v1/farms/user", nil)
+	req.Header.Set("Authorization", "Bearer "+generateTestToken(userID))
+	w := httptest.NewRecorder()
+
+	farmHandler.GetUserFarms(w, req)
+
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestSelectFarm_InvalidMethod(t *testing.T) {
+	mockRepo := new(MockUserRepository)
+	userService := service.NewUserService(mockRepo)
+	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+
+	req := httptest.NewRequest("GET", "/api/v1/farms/select", nil)
+	req.Header.Set("Authorization", "Bearer "+generateTestToken(1))
+	w := httptest.NewRecorder()
+
+	farmHandler.SelectFarm(w, req)
+
+	assert.Equal(t, http.StatusMethodNotAllowed, w.Code)
+}
+
+func TestSelectFarm_InvalidToken(t *testing.T) {
+	mockRepo := new(MockUserRepository)
+	userService := service.NewUserService(mockRepo)
+	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+
+	requestBody := map[string]interface{}{
+		"farm_id": 1,
+	}
+	jsonBody, _ := json.Marshal(requestBody)
+
+	req := httptest.NewRequest("POST", "/api/v1/farms/select", bytes.NewBuffer(jsonBody))
+	req.Header.Set("Authorization", "Bearer invalid-token")
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	farmHandler.SelectFarm(w, req)
+
+	assert.Equal(t, http.StatusUnauthorized, w.Code)
+}
+
+func TestSelectFarm_InvalidJSON(t *testing.T) {
+	mockRepo := new(MockUserRepository)
+	userService := service.NewUserService(mockRepo)
+	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+
+	req := httptest.NewRequest("POST", "/api/v1/farms/select", bytes.NewBuffer([]byte("invalid json")))
+	req.Header.Set("Authorization", "Bearer "+generateTestToken(1))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	farmHandler.SelectFarm(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestSelectFarm_ServiceError(t *testing.T) {
+	mockRepo := new(MockUserRepository)
+	userService := service.NewUserService(mockRepo)
+	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+
+	userID := uint(1)
+	farmID := uint(2)
+
+	mockRepo.On("GetUserFarmByID", userID, farmID).Return(nil, gorm.ErrRecordNotFound)
+
+	requestBody := map[string]interface{}{
+		"farm_id": farmID,
+	}
+	jsonBody, _ := json.Marshal(requestBody)
+
+	req := httptest.NewRequest("POST", "/api/v1/farms/select", bytes.NewBuffer(jsonBody))
+	req.Header.Set("Authorization", "Bearer "+generateTestToken(userID))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	farmHandler.SelectFarm(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	mockRepo.AssertExpectations(t)
+}

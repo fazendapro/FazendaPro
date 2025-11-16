@@ -18,6 +18,9 @@ func (m *MockMilkCollectionRepository) Create(milkCollection *models.MilkCollect
 
 func (m *MockMilkCollectionRepository) FindByID(id uint) (*models.MilkCollection, error) {
 	args := m.Called(id)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
 	return args.Get(0).(*models.MilkCollection), args.Error(1)
 }
 
