@@ -205,6 +205,7 @@ func (h *AnimalHandler) GetAnimalsByFarm(w http.ResponseWriter, r *http.Request)
 	farmID := r.URL.Query().Get("farmId")
 	if farmID == "" {
 		fmt.Printf("Erro: farmId não fornecido\n")
+
 		SendErrorResponse(w, "ID da fazenda é obrigatório", http.StatusBadRequest)
 		return
 	}
