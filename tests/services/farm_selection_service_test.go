@@ -6,63 +6,8 @@ import (
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"gorm.io/gorm"
 )
-
-type MockUserRepository struct {
-	mock.Mock
-}
-
-func (m *MockUserRepository) CreateWithPerson(user *models.User, person *models.Person) error {
-	args := m.Called(user, person)
-	return args.Error(0)
-}
-
-func (m *MockUserRepository) FindByPersonEmail(email string) (*models.User, error) {
-	args := m.Called(email)
-	return args.Get(0).(*models.User), args.Error(1)
-}
-
-func (m *MockUserRepository) FindByIDWithPerson(userID uint) (*models.User, error) {
-	args := m.Called(userID)
-	return args.Get(0).(*models.User), args.Error(1)
-}
-
-func (m *MockUserRepository) UpdatePersonData(userID uint, personData *models.Person) error {
-	args := m.Called(userID, personData)
-	return args.Error(0)
-}
-
-func (m *MockUserRepository) ValidatePassword(userID uint, password string) (bool, error) {
-	args := m.Called(userID, password)
-	return args.Bool(0), args.Error(1)
-}
-
-func (m *MockUserRepository) FarmExists(farmID uint) (bool, error) {
-	args := m.Called(farmID)
-	return args.Bool(0), args.Error(1)
-}
-
-func (m *MockUserRepository) CreateDefaultFarm(farmID uint) error {
-	args := m.Called(farmID)
-	return args.Error(0)
-}
-
-func (m *MockUserRepository) GetUserFarms(userID uint) ([]models.Farm, error) {
-	args := m.Called(userID)
-	return args.Get(0).([]models.Farm), args.Error(1)
-}
-
-func (m *MockUserRepository) GetUserFarmCount(userID uint) (int64, error) {
-	args := m.Called(userID)
-	return args.Get(0).(int64), args.Error(1)
-}
-
-func (m *MockUserRepository) GetUserFarmByID(userID, farmID uint) (*models.Farm, error) {
-	args := m.Called(userID, farmID)
-	return args.Get(0).(*models.Farm), args.Error(1)
-}
 
 func TestUserService_GetUserFarms(t *testing.T) {
 	mockRepo := new(MockUserRepository)

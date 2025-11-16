@@ -4,17 +4,18 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSale_TableName(t *testing.T) {
-	sale := Sale{}
+	sale := models.Sale{}
 	assert.Equal(t, "sales", sale.TableName())
 }
 
 func TestSale_ValidSale(t *testing.T) {
 	now := time.Now()
-	sale := Sale{
+	sale := models.Sale{
 		AnimalID:  1,
 		FarmID:    1,
 		BuyerName: "João Silva",
@@ -32,7 +33,7 @@ func TestSale_ValidSale(t *testing.T) {
 }
 
 func TestSale_EmptyFields(t *testing.T) {
-	sale := Sale{}
+	sale := models.Sale{}
 
 	assert.Equal(t, uint(0), sale.AnimalID)
 	assert.Equal(t, uint(0), sale.FarmID)

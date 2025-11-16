@@ -9,60 +9,18 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type MockUserRepository struct {
-	mock.Mock
-}
-
-func (m *MockUserRepository) Create(user *models.User) error {
-	args := m.Called(user)
-	return args.Error(0)
-}
-
-func (m *MockUserRepository) FindByPersonEmail(email string) (*models.User, error) {
-	args := m.Called(email)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*models.User), args.Error(1)
-}
-
-func (m *MockUserRepository) CreateWithPerson(user *models.User, personData *models.Person) error {
-	args := m.Called(user, personData)
-	return args.Error(0)
-}
-
-func (m *MockUserRepository) FindByIDWithPerson(userID uint) (*models.User, error) {
-	args := m.Called(userID)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*models.User), args.Error(1)
-}
-
-func (m *MockUserRepository) UpdatePersonData(userID uint, personData *models.Person) error {
-	args := m.Called(userID, personData)
-	return args.Error(0)
-}
-
-func (m *MockUserRepository) ValidatePassword(userID uint, password string) (bool, error) {
-	args := m.Called(userID, password)
-	return args.Bool(0), args.Error(1)
-}
-
-func (m *MockUserRepository) FindByEmail(email string) (*models.User, error) {
-	args := m.Called(email)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*models.User), args.Error(1)
-}
-
 func TestUserService(t *testing.T) {
 	t.Run("CreateUser_Success", func(t *testing.T) {
 		mockUserRepo := &MockUserRepository{}
 		userService := service.NewUserService(mockUserRepo)
 
-		mockUserRepo.On("CreateWithPerson", mock.AnythingOfType("*models.User"), mock.AnythingOfType("*models.Person")).Return(nil)
+		mockUserRepo.On("FarmExists", uint(1)).Return(true, nil)
+		mockUserRepo.On("CreateWithPerson", mock.AnythingOfType("*models.User"), mock.AnythingOfType("*models.Person")).Return(nil).Run(func(args mock.Arguments) {
+			user := args.Get(0).(*models.User)
+			user.ID = 1 // Simular ID retornado pelo banco
+		})
+		mockUserRepo.On("FindByIDWithPerson", uint(1)).Return(&models.User{ID: 1, FarmID: 1}, nil)
+		mockUserRepo.On("CreateUserFarm", mock.AnythingOfType("*models.UserFarm")).Return(nil)
 
 		user := &models.User{
 			FarmID: 1,

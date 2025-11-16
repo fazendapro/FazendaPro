@@ -6,13 +6,12 @@ import (
 	"time"
 
 	"github.com/fazendapro/FazendaPro-api/internal/models"
-	"github.com/fazendapro/FazendaPro-api/internal/repository"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestReproductionService_GetReproductionsByPhase(t *testing.T) {
-	mockRepo := &repository.MockReproductionRepository{}
+	mockRepo := &MockReproductionRepository{}
 	reproductionService := service.NewReproductionService(mockRepo)
 
 	now := time.Now()
@@ -62,7 +61,7 @@ func TestReproductionService_GetReproductionsByPhase(t *testing.T) {
 }
 
 func TestReproductionService_GetReproductionsByPhase_Error(t *testing.T) {
-	mockRepo := &repository.MockReproductionRepository{}
+	mockRepo := &MockReproductionRepository{}
 	reproductionService := service.NewReproductionService(mockRepo)
 
 	mockRepo.On("FindByPhase", models.PhasePrenhas).Return(nil, errors.New("database error"))
@@ -77,7 +76,7 @@ func TestReproductionService_GetReproductionsByPhase_Error(t *testing.T) {
 }
 
 func TestReproductionService_GetReproductionsByPhase_EmptyResults(t *testing.T) {
-	mockRepo := &repository.MockReproductionRepository{}
+	mockRepo := &MockReproductionRepository{}
 	reproductionService := service.NewReproductionService(mockRepo)
 
 	mockRepo.On("FindByPhase", models.PhasePrenhas).Return([]models.Reproduction{}, nil)
@@ -91,7 +90,7 @@ func TestReproductionService_GetReproductionsByPhase_EmptyResults(t *testing.T) 
 }
 
 func TestReproductionService_GetReproductionsByPhase_DifferentPhases(t *testing.T) {
-	mockRepo := &repository.MockReproductionRepository{}
+	mockRepo := &MockReproductionRepository{}
 	reproductionService := service.NewReproductionService(mockRepo)
 
 	mockReproductions := []models.Reproduction{
@@ -120,7 +119,7 @@ func TestReproductionService_GetReproductionsByPhase_DifferentPhases(t *testing.
 }
 
 func TestReproductionService_GetReproductionsByPhase_WithAnimalData(t *testing.T) {
-	mockRepo := &repository.MockReproductionRepository{}
+	mockRepo := &MockReproductionRepository{}
 	reproductionService := service.NewReproductionService(mockRepo)
 
 	now := time.Now()
@@ -174,7 +173,7 @@ func TestReproductionService_GetReproductionsByPhase_WithAnimalData(t *testing.T
 }
 
 func TestReproductionService_GetReproductionsByPhase_WithMultipleFarms(t *testing.T) {
-	mockRepo := &repository.MockReproductionRepository{}
+	mockRepo := &MockReproductionRepository{}
 	reproductionService := service.NewReproductionService(mockRepo)
 
 	now := time.Now()
@@ -247,7 +246,7 @@ func TestReproductionService_GetReproductionsByPhase_WithMultipleFarms(t *testin
 }
 
 func TestReproductionService_GetReproductionsByPhase_WithNullPregnancyDate(t *testing.T) {
-	mockRepo := &repository.MockReproductionRepository{}
+	mockRepo := &MockReproductionRepository{}
 	reproductionService := service.NewReproductionService(mockRepo)
 
 	mockReproductions := []models.Reproduction{

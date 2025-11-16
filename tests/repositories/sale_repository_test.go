@@ -17,18 +17,31 @@ func setupSaleTestDB(t *testing.T) *gorm.DB {
 	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 	require.NoError(t, err)
 
-	err = db.AutoMigrate(&models.Farm{}, &models.Animal{}, &models.Sale{})
+	err = db.AutoMigrate(&models.Company{}, &models.Farm{}, &models.Animal{}, &models.Sale{})
 	require.NoError(t, err)
 
 	return db
+}
+
+func createTestFarm(t *testing.T, db *gorm.DB) *models.Farm {
+	company := &models.Company{
+		CompanyName: "Test Company",
+	}
+	require.NoError(t, db.Create(company).Error)
+
+	farm := &models.Farm{
+		CompanyID: company.ID,
+		Logo:      "",
+	}
+	require.NoError(t, db.Create(farm).Error)
+	return farm
 }
 
 func TestSaleRepository_Create(t *testing.T) {
 	db := setupSaleTestDB(t)
 	repo := repository.NewSaleRepository(db)
 
-	farm := &models.Farm{FarmName: "Test Farm"}
-	db.Create(farm)
+	farm := createTestFarm(t, db)
 
 	animal := &models.Animal{
 		FarmID:     farm.ID,
@@ -57,8 +70,7 @@ func TestSaleRepository_GetByID(t *testing.T) {
 	db := setupSaleTestDB(t)
 	repo := repository.NewSaleRepository(db)
 
-	farm := &models.Farm{FarmName: "Test Farm"}
-	db.Create(farm)
+	farm := createTestFarm(t, db)
 
 	animal := &models.Animal{
 		FarmID:     farm.ID,
@@ -90,8 +102,7 @@ func TestSaleRepository_GetByFarmID(t *testing.T) {
 	db := setupSaleTestDB(t)
 	repo := repository.NewSaleRepository(db)
 
-	farm := &models.Farm{FarmName: "Test Farm"}
-	db.Create(farm)
+	farm := createTestFarm(t, db)
 
 	animal := &models.Animal{
 		FarmID:     farm.ID,
@@ -133,8 +144,7 @@ func TestSaleRepository_GetByAnimalID(t *testing.T) {
 	db := setupSaleTestDB(t)
 	repo := repository.NewSaleRepository(db)
 
-	farm := &models.Farm{FarmName: "Test Farm"}
-	db.Create(farm)
+	farm := createTestFarm(t, db)
 
 	animal := &models.Animal{
 		FarmID:     farm.ID,
@@ -165,8 +175,7 @@ func TestSaleRepository_GetByDateRange(t *testing.T) {
 	db := setupSaleTestDB(t)
 	repo := repository.NewSaleRepository(db)
 
-	farm := &models.Farm{Name: "Test Farm"}
-	db.Create(farm)
+	farm := createTestFarm(t, db)
 
 	animal := &models.Animal{
 		FarmID:     farm.ID,
@@ -211,8 +220,7 @@ func TestSaleRepository_Update(t *testing.T) {
 	db := setupSaleTestDB(t)
 	repo := repository.NewSaleRepository(db)
 
-	farm := &models.Farm{Name: "Test Farm"}
-	db.Create(farm)
+	farm := createTestFarm(t, db)
 
 	animal := &models.Animal{
 		FarmID:     farm.ID,
@@ -251,8 +259,7 @@ func TestSaleRepository_Delete(t *testing.T) {
 	db := setupSaleTestDB(t)
 	repo := repository.NewSaleRepository(db)
 
-	farm := &models.Farm{Name: "Test Farm"}
-	db.Create(farm)
+	farm := createTestFarm(t, db)
 
 	animal := &models.Animal{
 		FarmID:     farm.ID,
@@ -284,8 +291,7 @@ func TestSaleRepository_GetMonthlySalesCount(t *testing.T) {
 	db := setupSaleTestDB(t)
 	repo := repository.NewSaleRepository(db)
 
-	farm := &models.Farm{Name: "Test Farm"}
-	db.Create(farm)
+	farm := createTestFarm(t, db)
 
 	animal := &models.Animal{
 		FarmID:     farm.ID,

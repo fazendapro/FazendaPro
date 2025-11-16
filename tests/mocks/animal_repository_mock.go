@@ -43,3 +43,8 @@ func (m *MockAnimalRepository) Delete(id uint) error {
 	args := m.Called(id)
 	return args.Error(0)
 }
+
+func (m *MockAnimalRepository) CountBySex(farmID uint, sex int) (int64, error) {
+	args := m.Called(farmID, sex)
+	return args.Get(0).(int64), args.Error(1)
+}

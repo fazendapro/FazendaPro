@@ -12,7 +12,7 @@ import (
 
 func setupFarmSelectionTestDB() *gorm.DB {
 	db, _ := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
-	db.AutoMigrate(&models.User{}, &models.Person{}, &models.Farm{}, &models.Company{})
+	db.AutoMigrate(&models.User{}, &models.Person{}, &models.Farm{}, &models.Company{}, &models.UserFarm{})
 	return db
 }
 
@@ -42,6 +42,12 @@ func TestUserRepository_GetUserFarms(t *testing.T) {
 		FarmID:   farm1.ID,
 	}
 	db.Create(user)
+
+	userFarm := &models.UserFarm{
+		UserID: user.ID,
+		FarmID: farm1.ID,
+	}
+	db.Create(userFarm)
 
 	farms, err := userRepo.GetUserFarms(user.ID)
 
@@ -75,6 +81,12 @@ func TestUserRepository_GetUserFarmCount(t *testing.T) {
 	}
 	db.Create(user)
 
+	userFarm := &models.UserFarm{
+		UserID: user.ID,
+		FarmID: farm.ID,
+	}
+	db.Create(userFarm)
+
 	count, err := userRepo.GetUserFarmCount(user.ID)
 
 	assert.NoError(t, err)
@@ -105,6 +117,12 @@ func TestUserRepository_GetUserFarmByID(t *testing.T) {
 		FarmID:   farm.ID,
 	}
 	db.Create(user)
+
+	userFarm := &models.UserFarm{
+		UserID: user.ID,
+		FarmID: farm.ID,
+	}
+	db.Create(userFarm)
 
 	foundFarm, err := userRepo.GetUserFarmByID(user.ID, farm.ID)
 
@@ -137,6 +155,12 @@ func TestUserRepository_GetUserFarmByID_NotFound(t *testing.T) {
 		FarmID:   farm.ID,
 	}
 	db.Create(user)
+
+	userFarm := &models.UserFarm{
+		UserID: user.ID,
+		FarmID: farm.ID,
+	}
+	db.Create(userFarm)
 
 	foundFarm, err := userRepo.GetUserFarmByID(user.ID, 999)
 

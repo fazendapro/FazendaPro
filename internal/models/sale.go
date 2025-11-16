@@ -17,3 +17,7 @@ type Sale struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+func (Sale) TableName() string {
+	return "sales"
+}

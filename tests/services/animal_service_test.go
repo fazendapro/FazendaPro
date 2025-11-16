@@ -11,51 +11,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type MockAnimalRepository struct {
-	mock.Mock
-}
-
-func (m *MockAnimalRepository) Create(animal *models.Animal) error {
-	args := m.Called(animal)
-	return args.Error(0)
-}
-
-func (m *MockAnimalRepository) FindByID(id uint) (*models.Animal, error) {
-	args := m.Called(id)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*models.Animal), args.Error(1)
-}
-
-func (m *MockAnimalRepository) FindByFarmID(farmID uint) ([]models.Animal, error) {
-	args := m.Called(farmID)
-	return args.Get(0).([]models.Animal), args.Error(1)
-}
-
-func (m *MockAnimalRepository) FindByEarTagNumber(farmID uint, earTagNumber int) (*models.Animal, error) {
-	args := m.Called(farmID, earTagNumber)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*models.Animal), args.Error(1)
-}
-
-func (m *MockAnimalRepository) FindByFarmIDAndSex(farmID uint, sex int) ([]models.Animal, error) {
-	args := m.Called(farmID, sex)
-	return args.Get(0).([]models.Animal), args.Error(1)
-}
-
-func (m *MockAnimalRepository) Update(animal *models.Animal) error {
-	args := m.Called(animal)
-	return args.Error(0)
-}
-
-func (m *MockAnimalRepository) Delete(id uint) error {
-	args := m.Called(id)
-	return args.Error(0)
-}
-
 func TestAnimalService_CreateAnimal(t *testing.T) {
 	mockRepo := new(MockAnimalRepository)
 	service := service.NewAnimalService(mockRepo)

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/fazendapro/FazendaPro-api/internal/models"
+	"github.com/fazendapro/FazendaPro-api/internal/service"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -14,7 +15,7 @@ func TestCreateSale_UpdatesAnimalStatus(t *testing.T) {
 	mockSaleRepo := &MockSaleRepository{}
 	mockAnimalRepo := &MockAnimalRepository{}
 
-	service := NewSaleService(mockSaleRepo, mockAnimalRepo)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
 
 	animal := &models.Animal{
 		ID:     1,
@@ -37,7 +38,7 @@ func TestCreateSale_UpdatesAnimalStatus(t *testing.T) {
 		return a.Status == models.AnimalStatusSold
 	})).Return(nil)
 
-	err := service.CreateSale(context.Background(), sale)
+	err := saleService.CreateSale(context.Background(), sale)
 
 	assert.NoError(t, err)
 	mockAnimalRepo.AssertExpectations(t)
@@ -48,7 +49,7 @@ func TestCreateSale_PreventsSaleOfAlreadySoldAnimal(t *testing.T) {
 	mockSaleRepo := &MockSaleRepository{}
 	mockAnimalRepo := &MockAnimalRepository{}
 
-	service := NewSaleService(mockSaleRepo, mockAnimalRepo)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
 
 	animal := &models.Animal{
 		ID:     1,
@@ -67,7 +68,7 @@ func TestCreateSale_PreventsSaleOfAlreadySoldAnimal(t *testing.T) {
 
 	mockAnimalRepo.On("FindByID", uint(1)).Return(animal, nil)
 
-	err := service.CreateSale(context.Background(), sale)
+	err := saleService.CreateSale(context.Background(), sale)
 
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "animal is already sold")
@@ -79,7 +80,7 @@ func TestDeleteSale_RevertsAnimalStatus(t *testing.T) {
 	mockSaleRepo := &MockSaleRepository{}
 	mockAnimalRepo := &MockAnimalRepository{}
 
-	service := NewSaleService(mockSaleRepo, mockAnimalRepo)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
 
 	sale := &models.Sale{
 		ID:       1,
@@ -100,7 +101,7 @@ func TestDeleteSale_RevertsAnimalStatus(t *testing.T) {
 		return a.Status == models.AnimalStatusActive
 	})).Return(nil)
 
-	err := service.DeleteSale(context.Background(), 1)
+	err := saleService.DeleteSale(context.Background(), 1)
 
 	assert.NoError(t, err)
 	mockAnimalRepo.AssertExpectations(t)
