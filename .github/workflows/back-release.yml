@@ -1,0 +1,48 @@
+name: Deploy to Dokploy
+
+on:
+  push:
+    branches:
+      - back/release
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.24.2'
+
+      - name: Run tests
+        run: |
+          go mod download
+          go test ./... -v
+
+      - name: Build Docker image
+        run: |
+          docker build -t fazendapro-backend:latest .
+
+      - name: Notify Dokploy (Webhook)
+        if: success()
+        env:
+          DOKPLOY_WEBHOOK_URL: ${{ secrets.DOKPLOY_WEBHOOK_URL }}
+        run: |
+          if [ -n "$DOKPLOY_WEBHOOK_URL" ]; then
+            curl -X POST "$DOKPLOY_WEBHOOK_URL" \
+              -H "Content-Type: application/json" \
+              -d '{
+                "repository": "${{ github.repository }}",
+                "branch": "${{ github.ref_name }}",
+                "commit": "${{ github.sha }}",
+                "message": "Deploy triggered from GitHub Actions"
+              }'
+          else
+            echo "DOKPLOY_WEBHOOK_URL not set, skipping webhook notification"
+          fi
+
