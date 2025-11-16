@@ -11,11 +11,21 @@ import (
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/repository"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
+	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/go-chi/chi/v5"
 )
 
 func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Config) *chi.Mux {
 	r := chi.NewRouter()
+
+	if cfg.SentryDSN != "" {
+		sentryHandler := sentryhttp.New(sentryhttp.Options{
+			Repanic: true,
+		})
+		r.Use(func(next http.Handler) http.Handler {
+			return sentryHandler.Handle(next)
+		})
+	}
 
 	r.Use(middleware.CORSMiddleware(cfg))
 
