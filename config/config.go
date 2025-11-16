@@ -13,6 +13,7 @@ import (
 type Config struct {
 	Port      string
 	JWTSecret string
+	SentryDSN string
 	DBHost    string
 	DBPort    string
 	User      string
@@ -73,6 +74,7 @@ func Load() (*Config, error) {
 	return &Config{
 		Port:      getEnvWithDefault("PORT", "8080"),
 		JWTSecret: getEnvWithDefault("JWT_SECRET", "dev-secret-key"),
+		SentryDSN: getEnvWithDefault("SENTRY_DSN", ""),
 		DBHost:    dbHost,
 		DBPort:    dbPort,
 		User:      dbUser,

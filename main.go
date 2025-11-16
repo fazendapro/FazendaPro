@@ -13,6 +13,7 @@ import (
 	"github.com/fazendapro/FazendaPro-api/internal/migrations"
 	"github.com/fazendapro/FazendaPro-api/internal/repository"
 	"github.com/fazendapro/FazendaPro-api/internal/routes"
+	"github.com/getsentry/sentry-go"
 )
 
 func main() {
@@ -35,6 +36,18 @@ func main() {
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatal("Erro ao carregar configuração:", err)
+	}
+
+	if cfg.SentryDSN != "" {
+		if err := sentry.Init(sentry.ClientOptions{
+			Dsn: cfg.SentryDSN,
+		}); err != nil {
+			app.Logger.Printf("Sentry initialization failed: %v\n", err)
+		} else {
+			app.Logger.Println("Sentry inicializado com sucesso")
+		}
+	} else {
+		app.Logger.Println("Sentry DSN não configurado, continuando sem Sentry")
 	}
 
 	db, err := repository.NewDatabase(cfg)
