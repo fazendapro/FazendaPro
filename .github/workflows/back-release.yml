@@ -3,14 +3,13 @@ name: Deploy to Dokploy
 on:
   push:
     branches:
-      - main
-      - master
+      - back/release
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
