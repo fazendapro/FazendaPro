@@ -307,3 +307,30 @@ func TestUserHandler_UpdatePersonData_ServiceError(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 	mockRepo.AssertExpectations(t)
 }
+
+func TestUserHandler_GetUser_InvalidEmail(t *testing.T) {
+	mockRepo := new(services.MockUserRepository)
+	router, _ := setupUserRouter(mockRepo)
+
+	req, _ := http.NewRequest("GET", "/users?email=invalid-email", nil)
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+}
+
+func TestUserHandler_GetUserWithPerson_ServiceError(t *testing.T) {
+	mockRepo := new(services.MockUserRepository)
+	router, _ := setupUserRouter(mockRepo)
+
+	req, _ := http.NewRequest("GET", "/users/person?id=1", nil)
+	w := httptest.NewRecorder()
+
+	mockRepo.On("FindByIDWithPerson", uint(1)).Return(nil, errors.New("database error"))
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	mockRepo.AssertExpectations(t)
+}

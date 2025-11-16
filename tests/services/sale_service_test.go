@@ -505,6 +505,71 @@ func TestSaleService_DeleteSale_NotFound(t *testing.T) {
 	mockSaleRepo.AssertExpectations(t)
 }
 
+func TestSaleService_DeleteSale_WithAnimalUpdate(t *testing.T) {
+	mockSaleRepo := new(MockSaleRepository)
+	mockAnimalRepo := new(MockAnimalRepository)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+
+	ctx := context.Background()
+	saleID := uint(1)
+	animalID := uint(1)
+
+	sale := &models.Sale{
+		ID:        saleID,
+		AnimalID:  animalID,
+		FarmID:    1,
+		BuyerName: "Comprador Teste",
+		Price:     1000.0,
+		SaleDate:  time.Now(),
+	}
+
+	animal := &models.Animal{
+		ID:     animalID,
+		FarmID: 1,
+		Status: models.AnimalStatusSold,
+	}
+
+	mockSaleRepo.On("GetByID", ctx, saleID).Return(sale, nil)
+	mockSaleRepo.On("Delete", ctx, saleID).Return(nil)
+	mockAnimalRepo.On("FindByID", animalID).Return(animal, nil)
+	mockAnimalRepo.On("Update", mock.AnythingOfType("*models.Animal")).Return(nil)
+
+	err := saleService.DeleteSale(ctx, saleID)
+
+	assert.NoError(t, err)
+	mockSaleRepo.AssertExpectations(t)
+	mockAnimalRepo.AssertExpectations(t)
+}
+
+func TestSaleService_DeleteSale_AnimalNotFound(t *testing.T) {
+	mockSaleRepo := new(MockSaleRepository)
+	mockAnimalRepo := new(MockAnimalRepository)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+
+	ctx := context.Background()
+	saleID := uint(1)
+	animalID := uint(1)
+
+	sale := &models.Sale{
+		ID:        saleID,
+		AnimalID:  animalID,
+		FarmID:    1,
+		BuyerName: "Comprador Teste",
+		Price:     1000.0,
+		SaleDate:  time.Now(),
+	}
+
+	mockSaleRepo.On("GetByID", ctx, saleID).Return(sale, nil)
+	mockSaleRepo.On("Delete", ctx, saleID).Return(nil)
+	mockAnimalRepo.On("FindByID", animalID).Return(nil, errors.New("animal not found"))
+
+	err := saleService.DeleteSale(ctx, saleID)
+
+	assert.NoError(t, err)
+	mockSaleRepo.AssertExpectations(t)
+	mockAnimalRepo.AssertExpectations(t)
+}
+
 func TestSaleService_GetSalesHistory(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
@@ -598,5 +663,240 @@ func TestSaleService_GetMonthlySalesCount(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedCount, count)
+	mockSaleRepo.AssertExpectations(t)
+}
+
+func TestSaleService_GetMonthlySalesCount_InvalidDateRange(t *testing.T) {
+	mockSaleRepo := new(MockSaleRepository)
+	mockAnimalRepo := new(MockAnimalRepository)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+
+	ctx := context.Background()
+	farmID := uint(1)
+	now := time.Now()
+	startDate := now.AddDate(0, 0, 10)
+	endDate := now
+
+	count, err := saleService.GetMonthlySalesCount(ctx, farmID, startDate, endDate)
+
+	assert.Error(t, err)
+	assert.Equal(t, int64(0), count)
+	assert.Contains(t, err.Error(), "start date cannot be after end date")
+	mockSaleRepo.AssertNotCalled(t, "GetMonthlySalesCount")
+}
+
+func TestSaleService_GetSaleByID_Success(t *testing.T) {
+	mockSaleRepo := new(MockSaleRepository)
+	mockAnimalRepo := new(MockAnimalRepository)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+
+	ctx := context.Background()
+	saleID := uint(1)
+	expectedSale := &models.Sale{
+		ID:        saleID,
+		AnimalID:  1,
+		FarmID:    1,
+		BuyerName: "Comprador Teste",
+		Price:     1000.0,
+		SaleDate:  time.Now(),
+	}
+
+	mockSaleRepo.On("GetByID", ctx, saleID).Return(expectedSale, nil)
+
+	sale, err := saleService.GetSaleByID(ctx, saleID)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, sale)
+	assert.Equal(t, saleID, sale.ID)
+	mockSaleRepo.AssertExpectations(t)
+}
+
+func TestSaleService_GetSaleByID_NotFound(t *testing.T) {
+	mockSaleRepo := new(MockSaleRepository)
+	mockAnimalRepo := new(MockAnimalRepository)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+
+	ctx := context.Background()
+	saleID := uint(999)
+
+	mockSaleRepo.On("GetByID", ctx, saleID).Return(nil, errors.New("not found"))
+
+	sale, err := saleService.GetSaleByID(ctx, saleID)
+
+	assert.Error(t, err)
+	assert.Nil(t, sale)
+	mockSaleRepo.AssertExpectations(t)
+}
+
+func TestSaleService_GetMonthlySalesData_Success(t *testing.T) {
+	mockSaleRepo := new(MockSaleRepository)
+	mockAnimalRepo := new(MockAnimalRepository)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+
+	ctx := context.Background()
+	farmID := uint(1)
+	months := 6
+
+	expectedData := []repository.MonthlySalesData{
+		{Month: "2024-01", Count: 5},
+		{Month: "2024-02", Count: 3},
+	}
+
+	mockSaleRepo.On("GetMonthlySalesData", ctx, farmID, months).Return(expectedData, nil)
+
+	data, err := saleService.GetMonthlySalesData(ctx, farmID, months)
+
+	assert.NoError(t, err)
+	assert.Len(t, data, 2)
+	mockSaleRepo.AssertExpectations(t)
+}
+
+func TestSaleService_GetMonthlySalesData_DefaultMonths(t *testing.T) {
+	mockSaleRepo := new(MockSaleRepository)
+	mockAnimalRepo := new(MockAnimalRepository)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+
+	ctx := context.Background()
+	farmID := uint(1)
+
+	expectedData := []repository.MonthlySalesData{}
+
+	mockSaleRepo.On("GetMonthlySalesData", ctx, farmID, 12).Return(expectedData, nil)
+
+	data, err := saleService.GetMonthlySalesData(ctx, farmID, 0)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, data)
+	mockSaleRepo.AssertExpectations(t)
+}
+
+func TestSaleService_GetMonthlySalesData_MaxMonths(t *testing.T) {
+	mockSaleRepo := new(MockSaleRepository)
+	mockAnimalRepo := new(MockAnimalRepository)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+
+	ctx := context.Background()
+	farmID := uint(1)
+
+	expectedData := []repository.MonthlySalesData{}
+
+	mockSaleRepo.On("GetMonthlySalesData", ctx, farmID, 24).Return(expectedData, nil)
+
+	data, err := saleService.GetMonthlySalesData(ctx, farmID, 30)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, data)
+	mockSaleRepo.AssertExpectations(t)
+}
+
+func TestSaleService_GetMonthlySalesData_RepositoryError(t *testing.T) {
+	mockSaleRepo := new(MockSaleRepository)
+	mockAnimalRepo := new(MockAnimalRepository)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+
+	ctx := context.Background()
+	farmID := uint(1)
+	months := 6
+
+	mockSaleRepo.On("GetMonthlySalesData", ctx, farmID, months).Return(nil, errors.New("database error"))
+
+	data, err := saleService.GetMonthlySalesData(ctx, farmID, months)
+
+	assert.Error(t, err)
+	assert.Nil(t, data)
+	mockSaleRepo.AssertExpectations(t)
+}
+
+func TestSaleService_CreateSale_AnimalWrongFarm(t *testing.T) {
+	mockSaleRepo := new(MockSaleRepository)
+	mockAnimalRepo := new(MockAnimalRepository)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+
+	ctx := context.Background()
+	now := time.Now()
+
+	animal := &models.Animal{
+		ID:         1,
+		FarmID:     2,
+		AnimalName: "Test Animal",
+		Status:     0,
+	}
+
+	sale := &models.Sale{
+		AnimalID:  1,
+		FarmID:    1,
+		BuyerName: "João Silva",
+		Price:     1500.50,
+		SaleDate:  now,
+	}
+
+	mockAnimalRepo.On("FindByID", uint(1)).Return(animal, nil)
+
+	err := saleService.CreateSale(ctx, sale)
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "animal does not belong to the specified farm")
+	mockAnimalRepo.AssertExpectations(t)
+	mockSaleRepo.AssertNotCalled(t, "Create")
+}
+
+func TestSaleService_CreateSale_UpdateAnimalStatusFails(t *testing.T) {
+	mockSaleRepo := new(MockSaleRepository)
+	mockAnimalRepo := new(MockAnimalRepository)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+
+	ctx := context.Background()
+	now := time.Now()
+
+	animal := &models.Animal{
+		ID:         1,
+		FarmID:     1,
+		AnimalName: "Test Animal",
+		Status:     0,
+	}
+
+	sale := &models.Sale{
+		ID:        1,
+		AnimalID:  1,
+		FarmID:    1,
+		BuyerName: "João Silva",
+		Price:     1500.50,
+		SaleDate:  now,
+	}
+
+	mockAnimalRepo.On("FindByID", uint(1)).Return(animal, nil)
+	mockSaleRepo.On("Create", ctx, sale).Return(nil)
+	mockAnimalRepo.On("Update", mock.AnythingOfType("*models.Animal")).Return(errors.New("update failed"))
+	mockSaleRepo.On("Delete", ctx, uint(1)).Return(nil)
+
+	err := saleService.CreateSale(ctx, sale)
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to update animal status")
+	mockAnimalRepo.AssertExpectations(t)
+	mockSaleRepo.AssertExpectations(t)
+}
+
+func TestSaleService_UpdateSale_RepositoryError(t *testing.T) {
+	mockSaleRepo := new(MockSaleRepository)
+	mockAnimalRepo := new(MockAnimalRepository)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+
+	ctx := context.Background()
+	now := time.Now()
+
+	sale := &models.Sale{
+		ID:        1,
+		BuyerName: "Comprador Atualizado",
+		Price:     2000.0,
+		SaleDate:  now,
+	}
+
+	mockSaleRepo.On("Update", ctx, sale).Return(errors.New("database error"))
+
+	err := saleService.UpdateSale(ctx, sale)
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "database error")
 	mockSaleRepo.AssertExpectations(t)
 }

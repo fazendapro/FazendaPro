@@ -753,3 +753,79 @@ func TestReproductionService_DeleteReproduction_Error(t *testing.T) {
 	assert.Error(t, err)
 	mockRepo.AssertExpectations(t)
 }
+
+func TestReproductionService_UpdateReproduction_RepositoryError(t *testing.T) {
+	mockRepo := &MockReproductionRepository{}
+	reproductionService := service.NewReproductionService(mockRepo)
+
+	reproduction := &models.Reproduction{
+		ID: 1,
+	}
+
+	mockRepo.On("FindByID", uint(1)).Return(nil, errors.New("database error"))
+
+	err := reproductionService.UpdateReproduction(reproduction)
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "database error")
+	mockRepo.AssertExpectations(t)
+}
+
+func TestReproductionService_UpdateReproduction_UpdateError(t *testing.T) {
+	mockRepo := &MockReproductionRepository{}
+	reproductionService := service.NewReproductionService(mockRepo)
+
+	existingReproduction := &models.Reproduction{
+		ID:           1,
+		AnimalID:     1,
+		CurrentPhase: models.PhaseVazias,
+	}
+
+	updatedReproduction := &models.Reproduction{
+		ID:           1,
+		AnimalID:     1,
+		CurrentPhase: models.PhasePrenhas,
+	}
+
+	mockRepo.On("FindByID", uint(1)).Return(existingReproduction, nil)
+	mockRepo.On("Update", mock.AnythingOfType("*models.Reproduction")).Return(errors.New("update error"))
+
+	err := reproductionService.UpdateReproduction(updatedReproduction)
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "update error")
+	mockRepo.AssertExpectations(t)
+}
+
+func TestReproductionService_UpdateReproductionPhase_RepositoryError(t *testing.T) {
+	mockRepo := &MockReproductionRepository{}
+	reproductionService := service.NewReproductionService(mockRepo)
+
+	mockRepo.On("FindByAnimalID", uint(1)).Return(nil, errors.New("database error"))
+
+	err := reproductionService.UpdateReproductionPhase(1, models.PhasePrenhas, map[string]interface{}{})
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "database error")
+	mockRepo.AssertExpectations(t)
+}
+
+func TestReproductionService_UpdateReproductionPhase_UpdateError(t *testing.T) {
+	mockRepo := &MockReproductionRepository{}
+	reproductionService := service.NewReproductionService(mockRepo)
+
+	existingReproduction := &models.Reproduction{
+		ID:           1,
+		AnimalID:     1,
+		CurrentPhase: models.PhaseVazias,
+	}
+
+	mockRepo.On("FindByAnimalID", uint(1)).Return(existingReproduction, nil)
+	mockRepo.On("Update", mock.AnythingOfType("*models.Reproduction")).Return(errors.New("update error"))
+
+	err := reproductionService.UpdateReproductionPhase(1, models.PhasePrenhas, map[string]interface{}{})
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "update error")
+	mockRepo.AssertExpectations(t)
+}

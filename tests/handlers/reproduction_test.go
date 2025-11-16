@@ -327,3 +327,182 @@ func TestReproductionHandler_DeleteReproduction_NotFound(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 	mockRepo.AssertExpectations(t)
 }
+
+func TestReproductionHandler_CreateReproduction_WithAllDates(t *testing.T) {
+	mockRepo := new(services.MockReproductionRepository)
+	router, _ := setupReproductionRouter(mockRepo)
+
+	inseminationDate := "2024-01-01"
+	pregnancyDate := "2024-01-15"
+	expectedBirthDate := "2024-10-24"
+	actualBirthDate := "2024-10-20"
+	lactationStartDate := "2024-10-21"
+	lactationEndDate := "2024-12-01"
+	dryPeriodStartDate := "2024-12-02"
+
+	reproductionData := map[string]interface{}{
+		"animal_id":               1,
+		"current_phase":           3,
+		"insemination_date":       inseminationDate,
+		"pregnancy_date":          pregnancyDate,
+		"expected_birth_date":     expectedBirthDate,
+		"actual_birth_date":       actualBirthDate,
+		"lactation_start_date":    lactationStartDate,
+		"lactation_end_date":      lactationEndDate,
+		"dry_period_start_date":   dryPeriodStartDate,
+		"insemination_type":       "IA",
+		"veterinary_confirmation": true,
+		"observations":            "Teste completo",
+	}
+
+	jsonData, _ := json.Marshal(reproductionData)
+	req, _ := http.NewRequest("POST", "/reproductions", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	mockRepo.On("FindByAnimalID", uint(1)).Return(nil, nil)
+	mockRepo.On("Create", mock.AnythingOfType("*models.Reproduction")).Return(nil).Run(func(args mock.Arguments) {
+		rep := args.Get(0).(*models.Reproduction)
+		rep.ID = 1
+	})
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusCreated, w.Code)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestReproductionHandler_CreateReproduction_WithInvalidDates(t *testing.T) {
+	mockRepo := new(services.MockReproductionRepository)
+	router, _ := setupReproductionRouter(mockRepo)
+
+	reproductionData := map[string]interface{}{
+		"animal_id":         1,
+		"current_phase":     3,
+		"pregnancy_date":    "invalid-date",
+		"insemination_date": "also-invalid",
+	}
+
+	jsonData, _ := json.Marshal(reproductionData)
+	req, _ := http.NewRequest("POST", "/reproductions", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	mockRepo.On("FindByAnimalID", uint(1)).Return(nil, nil)
+	mockRepo.On("Create", mock.AnythingOfType("*models.Reproduction")).Return(nil).Run(func(args mock.Arguments) {
+		rep := args.Get(0).(*models.Reproduction)
+		rep.ID = 1
+	})
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusCreated, w.Code)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestReproductionHandler_GetReproduction_InvalidID(t *testing.T) {
+	mockRepo := new(services.MockReproductionRepository)
+	router, _ := setupReproductionRouter(mockRepo)
+
+	req, _ := http.NewRequest("GET", "/reproductions?id=invalid", nil)
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestReproductionHandler_GetReproductionByAnimal_InvalidAnimalID(t *testing.T) {
+	mockRepo := new(services.MockReproductionRepository)
+	router, _ := setupReproductionRouter(mockRepo)
+
+	req, _ := http.NewRequest("GET", "/reproductions/animal?animalId=invalid", nil)
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestReproductionHandler_GetReproductionsByFarm_InvalidFarmID(t *testing.T) {
+	mockRepo := new(services.MockReproductionRepository)
+	router, _ := setupReproductionRouter(mockRepo)
+
+	req, _ := http.NewRequest("GET", "/reproductions/farm?farmId=invalid", nil)
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestReproductionHandler_GetReproductionsByPhase_InvalidPhase(t *testing.T) {
+	mockRepo := new(services.MockReproductionRepository)
+	router, _ := setupReproductionRouter(mockRepo)
+
+	req, _ := http.NewRequest("GET", "/reproductions/phase?phase=invalid", nil)
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestReproductionHandler_GetReproduction_WithAllDates(t *testing.T) {
+	mockRepo := new(services.MockReproductionRepository)
+	router, _ := setupReproductionRouter(mockRepo)
+
+	now := time.Now()
+	inseminationDate := now.AddDate(0, -9, 0)
+	pregnancyDate := now.AddDate(0, -8, 0)
+	expectedBirthDate := now.AddDate(0, 1, 0)
+	actualBirthDate := now.AddDate(0, 0, -5)
+	lactationStartDate := now.AddDate(0, 0, -4)
+	lactationEndDate := now.AddDate(0, 0, -1)
+	dryPeriodStartDate := now
+
+	reproduction := &models.Reproduction{
+		ID:                     1,
+		AnimalID:               1,
+		CurrentPhase:           models.PhaseLactacao,
+		InseminationDate:       &inseminationDate,
+		PregnancyDate:          &pregnancyDate,
+		ExpectedBirthDate:      &expectedBirthDate,
+		ActualBirthDate:        &actualBirthDate,
+		LactationStartDate:     &lactationStartDate,
+		LactationEndDate:       &lactationEndDate,
+		DryPeriodStartDate:     &dryPeriodStartDate,
+		InseminationType:       "IA",
+		VeterinaryConfirmation: true,
+		Observations:           "Teste completo",
+		Animal: models.Animal{
+			ID:                1,
+			FarmID:            1,
+			AnimalName:        "Vaca Teste",
+			EarTagNumberLocal: 123,
+		},
+		CreatedAt: now,
+		UpdatedAt: now,
+	}
+
+	req, _ := http.NewRequest("GET", "/reproductions?id=1", nil)
+	w := httptest.NewRecorder()
+
+	mockRepo.On("FindByID", uint(1)).Return(reproduction, nil)
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	var response map[string]interface{}
+	json.Unmarshal(w.Body.Bytes(), &response)
+	assert.True(t, response["success"].(bool))
+	data := response["data"].(map[string]interface{})
+	assert.NotNil(t, data["insemination_date"])
+	assert.NotNil(t, data["pregnancy_date"])
+	assert.NotNil(t, data["expected_birth_date"])
+	assert.NotNil(t, data["actual_birth_date"])
+	assert.NotNil(t, data["lactation_start_date"])
+	assert.NotNil(t, data["lactation_end_date"])
+	assert.NotNil(t, data["dry_period_start_date"])
+	mockRepo.AssertExpectations(t)
+}

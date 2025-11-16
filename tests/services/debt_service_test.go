@@ -249,3 +249,71 @@ func TestDebtService_GetTotalByPersonInMonth_MonthTooHigh(t *testing.T) {
 	assert.Contains(t, err.Error(), "mês deve estar entre 1 e 12")
 }
 
+func TestDebtService_GetTotalByPersonInMonth_YearTooHigh(t *testing.T) {
+	mockRepo := new(MockDebtRepository)
+	debtService := service.NewDebtService(mockRepo)
+
+	totals, err := debtService.GetTotalByPersonInMonth(3001, 1)
+
+	assert.Error(t, err)
+	assert.Nil(t, totals)
+	assert.Contains(t, err.Error(), "ano deve estar entre 2000 e 3000")
+}
+
+func TestDebtService_GetTotalByPersonInMonth_RepositoryError(t *testing.T) {
+	mockRepo := new(MockDebtRepository)
+	debtService := service.NewDebtService(mockRepo)
+
+	mockRepo.On("GetTotalByPersonInMonth", 2024, 1).Return(nil, errors.New("database error"))
+
+	totals, err := debtService.GetTotalByPersonInMonth(2024, 1)
+
+	assert.Error(t, err)
+	assert.Nil(t, totals)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestDebtService_GetDebtsWithPagination_RepositoryError(t *testing.T) {
+	mockRepo := new(MockDebtRepository)
+	debtService := service.NewDebtService(mockRepo)
+
+	mockRepo.On("FindAllWithPagination", 1, 10, (*int)(nil), (*int)(nil)).Return(nil, int64(0), errors.New("database error"))
+
+	debts, total, err := debtService.GetDebtsWithPagination(1, 10, nil, nil)
+
+	assert.Error(t, err)
+	assert.Nil(t, debts)
+	assert.Equal(t, int64(0), total)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestDebtService_GetDebtByID_RepositoryError(t *testing.T) {
+	mockRepo := new(MockDebtRepository)
+	debtService := service.NewDebtService(mockRepo)
+
+	mockRepo.On("FindByID", uint(1)).Return(nil, errors.New("database error"))
+
+	debt, err := debtService.GetDebtByID(1)
+
+	assert.Error(t, err)
+	assert.Nil(t, debt)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestDebtService_CreateDebt_RepositoryError(t *testing.T) {
+	mockRepo := new(MockDebtRepository)
+	debtService := service.NewDebtService(mockRepo)
+
+	debt := &models.Debt{
+		Person: "João Silva",
+		Value:  1500.50,
+	}
+
+	mockRepo.On("Create", debt).Return(errors.New("database error"))
+
+	err := debtService.CreateDebt(debt)
+
+	assert.Error(t, err)
+	mockRepo.AssertExpectations(t)
+}
+

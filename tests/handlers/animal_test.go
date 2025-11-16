@@ -351,6 +351,104 @@ func TestAnimalHandler_DeleteAnimal_InvalidID(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
 
+func TestAnimalHandler_DeleteAnimal_ServiceError(t *testing.T) {
+	mockRepo := new(services.MockAnimalRepository)
+	router, _ := setupAnimalRouter(mockRepo)
+
+	req, _ := http.NewRequest("DELETE", "/animals?id=1", nil)
+	w := httptest.NewRecorder()
+
+	mockRepo.On("FindByID", uint(1)).Return(nil, errors.New("animal not found"))
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestAnimalHandler_UpdateAnimal_ServiceError(t *testing.T) {
+	mockRepo := new(services.MockAnimalRepository)
+	router, _ := setupAnimalRouter(mockRepo)
+
+	animalData := map[string]interface{}{
+		"id":                   1,
+		"farm_id":              1,
+		"ear_tag_number_local": 123,
+		"animal_name":          "Animal Atualizado",
+	}
+
+	jsonData, _ := json.Marshal(animalData)
+	req, _ := http.NewRequest("PUT", "/animals", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	existingAnimal := &models.Animal{ID: 1, FarmID: 1}
+	mockRepo.On("FindByID", uint(1)).Return(existingAnimal, nil).Once()
+	mockRepo.On("Update", mock.AnythingOfType("*models.Animal")).Return(errors.New("erro ao atualizar"))
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestAnimalHandler_UpdateAnimal_GetAnimalError(t *testing.T) {
+	mockRepo := new(services.MockAnimalRepository)
+	router, _ := setupAnimalRouter(mockRepo)
+
+	animalData := map[string]interface{}{
+		"id":                   1,
+		"farm_id":              1,
+		"ear_tag_number_local": 123,
+		"animal_name":          "Animal Atualizado",
+	}
+
+	jsonData, _ := json.Marshal(animalData)
+	req, _ := http.NewRequest("PUT", "/animals", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	existingAnimal := &models.Animal{ID: 1, FarmID: 1}
+	mockRepo.On("FindByID", uint(1)).Return(existingAnimal, nil).Once()
+	mockRepo.On("Update", mock.AnythingOfType("*models.Animal")).Return(nil)
+	mockRepo.On("FindByID", uint(1)).Return(nil, errors.New("erro ao buscar"))
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestAnimalHandler_GetAnimalsByFarm_ServiceError(t *testing.T) {
+	mockRepo := new(services.MockAnimalRepository)
+	router, _ := setupAnimalRouter(mockRepo)
+
+	req, _ := http.NewRequest("GET", "/animals/farm?farmId=1", nil)
+	w := httptest.NewRecorder()
+
+	mockRepo.On("FindByFarmID", uint(1)).Return(nil, errors.New("erro ao buscar"))
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestAnimalHandler_GetAnimalsBySex_ServiceError(t *testing.T) {
+	mockRepo := new(services.MockAnimalRepository)
+	router, _ := setupAnimalRouter(mockRepo)
+
+	req, _ := http.NewRequest("GET", "/animals/sex?farmId=1&sex=1", nil)
+	w := httptest.NewRecorder()
+
+	mockRepo.On("FindByFarmIDAndSex", uint(1), 1).Return(nil, errors.New("erro ao buscar"))
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	mockRepo.AssertExpectations(t)
+}
+
 func TestAnimalHandler_GetAnimalsBySex_Success(t *testing.T) {
 	mockRepo := new(services.MockAnimalRepository)
 	router, _ := setupAnimalRouter(mockRepo)
@@ -482,4 +580,205 @@ func TestAnimalHandler_UploadAnimalPhoto_MissingAnimalID(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestAnimalHandler_UploadAnimalPhoto_InvalidAnimalID(t *testing.T) {
+	mockRepo := new(services.MockAnimalRepository)
+	router, _ := setupAnimalRouter(mockRepo)
+
+	var b bytes.Buffer
+	writer := multipart.NewWriter(&b)
+	writer.WriteField("animal_id", "invalid")
+	writer.Close()
+
+	req, _ := http.NewRequest("POST", "/animals/photo", &b)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestAnimalHandler_UploadAnimalPhoto_AnimalNotFound(t *testing.T) {
+	mockRepo := new(services.MockAnimalRepository)
+	router, _ := setupAnimalRouter(mockRepo)
+
+	var b bytes.Buffer
+	writer := multipart.NewWriter(&b)
+	writer.WriteField("animal_id", "1")
+	fileWriter, _ := writer.CreateFormFile("photo", "test.jpg")
+	fileWriter.Write([]byte("fake image data"))
+	writer.Close()
+
+	req, _ := http.NewRequest("POST", "/animals/photo", &b)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	w := httptest.NewRecorder()
+
+	mockRepo.On("FindByID", uint(1)).Return(nil, errors.New("animal not found"))
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestAnimalHandler_UploadAnimalPhoto_UpdateError(t *testing.T) {
+	mockRepo := new(services.MockAnimalRepository)
+	router, _ := setupAnimalRouter(mockRepo)
+
+	var b bytes.Buffer
+	writer := multipart.NewWriter(&b)
+	writer.WriteField("animal_id", "1")
+	fileWriter, _ := writer.CreateFormFile("photo", "test.jpg")
+	fileWriter.Write([]byte("fake image data"))
+	writer.Close()
+
+	req, _ := http.NewRequest("POST", "/animals/photo", &b)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	w := httptest.NewRecorder()
+
+	existingAnimal := &models.Animal{ID: 1, FarmID: 1}
+	mockRepo.On("FindByID", uint(1)).Return(existingAnimal, nil).Once()
+	mockRepo.On("FindByID", uint(1)).Return(existingAnimal, nil).Once()
+	mockRepo.On("Update", mock.AnythingOfType("*models.Animal")).Return(errors.New("erro ao atualizar"))
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestAnimalHandler_UploadAnimalPhoto_GetUpdatedAnimalError(t *testing.T) {
+	mockRepo := new(services.MockAnimalRepository)
+	router, _ := setupAnimalRouter(mockRepo)
+
+	var b bytes.Buffer
+	writer := multipart.NewWriter(&b)
+	writer.WriteField("animal_id", "1")
+	fileWriter, _ := writer.CreateFormFile("photo", "test.jpg")
+	fileWriter.Write([]byte("fake image data"))
+	writer.Close()
+
+	req, _ := http.NewRequest("POST", "/animals/photo", &b)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	w := httptest.NewRecorder()
+
+	existingAnimal := &models.Animal{ID: 1, FarmID: 1}
+	mockRepo.On("FindByID", uint(1)).Return(existingAnimal, nil).Once()
+	mockRepo.On("FindByID", uint(1)).Return(existingAnimal, nil).Once()
+	mockRepo.On("Update", mock.AnythingOfType("*models.Animal")).Return(nil)
+	mockRepo.On("FindByID", uint(1)).Return(nil, errors.New("erro ao buscar"))
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestAnimalHandler_CreateAnimal_WithFatherAndMother(t *testing.T) {
+	mockRepo := new(services.MockAnimalRepository)
+	router, _ := setupAnimalRouter(mockRepo)
+
+	fatherID := uint(10)
+	motherID := uint(20)
+	animalData := map[string]interface{}{
+		"farm_id":                 1,
+		"ear_tag_number_local":    123,
+		"ear_tag_number_register": 456,
+		"animal_name":             "Filhote Teste",
+		"sex":                     0,
+		"breed":                   "Holandesa",
+		"type":                    "Bovino",
+		"father_id":               fatherID,
+		"mother_id":               motherID,
+		"animal_type":             0,
+		"purpose":                 1,
+	}
+
+	jsonData, _ := json.Marshal(animalData)
+	req, _ := http.NewRequest("POST", "/animals", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	mockRepo.On("FindByEarTagNumber", uint(1), 123).Return(nil, nil)
+	mockRepo.On("Create", mock.AnythingOfType("*models.Animal")).Return(nil)
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusCreated, w.Code)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestAnimalHandler_CreateAnimal_InvalidBirthDate(t *testing.T) {
+	mockRepo := new(services.MockAnimalRepository)
+	router, _ := setupAnimalRouter(mockRepo)
+
+	animalData := map[string]interface{}{
+		"farm_id":                 1,
+		"ear_tag_number_local":    123,
+		"ear_tag_number_register": 456,
+		"animal_name":             "Animal Teste",
+		"sex":                     0,
+		"breed":                   "Holandesa",
+		"type":                    "Bovino",
+		"birth_date":              "invalid-date",
+		"animal_type":             0,
+		"purpose":                 1,
+	}
+
+	jsonData, _ := json.Marshal(animalData)
+	req, _ := http.NewRequest("POST", "/animals", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	mockRepo.On("FindByEarTagNumber", uint(1), 123).Return(nil, nil)
+	mockRepo.On("Create", mock.AnythingOfType("*models.Animal")).Return(nil)
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusCreated, w.Code)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestAnimalHandler_GetAnimal_WithFatherAndMother(t *testing.T) {
+	mockRepo := new(services.MockAnimalRepository)
+	router, _ := setupAnimalRouter(mockRepo)
+
+	fatherID := uint(10)
+	motherID := uint(20)
+	animal := &models.Animal{
+		ID:                1,
+		FarmID:            1,
+		AnimalName:        "Filhote",
+		EarTagNumberLocal: 123,
+		Father: &models.Animal{
+			ID:                fatherID,
+			AnimalName:        "Pai",
+			EarTagNumberLocal: 10,
+		},
+		Mother: &models.Animal{
+			ID:                motherID,
+			AnimalName:        "Mãe",
+			EarTagNumberLocal: 20,
+		},
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	req, _ := http.NewRequest("GET", "/animals?id=1", nil)
+	w := httptest.NewRecorder()
+
+	mockRepo.On("FindByID", uint(1)).Return(animal, nil)
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	var response map[string]interface{}
+	json.Unmarshal(w.Body.Bytes(), &response)
+	assert.True(t, response["success"].(bool))
+	data := response["data"].(map[string]interface{})
+	assert.NotNil(t, data["father"])
+	assert.NotNil(t, data["mother"])
+	mockRepo.AssertExpectations(t)
 }

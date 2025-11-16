@@ -262,3 +262,150 @@ func TestMilkCollectionHandler_GetTopMilkProducers_Success(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 	mockMilkRepo.AssertExpectations(t)
 }
+
+func TestMilkCollectionHandler_GetMilkCollectionsByFarmID_WithDateRange(t *testing.T) {
+	mockMilkRepo := new(mocks.MockMilkCollectionRepository)
+	mockAnimalRepo := new(services.MockAnimalRepository)
+	router, _ := setupMilkCollectionRouter(mockMilkRepo, mockAnimalRepo)
+
+	expectedCollections := []models.MilkCollection{
+		{ID: 1, AnimalID: 1, Liters: 35.5, Date: time.Now()},
+	}
+
+	req, _ := http.NewRequest("GET", "/milk-collections/farm/1?start_date=2024-01-01&end_date=2024-01-31", nil)
+	w := httptest.NewRecorder()
+
+	mockMilkRepo.On("FindByFarmIDWithDateRange", uint(1), mock.AnythingOfType("*time.Time"), mock.AnythingOfType("*time.Time")).Return(expectedCollections, nil)
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	mockMilkRepo.AssertExpectations(t)
+}
+
+func TestMilkCollectionHandler_GetMilkCollectionsByFarmID_InvalidFarmID(t *testing.T) {
+	mockMilkRepo := new(mocks.MockMilkCollectionRepository)
+	mockAnimalRepo := new(services.MockAnimalRepository)
+	router, _ := setupMilkCollectionRouter(mockMilkRepo, mockAnimalRepo)
+
+	req, _ := http.NewRequest("GET", "/milk-collections/farm/invalid", nil)
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestMilkCollectionHandler_GetMilkCollectionsByAnimalID_InvalidAnimalID(t *testing.T) {
+	mockMilkRepo := new(mocks.MockMilkCollectionRepository)
+	mockAnimalRepo := new(services.MockAnimalRepository)
+	router, _ := setupMilkCollectionRouter(mockMilkRepo, mockAnimalRepo)
+
+	req, _ := http.NewRequest("GET", "/milk-collections/animal/invalid", nil)
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestMilkCollectionHandler_GetTopMilkProducers_MissingFarmID(t *testing.T) {
+	mockMilkRepo := new(mocks.MockMilkCollectionRepository)
+	mockAnimalRepo := new(services.MockAnimalRepository)
+	router, _ := setupMilkCollectionRouter(mockMilkRepo, mockAnimalRepo)
+
+	req, _ := http.NewRequest("GET", "/milk-collections/top-producers", nil)
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestMilkCollectionHandler_GetTopMilkProducers_InvalidFarmID(t *testing.T) {
+	mockMilkRepo := new(mocks.MockMilkCollectionRepository)
+	mockAnimalRepo := new(services.MockAnimalRepository)
+	router, _ := setupMilkCollectionRouter(mockMilkRepo, mockAnimalRepo)
+
+	req, _ := http.NewRequest("GET", "/milk-collections/top-producers?farmId=invalid", nil)
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestMilkCollectionHandler_GetMilkCollectionsByFarmID_WithAnimalData(t *testing.T) {
+	mockMilkRepo := new(mocks.MockMilkCollectionRepository)
+	mockAnimalRepo := new(services.MockAnimalRepository)
+	router, _ := setupMilkCollectionRouter(mockMilkRepo, mockAnimalRepo)
+
+	birthDate := time.Date(2020, 1, 15, 0, 0, 0, 0, time.UTC)
+	expectedCollections := []models.MilkCollection{
+		{
+			ID:       1,
+			AnimalID: 1,
+			Liters:   35.5,
+			Date:     time.Now(),
+			Animal: models.Animal{
+				ID:                1,
+				FarmID:            1,
+				AnimalName:        "Vaca Teste",
+				EarTagNumberLocal: 123,
+				BirthDate:         &birthDate,
+			},
+		},
+	}
+
+	req, _ := http.NewRequest("GET", "/milk-collections/farm/1", nil)
+	w := httptest.NewRecorder()
+
+	mockMilkRepo.On("FindByFarmID", uint(1)).Return(expectedCollections, nil)
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	var response handlers.MilkCollectionsResponse
+	json.Unmarshal(w.Body.Bytes(), &response)
+	assert.True(t, response.Success)
+	assert.Len(t, response.Data, 1)
+	assert.NotEmpty(t, response.Data[0].Animal.BirthDate)
+	mockMilkRepo.AssertExpectations(t)
+}
+
+func TestMilkCollectionHandler_GetMilkCollectionsByFarmID_WithNilBirthDate(t *testing.T) {
+	mockMilkRepo := new(mocks.MockMilkCollectionRepository)
+	mockAnimalRepo := new(services.MockAnimalRepository)
+	router, _ := setupMilkCollectionRouter(mockMilkRepo, mockAnimalRepo)
+
+	expectedCollections := []models.MilkCollection{
+		{
+			ID:       1,
+			AnimalID: 1,
+			Liters:   35.5,
+			Date:     time.Now(),
+			Animal: models.Animal{
+				ID:                1,
+				FarmID:            1,
+				AnimalName:        "Vaca Teste",
+				EarTagNumberLocal: 123,
+				BirthDate:         nil,
+			},
+		},
+	}
+
+	req, _ := http.NewRequest("GET", "/milk-collections/farm/1", nil)
+	w := httptest.NewRecorder()
+
+	mockMilkRepo.On("FindByFarmID", uint(1)).Return(expectedCollections, nil)
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	var response handlers.MilkCollectionsResponse
+	json.Unmarshal(w.Body.Bytes(), &response)
+	assert.True(t, response.Success)
+	assert.Len(t, response.Data, 1)
+	assert.Empty(t, response.Data[0].Animal.BirthDate)
+	mockMilkRepo.AssertExpectations(t)
+}

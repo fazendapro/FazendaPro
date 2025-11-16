@@ -310,3 +310,115 @@ func TestDebtHandler_GetTotalByPerson_ServiceError(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 	mockRepo.AssertExpectations(t)
 }
+
+func TestDebtHandler_GetDebts_InvalidPage(t *testing.T) {
+	mockRepo := new(services.MockDebtRepository)
+	router, _ := setupDebtRouter(mockRepo)
+
+	expectedDebts := []models.Debt{}
+	mockRepo.On("FindAllWithPagination", 1, 10, (*int)(nil), (*int)(nil)).Return(expectedDebts, int64(0), nil)
+
+	req, _ := http.NewRequest("GET", "/debts?page=invalid", nil)
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestDebtHandler_GetDebts_InvalidLimit(t *testing.T) {
+	mockRepo := new(services.MockDebtRepository)
+	router, _ := setupDebtRouter(mockRepo)
+
+	expectedDebts := []models.Debt{}
+	mockRepo.On("FindAllWithPagination", 1, 10, (*int)(nil), (*int)(nil)).Return(expectedDebts, int64(0), nil)
+
+	req, _ := http.NewRequest("GET", "/debts?limit=invalid", nil)
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestDebtHandler_GetDebts_InvalidYear(t *testing.T) {
+	mockRepo := new(services.MockDebtRepository)
+	router, _ := setupDebtRouter(mockRepo)
+
+	expectedDebts := []models.Debt{}
+	mockRepo.On("FindAllWithPagination", 1, 10, (*int)(nil), (*int)(nil)).Return(expectedDebts, int64(0), nil)
+
+	req, _ := http.NewRequest("GET", "/debts?year=invalid", nil)
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestDebtHandler_GetDebts_InvalidMonth(t *testing.T) {
+	mockRepo := new(services.MockDebtRepository)
+	router, _ := setupDebtRouter(mockRepo)
+
+	expectedDebts := []models.Debt{}
+	mockRepo.On("FindAllWithPagination", 1, 10, (*int)(nil), (*int)(nil)).Return(expectedDebts, int64(0), nil)
+
+	req, _ := http.NewRequest("GET", "/debts?month=invalid", nil)
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestDebtHandler_GetDebts_MonthOutOfRange(t *testing.T) {
+	mockRepo := new(services.MockDebtRepository)
+	router, _ := setupDebtRouter(mockRepo)
+
+	expectedDebts := []models.Debt{}
+	mockRepo.On("FindAllWithPagination", 1, 10, (*int)(nil), (*int)(nil)).Return(expectedDebts, int64(0), nil)
+
+	req, _ := http.NewRequest("GET", "/debts?month=13", nil)
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestDebtHandler_GetDebts_ZeroPage(t *testing.T) {
+	mockRepo := new(services.MockDebtRepository)
+	router, _ := setupDebtRouter(mockRepo)
+
+	expectedDebts := []models.Debt{}
+	mockRepo.On("FindAllWithPagination", 1, 10, (*int)(nil), (*int)(nil)).Return(expectedDebts, int64(0), nil)
+
+	req, _ := http.NewRequest("GET", "/debts?page=0", nil)
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestDebtHandler_GetDebts_ZeroLimit(t *testing.T) {
+	mockRepo := new(services.MockDebtRepository)
+	router, _ := setupDebtRouter(mockRepo)
+
+	expectedDebts := []models.Debt{}
+	mockRepo.On("FindAllWithPagination", 1, 10, (*int)(nil), (*int)(nil)).Return(expectedDebts, int64(0), nil)
+
+	req, _ := http.NewRequest("GET", "/debts?limit=0", nil)
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	mockRepo.AssertExpectations(t)
+}

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -379,4 +380,104 @@ func TestAnimalService_UpdateAnimal_InvalidID(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "ID do animal é obrigatório")
+}
+
+func TestAnimalService_CreateAnimal_MissingFields(t *testing.T) {
+	mockRepo := new(MockAnimalRepository)
+	service := service.NewAnimalService(mockRepo)
+
+	testCases := []struct {
+		name      string
+		animal    *models.Animal
+		errorMsg  string
+	}{
+		{
+			name:     "MissingFarmID",
+			animal:   &models.Animal{EarTagNumberLocal: 123, AnimalName: "Vaca", Breed: "Holandesa", Type: "Bovino"},
+			errorMsg: "farm ID é obrigatório",
+		},
+		{
+			name:     "MissingEarTagNumber",
+			animal:   &models.Animal{FarmID: 1, AnimalName: "Vaca", Breed: "Holandesa", Type: "Bovino"},
+			errorMsg: "número da brinca local é obrigatório",
+		},
+		{
+			name:     "MissingAnimalName",
+			animal:   &models.Animal{FarmID: 1, EarTagNumberLocal: 123, Breed: "Holandesa", Type: "Bovino"},
+			errorMsg: "nome do animal é obrigatório",
+		},
+		{
+			name:     "MissingBreed",
+			animal:   &models.Animal{FarmID: 1, EarTagNumberLocal: 123, AnimalName: "Vaca", Type: "Bovino"},
+			errorMsg: "raça do animal é obrigatória",
+		},
+		{
+			name:     "MissingType",
+			animal:   &models.Animal{FarmID: 1, EarTagNumberLocal: 123, AnimalName: "Vaca", Breed: "Holandesa"},
+			errorMsg: "tipo do animal é obrigatório",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			err := service.CreateAnimal(tc.animal)
+			assert.Error(t, err)
+			assert.Contains(t, err.Error(), tc.errorMsg)
+		})
+	}
+}
+
+func TestAnimalService_CreateAnimal_RepositoryError(t *testing.T) {
+	mockRepo := new(MockAnimalRepository)
+	service := service.NewAnimalService(mockRepo)
+
+	animal := &models.Animal{
+		FarmID:            1,
+		EarTagNumberLocal: 123,
+		AnimalName:        "Vaca Teste",
+		Sex:               0,
+		Breed:             "Holandesa",
+		Type:              "Bovino",
+		AnimalType:        0,
+		Purpose:           1,
+	}
+
+	mockRepo.On("FindByEarTagNumber", uint(1), 123).Return(nil, errors.New("database error"))
+
+	err := service.CreateAnimal(animal)
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "database error")
+	mockRepo.AssertExpectations(t)
+}
+
+func TestAnimalService_UpdateAnimal_RepositoryError(t *testing.T) {
+	mockRepo := new(MockAnimalRepository)
+	service := service.NewAnimalService(mockRepo)
+
+	animal := &models.Animal{
+		ID:     1,
+		FarmID: 1,
+	}
+
+	mockRepo.On("FindByID", uint(1)).Return(nil, errors.New("database error"))
+
+	err := service.UpdateAnimal(animal)
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "database error")
+	mockRepo.AssertExpectations(t)
+}
+
+func TestAnimalService_DeleteAnimal_RepositoryError(t *testing.T) {
+	mockRepo := new(MockAnimalRepository)
+	service := service.NewAnimalService(mockRepo)
+
+	mockRepo.On("FindByID", uint(1)).Return(nil, errors.New("database error"))
+
+	err := service.DeleteAnimal(1)
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "database error")
+	mockRepo.AssertExpectations(t)
 }

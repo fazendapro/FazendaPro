@@ -321,3 +321,96 @@ func TestSelectFarm_ServiceError(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 	mockRepo.AssertExpectations(t)
 }
+
+func TestGetUserFarms_ShouldAutoSelectFarmError(t *testing.T) {
+	mockRepo := new(MockUserRepository)
+	userService := service.NewUserService(mockRepo)
+	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+
+	userID := uint(1)
+	farms := []models.Farm{
+		{ID: 1},
+		{ID: 2},
+	}
+
+	mockRepo.On("GetUserFarms", userID).Return(farms, nil)
+	mockRepo.On("GetUserFarmCount", userID).Return(int64(0), gorm.ErrRecordNotFound)
+
+	req := httptest.NewRequest("GET", "/api/v1/farms", nil)
+	req.Header.Set("Authorization", "Bearer "+generateTestToken(userID))
+	w := httptest.NewRecorder()
+
+	farmHandler.GetUserFarms(w, req)
+
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestGetUserFarms_EmptyFarmsList(t *testing.T) {
+	mockRepo := new(MockUserRepository)
+	userService := service.NewUserService(mockRepo)
+	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+
+	userID := uint(1)
+
+	mockRepo.On("GetUserFarms", userID).Return([]models.Farm{}, nil)
+	mockRepo.On("GetUserFarmCount", userID).Return(int64(0), nil)
+
+	req := httptest.NewRequest("GET", "/api/v1/farms", nil)
+	req.Header.Set("Authorization", "Bearer "+generateTestToken(userID))
+	w := httptest.NewRecorder()
+
+	farmHandler.GetUserFarms(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	var response handlers.GetUserFarmsResponse
+	json.Unmarshal(w.Body.Bytes(), &response)
+	assert.True(t, response.Success)
+	assert.Len(t, response.Farms.([]interface{}), 0)
+	assert.False(t, response.AutoSelect)
+	assert.Nil(t, response.SelectedFarmID)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestExtractUserIDFromToken_InvalidClaims(t *testing.T) {
+	mockRepo := new(MockUserRepository)
+	userService := service.NewUserService(mockRepo)
+	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+
+	now := time.Now()
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"iat": now.Unix(),
+		"exp": now.Add(24 * time.Hour).Unix(),
+	})
+	tokenString, _ := token.SignedString([]byte("test-secret"))
+
+	req := httptest.NewRequest("GET", "/api/v1/farms", nil)
+	req.Header.Set("Authorization", "Bearer "+tokenString)
+	w := httptest.NewRecorder()
+
+	farmHandler.GetUserFarms(w, req)
+
+	assert.Equal(t, http.StatusUnauthorized, w.Code)
+}
+
+func TestExtractUserIDFromToken_InvalidTokenType(t *testing.T) {
+	mockRepo := new(MockUserRepository)
+	userService := service.NewUserService(mockRepo)
+	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+
+	now := time.Now()
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"sub": "invalid-type",
+		"iat": now.Unix(),
+		"exp": now.Add(24 * time.Hour).Unix(),
+	})
+	tokenString, _ := token.SignedString([]byte("test-secret"))
+
+	req := httptest.NewRequest("GET", "/api/v1/farms", nil)
+	req.Header.Set("Authorization", "Bearer "+tokenString)
+	w := httptest.NewRecorder()
+
+	farmHandler.GetUserFarms(w, req)
+
+	assert.Equal(t, http.StatusUnauthorized, w.Code)
+}
