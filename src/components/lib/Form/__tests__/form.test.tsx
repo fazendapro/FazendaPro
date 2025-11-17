@@ -16,7 +16,7 @@ vi.mock('antd', async (importOriginal) => {
     ...antd,
     Form: {
       ...antd.Form,
-      Item: ({ children, label, validateStatus, help }: any) => (
+      Item: ({ children, label, validateStatus, help }: { children?: React.ReactNode; label?: string; validateStatus?: string; help?: string }) => (
         <div data-testid="form-item" data-status={validateStatus} data-help={help}>
           {label && <label data-testid="form-label">{label}</label>}
           {children}
@@ -26,7 +26,7 @@ vi.mock('antd', async (importOriginal) => {
     },
     Input: {
       ...antd.Input,
-      Password: ({ value, onChange, placeholder, ...props }: any) => (
+      Password: ({ value, onChange, placeholder, ...props }: { value?: string; onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void; placeholder?: string; [key: string]: unknown }) => (
         <input
           type="password"
           value={value}
@@ -37,17 +37,17 @@ vi.mock('antd', async (importOriginal) => {
         />
       )
     },
-    InputNumber: ({ value, onChange, placeholder, ...props }: any) => (
+    InputNumber: ({ value, onChange, placeholder, ...props }: { value?: number; onChange?: (value: number | null) => void; placeholder?: string; [key: string]: unknown }) => (
       <input
         type="number"
         value={value}
-        onChange={onChange}
+        onChange={(e) => onChange?.(e.target.value ? Number(e.target.value) : null)}
         placeholder={placeholder}
         data-testid="number-input"
         {...props}
       />
     ),
-    Checkbox: ({ checked, onChange, children }: any) => (
+    Checkbox: ({ checked, onChange, children }: { checked?: boolean; onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void; children?: React.ReactNode }) => (
       <label>
         <input
           type="checkbox"
@@ -58,18 +58,18 @@ vi.mock('antd', async (importOriginal) => {
         {children}
       </label>
     ),
-    Row: ({ children, gutter }: any) => (
+    Row: ({ children, gutter }: { children?: React.ReactNode; gutter?: number | [number, number] }) => (
       <div data-testid="form-row" data-gutter={gutter}>
         {children}
       </div>
     ),
-    Col: ({ children, span }: any) => (
+    Col: ({ children, span }: { children?: React.ReactNode; span?: number }) => (
       <div data-testid="form-col" data-span={span}>
         {children}
       </div>
     ),
     Typography: {
-      Link: ({ children, href, style }: any) => (
+      Link: ({ children, href, style }: { children?: React.ReactNode; href?: string; style?: React.CSSProperties }) => (
         <a href={href} style={style} data-testid="form-link">
           {children}
         </a>
@@ -80,7 +80,7 @@ vi.mock('antd', async (importOriginal) => {
 
 const TestWrapper: React.FC<{
   fields: FieldType[]
-  onSubmit: (data: any) => void
+  onSubmit: (data: Record<string, unknown>) => void
   children?: React.ReactNode
 }> = ({ fields, onSubmit, children }) => {
   const methods = useForm({
@@ -137,10 +137,12 @@ describe('Form', () => {
   it('deve renderizar campos de texto corretamente', () => {
     render(<TestWrapper fields={basicFields} onSubmit={mockOnSubmit} />)
 
-    const textInputs = screen.getAllByRole('textbox')
-    expect(textInputs).toHaveLength(2)
-    expect(textInputs[0]).toHaveAttribute('placeholder', 'Digite seu nome')
-    expect(textInputs[1]).toHaveAttribute('placeholder', 'Digite seu email')
+    const nameInput = screen.getByPlaceholderText('Digite seu nome')
+    const emailInput = screen.getByPlaceholderText('Digite seu email')
+    expect(nameInput).toBeInTheDocument()
+    expect(emailInput).toBeInTheDocument()
+    expect(nameInput).toHaveAttribute('placeholder', 'Digite seu nome')
+    expect(emailInput).toHaveAttribute('placeholder', 'Digite seu email')
   })
 
   it('deve renderizar campo de senha', () => {
@@ -235,14 +237,18 @@ describe('Form', () => {
 
     render(<TestWrapper fields={fieldsWithColSpan} onSubmit={mockOnSubmit} />)
 
-    const col = screen.getByTestId('form-col')
-    expect(col).toHaveAttribute('data-span', '12')
+    const cols = screen.getAllByTestId('form-col')
+    const colWithSpan12 = cols.find(col => col.getAttribute('data-span') === '12')
+    expect(colWithSpan12).toBeInTheDocument()
+    expect(colWithSpan12).toHaveAttribute('data-span', '12')
   })
 
   it('deve usar colSpan padrão quando não especificado', () => {
-    render(<TestWrapper fields={basicFields} onSubmit={mockOnSubmit} />)
+    const { container } = render(<TestWrapper fields={basicFields} onSubmit={mockOnSubmit} />)
 
-    const cols = screen.getAllByTestId('form-col')
+    const form = container.querySelector('form')
+    const cols = form ? Array.from(form.querySelectorAll('[data-testid="form-col"]')) : []
+    expect(cols.length).toBeGreaterThanOrEqual(2)
     cols.forEach(col => {
       expect(col).toHaveAttribute('data-span', '24')
     })
@@ -296,10 +302,12 @@ describe('Form', () => {
   })
 
   it('deve renderizar com campos vazios sem erro', () => {
-    render(<TestWrapper fields={[]} onSubmit={mockOnSubmit} />)
+    const { container } = render(<TestWrapper fields={[]} onSubmit={mockOnSubmit} />)
 
-    expect(screen.getByTestId('form-row')).toBeInTheDocument()
-    expect(screen.queryByTestId('form-col')).not.toBeInTheDocument()
+    const formRow = container.querySelector('[data-testid="form-row"]')
+    expect(formRow).toBeInTheDocument()
+    const formCols = container.querySelectorAll('[data-testid="form-col"]')
+    expect(formCols.length).toBe(0)
   })
 
   it('deve renderizar múltiplos tipos de campo', () => {

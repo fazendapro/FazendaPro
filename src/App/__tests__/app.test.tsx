@@ -1,25 +1,20 @@
 import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render } from '@testing-library/react'
+import { App } from '../App'
+import { BrowserRouter } from 'react-router-dom'
 
-const MockApp = () => (
-  <div data-testid="app">
-    <h1>FazendaPro App</h1>
-  </div>
+const wrapper = ({ children }: { children: React.ReactNode }) => (
+  <BrowserRouter>{children}</BrowserRouter>
 )
 
 describe('App', () => {
   it('deve renderizar sem erros', () => {
-    render(<MockApp />)
-
-    expect(screen.getByTestId('app')).toBeInTheDocument()
-    expect(screen.getByText('FazendaPro App')).toBeInTheDocument()
+    const { container } = render(<App />, { wrapper })
+    expect(container).toBeDefined()
   })
 
   it('deve ter estrutura básica', () => {
-    render(<MockApp />)
-
-    const app = screen.getByTestId('app')
-    expect(app).toBeInTheDocument()
-    expect(app.tagName).toBe('DIV')
+    const { container } = render(<App />, { wrapper })
+    expect(container.firstChild).toBeDefined()
   })
 })

@@ -86,7 +86,7 @@ export const CreateMilkProductionModal: React.FC<MilkProductionModalProps> = ({
       
       onSuccess()
       form.resetFields()
-    } catch (error) {
+    } catch {
       const errorMessage = isEditing 
         ? t('animalTable.milkProductionContainer.updateError')
         : t('animalTable.milkProductionContainer.createError')

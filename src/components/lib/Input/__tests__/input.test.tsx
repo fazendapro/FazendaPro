@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { Input } from '../input'
 
@@ -8,7 +8,7 @@ vi.mock('antd', async (importOriginal) => {
   return {
     ...antd,
     Form: {
-      Item: ({ children, label, validateStatus, help, style }: any) => (
+      Item: ({ children, label, validateStatus, help, style }: { children?: React.ReactNode; label?: React.ReactNode; validateStatus?: string; help?: string; style?: React.CSSProperties }) => (
         <div 
           data-testid="form-item" 
           data-status={validateStatus} 
@@ -21,9 +21,9 @@ vi.mock('antd', async (importOriginal) => {
         </div>
       )
     },
-    Input: ({ prefix, name, id, placeholder, maxLength, autoComplete, ...props }: any) => (
+    Input: ({ prefix, name, id, placeholder, maxLength, autoComplete, ...props }: { prefix?: React.ReactNode; name?: string; id?: string; placeholder?: string; maxLength?: number; autoComplete?: string; [key: string]: unknown }) => (
       <input
-        prefix={prefix}
+        data-prefix={prefix ? 'true' : undefined}
         name={name}
         id={id}
         placeholder={placeholder}
@@ -34,16 +34,16 @@ vi.mock('antd', async (importOriginal) => {
       />
     ),
     Typography: {
-      Text: ({ children, strong, style }: any) => (
+      Text: ({ children, strong, style }: { children?: React.ReactNode; strong?: boolean; style?: React.CSSProperties }) => (
         <span data-testid="text" data-strong={strong} style={style}>
           {children}
         </span>
       )
     },
-    Space: ({ children }: any) => (
+    Space: ({ children }: { children?: React.ReactNode }) => (
       <div data-testid="space">{children}</div>
     ),
-    Tooltip: ({ children, title }: any) => (
+    Tooltip: ({ children, title }: { children?: React.ReactNode; title?: string }) => (
       <div data-testid="tooltip" title={title}>
         {children}
       </div>
@@ -52,14 +52,14 @@ vi.mock('antd', async (importOriginal) => {
 })
 
 vi.mock('@ant-design/icons', () => ({
-  QuestionCircleOutlined: ({ style }: any) => (
+  QuestionCircleOutlined: ({ style }: { style?: React.CSSProperties }) => (
     <span data-testid="question-icon" style={style}>?</span>
   )
 }))
 
 const TestWrapper: React.FC<{
   children: React.ReactNode
-  defaultValues?: any
+  defaultValues?: Record<string, unknown>
 }> = ({ children, defaultValues = {} }) => {
   const methods = useForm({
     defaultValues: {
@@ -81,14 +81,18 @@ describe('Input', () => {
     vi.clearAllMocks()
   })
 
+  afterEach(() => {
+    cleanup()
+  })
+
   it('deve renderizar input básico', () => {
-    render(
+    const { container } = render(
       <TestWrapper>
         <Input name="testField" />
       </TestWrapper>
     )
 
-    const input = screen.getByTestId('ant-input')
+    const input = container.querySelector('input[data-testid="ant-input"]')
     expect(input).toBeInTheDocument()
     expect(input).toHaveAttribute('name', 'testField')
     expect(input).toHaveAttribute('id', 'testField')
@@ -112,7 +116,7 @@ describe('Input', () => {
       </TestWrapper>
     )
 
-    const input = screen.getByTestId('ant-input')
+    const input = screen.getByPlaceholderText('Digite seu nome')
     expect(input).toHaveAttribute('placeholder', 'Digite seu nome')
   })
 
@@ -140,49 +144,50 @@ describe('Input', () => {
   it('deve renderizar com ícone à esquerda', () => {
     const icon = <span data-testid="custom-icon">@</span>
     
-    render(
+    const { container } = render(
       <TestWrapper>
         <Input name="testField" iconLeft={icon} />
       </TestWrapper>
     )
 
-    const input = screen.getByTestId('ant-input')
-    expect(input).toHaveAttribute('prefix')
+    const input = container.querySelector('input[data-testid="ant-input"]')
+    expect(input).toBeInTheDocument()
+    expect(input).toHaveAttribute('data-prefix', 'true')
   })
 
   it('deve renderizar com erro', () => {
     const error = { message: 'Campo obrigatório' }
     
-    render(
+    const { container } = render(
       <TestWrapper>
         <Input name="testField" error={error} />
       </TestWrapper>
     )
 
-    const formItem = screen.getByTestId('form-item')
+    const formItem = container.querySelector('[data-testid="form-item"]')
     expect(formItem).toHaveAttribute('data-status', 'error')
-    expect(screen.getByTestId('form-help')).toHaveTextContent('Campo obrigatório')
+    expect(screen.getByText('Campo obrigatório')).toBeInTheDocument()
   })
 
   it('deve renderizar como inválido', () => {
-    render(
+    const { container } = render(
       <TestWrapper>
         <Input name="testField" isInvalid />
       </TestWrapper>
     )
 
-    const formItem = screen.getByTestId('form-item')
+    const formItem = container.querySelector('[data-testid="form-item"]')
     expect(formItem).toHaveAttribute('data-status', 'error')
   })
 
   it('deve renderizar com maxLength', () => {
-    render(
+    const { container } = render(
       <TestWrapper>
         <Input name="testField" max="50" />
       </TestWrapper>
     )
 
-    const input = screen.getByTestId('ant-input')
+    const input = container.querySelector('input[data-testid="ant-input"]')
     expect(input).toHaveAttribute('maxLength', '50')
   })
 
@@ -220,24 +225,24 @@ describe('Input', () => {
   })
 
   it('deve renderizar com autoComplete off', () => {
-    render(
+    const { container } = render(
       <TestWrapper>
         <Input name="testField" autoComplete="off" />
       </TestWrapper>
     )
 
-    const input = screen.getByTestId('ant-input')
+    const input = container.querySelector('input[data-testid="ant-input"]')
     expect(input).toHaveAttribute('autoComplete', 'off')
   })
 
   it('deve renderizar com autoComplete on (padrão)', () => {
-    render(
+    const { container } = render(
       <TestWrapper>
         <Input name="testField" />
       </TestWrapper>
     )
 
-    const input = screen.getByTestId('ant-input')
+    const input = container.querySelector('input[data-testid="ant-input"]')
     expect(input).toHaveAttribute('autoComplete', 'on')
   })
 
@@ -253,24 +258,24 @@ describe('Input', () => {
   })
 
   it('deve renderizar com margem personalizada', () => {
-    render(
+    const { container } = render(
       <TestWrapper>
         <Input name="testField" mtLabel={10} mbField={20} />
       </TestWrapper>
     )
 
-    const formItem = screen.getByTestId('form-item')
+    const formItem = container.querySelector('[data-testid="form-item"]')
     expect(formItem).toHaveStyle('margin-bottom: 20px')
   })
 
   it('deve permitir interação com o input', async () => {
-    render(
+    const { container } = render(
       <TestWrapper>
         <Input name="testField" />
       </TestWrapper>
     )
 
-    const input = screen.getByTestId('ant-input')
+    const input = container.querySelector('input[data-testid="ant-input"]') as HTMLInputElement
     
     fireEvent.change(input, { target: { value: 'João Silva' } })
     
@@ -300,14 +305,15 @@ describe('Input', () => {
   })
 
   it('deve renderizar sem ícone quando iconLeft é false', () => {
-    render(
+    const { container } = render(
       <TestWrapper>
         <Input name="testField" iconLeft={false} />
       </TestWrapper>
     )
 
-    const input = screen.getByTestId('ant-input')
-    expect(input).not.toHaveAttribute('prefix')
+    const input = container.querySelector('input[data-testid="ant-input"]')
+    expect(input).toBeInTheDocument()
+    expect(input).not.toHaveAttribute('data-prefix')
   })
 
   it('deve renderizar com todas as props customizadas', () => {
@@ -336,10 +342,10 @@ describe('Input', () => {
     expect(screen.getByText('Email')).toBeInTheDocument()
     expect(screen.getByText('*')).toBeInTheDocument()
     expect(screen.getByTestId('tooltip')).toBeInTheDocument()
-    expect(screen.getByTestId('form-help')).toHaveTextContent('Erro de validação')
+    expect(screen.getByText('Erro de validação')).toBeInTheDocument()
     
-    const input = screen.getByTestId('ant-input')
-    expect(input).toHaveAttribute('prefix')
+    const input = screen.getByPlaceholderText('Digite seu email')
+    expect(input).toHaveAttribute('data-prefix', 'true')
     expect(input).toHaveAttribute('placeholder', 'Digite seu email')
     expect(input).toHaveAttribute('maxLength', '100')
     expect(input).toHaveAttribute('autoComplete', 'off')

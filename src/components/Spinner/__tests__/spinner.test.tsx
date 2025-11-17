@@ -6,7 +6,7 @@ vi.mock('antd', async (importOriginal) => {
   const antd = await importOriginal<typeof import('antd')>()
   return {
     ...antd,
-    Spin: ({ size, ...props }: any) => (
+    Spin: ({ size, ...props }: { size?: string; [key: string]: unknown }) => (
       <div data-testid="ant-spin" data-size={size} {...props}>
         <div data-testid="spinner-content">Loading...</div>
       </div>

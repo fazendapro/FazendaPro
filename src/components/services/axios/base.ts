@@ -42,7 +42,8 @@ export function baseAxios(baseUrl: string) {
               originalRequest.headers.Authorization = `Bearer ${response.access_token}`
               return instance(originalRequest)
             }
-          } catch (refreshError) {
+          } catch {
+            // Erro ao renovar token, será tratado abaixo
           }
         }
 

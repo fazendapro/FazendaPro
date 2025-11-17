@@ -41,10 +41,21 @@ export const UpdateReproductionPhaseModal = ({
     }
   }, [visible, reproduction, form]);
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: {
+    new_phase: number;
+    insemination_date?: dayjs.Dayjs;
+    insemination_type?: string;
+    pregnancy_date?: dayjs.Dayjs;
+    lactation_start_date?: dayjs.Dayjs;
+    lactation_end_date?: dayjs.Dayjs;
+    dry_period_start_date?: dayjs.Dayjs;
+    actual_birth_date?: dayjs.Dayjs;
+    veterinary_confirmation?: boolean;
+    observations?: string;
+  }) => {
     if (!reproduction) return;
 
-    const additionalData: any = {};
+    const additionalData: UpdateReproductionPhaseRequest['additional_data'] = {};
 
     if (values.insemination_date) {
       additionalData.insemination_date = values.insemination_date.format('YYYY-MM-DD');

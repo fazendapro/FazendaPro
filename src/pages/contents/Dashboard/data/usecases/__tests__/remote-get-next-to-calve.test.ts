@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { RemoteGetNextToCalve } from '../remote-get-next-to-calve';
 import { api } from '../../../../../../components';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosRequestConfig } from 'axios';
 
 // Mock da API
 vi.mock('../../../../../../components', () => ({
@@ -45,7 +45,7 @@ describe('RemoteGetNextToCalve', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockResolvedValue(mockResponse)
-    } as any;
+    } as unknown as typeof api;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -78,7 +78,7 @@ describe('RemoteGetNextToCalve', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockResolvedValue(mockResponse)
-    } as any;
+    } as unknown as typeof api;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -99,12 +99,12 @@ describe('RemoteGetNextToCalve', () => {
       status: 500,
       statusText: 'Internal Server Error',
       headers: {},
-      config: {} as any
+      config: {} as AxiosRequestConfig
     };
 
     const mockApiInstance = {
       get: vi.fn().mockRejectedValue(mockError)
-    } as any;
+    } as unknown as typeof api;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -118,7 +118,7 @@ describe('RemoteGetNextToCalve', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockRejectedValue(mockError)
-    } as any;
+    } as unknown as typeof api;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -129,7 +129,7 @@ describe('RemoteGetNextToCalve', () => {
   it('deve lidar com erro desconhecido', async () => {
     const mockApiInstance = {
       get: vi.fn().mockRejectedValue(new Error('Unknown error'))
-    } as any;
+    } as unknown as typeof api;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -147,7 +147,7 @@ describe('RemoteGetNextToCalve', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockResolvedValue(mockResponse)
-    } as any;
+    } as unknown as typeof api;
 
     mockApi.mockReturnValue(mockApiInstance);
 

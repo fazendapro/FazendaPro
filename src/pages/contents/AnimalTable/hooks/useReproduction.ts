@@ -24,8 +24,8 @@ export const useReproduction = () => {
     try {
       const result = await remoteCreateReproduction(data);
       return result;
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Erro ao criar registro de reprodução';
+    } catch (err: unknown) {
+      const errorMessage = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Erro ao criar registro de reprodução';
       setError(errorMessage);
       return null;
     } finally {
@@ -45,8 +45,8 @@ export const useReproduction = () => {
     try {
       const result = await remoteGetReproductionsByFarm(farm.id);
       return result;
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Erro ao buscar registros de reprodução';
+    } catch (err: unknown) {
+      const errorMessage = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Erro ao buscar registros de reprodução';
       setError(errorMessage);
       return [];
     } finally {
@@ -61,8 +61,8 @@ export const useReproduction = () => {
     try {
       await remoteUpdateReproductionPhase(data);
       return true;
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Erro ao atualizar fase de reprodução';
+    } catch (err: unknown) {
+      const errorMessage = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Erro ao atualizar fase de reprodução';
       setError(errorMessage);
       return false;
     } finally {
@@ -77,8 +77,8 @@ export const useReproduction = () => {
     try {
       await remoteUpdateReproduction(data);
       return true;
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Erro ao atualizar registro de reprodução';
+    } catch (err: unknown) {
+      const errorMessage = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Erro ao atualizar registro de reprodução';
       setError(errorMessage);
       return false;
     } finally {
@@ -93,8 +93,8 @@ export const useReproduction = () => {
     try {
       await remoteDeleteReproduction(id);
       return true;
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Erro ao deletar registro de reprodução';
+    } catch (err: unknown) {
+      const errorMessage = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Erro ao deletar registro de reprodução';
       setError(errorMessage);
       return false;
     } finally {

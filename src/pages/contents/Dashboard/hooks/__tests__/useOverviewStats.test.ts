@@ -7,9 +7,10 @@ vi.mock('../../../../../hooks/useFarm', () => ({
   useFarm: vi.fn()
 }));
 
+const mockGetOverviewStats = vi.fn();
 vi.mock('../../factories/usecases/get-overview-stats-factory', () => ({
   GetOverviewStatsFactory: vi.fn(() => ({
-    getOverviewStats: vi.fn()
+    getOverviewStats: mockGetOverviewStats
   }))
 }));
 
@@ -26,6 +27,7 @@ describe('useOverviewStats', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockGetOverviewStats.mockReset();
     mockUseFarm.mockReturnValue({
       farm: mockFarm,
       loading: false,
@@ -35,16 +37,11 @@ describe('useOverviewStats', () => {
   });
 
   it('deve retornar dados iniciais corretos', async () => {
-    const mockGetOverviewStats = vi.fn().mockResolvedValue({
+    mockGetOverviewStats.mockResolvedValue({
       data: { males_count: 0, females_count: 0, total_sold: 0, total_revenue: 0 },
       success: true,
       message: 'Success',
       status: 200
-    });
-
-    const { GetOverviewStatsFactory } = await import('../../factories/usecases/get-overview-stats-factory');
-    vi.mocked(GetOverviewStatsFactory).mockReturnValue({
-      getOverviewStats: mockGetOverviewStats
     });
 
     const { result } = renderHook(() => useOverviewStats());
@@ -58,16 +55,11 @@ describe('useOverviewStats', () => {
   });
 
   it('deve buscar estatísticas quando farmId for fornecido', async () => {
-    const mockGetOverviewStats = vi.fn().mockResolvedValue({
+    mockGetOverviewStats.mockResolvedValue({
       data: mockStats,
       success: true,
       message: 'Success',
       status: 200
-    });
-
-    const { GetOverviewStatsFactory } = await import('../../factories/usecases/get-overview-stats-factory');
-    vi.mocked(GetOverviewStatsFactory).mockReturnValue({
-      getOverviewStats: mockGetOverviewStats
     });
 
     const { result } = renderHook(() => useOverviewStats(1));
@@ -83,23 +75,25 @@ describe('useOverviewStats', () => {
   });
 
   it('deve usar farm do contexto quando farmId não for fornecido', async () => {
-    const mockGetOverviewStats = vi.fn().mockResolvedValue({
+    mockUseFarm.mockReturnValue({
+      farm: mockFarm,
+      loading: false,
+      error: null,
+      refetch: vi.fn()
+    });
+
+    mockGetOverviewStats.mockResolvedValue({
       data: mockStats,
       success: true,
       message: 'Success',
       status: 200
     });
 
-    const { GetOverviewStatsFactory } = await import('../../factories/usecases/get-overview-stats-factory');
-    vi.mocked(GetOverviewStatsFactory).mockReturnValue({
-      getOverviewStats: mockGetOverviewStats
-    });
-
     const { result } = renderHook(() => useOverviewStats());
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
-    });
+    }, { timeout: 3000 });
 
     expect(mockGetOverviewStats).toHaveBeenCalledWith({
       farm_id: 1
@@ -125,12 +119,7 @@ describe('useOverviewStats', () => {
   });
 
   it('deve lidar com erro na requisição', async () => {
-    const mockGetOverviewStats = vi.fn().mockRejectedValue(new Error('Network error'));
-
-    const { GetOverviewStatsFactory } = await import('../../factories/usecases/get-overview-stats-factory');
-    vi.mocked(GetOverviewStatsFactory).mockReturnValue({
-      getOverviewStats: mockGetOverviewStats
-    });
+    mockGetOverviewStats.mockRejectedValue(new Error('Network error'));
 
     const { result } = renderHook(() => useOverviewStats(1));
 
@@ -143,16 +132,11 @@ describe('useOverviewStats', () => {
   });
 
   it('deve permitir refetch dos dados', async () => {
-    const mockGetOverviewStats = vi.fn().mockResolvedValue({
+    mockGetOverviewStats.mockResolvedValue({
       data: mockStats,
       success: true,
       message: 'Success',
       status: 200
-    });
-
-    const { GetOverviewStatsFactory } = await import('../../factories/usecases/get-overview-stats-factory');
-    vi.mocked(GetOverviewStatsFactory).mockReturnValue({
-      getOverviewStats: mockGetOverviewStats
     });
 
     const { result } = renderHook(() => useOverviewStats(1));

@@ -8,9 +8,10 @@ vi.mock('../../../../../hooks/useFarm', () => ({
   useFarm: vi.fn()
 }));
 
+const mockGetNextToCalve = vi.fn();
 vi.mock('../../factories/usecases/get-next-to-calve-factory', () => ({
   GetNextToCalveFactory: vi.fn(() => ({
-    getNextToCalve: vi.fn()
+    getNextToCalve: mockGetNextToCalve
   }))
 }));
 
@@ -49,6 +50,7 @@ describe('useNextToCalve', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockGetNextToCalve.mockReset();
     mockUseFarm.mockReturnValue({
       farm: mockFarm,
       loading: false,
@@ -69,16 +71,11 @@ describe('useNextToCalve', () => {
   });
 
   it('deve buscar próximas vacas a parir quando farmId for fornecido', async () => {
-    const mockGetNextToCalve = vi.fn().mockResolvedValue({
+    mockGetNextToCalve.mockResolvedValue({
       data: mockNextToCalveData,
       success: true,
       message: 'Success',
       status: 200
-    });
-
-    const { GetNextToCalveFactory } = await import('../../factories/usecases/get-next-to-calve-factory');
-    vi.mocked(GetNextToCalveFactory).mockReturnValue({
-      getNextToCalve: mockGetNextToCalve
     });
 
     const { result } = renderHook(() => useNextToCalve(1));
@@ -92,23 +89,25 @@ describe('useNextToCalve', () => {
   });
 
   it('deve usar farm do contexto quando farmId não for fornecido', async () => {
-    const mockGetNextToCalve = vi.fn().mockResolvedValue({
+    mockUseFarm.mockReturnValue({
+      farm: mockFarm,
+      loading: false,
+      error: null,
+      refetch: vi.fn()
+    });
+
+    mockGetNextToCalve.mockResolvedValue({
       data: mockNextToCalveData,
       success: true,
       message: 'Success',
       status: 200
     });
 
-    const { GetNextToCalveFactory } = await import('../../factories/usecases/get-next-to-calve-factory');
-    vi.mocked(GetNextToCalveFactory).mockReturnValue({
-      getNextToCalve: mockGetNextToCalve
-    });
-
     const { result } = renderHook(() => useNextToCalve());
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
-    });
+    }, { timeout: 3000 });
 
     expect(mockGetNextToCalve).toHaveBeenCalledWith({ farm_id: 1 });
   });
@@ -132,12 +131,7 @@ describe('useNextToCalve', () => {
   });
 
   it('deve lidar com erro na requisição', async () => {
-    const mockGetNextToCalve = vi.fn().mockRejectedValue(new Error('Network error'));
-
-    const { GetNextToCalveFactory } = await import('../../factories/usecases/get-next-to-calve-factory');
-    vi.mocked(GetNextToCalveFactory).mockReturnValue({
-      getNextToCalve: mockGetNextToCalve
-    });
+    mockGetNextToCalve.mockRejectedValue(new Error('Network error'));
 
     const { result } = renderHook(() => useNextToCalve(1));
 
@@ -150,16 +144,11 @@ describe('useNextToCalve', () => {
   });
 
   it('deve permitir refetch dos dados', async () => {
-    const mockGetNextToCalve = vi.fn().mockResolvedValue({
+    mockGetNextToCalve.mockResolvedValue({
       data: mockNextToCalveData,
       success: true,
       message: 'Success',
       status: 200
-    });
-
-    const { GetNextToCalveFactory } = await import('../../factories/usecases/get-next-to-calve-factory');
-    vi.mocked(GetNextToCalveFactory).mockReturnValue({
-      getNextToCalve: mockGetNextToCalve
     });
 
     const { result } = renderHook(() => useNextToCalve(1));

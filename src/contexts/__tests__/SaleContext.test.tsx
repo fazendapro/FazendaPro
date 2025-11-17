@@ -1,5 +1,7 @@
 import { render, screen, act, fireEvent } from '@testing-library/react';
+import { vi } from 'vitest';
 import { SaleProvider, useSaleContext } from '../SaleContext';
+import * as saleServiceModule from '../../components/services/saleService';
 
 jest.mock('../../components/services/saleService', () => ({
   saleService: {
@@ -86,7 +88,6 @@ describe('SaleContext', () => {
   });
 
   it('handles createSale successfully', async () => {
-    const { saleService } = require('../../components/services/saleService');
     const mockSale = {
       id: 1,
       animal_id: 1,
@@ -98,7 +99,7 @@ describe('SaleContext', () => {
       created_at: '2024-01-01T00:00:00Z',
       updated_at: '2024-01-01T00:00:00Z',
     };
-    saleService.createSale.mockResolvedValue(mockSale);
+    vi.mocked(saleServiceModule.saleService.createSale).mockResolvedValue(mockSale);
 
     render(
       <SaleProvider>
@@ -110,7 +111,7 @@ describe('SaleContext', () => {
       fireEvent.click(screen.getByTestId('create-sale'));
     });
 
-    expect(saleService.createSale).toHaveBeenCalledWith({
+    expect(saleServiceModule.saleService.createSale).toHaveBeenCalledWith({
       animal_id: 1,
       buyer_name: 'Test Buyer',
       price: 1000,
@@ -120,8 +121,7 @@ describe('SaleContext', () => {
   });
 
   it('handles createSale error', async () => {
-    const { saleService } = require('../../components/services/saleService');
-    saleService.createSale.mockRejectedValue(new Error('Network error'));
+    vi.mocked(saleServiceModule.saleService.createSale).mockRejectedValue(new Error('Network error'));
 
     render(
       <SaleProvider>
@@ -133,11 +133,10 @@ describe('SaleContext', () => {
       fireEvent.click(screen.getByTestId('create-sale'));
     });
 
-    expect(saleService.createSale).toHaveBeenCalled();
+    expect(saleServiceModule.saleService.createSale).toHaveBeenCalled();
   });
 
   it('handles updateSale successfully', async () => {
-    const { saleService } = require('../../components/services/saleService');
     const mockUpdatedSale = {
       id: 1,
       animal_id: 1,
@@ -149,7 +148,7 @@ describe('SaleContext', () => {
       created_at: '2024-01-01T00:00:00Z',
       updated_at: '2024-01-02T00:00:00Z',
     };
-    saleService.updateSale.mockResolvedValue(mockUpdatedSale);
+    vi.mocked(saleServiceModule.saleService.updateSale).mockResolvedValue(mockUpdatedSale);
 
     render(
       <SaleProvider>
@@ -161,7 +160,7 @@ describe('SaleContext', () => {
       fireEvent.click(screen.getByTestId('update-sale'));
     });
 
-    expect(saleService.updateSale).toHaveBeenCalledWith(1, {
+    expect(saleServiceModule.saleService.updateSale).toHaveBeenCalledWith(1, {
       buyer_name: 'Updated Buyer',
       price: 1500,
       sale_date: '2024-01-02',
@@ -170,8 +169,7 @@ describe('SaleContext', () => {
   });
 
   it('handles deleteSale successfully', async () => {
-    const { saleService } = require('../../components/services/saleService');
-    saleService.deleteSale.mockResolvedValue(undefined);
+    vi.mocked(saleServiceModule.saleService.deleteSale).mockResolvedValue(undefined);
 
     render(
       <SaleProvider>

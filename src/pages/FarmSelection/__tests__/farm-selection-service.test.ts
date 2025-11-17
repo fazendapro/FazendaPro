@@ -1,19 +1,20 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { farmSelectionService } from '../services/farm-selection-service';
 import { api } from '../../../components/services/axios/api';
 
-jest.mock('../../../components/services/axios/api');
-const mockApi = api as jest.MockedFunction<typeof api>;
+vi.mock('../../../components/services/axios/api');
+const mockApi = api as ReturnType<typeof vi.fn>;
 
 const mockApiInstance = {
-  get: jest.fn(),
-  post: jest.fn()
+  get: vi.fn(),
+  post: vi.fn()
 };
 
 mockApi.mockReturnValue(mockApiInstance as unknown as ReturnType<typeof api>);
 
 describe('farmSelectionService', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('getUserFarms', () => {
@@ -31,7 +32,7 @@ describe('farmSelectionService', () => {
 
       const result = await farmSelectionService.getUserFarms();
 
-      expect(mockApiInstance.get).toHaveBeenCalledWith('/api/v1/farms/user');
+      expect(mockApiInstance.get).toHaveBeenCalledWith('/farms/user');
       expect(result).toEqual(mockResponse);
     });
 
@@ -73,7 +74,7 @@ describe('farmSelectionService', () => {
 
       const result = await farmSelectionService.selectFarm(2);
 
-      expect(mockApiInstance.post).toHaveBeenCalledWith('/api/v1/farms/select', { farm_id: 2 });
+      expect(mockApiInstance.post).toHaveBeenCalledWith('/farms/select', { farm_id: 2 });
       expect(result).toEqual(mockResponse);
     });
 
@@ -81,7 +82,7 @@ describe('farmSelectionService', () => {
       const mockError = new Error('Fazenda não encontrada');
       mockApiInstance.post.mockRejectedValue(mockError);
 
-      await expect(farmSelectionService.selectFarm(999)).rejects.toThrow('Fazenda não encontrada');
+      await expect(farmSelectionService.selectFarm(999)).rejects.toThrow('Erro ao selecionar fazenda');
     });
   });
 });

@@ -9,9 +9,9 @@ vi.mock('../../../hooks/useMilkProduction');
 vi.mock('../../../../../../hooks/useFarm');
 vi.mock('../../../../../../hooks');
 
-const mockUseMilkProduction = useMilkProduction as any;
-const mockUseFarm = useFarm as any;
-const mockUseResponsive = useResponsive as any;
+const mockUseMilkProduction = useMilkProduction as ReturnType<typeof vi.fn>;
+const mockUseFarm = useFarm as ReturnType<typeof vi.fn>;
+const mockUseResponsive = useResponsive as ReturnType<typeof vi.fn>;
 
 describe('MilkProductionTable Pagination Integration', () => {
   const mockMilkProductions = Array.from({ length: 30 }, (_, i) => ({
@@ -60,8 +60,16 @@ describe('MilkProductionTable Pagination Integration', () => {
     it('deve navegar para próxima página', async () => {
       render(<MilkProductionTable />);
       
-      const nextButton = screen.getByRole('button', { name: /next/i });
-      fireEvent.click(nextButton);
+      const nextButtons = screen.getAllByTitle('Next Page');
+      const enabledNextButton = nextButtons.find(btn => {
+        const li = btn.closest('li');
+        return li && li.getAttribute('aria-disabled') !== 'true';
+      });
+      if (enabledNextButton) {
+        fireEvent.click(enabledNextButton);
+      } else {
+        fireEvent.click(nextButtons[0]);
+      }
       
       await waitFor(() => {
         expect(screen.getByText('Animal 11')).toBeInTheDocument();
@@ -73,8 +81,13 @@ describe('MilkProductionTable Pagination Integration', () => {
     it('deve navegar para última página', async () => {
       render(<MilkProductionTable />);
       
-      const page3Button = screen.getByRole('button', { name: /3/i });
-      fireEvent.click(page3Button);
+      const page3Buttons = screen.queryAllByTitle('3');
+      if (page3Buttons.length > 0) {
+        fireEvent.click(page3Buttons[0]);
+      } else {
+        const page3ByText = screen.getByText('3');
+        fireEvent.click(page3ByText);
+      }
       
       await waitFor(() => {
         expect(screen.getByText('Animal 21')).toBeInTheDocument();
@@ -111,8 +124,16 @@ describe('MilkProductionTable Pagination Integration', () => {
     it('deve resetar paginação ao alterar filtros', async () => {
       render(<MilkProductionTable />);
       
-      const nextButton = screen.getByRole('button', { name: /next/i });
-      fireEvent.click(nextButton);
+      const nextButtons = screen.getAllByTitle('Next Page');
+      const enabledNextButton = nextButtons.find(btn => {
+        const li = btn.closest('li');
+        return li && li.getAttribute('aria-disabled') !== 'true';
+      });
+      if (enabledNextButton) {
+        fireEvent.click(enabledNextButton);
+      } else {
+        fireEvent.click(nextButtons[0]);
+      }
       
       await waitFor(() => {
         expect(screen.getByText('Animal 11')).toBeInTheDocument();
@@ -244,8 +265,16 @@ describe('MilkProductionTable Pagination Integration', () => {
       const onEditProduction = vi.fn();
       render(<MilkProductionTable onEditProduction={onEditProduction} />);
       
-      const nextButton = screen.getByRole('button', { name: /next/i });
-      fireEvent.click(nextButton);
+      const nextButtons = screen.getAllByTitle('Next Page');
+      const enabledNextButton = nextButtons.find(btn => {
+        const li = btn.closest('li');
+        return li && li.getAttribute('aria-disabled') !== 'true';
+      });
+      if (enabledNextButton) {
+        fireEvent.click(enabledNextButton);
+      } else {
+        fireEvent.click(nextButtons[0]);
+      }
       
       await waitFor(() => {
         expect(screen.getByText('Animal 11')).toBeInTheDocument();

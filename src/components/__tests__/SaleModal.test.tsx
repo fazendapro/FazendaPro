@@ -1,6 +1,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { vi } from 'vitest';
 import { SaleModal } from '../SaleModal/SaleModal';
 import { Sale } from '../../types/sale';
+import * as useSaleModule from '../../hooks/useSale';
 
 jest.mock('../../hooks/useSale', () => ({
   useSaleForm: () => ({
@@ -20,7 +22,7 @@ jest.mock('dayjs', () => {
   const originalDayjs = jest.requireActual('dayjs');
   return {
     ...originalDayjs,
-    default: (date?: any) => originalDayjs(date),
+    default: (date?: string | number | Date) => originalDayjs(date),
   };
 });
 
@@ -122,9 +124,8 @@ describe('SaleModal', () => {
   });
 
   it('submits form with valid data', async () => {
-    const { useSaleForm } = require('../../hooks/useSale');
     const mockCreateSale = jest.fn().mockResolvedValue(undefined);
-    useSaleForm.mockReturnValue({
+    vi.mocked(useSaleModule.useSaleForm).mockReturnValue({
       createSale: mockCreateSale,
       updateSale: jest.fn(),
       loading: false,

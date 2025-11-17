@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, afterEach } from 'vitest'
+import { render, cleanup } from '@testing-library/react'
 
 const MockReproductionTable = () => (
   <div data-testid="reproduction-table">
@@ -8,13 +9,18 @@ const MockReproductionTable = () => (
 )
 
 describe('ReproductionTable', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   it('deve renderizar a tabela básica', () => {
-    const table = MockReproductionTable()
-    expect(table).toBeDefined()
+    const { container } = render(<MockReproductionTable />)
+    expect(container).toBeDefined()
   })
 
   it('deve ter estrutura básica', () => {
-    const table = MockReproductionTable()
-    expect(table).toBeDefined()
+    const { container } = render(<MockReproductionTable />)
+    const table = container.querySelector('[data-testid="reproduction-table"]')
+    expect(table).toBeInTheDocument()
   })
 })

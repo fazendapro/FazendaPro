@@ -7,9 +7,10 @@ vi.mock('../../../../../hooks/useFarm', () => ({
   useFarm: vi.fn()
 }));
 
+const mockGetTopMilkProducers = vi.fn();
 vi.mock('../../factories/usecases/get-top-milk-producers-factory', () => ({
   GetTopMilkProducersFactory: vi.fn(() => ({
-    getTopMilkProducers: vi.fn()
+    getTopMilkProducers: mockGetTopMilkProducers
   }))
 }));
 
@@ -44,6 +45,7 @@ describe('useTopMilkProducers', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockGetTopMilkProducers.mockReset();
     mockUseFarm.mockReturnValue({
       farm: mockFarm,
       loading: false,
@@ -53,17 +55,13 @@ describe('useTopMilkProducers', () => {
   });
 
   it('deve retornar dados iniciais corretos', async () => {
-    const mockGetTopMilkProducers = vi.fn().mockResolvedValue({
+    mockGetTopMilkProducers.mockResolvedValue({
       data: [],
       success: true,
       message: 'Success',
       status: 200
     });
 
-    const { GetTopMilkProducersFactory } = await import('../../factories/usecases/get-top-milk-producers-factory');
-    vi.mocked(GetTopMilkProducersFactory).mockReturnValue({
-      getTopMilkProducers: mockGetTopMilkProducers
-    });
 
     const { result } = renderHook(() => useTopMilkProducers());
 
@@ -76,17 +74,13 @@ describe('useTopMilkProducers', () => {
   });
 
   it('deve buscar maiores produtoras quando farmId for fornecido', async () => {
-    const mockGetTopMilkProducers = vi.fn().mockResolvedValue({
+    mockGetTopMilkProducers.mockResolvedValue({
       data: mockTopProducersData,
       success: true,
       message: 'Success',
       status: 200
     });
 
-    const { GetTopMilkProducersFactory } = await import('../../factories/usecases/get-top-milk-producers-factory');
-    vi.mocked(GetTopMilkProducersFactory).mockReturnValue({
-      getTopMilkProducers: mockGetTopMilkProducers
-    });
 
     const { result } = renderHook(() => useTopMilkProducers(1));
 
@@ -103,23 +97,26 @@ describe('useTopMilkProducers', () => {
   });
 
   it('deve usar farm do contexto quando farmId não for fornecido', async () => {
-    const mockGetTopMilkProducers = vi.fn().mockResolvedValue({
+    mockUseFarm.mockReturnValue({
+      farm: mockFarm,
+      loading: false,
+      error: null,
+      refetch: vi.fn()
+    });
+
+    mockGetTopMilkProducers.mockResolvedValue({
       data: mockTopProducersData,
       success: true,
       message: 'Success',
       status: 200
     });
 
-    const { GetTopMilkProducersFactory } = await import('../../factories/usecases/get-top-milk-producers-factory');
-    vi.mocked(GetTopMilkProducersFactory).mockReturnValue({
-      getTopMilkProducers: mockGetTopMilkProducers
-    });
 
     const { result } = renderHook(() => useTopMilkProducers());
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
-    });
+    }, { timeout: 3000 });
 
     expect(mockGetTopMilkProducers).toHaveBeenCalledWith({
       farm_id: 1,
@@ -129,17 +126,13 @@ describe('useTopMilkProducers', () => {
   });
 
   it('deve usar parâmetros customizados quando fornecidos', async () => {
-    const mockGetTopMilkProducers = vi.fn().mockResolvedValue({
+    mockGetTopMilkProducers.mockResolvedValue({
       data: mockTopProducersData,
       success: true,
       message: 'Success',
       status: 200
     });
 
-    const { GetTopMilkProducersFactory } = await import('../../factories/usecases/get-top-milk-producers-factory');
-    vi.mocked(GetTopMilkProducersFactory).mockReturnValue({
-      getTopMilkProducers: mockGetTopMilkProducers
-    });
 
     const { result } = renderHook(() => useTopMilkProducers(1, 5, 15));
 
@@ -173,12 +166,8 @@ describe('useTopMilkProducers', () => {
   });
 
   it('deve lidar com erro na requisição', async () => {
-    const mockGetTopMilkProducers = vi.fn().mockRejectedValue(new Error('Network error'));
+    mockGetTopMilkProducers.mockRejectedValue(new Error('Network error'));
 
-    const { GetTopMilkProducersFactory } = await import('../../factories/usecases/get-top-milk-producers-factory');
-    vi.mocked(GetTopMilkProducersFactory).mockReturnValue({
-      getTopMilkProducers: mockGetTopMilkProducers
-    });
 
     const { result } = renderHook(() => useTopMilkProducers(1));
 
@@ -191,17 +180,13 @@ describe('useTopMilkProducers', () => {
   });
 
   it('deve permitir refetch dos dados', async () => {
-    const mockGetTopMilkProducers = vi.fn().mockResolvedValue({
+    mockGetTopMilkProducers.mockResolvedValue({
       data: mockTopProducersData,
       success: true,
       message: 'Success',
       status: 200
     });
 
-    const { GetTopMilkProducersFactory } = await import('../../factories/usecases/get-top-milk-producers-factory');
-    vi.mocked(GetTopMilkProducersFactory).mockReturnValue({
-      getTopMilkProducers: mockGetTopMilkProducers
-    });
 
     const { result } = renderHook(() => useTopMilkProducers(1));
 

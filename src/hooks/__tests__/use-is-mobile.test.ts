@@ -102,8 +102,8 @@ describe('useIsMobile', () => {
         value: 600,
       })
 
-      const resizeHandler = (window.addEventListener as any).mock.calls.find(
-        (call: any) => call[0] === 'resize'
+      const resizeHandler = (window.addEventListener as unknown as { mock: { calls: Array<[string, EventListener]> } }).mock.calls.find(
+        (call: [string, EventListener]) => call[0] === 'resize'
       )?.[1]
 
       if (resizeHandler) {

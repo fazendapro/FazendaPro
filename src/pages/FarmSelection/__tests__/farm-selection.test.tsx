@@ -1,16 +1,30 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { FarmSelection } from '../farm-selection';
 import { useFarmSelection } from '../hooks/useFarmSelection';
 
-jest.mock('../hooks/useFarmSelection');
-const mockUseFarmSelection = useFarmSelection as jest.MockedFunction<typeof useFarmSelection>;
+vi.mock('../hooks/useFarmSelection');
+const mockUseFarmSelection = useFarmSelection as ReturnType<typeof vi.fn>;
 
-const mockNavigate = jest.fn();
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: () => mockNavigate,
+vi.mock('../../hooks/use-responsive', () => ({
+  useResponsive: () => ({
+    isMobile: false,
+    isTablet: false,
+    isDesktop: true,
+    isLargeDesktop: false,
+    screenWidth: 1024,
+  }),
 }));
+
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
 
 const renderWithRouter = (component: React.ReactElement) => {
   return render(
@@ -22,7 +36,7 @@ const renderWithRouter = (component: React.ReactElement) => {
 
 describe('FarmSelection', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('deve renderizar a tela de seleção quando há múltiplas fazendas', () => {
@@ -37,7 +51,7 @@ describe('FarmSelection', () => {
       error: null,
       autoSelect: false,
       selectedFarmId: null,
-      selectFarm: jest.fn(),
+      selectFarm: vi.fn(),
     });
 
     renderWithRouter(<FarmSelection />);
@@ -54,7 +68,7 @@ describe('FarmSelection', () => {
       error: null,
       autoSelect: false,
       selectedFarmId: null,
-      selectFarm: jest.fn(),
+      selectFarm: vi.fn(),
     });
 
     renderWithRouter(<FarmSelection />);
@@ -69,7 +83,7 @@ describe('FarmSelection', () => {
       error: 'Erro ao carregar fazendas',
       autoSelect: false,
       selectedFarmId: null,
-      selectFarm: jest.fn(),
+      selectFarm: vi.fn(),
     });
 
     renderWithRouter(<FarmSelection />);
@@ -78,7 +92,7 @@ describe('FarmSelection', () => {
   });
 
   it('deve chamar selectFarm quando uma fazenda é selecionada', async () => {
-    const mockSelectFarm = jest.fn();
+    const mockSelectFarm = vi.fn();
     const mockFarms = [
       { ID: 1, CompanyID: 1, Logo: 'logo1.png' },
       { ID: 2, CompanyID: 2, Logo: 'logo2.png' },
@@ -95,8 +109,18 @@ describe('FarmSelection', () => {
 
     renderWithRouter(<FarmSelection />);
 
-    const farmButton = screen.getByText('Fazenda 1');
-    fireEvent.click(farmButton);
+    // O Card tem onClick que chama selectFarm diretamente
+    // Vamos encontrar o Card que contém "Fazenda 1" e clicar nele
+    const farmTitle = screen.getByText('Fazenda 1');
+    // Encontrar o Card pai (pode estar em vários níveis acima)
+    const cardElement = farmTitle.closest('[class*="ant-card"]') || farmTitle.parentElement?.parentElement;
+    
+    if (cardElement) {
+      fireEvent.click(cardElement as HTMLElement);
+    } else {
+      // Fallback: clicar diretamente no título
+      fireEvent.click(farmTitle);
+    }
 
     await waitFor(() => {
       expect(mockSelectFarm).toHaveBeenCalledWith(1);
@@ -114,7 +138,7 @@ describe('FarmSelection', () => {
       error: null,
       autoSelect: true,
       selectedFarmId: 1,
-      selectFarm: jest.fn(),
+      selectFarm: vi.fn(),
     });
 
     renderWithRouter(<FarmSelection />);

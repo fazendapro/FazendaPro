@@ -35,7 +35,7 @@ export const farmSelectionService = {
     try {
       const response = await api().get<GetUserFarmsResponse>('/farms/user');
       return response.data;
-    } catch (error) {
+    } catch {
       throw new Error('Erro ao buscar fazendas do usuário');
     }
   },
@@ -46,7 +46,7 @@ export const farmSelectionService = {
         farm_id: farmId,
       });
       return response.data;
-    } catch (error) {
+    } catch {
       throw new Error('Erro ao selecionar fazenda');
     }
   },

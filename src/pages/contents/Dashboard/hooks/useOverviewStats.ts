@@ -28,7 +28,7 @@ export const useOverviewStats = (farmId?: number) => {
       const result = await getOverviewStatsUseCase.getOverviewStats({
         farm_id: targetFarmId
       });
-      const statsData = result.data || { males_count: 0, females_count: 0, total_sold: 0, total_revenue: 0 };
+      const statsData = result?.data || { males_count: 0, females_count: 0, total_sold: 0, total_revenue: 0 };
       setStats(statsData);
       return statsData;
     } catch (err: unknown) {

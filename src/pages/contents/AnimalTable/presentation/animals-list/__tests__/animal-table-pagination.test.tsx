@@ -11,10 +11,10 @@ vi.mock('../../../../../../hooks/useFarm');
 vi.mock('../column-builder.tsx');
 vi.mock('../../../../../../hooks');
 
-const mockUseAnimals = useAnimals as any;
-const mockUseFarm = useFarm as any;
-const mockUseAnimalColumnBuilder = useAnimalColumnBuilder as any;
-const mockUseResponsive = useResponsive as any;
+const mockUseAnimals = useAnimals as ReturnType<typeof vi.fn>;
+const mockUseFarm = useFarm as ReturnType<typeof vi.fn>;
+const mockUseAnimalColumnBuilder = useAnimalColumnBuilder as ReturnType<typeof vi.fn>;
+const mockUseResponsive = useResponsive as ReturnType<typeof vi.fn>;
 
 describe('AnimalTable Pagination Integration', () => {
   const mockAnimals = Array.from({ length: 25 }, (_, i) => ({
@@ -113,8 +113,16 @@ describe('AnimalTable Pagination Integration', () => {
     it('deve navegar para próxima página', async () => {
       render(<AnimalTable />);
       
-      const nextButton = screen.getByRole('button', { name: /next/i });
-      fireEvent.click(nextButton);
+      const nextButtons = screen.getAllByTitle('Next Page');
+      const enabledNextButton = nextButtons.find(btn => {
+        const li = btn.closest('li');
+        return li && li.getAttribute('aria-disabled') !== 'true';
+      });
+      if (enabledNextButton) {
+        fireEvent.click(enabledNextButton);
+      } else {
+        fireEvent.click(nextButtons[0]);
+      }
       
       await waitFor(() => {
         expect(screen.getByText('Animal 11')).toBeInTheDocument();
@@ -126,8 +134,13 @@ describe('AnimalTable Pagination Integration', () => {
     it('deve navegar para página específica', async () => {
       render(<AnimalTable />);
       
-      const page3Button = screen.getByRole('button', { name: /3/i });
-      fireEvent.click(page3Button);
+      const page3Buttons = screen.queryAllByTitle('3');
+      if (page3Buttons.length > 0) {
+        fireEvent.click(page3Buttons[0]);
+      } else {
+        const page3ByText = screen.getByText('3');
+        fireEvent.click(page3ByText);
+      }
       
       await waitFor(() => {
         expect(screen.getByText('Animal 21')).toBeInTheDocument();
@@ -157,8 +170,16 @@ describe('AnimalTable Pagination Integration', () => {
     it('deve resetar para primeira página ao alterar tamanho', async () => {
       render(<AnimalTable />);
       
-      const nextButton = screen.getByRole('button', { name: /next/i });
-      fireEvent.click(nextButton);
+      const nextButtons = screen.getAllByTitle('Next Page');
+      const enabledNextButton = nextButtons.find(btn => {
+        const li = btn.closest('li');
+        return li && li.getAttribute('aria-disabled') !== 'true';
+      });
+      if (enabledNextButton) {
+        fireEvent.click(enabledNextButton);
+      } else {
+        fireEvent.click(nextButtons[0]);
+      }
       
       await waitFor(() => {
         expect(screen.getByText('Animal 11')).toBeInTheDocument();
@@ -236,8 +257,16 @@ describe('AnimalTable Pagination Integration', () => {
     it('deve resetar para primeira página ao aplicar filtro', async () => {
       render(<AnimalTable />);
       
-      const nextButton = screen.getByRole('button', { name: /next/i });
-      fireEvent.click(nextButton);
+      const nextButtons = screen.getAllByTitle('Next Page');
+      const enabledNextButton = nextButtons.find(btn => {
+        const li = btn.closest('li');
+        return li && li.getAttribute('aria-disabled') !== 'true';
+      });
+      if (enabledNextButton) {
+        fireEvent.click(enabledNextButton);
+      } else {
+        fireEvent.click(nextButtons[0]);
+      }
       
       await waitFor(() => {
         expect(screen.getByText('Animal 11')).toBeInTheDocument();

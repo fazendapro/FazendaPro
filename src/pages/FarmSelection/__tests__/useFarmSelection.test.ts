@@ -1,18 +1,34 @@
 import { renderHook, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useFarmSelection } from '../hooks/useFarmSelection';
 import { farmSelectionService } from '../services/farm-selection-service';
 
-jest.mock('../services/farm-selection-service');
-const mockFarmSelectionService = farmSelectionService as jest.Mocked<typeof farmSelectionService>;
+vi.mock('../services/farm-selection-service', () => ({
+  farmSelectionService: {
+    getUserFarms: vi.fn(),
+    selectFarm: vi.fn(),
+  },
+}));
 
-const mockNavigate = jest.fn();
-jest.mock('react-router-dom', () => ({
+const mockFarmSelectionService = vi.mocked(farmSelectionService);
+
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
+}));
+
+const mockSetSelectedFarm = vi.fn();
+vi.mock('../../../contexts/FarmContext', () => ({
+  useFarm: () => ({
+    farm: null,
+    setFarm: vi.fn(),
+    setSelectedFarm: mockSetSelectedFarm,
+  }),
 }));
 
 describe('useFarmSelection', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('deve carregar fazendas do usuário ao inicializar', async () => {
@@ -30,8 +46,9 @@ describe('useFarmSelection', () => {
 
     const { result } = renderHook(() => useFarmSelection());
 
+    // Aguardar o useEffect executar e o estado atualizar
     await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise(resolve => setTimeout(resolve, 100));
     });
 
     expect(result.current.farms).toEqual(mockFarms);
@@ -54,8 +71,9 @@ describe('useFarmSelection', () => {
 
     const { result } = renderHook(() => useFarmSelection());
 
+    // Aguardar o useEffect executar e o estado atualizar
     await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise(resolve => setTimeout(resolve, 100));
     });
 
     expect(result.current.autoSelect).toBe(true);
@@ -83,12 +101,14 @@ describe('useFarmSelection', () => {
 
     const { result } = renderHook(() => useFarmSelection());
 
+    // Aguardar o useEffect executar primeiro
     await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise(resolve => setTimeout(resolve, 100));
     });
 
+    // Aguardar o selectFarm executar completamente
     await act(async () => {
-      result.current.selectFarm(2);
+      await result.current.selectFarm(2);
     });
 
     expect(mockFarmSelectionService.selectFarm).toHaveBeenCalledWith(2);
@@ -100,8 +120,9 @@ describe('useFarmSelection', () => {
 
     const { result } = renderHook(() => useFarmSelection());
 
+    // Aguardar o useEffect executar e tratar o erro
     await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise(resolve => setTimeout(resolve, 100));
     });
 
     expect(result.current.error).toBe('Erro ao carregar fazendas');
@@ -124,12 +145,14 @@ describe('useFarmSelection', () => {
 
     const { result } = renderHook(() => useFarmSelection());
 
+    // Aguardar o useEffect executar primeiro
     await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise(resolve => setTimeout(resolve, 100));
     });
 
+    // Aguardar o selectFarm executar e tratar o erro
     await act(async () => {
-      result.current.selectFarm(1);
+      await result.current.selectFarm(1);
     });
 
     expect(result.current.error).toBe('Erro ao selecionar fazenda');

@@ -4,6 +4,7 @@ import { Animal } from '../../pages/contents/AnimalTable/types/type';
 import { Sale } from '../../types/sale';
 import { MilkCollection } from '../../types/milk-collection';
 import { Reproduction } from '../../types/reproduction';
+import { jsPDF } from 'jspdf';
 
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -120,7 +121,6 @@ describe('AnimalHistoryExport', () => {
   });
 
   it('generates PDF when button is clicked', () => {
-    const { jsPDF } = require('jspdf');
     const mockDoc = new jsPDF();
 
     render(
@@ -153,7 +153,6 @@ describe('AnimalHistoryExport', () => {
   });
 
   it('generates correct filename', () => {
-    const { jsPDF } = require('jspdf');
     const mockDoc = new jsPDF();
 
     render(

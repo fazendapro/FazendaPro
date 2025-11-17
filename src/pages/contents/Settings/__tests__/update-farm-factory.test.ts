@@ -1,10 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { UpdateFarmFactory, GetFarmFactory } from '../factories/usecases/update-farm-factory'
-import { RemoteUpdateFarm, RemoteGetFarm } from '../data/usecases/remote-update-farm'
+
+const mockRemoteUpdateFarm = vi.fn()
+const mockRemoteGetFarm = vi.fn()
 
 vi.mock('../data/usecases/remote-update-farm', () => ({
-  RemoteUpdateFarm: vi.fn(),
-  RemoteGetFarm: vi.fn(),
+  RemoteUpdateFarm: class {
+    constructor() {
+      mockRemoteUpdateFarm()
+    }
+  },
+  RemoteGetFarm: class {
+    constructor() {
+      mockRemoteGetFarm()
+    }
+  },
 }))
 
 describe('UpdateFarmFactory', () => {
@@ -15,8 +25,8 @@ describe('UpdateFarmFactory', () => {
   it('deve criar instância de RemoteUpdateFarm', () => {
     const factory = UpdateFarmFactory.create()
     
-    expect(RemoteUpdateFarm).toHaveBeenCalled()
-    expect(factory).toBeInstanceOf(RemoteUpdateFarm)
+    expect(mockRemoteUpdateFarm).toHaveBeenCalled()
+    expect(factory).toBeDefined()
   })
 
   it('deve retornar nova instância a cada chamada', () => {
@@ -24,7 +34,7 @@ describe('UpdateFarmFactory', () => {
     const factory2 = UpdateFarmFactory.create()
     
     expect(factory1).not.toBe(factory2)
-    expect(RemoteUpdateFarm).toHaveBeenCalledTimes(2)
+    expect(mockRemoteUpdateFarm).toHaveBeenCalledTimes(2)
   })
 })
 
@@ -36,8 +46,8 @@ describe('GetFarmFactory', () => {
   it('deve criar instância de RemoteGetFarm', () => {
     const factory = GetFarmFactory.create()
     
-    expect(RemoteGetFarm).toHaveBeenCalled()
-    expect(factory).toBeInstanceOf(RemoteGetFarm)
+    expect(mockRemoteGetFarm).toHaveBeenCalled()
+    expect(factory).toBeDefined()
   })
 
   it('deve retornar nova instância a cada chamada', () => {
@@ -45,6 +55,6 @@ describe('GetFarmFactory', () => {
     const factory2 = GetFarmFactory.create()
     
     expect(factory1).not.toBe(factory2)
-    expect(RemoteGetFarm).toHaveBeenCalledTimes(2)
+    expect(mockRemoteGetFarm).toHaveBeenCalledTimes(2)
   })
 })

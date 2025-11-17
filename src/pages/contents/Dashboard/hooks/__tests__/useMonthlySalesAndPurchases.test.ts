@@ -7,9 +7,10 @@ vi.mock('../../../../../hooks/useFarm', () => ({
   useFarm: vi.fn()
 }));
 
+const mockGetMonthlySalesAndPurchases = vi.fn();
 vi.mock('../../factories/usecases/get-monthly-sales-and-purchases-factory', () => ({
   GetMonthlySalesAndPurchasesFactory: vi.fn(() => ({
-    getMonthlySalesAndPurchases: vi.fn()
+    getMonthlySalesAndPurchases: mockGetMonthlySalesAndPurchases
   }))
 }));
 
@@ -30,6 +31,7 @@ describe('useMonthlySalesAndPurchases', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockGetMonthlySalesAndPurchases.mockReset();
     mockUseFarm.mockReturnValue({
       farm: mockFarm,
       loading: false,
@@ -39,17 +41,13 @@ describe('useMonthlySalesAndPurchases', () => {
   });
 
   it('deve retornar dados iniciais corretos', async () => {
-    const mockGetMonthlySalesAndPurchases = vi.fn().mockResolvedValue({
+    mockGetMonthlySalesAndPurchases.mockResolvedValue({
       data: { sales: [], purchases: [] },
       success: true,
       message: 'Success',
       status: 200
     });
 
-    const { GetMonthlySalesAndPurchasesFactory } = await import('../../factories/usecases/get-monthly-sales-and-purchases-factory');
-    vi.mocked(GetMonthlySalesAndPurchasesFactory).mockReturnValue({
-      getMonthlySalesAndPurchases: mockGetMonthlySalesAndPurchases
-    });
 
     const { result } = renderHook(() => useMonthlySalesAndPurchases());
 
@@ -62,17 +60,13 @@ describe('useMonthlySalesAndPurchases', () => {
   });
 
   it('deve buscar dados mensais quando farmId for fornecido', async () => {
-    const mockGetMonthlySalesAndPurchases = vi.fn().mockResolvedValue({
+    mockGetMonthlySalesAndPurchases.mockResolvedValue({
       data: mockMonthlyData,
       success: true,
       message: 'Success',
       status: 200
     });
 
-    const { GetMonthlySalesAndPurchasesFactory } = await import('../../factories/usecases/get-monthly-sales-and-purchases-factory');
-    vi.mocked(GetMonthlySalesAndPurchasesFactory).mockReturnValue({
-      getMonthlySalesAndPurchases: mockGetMonthlySalesAndPurchases
-    });
 
     const { result } = renderHook(() => useMonthlySalesAndPurchases(1));
 
@@ -88,23 +82,26 @@ describe('useMonthlySalesAndPurchases', () => {
   });
 
   it('deve usar farm do contexto quando farmId não for fornecido', async () => {
-    const mockGetMonthlySalesAndPurchases = vi.fn().mockResolvedValue({
+    mockUseFarm.mockReturnValue({
+      farm: mockFarm,
+      loading: false,
+      error: null,
+      refetch: vi.fn()
+    });
+
+    mockGetMonthlySalesAndPurchases.mockResolvedValue({
       data: mockMonthlyData,
       success: true,
       message: 'Success',
       status: 200
     });
 
-    const { GetMonthlySalesAndPurchasesFactory } = await import('../../factories/usecases/get-monthly-sales-and-purchases-factory');
-    vi.mocked(GetMonthlySalesAndPurchasesFactory).mockReturnValue({
-      getMonthlySalesAndPurchases: mockGetMonthlySalesAndPurchases
-    });
 
     const { result } = renderHook(() => useMonthlySalesAndPurchases());
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
-    });
+    }, { timeout: 3000 });
 
     expect(mockGetMonthlySalesAndPurchases).toHaveBeenCalledWith({
       farm_id: 1,
@@ -113,17 +110,13 @@ describe('useMonthlySalesAndPurchases', () => {
   });
 
   it('deve usar parâmetros customizados quando fornecidos', async () => {
-    const mockGetMonthlySalesAndPurchases = vi.fn().mockResolvedValue({
+    mockGetMonthlySalesAndPurchases.mockResolvedValue({
       data: mockMonthlyData,
       success: true,
       message: 'Success',
       status: 200
     });
 
-    const { GetMonthlySalesAndPurchasesFactory } = await import('../../factories/usecases/get-monthly-sales-and-purchases-factory');
-    vi.mocked(GetMonthlySalesAndPurchasesFactory).mockReturnValue({
-      getMonthlySalesAndPurchases: mockGetMonthlySalesAndPurchases
-    });
 
     const { result } = renderHook(() => useMonthlySalesAndPurchases(1, 6));
 
@@ -156,12 +149,8 @@ describe('useMonthlySalesAndPurchases', () => {
   });
 
   it('deve lidar com erro na requisição', async () => {
-    const mockGetMonthlySalesAndPurchases = vi.fn().mockRejectedValue(new Error('Network error'));
+    mockGetMonthlySalesAndPurchases.mockRejectedValue(new Error('Network error'));
 
-    const { GetMonthlySalesAndPurchasesFactory } = await import('../../factories/usecases/get-monthly-sales-and-purchases-factory');
-    vi.mocked(GetMonthlySalesAndPurchasesFactory).mockReturnValue({
-      getMonthlySalesAndPurchases: mockGetMonthlySalesAndPurchases
-    });
 
     const { result } = renderHook(() => useMonthlySalesAndPurchases(1));
 
@@ -174,17 +163,13 @@ describe('useMonthlySalesAndPurchases', () => {
   });
 
   it('deve permitir refetch dos dados', async () => {
-    const mockGetMonthlySalesAndPurchases = vi.fn().mockResolvedValue({
+    mockGetMonthlySalesAndPurchases.mockResolvedValue({
       data: mockMonthlyData,
       success: true,
       message: 'Success',
       status: 200
     });
 
-    const { GetMonthlySalesAndPurchasesFactory } = await import('../../factories/usecases/get-monthly-sales-and-purchases-factory');
-    vi.mocked(GetMonthlySalesAndPurchasesFactory).mockReturnValue({
-      getMonthlySalesAndPurchases: mockGetMonthlySalesAndPurchases
-    });
 
     const { result } = renderHook(() => useMonthlySalesAndPurchases(1));
 
@@ -206,17 +191,13 @@ describe('useMonthlySalesAndPurchases', () => {
   });
 
   it('deve usar meses padrão (12) quando não fornecido', async () => {
-    const mockGetMonthlySalesAndPurchases = vi.fn().mockResolvedValue({
+    mockGetMonthlySalesAndPurchases.mockResolvedValue({
       data: mockMonthlyData,
       success: true,
       message: 'Success',
       status: 200
     });
 
-    const { GetMonthlySalesAndPurchasesFactory } = await import('../../factories/usecases/get-monthly-sales-and-purchases-factory');
-    vi.mocked(GetMonthlySalesAndPurchasesFactory).mockReturnValue({
-      getMonthlySalesAndPurchases: mockGetMonthlySalesAndPurchases
-    });
 
     const { result } = renderHook(() => useMonthlySalesAndPurchases());
 

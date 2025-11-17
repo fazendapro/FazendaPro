@@ -3,7 +3,7 @@ import { createContext, useContext } from 'react'
 import { CsrfTokenContextProps } from './csrf-token-context-props'
 
 export const CsrfTokenContext = createContext<CsrfTokenContextProps>({
-  csrfToken: undefined as any
+  csrfToken: undefined
 })
 
 export function useCsrfTokenContext(): CsrfTokenContextProps {

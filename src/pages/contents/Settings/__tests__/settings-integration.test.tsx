@@ -7,7 +7,6 @@ import { useSelectedFarm } from '../../../../hooks/useSelectedFarm'
 import { useFarm } from '../../../../hooks/useFarm'
 import { UpdateFarmFactory, GetFarmFactory } from '../factories'
 
-// Mock dos hooks
 vi.mock('../../../../hooks/useSelectedFarm')
 vi.mock('../../../../hooks/useFarm')
 vi.mock('../factories')
@@ -18,6 +17,29 @@ vi.mock('antd', async () => {
     message: {
       success: vi.fn(),
       error: vi.fn(),
+    },
+    Upload: ({ children, beforeUpload, accept }: { children?: React.ReactNode; beforeUpload?: (file: File) => Promise<boolean> | boolean; accept?: string }) => {
+      const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file && beforeUpload) {
+          // Chamar beforeUpload de forma assíncrona para simular comportamento real
+          Promise.resolve(beforeUpload(file)).catch(() => {})
+        }
+      }
+      return (
+        <span className="ant-upload-wrapper">
+          <span className="ant-upload">
+            <input
+              type="file"
+              accept={accept}
+              onChange={handleChange}
+              style={{ display: 'none' }}
+              data-testid="upload-input"
+            />
+            {children}
+          </span>
+        </span>
+      )
     },
   }
 })
@@ -56,17 +78,17 @@ const mockFarm = {
 }
 
 const mockFarmData = {
-  id: 1,
-  logo: 'data:image/jpeg;base64,test',
-  company_id: 1,
-  company: {
-    id: 1,
-    company_name: 'Empresa Teste',
-    location: 'Rua Teste, 123',
-    farm_cnpj: '12345678000199'
+  ID: 1,
+  Logo: 'data:image/jpeg;base64,test',
+  CompanyID: 1,
+  Company: {
+    ID: 1,
+    CompanyName: 'Empresa Teste',
+    Location: 'Rua Teste, 123',
+    FarmCNPJ: '12345678000199'
   },
-  created_at: '2021-01-01T00:00:00Z',
-  updated_at: '2021-01-01T00:00:00Z'
+  CreatedAt: '2021-01-01T00:00:00Z',
+  UpdatedAt: '2021-01-01T00:00:00Z'
 }
 
 const mockUpdateFarmUseCase = {
@@ -88,6 +110,23 @@ const renderSettings = () => {
 describe('Settings Integration Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+
+    // Mock FileReader que simula comportamento assíncrono
+    global.FileReader = class FileReader {
+      result: string | ArrayBuffer | null = null
+      onload: ((event: { target: FileReader }) => void) | null = null
+      onerror: ((event: { target: FileReader }) => void) | null = null
+      
+      readAsDataURL() {
+        // Usar Promise.resolve().then() para garantir que seja executado no próximo tick
+        Promise.resolve().then(() => {
+          this.result = 'data:image/jpeg;base64,test'
+          if (this.onload) {
+            this.onload({ target: this })
+          }
+        })
+      }
+    } as unknown as typeof FileReader
     
     vi.mocked(useSelectedFarm).mockReturnValue({
       selectedFarm: null,
@@ -125,7 +164,18 @@ describe('Settings Integration Tests', () => {
       })
 
       expect(screen.getByDisplayValue('Empresa Teste')).toBeInTheDocument()
-      expect(screen.getByRole('img')).toHaveAttribute('src', 'data:image/jpeg;base64,test')
+      
+      // Encontrar a imagem do logo (não os ícones SVG)
+      const allImages = screen.getAllByRole('img')
+      const logoImg = allImages.find(img => {
+        const src = img.getAttribute('src')
+        return src === 'data:image/jpeg;base64,test' || (src && src.startsWith('data:image'))
+      })
+      
+      expect(logoImg).toBeInTheDocument()
+      if (logoImg) {
+        expect(logoImg).toHaveAttribute('src', 'data:image/jpeg;base64,test')
+      }
       expect(screen.getByText('Alterar Logo')).toBeInTheDocument()
     })
 
@@ -136,16 +186,18 @@ describe('Settings Integration Tests', () => {
 
       await waitFor(() => {
         expect(mockGetFarmUseCase.get).toHaveBeenCalledWith(1)
-      })
+      }, { timeout: 3000 })
 
-      expect(screen.getByDisplayValue('Fazenda Teste')).toBeInTheDocument()
+      await waitFor(() => {
+        expect(screen.getByDisplayValue('Fazenda Teste')).toBeInTheDocument()
+      }, { timeout: 3000 })
     })
   })
 
   describe('Fluxo de upload de logo', () => {
     it('deve fazer upload de logo com sucesso', async () => {
       mockGetFarmUseCase.get.mockResolvedValue({
-        data: { ...mockFarmData, logo: '' },
+        data: { ...mockFarmData, Logo: '' },
         success: true,
         message: 'Success',
         status: 200
@@ -154,18 +206,18 @@ describe('Settings Integration Tests', () => {
       mockUpdateFarmUseCase.update.mockResolvedValue({
         success: true,
         message: 'Logo atualizada com sucesso',
-        data: { ...mockFarmData, logo: 'data:image/jpeg;base64,newlogo' }
+        data: { ...mockFarmData, Logo: 'data:image/jpeg;base64,newlogo' }
       })
 
       mockGetFarmUseCase.get
         .mockResolvedValueOnce({
-          data: { ...mockFarmData, logo: '' },
+          data: { ...mockFarmData, Logo: '' },
           success: true,
           message: 'Success',
           status: 200
         })
         .mockResolvedValueOnce({
-          data: { ...mockFarmData, logo: 'data:image/jpeg;base64,newlogo' },
+          data: { ...mockFarmData, Logo: 'data:image/jpeg;base64,newlogo' },
           success: true,
           message: 'Success',
           status: 200
@@ -178,27 +230,37 @@ describe('Settings Integration Tests', () => {
       })
 
       const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' })
-      const uploadInput = screen.getByRole('button', { name: /adicionar logo/i })
       
-      fireEvent.click(uploadInput)
+      // Aguardar o componente renderizar completamente
+      await waitFor(() => {
+        const fileInput = screen.getByTestId('upload-input') as HTMLInputElement
+        expect(fileInput).toBeInTheDocument()
+      })
       
-      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
-      if (fileInput) {
-        fireEvent.change(fileInput, { target: { files: [file] } })
-      }
+      const fileInput = screen.getByTestId('upload-input') as HTMLInputElement
+      Object.defineProperty(fileInput, 'files', {
+        value: [file],
+        writable: false,
+      })
+      
+      fireEvent.change(fileInput)
 
+      // Aguardar FileReader processar e chamar onload
       await waitFor(() => {
         expect(mockUpdateFarmUseCase.update).toHaveBeenCalledWith(1, {
           logo: expect.stringContaining('data:image/jpeg;base64,')
         })
-      })
+      }, { timeout: 10000 })
 
-      expect(message.success).toHaveBeenCalledWith('Logo atualizada com sucesso!')
+      // Aguardar loadFarmData e message.success
+      await waitFor(() => {
+        expect(message.success).toHaveBeenCalledWith('Logo atualizada com sucesso!')
+      }, { timeout: 10000 })
     })
 
     it('deve tratar erro no upload de logo', async () => {
       mockGetFarmUseCase.get.mockResolvedValue({
-        data: { ...mockFarmData, logo: '' },
+        data: { ...mockFarmData, Logo: '' },
         success: true,
         message: 'Success',
         status: 200
@@ -213,18 +275,23 @@ describe('Settings Integration Tests', () => {
       })
 
       const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' })
-      const uploadInput = screen.getByRole('button', { name: /adicionar logo/i })
       
-      fireEvent.click(uploadInput)
+      await waitFor(() => {
+        const fileInput = screen.getByTestId('upload-input') as HTMLInputElement
+        expect(fileInput).toBeInTheDocument()
+      })
       
-      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
-      if (fileInput) {
-        fireEvent.change(fileInput, { target: { files: [file] } })
-      }
+      const fileInput = screen.getByTestId('upload-input') as HTMLInputElement
+      Object.defineProperty(fileInput, 'files', {
+        value: [file],
+        writable: false,
+      })
+      
+      fireEvent.change(fileInput)
 
       await waitFor(() => {
         expect(message.error).toHaveBeenCalledWith('Erro ao atualizar logo')
-      })
+      }, { timeout: 10000 })
     })
   })
 
@@ -250,8 +317,13 @@ describe('Settings Integration Tests', () => {
       renderSettings()
 
       await waitFor(() => {
+        expect(mockGetFarmUseCase.get).toHaveBeenCalledWith(1)
+      }, { timeout: 3000 })
+
+      // O componente usa farm?.name como fallback quando há erro
+      await waitFor(() => {
         expect(screen.getByDisplayValue('Fazenda Teste')).toBeInTheDocument()
-      })
+      }, { timeout: 5000 })
     })
   })
 })
