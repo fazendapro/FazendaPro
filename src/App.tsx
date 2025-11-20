@@ -38,7 +38,7 @@ const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
         marginBottom: screens.xs ? '60px' : 0,
         transition: 'all 0.2s'
       }}>
-        <Layout.Content style={{ 
+        <Layout.Content style={{
           height: screens.xs ? 'calc(100vh - 60px)' : '100vh',
           overflow: 'auto',
           background: '#f5f5f5'
