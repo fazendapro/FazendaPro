@@ -14,7 +14,7 @@ const { useBreakpoint } = Grid;
 const AnimalDetailWrapper = () => {
   const { id } = useParams<{ id: string }>();
   const animalId = parseInt(id || '0');
-  
+
   return (
     <AnimalDetailProvider animalId={animalId}>
       <AnimalDetail />
