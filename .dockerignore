@@ -44,3 +44,18 @@ cloud-sql-proxy*/
 
 # Google Cloud SDK
 google-cloud-sdk/ 
+node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+.env
+.nyc_output
+coverage
+.nyc_output
+.vscode
+.idea
+*.log
+dist
+build
+.DS_Store

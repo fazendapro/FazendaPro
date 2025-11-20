@@ -1,0 +1,14 @@
+# DOKPLOY Docker Only Configuration
+# This file forces DOKPLOY to use Docker instead of Nixpacks
+
+[build]
+dockerfile = "Dockerfile"
+context = "."
+build_args = ["VITE_API_URL"]
+
+[deploy]
+port = 8080
+health_check = "/health"
+
+[build.method]
+type = "docker"

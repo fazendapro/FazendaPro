@@ -1,0 +1,18 @@
+export const settingsTranslations = {
+  title: "Farm Settings",
+  basicInfo: "Basic Information",
+  farmName: "Farm Name",
+  farmNamePlaceholder: "Farm name",
+  farmNameDisabled: "The farm name is defined by the company and cannot be changed here.",
+  farmLogo: "Farm Logo",
+  changeLogo: "Change Logo",
+  addLogo: "Add Logo",
+  logoFormats: "Accepted formats: JPG, PNG, GIF (max. 2MB)",
+  noFarmSelected: "No farm selected",
+  farmUpdatedSuccessfully: "Farm updated successfully",
+  farmRetrievedSuccessfully: "Farm retrieved successfully",
+  logoUpdatedSuccessfully: "Logo updated successfully!",
+  errorUpdatingFarm: "Error updating farm",
+  errorUpdatingLogo: "Error updating logo",
+  errorLoadingFarmData: "Error loading farm data"
+};
