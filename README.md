@@ -14,7 +14,7 @@
 >
 > [Quais tecnologias são usadas?](https://github.com/fazendapro/cowtech/wiki/Stack-Tecnológica)
 >
-> [Onde está o roadmap do projeto?](https://github.com/fazendapro/FazendaPro/projects/1)
+> [Onde está o roadmap do projeto?](https://github.com/fazendapro/fazendapro/projects/1)
 >
 > [Onde vejo o design da interface?](<http://figma.com/proto/ZoKjm0cUGoA5tQncXZeGtb/Inventory-Management-Dashboard-(Community)?node-id=459-576>)
 
