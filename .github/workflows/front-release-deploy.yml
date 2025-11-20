@@ -33,6 +33,16 @@ jobs:
         run: npm run build
 
       - name: Disparar deploy no Dokploy
+        if: success()
+        env:
+          DOKPLOY_WEBHOOK_FRONT_URL: ${{ secrets.DOKPLOY_WEBHOOK_FRONT_URL }}
         run: |
-          curl -X POST "${{ secrets.DOKPLOY_WEBHOOK_FRONT_URL }}"
+          curl -X POST "$DOKPLOY_WEBHOOK_FRONT_URL" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "repository": "${{ github.repository }}",
+              "branch": "front/release",
+              "commit": "${{ github.sha }}",
+              "message": "Deploy triggered from GitHub Actions"
+            }'
         continue-on-error: true
