@@ -1,7 +1,7 @@
 import { vi } from 'vitest'
 
 export const mockI18n = {
-  t: (key: string, options?: any) => {
+  t: (key: string, options?: Record<string, string | number>) => {
     const translations: Record<string, string> = {
       'navigation.dashboard': 'Dashboard',
       'navigation.animals': 'Vacas',
@@ -93,7 +93,7 @@ export const mockUseTranslation = () => mockI18n
 
 export const createMockTranslations = (customTranslations: Record<string, string> = {}) => {
   return {
-    t: (key: string, options?: any) => {
+    t: (key: string, options?: Record<string, string | number>) => {
       const translation = customTranslations[key] || mockI18n.t(key, options)
       return translation
     },
@@ -104,7 +104,7 @@ export const createMockTranslations = (customTranslations: Record<string, string
 
 export const createMockNamespace = (_namespace: string, translations: Record<string, string>) => {
   return {
-    t: (key: string, options?: any) => {
+    t: (key: string, options?: Record<string, string | number>) => {
       const translation = translations[key] || key
       
       if (options) {

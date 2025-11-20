@@ -1,12 +1,31 @@
 import { vi } from 'vitest'
 
-export const mockAxios: any = {
+interface MockAxiosInstance {
+  get: ReturnType<typeof vi.fn>
+  post: ReturnType<typeof vi.fn>
+  put: ReturnType<typeof vi.fn>
+  delete: ReturnType<typeof vi.fn>
+  patch: ReturnType<typeof vi.fn>
+  create: ReturnType<typeof vi.fn>
+  interceptors: {
+    request: {
+      use: ReturnType<typeof vi.fn>
+      eject: ReturnType<typeof vi.fn>
+    }
+    response: {
+      use: ReturnType<typeof vi.fn>
+      eject: ReturnType<typeof vi.fn>
+    }
+  }
+}
+
+export const mockAxios: MockAxiosInstance = {
   get: vi.fn(),
   post: vi.fn(),
   put: vi.fn(),
   delete: vi.fn(),
   patch: vi.fn(),
-  create: vi.fn((): any => mockAxios),
+  create: vi.fn((): MockAxiosInstance => mockAxios),
   interceptors: {
     request: {
       use: vi.fn(),

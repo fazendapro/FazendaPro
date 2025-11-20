@@ -53,7 +53,20 @@ export const CreateReproductionModal = ({
     }
   }, [visible, preselectedAnimalId, editingReproduction, form]);
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: {
+    animal_id: number;
+    current_phase: number;
+    insemination_date?: dayjs.Dayjs;
+    insemination_type?: string;
+    pregnancy_date?: dayjs.Dayjs;
+    expected_birth_date?: dayjs.Dayjs;
+    actual_birth_date?: dayjs.Dayjs;
+    lactation_start_date?: dayjs.Dayjs;
+    lactation_end_date?: dayjs.Dayjs;
+    dry_period_start_date?: dayjs.Dayjs;
+    veterinary_confirmation?: boolean;
+    observations?: string;
+  }) => {
     const data: CreateReproductionRequest = {
       animal_id: values.animal_id,
       current_phase: values.current_phase,
@@ -79,7 +92,7 @@ export const CreateReproductionModal = ({
           form.resetFields();
           onSuccess();
         } else {
-          message.error('Erro ao atualizar registro de reprodução');
+          message.error(t('animalTable.reproduction.updateError'));
         }
       } else {
         const result = await createReproduction(data);
@@ -92,7 +105,7 @@ export const CreateReproductionModal = ({
           message.error('Erro ao criar registro de reprodução');
         }
       }
-    } catch (error) {
+    } catch {
       message.error(editingReproduction ? 'Erro ao atualizar registro de reprodução' : 'Erro ao criar registro de reprodução');
     }
   };

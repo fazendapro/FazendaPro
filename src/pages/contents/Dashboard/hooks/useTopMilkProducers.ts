@@ -28,8 +28,8 @@ export const useTopMilkProducers = (farmId?: number, limit?: number, periodDays?
       const topProducersData = result.data || [];
       setTopProducers(topProducersData);
       return topProducersData;
-    } catch (err: any) {
-      const errorMessage = err.message || 'Erro ao buscar maiores produtoras de leite';
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao buscar maiores produtoras de leite';
       setError(errorMessage);
       return [];
     } finally {

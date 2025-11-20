@@ -25,8 +25,8 @@ export const useAnimals = (farmId?: number) => {
       const animalsData = result.data || [];
       setAnimals(animalsData);
       return animalsData;
-    } catch (err: any) {
-      const errorMessage = err.message || 'Erro ao buscar animais';
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao buscar animais';
       setError(errorMessage);
       return [];
     } finally {

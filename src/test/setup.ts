@@ -1,5 +1,11 @@
 import '@testing-library/jest-dom'
-import { vi } from 'vitest'
+import { vi, afterEach } from 'vitest'
+import { cleanup } from '@testing-library/react'
+
+// Limpar o DOM após cada teste
+afterEach(() => {
+  cleanup()
+})
 
 vi.mock('react-router-dom', () => ({
   useNavigate: () => vi.fn(),
@@ -63,3 +69,12 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
   unobserve: vi.fn(),
   disconnect: vi.fn(),
 }))
+
+Object.defineProperty(window, 'getComputedStyle', {
+  value: () => ({
+    getPropertyValue: () => '',
+    scrollbarWidth: 0,
+  }),
+  writable: true,
+  configurable: true,
+})

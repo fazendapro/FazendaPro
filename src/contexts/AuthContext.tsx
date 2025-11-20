@@ -71,12 +71,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               const response = await authUseCase.refreshToken({ refresh_token: savedRefreshToken });
 
               if (response.success && response.access_token) {
-                localStorage.setItem('token', response.access_token);
-                setToken(response.access_token);
-                
                 const decoded = validateToken(response.access_token);
                 if (decoded) {
+                  localStorage.setItem('token', response.access_token);
+                  setToken(response.access_token);
                   setUser(decoded);
+
+                  if (response.refresh_token) {
+                    localStorage.setItem('refreshToken', response.refresh_token);
+                    setRefreshToken(response.refresh_token);
+                  }
+                } else {
+                  clearAuth();
                 }
               } else {
                 clearAuth();

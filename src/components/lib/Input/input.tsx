@@ -19,7 +19,7 @@ interface InputProps {
   maxNumber?: string | number;
   mbField?: number;
   autoComplete?: 'off' | 'on';
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 const QuestionMarkToolTip: React.FC<{ tipText: string; iconSize?: number; style?: React.CSSProperties }> = ({
@@ -87,7 +87,7 @@ const InputBase: ForwardRefRenderFunction<HTMLInputElement, Omit<InputProps, "re
       }
       validateStatus={error || isInvalid ? 'error' : ''}
       help={error?.message as string}
-      style={{ marginBottom: mbField }}
+      style={mbField > 0 ? { marginBottom: `${mbField}px` } : undefined}
     >
       <div style={{ position: 'relative' }}>
         <AntInput

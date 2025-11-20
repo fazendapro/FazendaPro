@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { RemoteGetMonthlySalesAndPurchases } from '../remote-get-monthly-sales-and-purchases';
 import { api } from '../../../../../../components';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosRequestConfig } from 'axios';
 
 vi.mock('../../../../../../components', () => ({
   api: vi.fn()
@@ -44,7 +44,7 @@ describe('RemoteGetMonthlySalesAndPurchases', () => {
       get: vi.fn().mockResolvedValue(mockResponse)
     };
 
-    mockApi.mockReturnValue(mockApiInstance as any);
+    mockApi.mockReturnValue(mockApiInstance as unknown as typeof api);
 
     const result = await remoteGetMonthlySalesAndPurchases.getMonthlySalesAndPurchases({ 
       farm_id: 1, 
@@ -84,7 +84,7 @@ describe('RemoteGetMonthlySalesAndPurchases', () => {
       get: vi.fn().mockResolvedValue(mockResponse)
     };
 
-    mockApi.mockReturnValue(mockApiInstance as any);
+    mockApi.mockReturnValue(mockApiInstance as unknown as typeof api);
 
     const result = await remoteGetMonthlySalesAndPurchases.getMonthlySalesAndPurchases({ farm_id: 1 });
 
@@ -118,7 +118,7 @@ describe('RemoteGetMonthlySalesAndPurchases', () => {
       get: vi.fn().mockResolvedValue(mockResponse)
     };
 
-    mockApi.mockReturnValue(mockApiInstance as any);
+    mockApi.mockReturnValue(mockApiInstance as unknown as typeof api);
 
     const result = await remoteGetMonthlySalesAndPurchases.getMonthlySalesAndPurchases({ farm_id: 1 });
 
@@ -137,14 +137,14 @@ describe('RemoteGetMonthlySalesAndPurchases', () => {
       status: 500,
       statusText: 'Internal Server Error',
       headers: {},
-      config: {} as any
+      config: {} as AxiosRequestConfig
     };
 
     const mockApiInstance = {
       get: vi.fn().mockRejectedValue(mockError)
     };
 
-    mockApi.mockReturnValue(mockApiInstance as any);
+    mockApi.mockReturnValue(mockApiInstance as unknown as typeof api);
 
     await expect(remoteGetMonthlySalesAndPurchases.getMonthlySalesAndPurchases({ farm_id: 1 }))
       .rejects.toThrow('Network Error');
@@ -158,7 +158,7 @@ describe('RemoteGetMonthlySalesAndPurchases', () => {
       get: vi.fn().mockRejectedValue(mockError)
     };
 
-    mockApi.mockReturnValue(mockApiInstance as any);
+    mockApi.mockReturnValue(mockApiInstance as unknown as typeof api);
 
     await expect(remoteGetMonthlySalesAndPurchases.getMonthlySalesAndPurchases({ farm_id: 1 }))
       .rejects.toThrow('Erro ao buscar dados mensais de vendas e compras');
@@ -169,7 +169,7 @@ describe('RemoteGetMonthlySalesAndPurchases', () => {
       get: vi.fn().mockRejectedValue(new Error('Unknown error'))
     };
 
-    mockApi.mockReturnValue(mockApiInstance as any);
+    mockApi.mockReturnValue(mockApiInstance as unknown as typeof api);
 
     await expect(remoteGetMonthlySalesAndPurchases.getMonthlySalesAndPurchases({ farm_id: 1 }))
       .rejects.toThrow('Erro desconhecido ao buscar dados mensais de vendas e compras');
@@ -191,7 +191,7 @@ describe('RemoteGetMonthlySalesAndPurchases', () => {
       get: vi.fn().mockResolvedValue(mockResponse)
     };
 
-    mockApi.mockReturnValue(mockApiInstance as any);
+    mockApi.mockReturnValue(mockApiInstance as unknown as typeof api);
 
     const result = await remoteGetMonthlySalesAndPurchases.getMonthlySalesAndPurchases({ farm_id: 1 });
 
@@ -215,7 +215,7 @@ describe('RemoteGetMonthlySalesAndPurchases', () => {
       get: vi.fn().mockResolvedValue(mockResponse)
     };
 
-    mockApi.mockReturnValue(mockApiInstance as any);
+    mockApi.mockReturnValue(mockApiInstance as unknown as typeof api);
 
     await remoteGetMonthlySalesAndPurchases.getMonthlySalesAndPurchases({ 
       farm_id: 2, 

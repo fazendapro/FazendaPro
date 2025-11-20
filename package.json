@@ -11,7 +11,7 @@
     "start": "serve dist -s -l 8080 --single",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage --run --reporter=verbose"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",

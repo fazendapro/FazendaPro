@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { RemoteGetTopMilkProducers } from '../remote-get-top-milk-producers';
 import { api } from '../../../../../../components';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosRequestConfig } from 'axios';
 
 vi.mock('../../../../../../components', () => ({
   api: vi.fn()
@@ -44,7 +44,7 @@ describe('RemoteGetTopMilkProducers', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockResolvedValue(mockResponse)
-    } as any;
+    } as unknown as typeof api;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -55,7 +55,7 @@ describe('RemoteGetTopMilkProducers', () => {
     });
 
     expect(mockApiInstance.get).toHaveBeenCalledWith(
-      '/api/v1/milk-collections/top-producers',
+      '/milk-collections/top-producers',
       {
         params: { 
           farmId: 1, 
@@ -85,14 +85,14 @@ describe('RemoteGetTopMilkProducers', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockResolvedValue(mockResponse)
-    } as any;
+    } as unknown as typeof api;
 
     mockApi.mockReturnValue(mockApiInstance);
 
     const result = await remoteGetTopMilkProducers.getTopMilkProducers({ farm_id: 1 });
 
     expect(mockApiInstance.get).toHaveBeenCalledWith(
-      '/api/v1/milk-collections/top-producers',
+      '/milk-collections/top-producers',
       {
         params: { farmId: 1 },
         headers: { 'Content-Type': 'application/json' }
@@ -118,7 +118,7 @@ describe('RemoteGetTopMilkProducers', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockResolvedValue(mockResponse)
-    } as any;
+    } as unknown as typeof api;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -139,12 +139,12 @@ describe('RemoteGetTopMilkProducers', () => {
       status: 500,
       statusText: 'Internal Server Error',
       headers: {},
-      config: {} as any
+      config: {} as AxiosRequestConfig
     };
 
     const mockApiInstance = {
       get: vi.fn().mockRejectedValue(mockError)
-    } as any;
+    } as unknown as typeof api;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -158,7 +158,7 @@ describe('RemoteGetTopMilkProducers', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockRejectedValue(mockError)
-    } as any;
+    } as unknown as typeof api;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -169,7 +169,7 @@ describe('RemoteGetTopMilkProducers', () => {
   it('deve lidar com erro desconhecido', async () => {
     const mockApiInstance = {
       get: vi.fn().mockRejectedValue(new Error('Unknown error'))
-    } as any;
+    } as unknown as typeof api;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -187,7 +187,7 @@ describe('RemoteGetTopMilkProducers', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockResolvedValue(mockResponse)
-    } as any;
+    } as unknown as typeof api;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -207,7 +207,7 @@ describe('RemoteGetTopMilkProducers', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockResolvedValue(mockResponse)
-    } as any;
+    } as unknown as typeof api;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -218,7 +218,7 @@ describe('RemoteGetTopMilkProducers', () => {
     });
 
     expect(mockApiInstance.get).toHaveBeenCalledWith(
-      '/api/v1/milk-collections/top-producers',
+      '/milk-collections/top-producers',
       {
         params: { 
           farmId: 2, 

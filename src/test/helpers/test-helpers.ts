@@ -1,12 +1,12 @@
 import { vi } from 'vitest'
 
-export const createMockFunction = <T extends (...args: any[]) => any>(
+export const createMockFunction = <T extends (...args: unknown[]) => unknown>(
   returnValue?: ReturnType<T>
 ) => {
   return vi.fn().mockReturnValue(returnValue)
 }
 
-export const createMockAsyncFunction = <T extends (...args: any[]) => Promise<any>>(
+export const createMockAsyncFunction = <T extends (...args: unknown[]) => Promise<unknown>>(
   returnValue?: Awaited<ReturnType<T>>
 ) => {
   return vi.fn().mockResolvedValue(returnValue)
@@ -56,7 +56,7 @@ export const mockScroll = (scrollTop: number, scrollLeft: number = 0) => {
   window.dispatchEvent(new Event('scroll'))
 }
 
-export const mockIntersectionObserver = (_isIntersecting: boolean = true) => {
+export const mockIntersectionObserver = () => {
   const mockIntersectionObserver = vi.fn()
   mockIntersectionObserver.mockReturnValue({
     observe: () => null,
@@ -196,5 +196,5 @@ export const createMockDataTransfer = (files: File[] = []) => {
     getData: vi.fn(),
     setData: vi.fn(),
     setDragImage: vi.fn(),
-  } as any
+  } as DataTransfer
 }
