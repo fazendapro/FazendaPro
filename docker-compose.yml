@@ -10,7 +10,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./backend/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U fazendapro_user -d fazendapro"]
       interval: 10s
@@ -19,7 +19,7 @@ services:
 
   app:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     container_name: fazendapro_app
     environment:
@@ -36,12 +36,12 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-      - ./migrations:/app/migrations
+      - ./backend/scripts:/app/migrations
     command: ["./main", "-port=8080"]
 
   migration:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     container_name: fazendapro_migration
     environment:
@@ -56,8 +56,8 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-      - ./migrations:/app/migrations
-      - ./env.development:/app/.env
+      - ./backend/scripts:/app/migrations
+      - ./backend/env.production:/app/.env
     command: ["./main", "migrate"]
     profiles:
       - migrate
@@ -71,7 +71,7 @@ volumes:
       - "${APP_PORT}:5173"
     working_dir: /app
     volumes:
-      - ./:/app
+      - ./frontend:/app
     environment:
       - NODE_ENV=development
     env_file: .env
