@@ -31,26 +31,3 @@ jobs:
 
       - name: Executar build
         run: npm run build
-
-      - name: Disparar deploy no Dokploy
-        if: success()
-        env:
-          DOKPLOY_API_URL: ${{ secrets.DOKPLOY_API_URL }}
-          DOKPLOY_API_KEY: ${{ secrets.DOKPLOY_API_KEY }}
-          DOKPLOY_APPLICATION_ID: ${{ secrets.DOKPLOY_APPLICATION_ID }}
-        run: |
-          if [ -z "$DOKPLOY_API_URL" ] || [ -z "$DOKPLOY_API_KEY" ] || [ -z "$DOKPLOY_APPLICATION_ID" ]; then
-            echo "Erro: Variáveis de ambiente do Dokploy não configuradas"
-            echo "Configure: DOKPLOY_API_URL, DOKPLOY_API_KEY e DOKPLOY_APPLICATION_ID"
-            exit 1
-          fi
-          
-          echo "Disparando deploy via API do Dokploy..."
-          curl -X POST "${DOKPLOY_API_URL}/api/application.deploy" \
-            -H "accept: application/json" \
-            -H "Content-Type: application/json" \
-            -H "x-api-key: ${DOKPLOY_API_KEY}" \
-            -d "{
-              \"applicationId\": \"${DOKPLOY_APPLICATION_ID}\"
-            }"
-        continue-on-error: true
