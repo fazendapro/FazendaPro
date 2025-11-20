@@ -4,8 +4,6 @@
 >
 > [O que é o software e para que serve?](https://github.com/fazendapro/cowtech/wiki/Introduction-&-Description)
 >
-> [O software é gratuito?](https://github.com/fazendapro/cowtech/wiki/Planos-e-Precos)
->
 > [Onde está o código fonte?](https://github.com/fazendapro/cowtech/projects)
 >
 > [Onde está a documentação completa?](https://github.com/fazendapro/cowtech/wiki)
