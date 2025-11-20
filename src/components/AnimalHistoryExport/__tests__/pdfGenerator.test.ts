@@ -155,7 +155,7 @@ describe('AnimalHistoryPDFGenerator', () => {
   });
 
   it('deve gerar PDF com dados completos', () => {
-    const generator = new AnimalHistoryPDFGenerator({
+    new AnimalHistoryPDFGenerator({
       animal: mockAnimal,
       sales: mockSales,
       milkCollections: mockMilkCollections,
@@ -168,7 +168,7 @@ describe('AnimalHistoryPDFGenerator', () => {
   });
 
   it('deve gerar PDF sem imagem do animal', () => {
-    const generator = new AnimalHistoryPDFGenerator({
+    new AnimalHistoryPDFGenerator({
       animal: mockAnimal,
       sales: [],
       milkCollections: [],
@@ -180,7 +180,7 @@ describe('AnimalHistoryPDFGenerator', () => {
   });
 
   it('deve gerar PDF com imagem do animal', () => {
-    const generator = new AnimalHistoryPDFGenerator({
+    new AnimalHistoryPDFGenerator({
       animal: mockAnimal,
       sales: [],
       milkCollections: [],
@@ -193,7 +193,7 @@ describe('AnimalHistoryPDFGenerator', () => {
   });
 
   it('deve formatar corretamente os dados do animal', () => {
-    const generator = new AnimalHistoryPDFGenerator({
+    new AnimalHistoryPDFGenerator({
       animal: mockAnimal,
       sales: [],
       milkCollections: [],
@@ -205,7 +205,7 @@ describe('AnimalHistoryPDFGenerator', () => {
   });
 
   it('deve calcular estatísticas corretamente', () => {
-    const generator = new AnimalHistoryPDFGenerator({
+    new AnimalHistoryPDFGenerator({
       animal: mockAnimal,
       sales: mockSales,
       milkCollections: mockMilkCollections,
