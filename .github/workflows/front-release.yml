@@ -37,11 +37,13 @@ jobs:
         env:
           DOKPLOY_WEBHOOK_FRONT_URL: ${{ secrets.DOKPLOY_WEBHOOK_FRONT_URL }}
         run: |
+          echo "Branch atual: ${{ github.ref_name }}"
+          echo "Repository: ${{ github.repository }}"
           curl -X POST "$DOKPLOY_WEBHOOK_FRONT_URL" \
             -H "Content-Type: application/json" \
             -d '{
               "repository": "${{ github.repository }}",
-              "branch": "front/release",
+              "branch": "${{ github.ref_name }}",
               "commit": "${{ github.sha }}",
               "message": "Deploy triggered from GitHub Actions"
             }'
