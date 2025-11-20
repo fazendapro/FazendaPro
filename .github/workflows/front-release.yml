@@ -1,4 +1,4 @@
-name: Deploy Frontend - Main
+name: Deploy Frontend - Release
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout código
         uses: actions/checkout@v4
@@ -33,7 +33,16 @@ jobs:
         run: npm run build
 
       - name: Disparar deploy no Dokploy
+        if: success()
+        env:
+          DOKPLOY_WEBHOOK_FRONT_URL: ${{ secrets.DOKPLOY_WEBHOOK_FRONT_URL }}
         run: |
-          curl -X POST "${{ secrets.DOKPLOY_WEBHOOK_FRONT_URL }}"
+          curl -X POST "$DOKPLOY_WEBHOOK_FRONT_URL" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "repository": "${{ github.repository }}",
+              "branch": "front/release",
+              "commit": "${{ github.sha }}",
+              "message": "Deploy triggered from GitHub Actions"
+            }'
         continue-on-error: true
-
