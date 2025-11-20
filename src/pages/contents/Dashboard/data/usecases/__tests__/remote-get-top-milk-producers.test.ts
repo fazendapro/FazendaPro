@@ -55,7 +55,7 @@ describe('RemoteGetTopMilkProducers', () => {
     });
 
     expect(mockApiInstance.get).toHaveBeenCalledWith(
-      '/api/v1/milk-collections/top-producers',
+      '/milk-collections/top-producers',
       {
         params: { 
           farmId: 1, 
@@ -92,7 +92,7 @@ describe('RemoteGetTopMilkProducers', () => {
     const result = await remoteGetTopMilkProducers.getTopMilkProducers({ farm_id: 1 });
 
     expect(mockApiInstance.get).toHaveBeenCalledWith(
-      '/api/v1/milk-collections/top-producers',
+      '/milk-collections/top-producers',
       {
         params: { farmId: 1 },
         headers: { 'Content-Type': 'application/json' }
@@ -218,7 +218,7 @@ describe('RemoteGetTopMilkProducers', () => {
     });
 
     expect(mockApiInstance.get).toHaveBeenCalledWith(
-      '/api/v1/milk-collections/top-producers',
+      '/milk-collections/top-producers',
       {
         params: { 
           farmId: 2, 

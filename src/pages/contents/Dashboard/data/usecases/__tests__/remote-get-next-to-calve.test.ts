@@ -52,7 +52,7 @@ describe('RemoteGetNextToCalve', () => {
     const result = await remoteGetNextToCalve.getNextToCalve({ farm_id: 1 });
 
     expect(mockApiInstance.get).toHaveBeenCalledWith(
-      '/api/v1/reproductions/next-to-calve',
+      '/reproductions/next-to-calve',
       {
         params: { farmId: 1 },
         headers: { 'Content-Type': 'application/json' }
