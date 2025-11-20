@@ -43,6 +43,7 @@ export function baseAxios(baseUrl: string) {
               return instance(originalRequest)
             }
           } catch {
+            void 0;
           }
         }
 

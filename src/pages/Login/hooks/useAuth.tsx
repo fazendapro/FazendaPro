@@ -102,7 +102,7 @@ export const useAuth = () => {
     };
 
     initializeAuth();
-  }, []);
+  }, [clearAuth, csrfToken, initialized, validateToken]);
 
   const login = useCallback(
     async (email: string, password: string) => {
@@ -173,6 +173,7 @@ export const useAuth = () => {
         await authUseCase.logout({ refresh_token: refreshToken });
       }
     } catch {
+      void 0;
     } finally {
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');

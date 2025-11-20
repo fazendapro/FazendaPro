@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { RemoteGetTopMilkProducers } from '../remote-get-top-milk-producers';
 import { api } from '../../../../../../components';
-import { AxiosError } from 'axios';
+import { AxiosError, InternalAxiosRequestConfig } from 'axios';
 
 vi.mock('../../../../../../components', () => ({
   api: vi.fn()
@@ -44,7 +44,7 @@ describe('RemoteGetTopMilkProducers', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockResolvedValue(mockResponse)
-    } as any;
+    } as unknown as ReturnType<typeof api>;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -85,7 +85,7 @@ describe('RemoteGetTopMilkProducers', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockResolvedValue(mockResponse)
-    } as any;
+    } as unknown as ReturnType<typeof api>;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -118,7 +118,7 @@ describe('RemoteGetTopMilkProducers', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockResolvedValue(mockResponse)
-    } as any;
+    } as unknown as ReturnType<typeof api>;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -139,12 +139,12 @@ describe('RemoteGetTopMilkProducers', () => {
       status: 500,
       statusText: 'Internal Server Error',
       headers: {},
-      config: {} as any
+      config: {} as unknown as InternalAxiosRequestConfig
     };
 
     const mockApiInstance = {
       get: vi.fn().mockRejectedValue(mockError)
-    } as any;
+    } as unknown as ReturnType<typeof api>;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -158,7 +158,7 @@ describe('RemoteGetTopMilkProducers', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockRejectedValue(mockError)
-    } as any;
+    } as unknown as ReturnType<typeof api>;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -169,7 +169,7 @@ describe('RemoteGetTopMilkProducers', () => {
   it('deve lidar com erro desconhecido', async () => {
     const mockApiInstance = {
       get: vi.fn().mockRejectedValue(new Error('Unknown error'))
-    } as any;
+    } as unknown as ReturnType<typeof api>;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -187,7 +187,7 @@ describe('RemoteGetTopMilkProducers', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockResolvedValue(mockResponse)
-    } as any;
+    } as unknown as ReturnType<typeof api>;
 
     mockApi.mockReturnValue(mockApiInstance);
 
@@ -207,7 +207,7 @@ describe('RemoteGetTopMilkProducers', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockResolvedValue(mockResponse)
-    } as any;
+    } as unknown as ReturnType<typeof api>;
 
     mockApi.mockReturnValue(mockApiInstance);
 
