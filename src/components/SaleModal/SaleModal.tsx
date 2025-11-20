@@ -79,7 +79,6 @@ export const SaleModal: React.FC<SaleModalProps> = ({
       form.resetFields();
       onSuccess();
     } catch {
-      // Error handling is done in the context
     }
   };
 
@@ -127,7 +126,7 @@ export const SaleModal: React.FC<SaleModalProps> = ({
             }
           >
             {animals
-              .filter(animal => animal.status === 0) // Apenas animais ativos (não vendidos)
+              .filter(animal => animal.status === 0)
               .map(animal => (
                 <Select.Option key={animal.id} value={animal.id}>
                   {animal.animal_name} - Brinco: {animal.ear_tag_number_local}

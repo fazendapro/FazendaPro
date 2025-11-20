@@ -102,7 +102,6 @@ export const useAuth = () => {
     };
 
     initializeAuth();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const login = useCallback(
@@ -174,9 +173,7 @@ export const useAuth = () => {
         await authUseCase.logout({ refresh_token: refreshToken });
       }
     } catch {
-      // Ignore logout errors
     } finally {
-      // Clear all auth data
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
       setToken(null);

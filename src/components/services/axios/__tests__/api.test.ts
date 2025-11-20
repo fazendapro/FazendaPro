@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { api } from '../api';
 import { baseAxios } from '../base';
 
-// Mock baseAxios
 const mockBaseAxiosInstance = {
   get: vi.fn(),
   post: vi.fn(),
@@ -14,7 +13,6 @@ vi.mock('../base', () => ({
   baseAxios: vi.fn(() => mockBaseAxiosInstance),
 }));
 
-// Mock central api
 const mockCentralApi = {
   get: vi.fn(),
   post: vi.fn(),

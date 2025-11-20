@@ -54,10 +54,20 @@ const InputBase: ForwardRefRenderFunction<HTMLInputElement, Omit<InputProps, "re
   const [size, setSize] = useState(0);
   const formContext = useFormContext();
   const watch = formContext?.watch;
-  const value = watch ? watch(name) : null;
+  const watchedValue = watch ? (watch(name as any) as unknown) : null;
+  const value = typeof watchedValue === 'string' ? watchedValue : null;
+
+  const typedBold = typeof bold === 'boolean' ? bold : undefined;
+  const typedMtLabel = typeof mtLabel === 'number' ? mtLabel : 0;
+  const typedMbField = typeof mbField === 'number' ? mbField : 0;
+  const typedMax = typeof max === 'string' || typeof max === 'number' ? max : undefined;
+  const typedIconLeft = (iconLeft && iconLeft !== false) ? (iconLeft as React.ReactNode) : undefined;
+  const typedLabel = typeof label === 'string' ? label : (label as string | undefined);
+  const typedTooltip = typeof tooltip === 'string' ? tooltip : (tooltip as string | undefined);
+  const typedPlaceholder = typeof placeholder === 'string' ? placeholder : (placeholder as string | undefined);
 
   useEffect(() => {
-    if (value) {
+    if (value && typeof value === 'string') {
       setSize(value.length);
     } else {
       setSize(0);
@@ -67,42 +77,42 @@ const InputBase: ForwardRefRenderFunction<HTMLInputElement, Omit<InputProps, "re
   return (
     <Form.Item
       label={
-        label && (
+        typedLabel ? (
           <Space>
-            <Text strong={bold} style={{ fontSize: 14, marginTop: mtLabel }}>
-              {label}
+            <Text strong={typedBold} style={{ fontSize: 14, marginTop: typedMtLabel }}>
+              {typedLabel}
             </Text>
-            {isRequired && (
+            {isRequired ? (
               <Text style={{ color: 'red', fontSize: 14 }}>*</Text>
-            )}
-            {tooltip && (
+            ) : null}
+            {typedTooltip && (
               <QuestionMarkToolTip
-                tipText={tooltip}
+                tipText={typedTooltip}
                 iconSize={16}
                 style={{ marginLeft: 4 }}
               />
             )}
           </Space>
-        )
+        ) : undefined
       }
       validateStatus={error || isInvalid ? 'error' : ''}
-      help={error?.message as string}
-      style={mbField > 0 ? { marginBottom: `${mbField}px` } : undefined}
+      help={error && typeof error === 'object' && 'message' in error && error.message ? String(error.message) : undefined}
+      style={typedMbField > 0 ? { marginBottom: `${typedMbField}px` } : undefined}
     >
       <div style={{ position: 'relative' }}>
         <AntInput
-          prefix={iconLeft || null}
+          prefix={typedIconLeft}
           name={name}
           id={name}
-          placeholder={placeholder}
-          maxLength={max ? Number(max) : undefined}
+          placeholder={typedPlaceholder || undefined}
+          maxLength={typedMax ? Number(typedMax) : undefined}
           ref={ref as React.Ref<InputRef>}
           autoComplete={autoComplete}
-          {...rest}
+          {...(rest as any)}
         />
-        {value && max && Number(max) > 0 && (
+        {value && typedMax && Number(typedMax) > 0 && (
           <div style={{ position: 'absolute', right: 8, bottom: -20, fontSize: 12, color: '#8c8c8c' }}>
-            {size} / {max}
+            {size} / {String(typedMax)}
           </div>
         )}
       </div>

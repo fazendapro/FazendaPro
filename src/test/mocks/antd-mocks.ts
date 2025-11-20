@@ -57,7 +57,7 @@ export const mockAntdComponents = {
           React.createElement('tr', { key: rowIndex },
             columns?.map((col: TableColumn, colIndex: number) => 
               React.createElement('td', { key: colIndex },
-                col.render ? col.render(row[col.dataIndex || ''], row) : row[col.dataIndex || '']
+                col.render ? (col.render(row[col.dataIndex || ''], row) as React.ReactNode) : (row[col.dataIndex || ''] as React.ReactNode)
               )
             )
           )

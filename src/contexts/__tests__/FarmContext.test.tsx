@@ -170,7 +170,6 @@ describe('FarmContext', () => {
 
   describe('useFarm hook', () => {
     it('deve lançar erro quando usado fora do FarmProvider', () => {
-      // Suprime o erro esperado no console
       const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       expect(() => {

@@ -10,7 +10,6 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import isBetween from 'dayjs/plugin/isBetween'
 
-// Configurar plugins
 dayjs.extend(customParseFormat)
 dayjs.extend(weekOfYear)
 dayjs.extend(weekYear)
@@ -19,7 +18,6 @@ dayjs.extend(isSameOrAfter)
 dayjs.extend(isSameOrBefore)
 dayjs.extend(isBetween)
 
-// Configurar localização padrão
 dayjs.locale('pt-br')
 
 export default dayjs

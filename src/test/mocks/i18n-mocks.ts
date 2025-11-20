@@ -74,7 +74,7 @@ export const mockI18n = {
     
     if (options) {
       Object.keys(options).forEach(optionKey => {
-        translation = translation.replace(`{${optionKey}}`, options[optionKey])
+        translation = translation.replace(`{${optionKey}}`, String(options[optionKey]))
       })
     }
     
@@ -108,7 +108,7 @@ export const createMockNamespace = (_namespace: string, translations: Record<str
       const translation = translations[key] || key
       
       if (options) {
-        return translation.replace(/\{(\w+)\}/g, (match, key) => options[key] || match)
+        return translation.replace(/\{(\w+)\}/g, (match, key) => String(options[key] || match))
       }
       
       return translation

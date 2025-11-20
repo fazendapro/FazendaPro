@@ -81,6 +81,8 @@ describe('useSaleForm', () => {
     const saleData = {
       buyer_name: 'Updated Buyer',
       price: 1500,
+      sale_date: '2024-01-01',
+      notes: '',
     }
 
     await result.current.updateSale(1, saleData)
@@ -91,7 +93,16 @@ describe('useSaleForm', () => {
 
 describe('useSaleList', () => {
   const mockContext = {
-    sales: [{ id: 1, buyer_name: 'Test Buyer' }],
+    sales: [{
+      id: 1,
+      animal_id: 1,
+      farm_id: 1,
+      buyer_name: 'Test Buyer',
+      price: 1000,
+      sale_date: '2024-01-01',
+      created_at: '2024-01-01T00:00:00Z',
+      updated_at: '2024-01-01T00:00:00Z',
+    }],
     loading: false,
     error: null,
     createSale: vi.fn(),

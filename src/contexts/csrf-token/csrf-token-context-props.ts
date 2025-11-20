@@ -1,3 +1,3 @@
 export type CsrfTokenContextProps = {
-  csrfToken: string
+  csrfToken: string | undefined
 }

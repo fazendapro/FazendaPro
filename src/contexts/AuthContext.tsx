@@ -76,11 +76,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                   localStorage.setItem('token', response.access_token);
                   setToken(response.access_token);
                   setUser(decoded);
-
-                  if (response.refresh_token) {
-                    localStorage.setItem('refreshToken', response.refresh_token);
-                    setRefreshToken(response.refresh_token);
-                  }
                 } else {
                   clearAuth();
                 }
@@ -107,7 +102,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     initializeAuth();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const login = useCallback(
@@ -179,9 +173,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         await authUseCase.logout({ refresh_token: refreshToken });
       }
     } catch {
-      // Ignore logout errors
     } finally {
-      // Clear all auth data
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
       setToken(null);

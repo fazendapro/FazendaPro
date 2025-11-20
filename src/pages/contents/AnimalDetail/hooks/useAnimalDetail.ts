@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-// import { toast } from 'react-hot-toast';
 import { animalDetailService } from '../data';
 import { AnimalDetail, AnimalDetailFormData, AnimalParent } from '../types';
 
