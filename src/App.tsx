@@ -27,7 +27,6 @@ const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
   const screens = useBreakpoint();
 
   if (isLoading) return <Spinner />
-
   if (!isAuthenticated) return <Navigate to="/login" replace />
 
   return (
