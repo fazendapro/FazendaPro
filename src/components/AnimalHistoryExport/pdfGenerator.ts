@@ -5,24 +5,88 @@ import { Sale } from '../../types/sale';
 import { MilkCollection } from '../../types/milk-collection';
 import { Reproduction } from '../../types/reproduction';
 
+interface AutoTableOptions {
+  startY: number;
+  head: string[][];
+  body: string[][];
+  styles: {
+    fontSize: number;
+    cellPadding: number;
+  };
+  headStyles: {
+    fillColor: number[];
+    textColor: number[];
+    fontStyle: string;
+  };
+  alternateRowStyles: {
+    fillColor: number[];
+  };
+  margin: {
+    left: number;
+    right: number;
+  };
+}
+
+interface JSPDFWithAutoTable extends jsPDF {
+  autoTable: (options: AutoTableOptions) => void;
+  lastAutoTable: {
+    finalY: number;
+  };
+}
+
+interface Translations {
+  animalHistoryExport: {
+    title: string;
+    animalInfo: string;
+    fields: Record<string, string>;
+    statistics: string;
+    stats: Record<string, string>;
+    salesHistory: string;
+    salesTable: Record<string, string>;
+    milkHistory: string;
+    milkTable: Record<string, string>;
+    reproductionHistory: string;
+    reproductionTable: Record<string, string>;
+    footer: {
+      page: string;
+      of: string;
+    };
+    sex?: {
+      male?: string;
+      female?: string;
+    };
+    status?: {
+      active?: string;
+      inactive?: string;
+      sold?: string;
+      deceased?: string;
+    };
+  };
+  common?: {
+    yes?: string;
+    no?: string;
+    notInformed?: string;
+  };
+}
+
 interface PDFGeneratorOptions {
   animal: Animal;
   sales: Sale[];
   milkCollections: MilkCollection[];
   reproductions: Reproduction[];
   animalImage?: string;
-  translations: any;
+  translations: Translations;
 }
 
 export class AnimalHistoryPDFGenerator {
-  private doc: jsPDF;
+  private doc: JSPDFWithAutoTable;
   private pageWidth: number;
   private margin: number;
   private currentY: number;
-  private translations: any;
+  private translations: Translations;
 
   constructor(options: PDFGeneratorOptions) {
-    this.doc = new jsPDF();
+    this.doc = new jsPDF() as JSPDFWithAutoTable;
     this.pageWidth = this.doc.internal.pageSize.getWidth();
     this.margin = 20;
     this.currentY = 30;
@@ -196,7 +260,7 @@ export class AnimalHistoryPDFGenerator {
       sale.notes || '-'
     ]);
 
-    (this.doc as any).autoTable({
+    this.doc.autoTable({
       startY: this.currentY,
       head: [[
         this.translations.animalHistoryExport.salesTable.date,
@@ -220,7 +284,7 @@ export class AnimalHistoryPDFGenerator {
       margin: { left: this.margin, right: this.margin }
     });
 
-    this.currentY = (this.doc as any).lastAutoTable.finalY + 15;
+    this.currentY = this.doc.lastAutoTable.finalY + 15;
   }
 
   private addMilkHistory(milkCollections: MilkCollection[]) {
@@ -241,7 +305,7 @@ export class AnimalHistoryPDFGenerator {
       collection.notes || '-'
     ]);
 
-    (this.doc as any).autoTable({
+    this.doc.autoTable({
       startY: this.currentY,
       head: [[
         this.translations.animalHistoryExport.milkTable.date,
@@ -265,7 +329,7 @@ export class AnimalHistoryPDFGenerator {
       margin: { left: this.margin, right: this.margin }
     });
 
-    this.currentY = (this.doc as any).lastAutoTable.finalY + 15;
+    this.currentY = this.doc.lastAutoTable.finalY + 15;
   }
 
   private addReproductionHistory(reproductions: Reproduction[]) {
@@ -285,7 +349,7 @@ export class AnimalHistoryPDFGenerator {
       reproduction.notes || '-'
     ]);
 
-    (this.doc as any).autoTable({
+    this.doc.autoTable({
       startY: this.currentY,
       head: [[
         this.translations.animalHistoryExport.reproductionTable.date,
@@ -308,7 +372,7 @@ export class AnimalHistoryPDFGenerator {
       margin: { left: this.margin, right: this.margin }
     });
 
-    this.currentY = (this.doc as any).lastAutoTable.finalY + 15;
+    this.currentY = this.doc.lastAutoTable.finalY + 15;
   }
 
   private addFooter() {

@@ -79,6 +79,7 @@ export const SaleModal: React.FC<SaleModalProps> = ({
       form.resetFields();
       onSuccess();
     } catch {
+      void 0;
     }
   };
 

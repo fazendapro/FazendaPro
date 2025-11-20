@@ -54,7 +54,7 @@ const InputBase: ForwardRefRenderFunction<HTMLInputElement, Omit<InputProps, "re
   const [size, setSize] = useState(0);
   const formContext = useFormContext();
   const watch = formContext?.watch;
-  const watchedValue = watch ? (watch(name as any) as unknown) : null;
+  const watchedValue = watch ? (watch(name as string) as unknown) : null;
   const value = typeof watchedValue === 'string' ? watchedValue : null;
 
   const typedBold = typeof bold === 'boolean' ? bold : undefined;
@@ -65,6 +65,8 @@ const InputBase: ForwardRefRenderFunction<HTMLInputElement, Omit<InputProps, "re
   const typedLabel = typeof label === 'string' ? label : (label as string | undefined);
   const typedTooltip = typeof tooltip === 'string' ? tooltip : (tooltip as string | undefined);
   const typedPlaceholder = typeof placeholder === 'string' ? placeholder : (placeholder as string | undefined);
+  const typedName = typeof name === 'string' ? name : String(name);
+  const typedAutoComplete = typeof autoComplete === 'string' ? autoComplete : 'on';
 
   useEffect(() => {
     if (value && typeof value === 'string') {
@@ -102,13 +104,13 @@ const InputBase: ForwardRefRenderFunction<HTMLInputElement, Omit<InputProps, "re
       <div style={{ position: 'relative' }}>
         <AntInput
           prefix={typedIconLeft}
-          name={name}
-          id={name}
+          name={typedName}
+          id={typedName}
           placeholder={typedPlaceholder || undefined}
           maxLength={typedMax ? Number(typedMax) : undefined}
           ref={ref as React.Ref<InputRef>}
-          autoComplete={autoComplete}
-          {...(rest as any)}
+          autoComplete={typedAutoComplete}
+          {...(rest as Record<string, unknown>)}
         />
         {value && typedMax && Number(typedMax) > 0 && (
           <div style={{ position: 'absolute', right: 8, bottom: -20, fontSize: 12, color: '#8c8c8c' }}>

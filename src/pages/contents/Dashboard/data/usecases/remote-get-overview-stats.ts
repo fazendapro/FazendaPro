@@ -5,7 +5,7 @@ import { AxiosError } from 'axios';
 import { t } from 'i18next';
 
 export class RemoteGetOverviewStats implements GetOverviewStatsDomain {
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getOverviewStats(_params: GetOverviewStatsParams): Promise<GetOverviewStatsResponse> {
     try {
       const { data, status } = await api().get(
