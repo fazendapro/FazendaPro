@@ -5,7 +5,6 @@ import { Animal } from '../../pages/contents/AnimalTable/types/type';
 import { Sale } from '../../types/sale';
 import { MilkCollection } from '../../types/milk-collection';
 import { Reproduction } from '../../types/reproduction';
-import { jsPDF } from 'jspdf';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
