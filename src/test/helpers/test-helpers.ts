@@ -196,5 +196,5 @@ export const createMockDataTransfer = (files: File[] = []) => {
     getData: vi.fn(),
     setData: vi.fn(),
     setDragImage: vi.fn(),
-  } as DataTransfer
+  } as unknown as DataTransfer
 }

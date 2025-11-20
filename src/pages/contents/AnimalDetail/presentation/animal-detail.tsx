@@ -7,7 +7,6 @@ import { AnimalDetailFormData } from '../types';
 
 export const AnimalDetail: React.FC = () => {
   const { animal, loading, error, isEditing, setIsEditing, updateAnimal, uploadPhoto, refreshAnimal } = useAnimalDetailContext();
-  // const [saving, setSaving] = useState(false);
 
   const handleEdit = () => {
     setIsEditing(true);

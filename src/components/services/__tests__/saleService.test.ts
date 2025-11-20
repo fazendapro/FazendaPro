@@ -1,17 +1,21 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { Mock } from 'vitest';
 
-// Mock api antes de importar saleService
+const mockPost = vi.fn();
+const mockGet = vi.fn();
+const mockPut = vi.fn();
+const mockDelete = vi.fn();
+
 vi.mock('../../../config/api', () => ({
   api: {
-    post: vi.fn(),
-    get: vi.fn(),
-    put: vi.fn(),
-    delete: vi.fn(),
+    post: mockPost,
+    get: mockGet,
+    put: mockPut,
+    delete: mockDelete,
   },
 }));
 
 import { saleService } from '../saleService';
-import { api as mockApi } from '../../../config/api';
 
 describe('saleService', () => {
   beforeEach(() => {
@@ -35,11 +39,11 @@ describe('saleService', () => {
         },
       };
 
-      mockApi.post.mockResolvedValue(mockResponse);
+      (mockPost as Mock).mockResolvedValue(mockResponse);
 
       const result = await saleService.createSale(saleData);
 
-      expect(mockApi.post).toHaveBeenCalledWith('/sales', saleData);
+      expect(mockPost).toHaveBeenCalledWith('/sales', saleData);
       expect(result).toEqual(mockResponse.data);
     });
   });
@@ -53,11 +57,11 @@ describe('saleService', () => {
         ],
       };
 
-      mockApi.get.mockResolvedValue(mockResponse);
+      (mockGet as Mock).mockResolvedValue(mockResponse);
 
       const result = await saleService.getSalesByFarm();
 
-      expect(mockApi.get).toHaveBeenCalledWith('/sales');
+      expect(mockGet).toHaveBeenCalledWith('/sales');
       expect(result).toEqual(mockResponse.data);
     });
   });
@@ -70,11 +74,11 @@ describe('saleService', () => {
         ],
       };
 
-      mockApi.get.mockResolvedValue(mockResponse);
+      (mockGet as Mock).mockResolvedValue(mockResponse);
 
       const result = await saleService.getSalesHistory();
 
-      expect(mockApi.get).toHaveBeenCalledWith('/sales/history');
+      expect(mockGet).toHaveBeenCalledWith('/sales/history');
       expect(result).toEqual(mockResponse.data);
     });
   });
@@ -88,11 +92,11 @@ describe('saleService', () => {
         ],
       };
 
-      mockApi.get.mockResolvedValue(mockResponse);
+      (mockGet as Mock).mockResolvedValue(mockResponse);
 
       const result = await saleService.getSalesByAnimal(animalId);
 
-      expect(mockApi.get).toHaveBeenCalledWith(`/animals/${animalId}/sales`);
+      expect(mockGet).toHaveBeenCalledWith(`/animals/${animalId}/sales`);
       expect(result).toEqual(mockResponse.data);
     });
   });
@@ -110,11 +114,11 @@ describe('saleService', () => {
         ],
       };
 
-      mockApi.get.mockResolvedValue(mockResponse);
+      (mockGet as Mock).mockResolvedValue(mockResponse);
 
       const result = await saleService.getSalesByDateRange(filters);
 
-      expect(mockApi.get).toHaveBeenCalledWith(
+      expect(mockGet).toHaveBeenCalledWith(
         '/sales/date-range?start_date=2024-01-01&end_date=2024-01-31'
       );
       expect(result).toEqual(mockResponse.data);
@@ -125,11 +129,11 @@ describe('saleService', () => {
         start_date: '2024-01-01',
       };
 
-      mockApi.get.mockResolvedValue({ data: [] });
+      (mockGet as Mock).mockResolvedValue({ data: [] });
 
       await saleService.getSalesByDateRange(filters);
 
-      expect(mockApi.get).toHaveBeenCalledWith(
+      expect(mockGet).toHaveBeenCalledWith(
         '/sales/date-range?start_date=2024-01-01'
       );
     });
@@ -139,11 +143,11 @@ describe('saleService', () => {
         end_date: '2024-01-31',
       };
 
-      mockApi.get.mockResolvedValue({ data: [] });
+      (mockGet as Mock).mockResolvedValue({ data: [] });
 
       await saleService.getSalesByDateRange(filters);
 
-      expect(mockApi.get).toHaveBeenCalledWith(
+      expect(mockGet).toHaveBeenCalledWith(
         '/sales/date-range?end_date=2024-01-31'
       );
     });
@@ -160,11 +164,11 @@ describe('saleService', () => {
         },
       };
 
-      mockApi.get.mockResolvedValue(mockResponse);
+      (mockGet as Mock).mockResolvedValue(mockResponse);
 
       const result = await saleService.getSaleById(saleId);
 
-      expect(mockApi.get).toHaveBeenCalledWith(`/sales/${saleId}`);
+      expect(mockGet).toHaveBeenCalledWith(`/sales/${saleId}`);
       expect(result).toEqual(mockResponse.data);
     });
   });
@@ -173,7 +177,9 @@ describe('saleService', () => {
     it('deve atualizar uma venda', async () => {
       const saleId = 1;
       const updateData = {
+        buyer_name: 'Updated Buyer',
         price: 1500,
+        sale_date: '2024-01-01',
         notes: 'Updated notes',
       };
 
@@ -184,11 +190,11 @@ describe('saleService', () => {
         },
       };
 
-      mockApi.put.mockResolvedValue(mockResponse);
+      (mockPut as Mock).mockResolvedValue(mockResponse);
 
       const result = await saleService.updateSale(saleId, updateData);
 
-      expect(mockApi.put).toHaveBeenCalledWith(`/sales/${saleId}`, updateData);
+      expect(mockPut).toHaveBeenCalledWith(`/sales/${saleId}`, updateData);
       expect(result).toEqual(mockResponse.data);
     });
   });
@@ -197,11 +203,11 @@ describe('saleService', () => {
     it('deve deletar uma venda', async () => {
       const saleId = 1;
 
-      mockApi.delete.mockResolvedValue(undefined);
+      (mockDelete as Mock).mockResolvedValue(undefined);
 
       await saleService.deleteSale(saleId);
 
-      expect(mockApi.delete).toHaveBeenCalledWith(`/sales/${saleId}`);
+      expect(mockDelete).toHaveBeenCalledWith(`/sales/${saleId}`);
     });
   });
 });

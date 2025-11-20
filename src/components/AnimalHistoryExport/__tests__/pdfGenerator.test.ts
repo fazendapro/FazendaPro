@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AnimalHistoryPDFGenerator, generateAnimalHistoryPDF } from '../pdfGenerator';
+import { Animal } from '../../../pages/contents/AnimalTable/types/type';
+import { Sale } from '../../../types/sale';
+import { MilkCollection } from '../../../types/milk-collection';
+import { Reproduction } from '../../../types/reproduction';
 
-// Mock jsPDF
 const mockDoc = {
   setFontSize: vi.fn(),
   setFont: vi.fn(),
@@ -35,49 +38,68 @@ vi.mock('jspdf', () => {
 });
 
 describe('AnimalHistoryPDFGenerator', () => {
-  const mockAnimal = {
-    id: 1,
+  const mockAnimal: Animal = {
+    id: '1',
+    farm_id: 1,
     animal_name: 'Test Animal',
     ear_tag_number_local: 123,
+    ear_tag_number_register: 456,
     breed: 'Holandesa',
-    type: 'Bovino',
+    type: 'vaca',
     birth_date: '2020-01-01',
     sex: 0,
+    animal_type: 0,
     status: 0,
     confinement: false,
     fertilization: false,
     castrated: false,
-    current_weight: 500,
-    ideal_weight: 600,
-    milk_production: 20,
+    purpose: 0,
+    current_batch: 1,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+    current_weight: '500',
+    ideal_weight: '600',
+    milk_production: '20',
   };
 
-  const mockSales = [
+  const mockSales: Sale[] = [
     {
       id: 1,
+      animal_id: 1,
+      farm_id: 1,
       sale_date: '2024-01-01',
       buyer_name: 'Buyer 1',
       price: 1000,
       notes: 'Sale notes',
+      created_at: '2024-01-01T00:00:00Z',
+      updated_at: '2024-01-01T00:00:00Z',
     },
   ];
 
-  const mockMilkCollections = [
+  const mockMilkCollections: MilkCollection[] = [
     {
       id: 1,
+      animal_id: 1,
+      farm_id: 1,
       collection_date: '2024-01-01',
       quantity: 20,
       quality: 'Good',
       notes: 'Milk notes',
+      created_at: '2024-01-01T00:00:00Z',
+      updated_at: '2024-01-01T00:00:00Z',
     },
   ];
 
-  const mockReproductions = [
+  const mockReproductions: Reproduction[] = [
     {
       id: 1,
+      animal_id: 1,
+      farm_id: 1,
       date: '2024-01-01',
       phase: 'Gestação',
       notes: 'Reproduction notes',
+      created_at: '2024-01-01T00:00:00Z',
+      updated_at: '2024-01-01T00:00:00Z',
     },
   ];
 

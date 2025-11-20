@@ -133,8 +133,6 @@ describe('AnimalHistoryExport', () => {
   });
 
   it('generates PDF when button is clicked', () => {
-    // jsPDF é mockado, então não precisamos criar uma instância real
-
     render(
       <AnimalHistoryExport
         animal={mockAnimal}
@@ -146,7 +144,6 @@ describe('AnimalHistoryExport', () => {
 
     fireEvent.click(screen.getAllByText('animalDetail.exportHistory')[0]);
 
-    // Verifica que o botão foi clicado (o PDF é gerado internamente)
     expect(screen.getAllByText('animalDetail.exportHistory').length).toBeGreaterThan(0);
   });
 
@@ -175,7 +172,6 @@ describe('AnimalHistoryExport', () => {
 
     fireEvent.click(screen.getAllByText('animalDetail.exportHistory')[0]);
 
-    // Verifica que o botão foi clicado (o PDF é gerado internamente)
     expect(screen.getAllByText('animalDetail.exportHistory').length).toBeGreaterThan(0);
   });
 });

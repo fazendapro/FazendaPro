@@ -43,7 +43,6 @@ export function baseAxios(baseUrl: string) {
               return instance(originalRequest)
             }
           } catch {
-            // Erro ao renovar token, será tratado abaixo
           }
         }
 

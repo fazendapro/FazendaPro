@@ -25,7 +25,7 @@ export const mockAxios: MockAxiosInstance = {
   put: vi.fn(),
   delete: vi.fn(),
   patch: vi.fn(),
-  create: vi.fn((): MockAxiosInstance => mockAxios),
+  create: vi.fn((): MockAxiosInstance => mockAxios) as any,
   interceptors: {
     request: {
       use: vi.fn(),

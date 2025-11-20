@@ -11,7 +11,6 @@ interface PDFGeneratorOptions {
   milkCollections: MilkCollection[];
   reproductions: Reproduction[];
   animalImage?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   translations: any;
 }
 
@@ -20,7 +19,6 @@ export class AnimalHistoryPDFGenerator {
   private pageWidth: number;
   private margin: number;
   private currentY: number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private translations: any;
 
   constructor(options: PDFGeneratorOptions) {
@@ -83,7 +81,6 @@ export class AnimalHistoryPDFGenerator {
         this.currentY += imgHeight + 10;
       } catch (error) {
         console.warn('Erro ao adicionar imagem do animal:', error);
-        // Se falhar, continua sem a imagem
       }
     }
   }
@@ -199,7 +196,6 @@ export class AnimalHistoryPDFGenerator {
       sale.notes || '-'
     ]);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (this.doc as any).autoTable({
       startY: this.currentY,
       head: [[
@@ -224,7 +220,6 @@ export class AnimalHistoryPDFGenerator {
       margin: { left: this.margin, right: this.margin }
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.currentY = (this.doc as any).lastAutoTable.finalY + 15;
   }
 
@@ -246,7 +241,6 @@ export class AnimalHistoryPDFGenerator {
       collection.notes || '-'
     ]);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (this.doc as any).autoTable({
       startY: this.currentY,
       head: [[
@@ -271,7 +265,6 @@ export class AnimalHistoryPDFGenerator {
       margin: { left: this.margin, right: this.margin }
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.currentY = (this.doc as any).lastAutoTable.finalY + 15;
   }
 
@@ -292,7 +285,6 @@ export class AnimalHistoryPDFGenerator {
       reproduction.notes || '-'
     ]);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (this.doc as any).autoTable({
       startY: this.currentY,
       head: [[
@@ -316,7 +308,6 @@ export class AnimalHistoryPDFGenerator {
       margin: { left: this.margin, right: this.margin }
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.currentY = (this.doc as any).lastAutoTable.finalY + 15;
   }
 

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { RemoteGetOverviewStats } from '../remote-get-overview-stats';
 import { api } from '../../../../../../components';
-import { AxiosError, AxiosRequestConfig } from 'axios';
+import { AxiosError } from 'axios';
 
 vi.mock('../../../../../../components', () => ({
   api: vi.fn()
@@ -38,9 +38,9 @@ describe('RemoteGetOverviewStats', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockResolvedValue(mockResponse)
-    };
+    } as any;
 
-    mockApi.mockReturnValue(mockApiInstance as unknown as typeof api);
+    mockApi.mockReturnValue(mockApiInstance as any);
 
     const result = await remoteGetOverviewStats.getOverviewStats({ farm_id: 1 });
 
@@ -71,9 +71,9 @@ describe('RemoteGetOverviewStats', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockResolvedValue(mockResponse)
-    };
+    } as any;
 
-    mockApi.mockReturnValue(mockApiInstance as unknown as typeof api);
+    mockApi.mockReturnValue(mockApiInstance as any);
 
     const result = await remoteGetOverviewStats.getOverviewStats({ farm_id: 1 });
 
@@ -92,14 +92,14 @@ describe('RemoteGetOverviewStats', () => {
       status: 500,
       statusText: 'Internal Server Error',
       headers: {},
-      config: {} as AxiosRequestConfig
+      config: {} as any
     };
 
     const mockApiInstance = {
       get: vi.fn().mockRejectedValue(mockError)
-    };
+    } as any;
 
-    mockApi.mockReturnValue(mockApiInstance as unknown as typeof api);
+    mockApi.mockReturnValue(mockApiInstance as any);
 
     await expect(remoteGetOverviewStats.getOverviewStats({ farm_id: 1 }))
       .rejects.toThrow('Network Error');
@@ -111,9 +111,9 @@ describe('RemoteGetOverviewStats', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockRejectedValue(mockError)
-    };
+    } as any;
 
-    mockApi.mockReturnValue(mockApiInstance as unknown as typeof api);
+    mockApi.mockReturnValue(mockApiInstance as any);
 
     await expect(remoteGetOverviewStats.getOverviewStats({ farm_id: 1 }))
       .rejects.toThrow('Erro ao buscar estatísticas gerais');
@@ -124,7 +124,7 @@ describe('RemoteGetOverviewStats', () => {
       get: vi.fn().mockRejectedValue(new Error('Unknown error'))
     };
 
-    mockApi.mockReturnValue(mockApiInstance as unknown as typeof api);
+    mockApi.mockReturnValue(mockApiInstance as any);
 
     await expect(remoteGetOverviewStats.getOverviewStats({ farm_id: 1 }))
       .rejects.toThrow('Erro desconhecido ao buscar estatísticas gerais');
@@ -146,9 +146,9 @@ describe('RemoteGetOverviewStats', () => {
 
     const mockApiInstance = {
       get: vi.fn().mockResolvedValue(mockResponse)
-    };
+    } as any;
 
-    mockApi.mockReturnValue(mockApiInstance as unknown as typeof api);
+    mockApi.mockReturnValue(mockApiInstance as any);
 
     const result = await remoteGetOverviewStats.getOverviewStats({ farm_id: 1 });
 

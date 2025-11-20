@@ -107,7 +107,7 @@ describe('useIsMobile', () => {
       )?.[1]
 
       if (resizeHandler) {
-        resizeHandler()
+        resizeHandler({} as Event)
       }
     })
 
