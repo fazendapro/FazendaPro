@@ -1,0 +1,46 @@
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentação
+README*.md
+*.md
+
+# Scripts
+scripts/
+Makefile
+
+# Logs
+*.log
+
+# Binários
+bin/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Testes
+tests/
+*_test.go
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Cloud SQL Proxy
+cloud-sql-proxy*/
+
+# Google Cloud SDK
+google-cloud-sdk/ 
