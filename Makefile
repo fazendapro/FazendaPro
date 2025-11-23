@@ -1,6 +1,6 @@
 # Makefile para FazendaPro API
 
-.PHONY: help test test-coverage test-unit test-handlers clean install-deps run build migrate-docker
+.PHONY: help test test-coverage test-unit test-handlers clean install-deps run build migrate-docker db-reset
 
 # Variáveis
 GO_VERSION := 1.24.2
@@ -33,6 +33,8 @@ help:
 	@echo "🐳 Docker:"
 	@echo "  logs            - Mostra logs da aplicação"
 	@echo "  db-connect      - Conecta ao banco de dados"
+	@echo "  db-reset        - Recria o banco de dados do zero"
+	@echo "  migrate-docker  - Executa migrações no ambiente Docker"
 	@echo ""
 	@echo "🚀 Produção:"
 	@echo "  prod-build      - Constrói para produção"
@@ -55,10 +57,8 @@ test:
 test-coverage:
 	@echo "📊 Executando testes com coverage..."
 	@mkdir -p $(COVERAGE_DIR)
-	go test -v -coverprofile=$(COVERAGE_DIR)/coverage.out -covermode=atomic ./$(TEST_DIR)/...
-	go tool cover -html=$(COVERAGE_DIR)/coverage.out -o $(COVERAGE_DIR)/coverage.html
+	go test -v -coverprofile=$(COVERAGE_DIR)/coverage.out -covermode=atomic -coverpkg=./internal/...,./tests/... ./$(TEST_DIR)/...
 	go tool cover -func=$(COVERAGE_DIR)/coverage.out
-	@echo "📁 Relatório HTML gerado: $(COVERAGE_DIR)/coverage.html"
 
 # Executar testes unitários
 test-unit:
@@ -177,6 +177,67 @@ logs: ## Mostra logs da aplicação
 # Conecta ao banco de dados
 db-connect: ## Conecta ao banco de dados
 	docker-compose exec postgres psql -U fazendapro_user -d fazendapro
+
+# Recriar banco de dados (remove volumes e recria)
+db-reset: ## Recria o banco de dados do zero
+	@echo "🔄 Recriando banco de dados..."
+	docker-compose down -v
+	docker-compose up -d postgres
+	@echo "⏳ Aguardando banco de dados inicializar..."
+	@echo "   (aguardando PostgreSQL criar usuário e banco...)"
+	@echo "   Isso pode levar até 60 segundos na primeira inicialização..."
+	@timeout=120; \
+	attempt=0; \
+	internal_ready=0; \
+	while [ $$timeout -gt 0 ]; do \
+		attempt=$$((attempt + 1)); \
+		if docker-compose exec -T postgres psql -U fazendapro_user -d fazendapro -c "SELECT 1;" > /dev/null 2>&1; then \
+			internal_ready=1; \
+			echo "✅ Banco de dados pronto e usuário criado! (tentativa $$attempt)"; \
+			break; \
+		fi; \
+		if [ $$((attempt % 5)) -eq 0 ]; then \
+			echo "   Aguardando... ($$timeout segundos restantes)"; \
+		fi; \
+		sleep 2; \
+		timeout=$$((timeout - 2)); \
+	done; \
+	if [ $$internal_ready -eq 0 ]; then \
+		echo "❌ Timeout aguardando banco de dados"; \
+		echo "   Verifique os logs: docker-compose logs postgres"; \
+		exit 1; \
+	fi; \
+	echo "   Aguardando healthcheck estar disponível..."; \
+	timeout2=60; \
+	healthcheck_ok=0; \
+	while [ $$timeout2 -gt 0 ]; do \
+		if docker-compose ps postgres 2>/dev/null | grep -q "healthy"; then \
+			healthcheck_ok=1; \
+			echo "✅ Healthcheck OK!"; \
+			break; \
+		fi; \
+		sleep 2; \
+		timeout2=$$((timeout2 - 2)); \
+	done; \
+	if [ $$healthcheck_ok -eq 0 ]; then \
+		echo "⚠️  Healthcheck não ficou healthy, mas continuando..."; \
+	fi; \
+	echo "   Aguardando conexão externa estar disponível (pode levar alguns segundos)..."; \
+	sleep 10
+	@echo "📦 Executando migrações..."
+	$(MAKE) migrate-docker
+	@echo "✅ Banco de dados recriado com sucesso!"
+
+# Executar migrações no Docker
+migrate-docker: ## Executa migrações no ambiente Docker (usando rede Docker)
+	@echo "📦 Executando migrações via Docker..."
+	@if docker-compose ps postgres | grep -q "Up"; then \
+		echo "   Usando serviço migration do docker-compose (rede Docker)..."; \
+		docker-compose --profile migrate run --rm migration; \
+	else \
+		echo "⚠️  Container PostgreSQL não está rodando"; \
+		exit 1; \
+	fi
 
 # Constrói para produção
 prod-build: ## Constrói para produção
