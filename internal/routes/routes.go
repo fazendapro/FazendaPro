@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/repository"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
+	"github.com/getsentry/sentry-go"
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/go-chi/chi/v5"
 )
@@ -41,6 +43,20 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("FazendaPro API is running!"))
+	})
+
+	r.Get("/test-error", func(w http.ResponseWriter, r *http.Request) {
+		err := errors.New("erro de teste do Sentry - Rota /test-error")
+		sentry.CaptureException(err)
+		sentry.Flush(2)
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"error": "Erro de teste enviado para o Sentry", "message": "Verifique o dashboard do Sentry para ver este erro"}`))
+	})
+
+	r.Get("/test-panic", func(w http.ResponseWriter, r *http.Request) {
+		panic("Panic de teste do Sentry - Rota /test-panic")
 	})
 
 	var cacheClient cache.CacheInterface
