@@ -17,7 +17,7 @@ func TestUserService(t *testing.T) {
 		mockUserRepo.On("FarmExists", uint(1)).Return(true, nil)
 		mockUserRepo.On("CreateWithPerson", mock.AnythingOfType("*models.User"), mock.AnythingOfType("*models.Person")).Return(nil).Run(func(args mock.Arguments) {
 			user := args.Get(0).(*models.User)
-			user.ID = 1 // Simular ID retornado pelo banco
+			user.ID = 1
 		})
 		mockUserRepo.On("FindByIDWithPerson", uint(1)).Return(&models.User{ID: 1, FarmID: 1}, nil)
 		mockUserRepo.On("CreateUserFarm", mock.AnythingOfType("*models.UserFarm")).Return(nil)

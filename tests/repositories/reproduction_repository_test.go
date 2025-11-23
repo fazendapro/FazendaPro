@@ -336,3 +336,293 @@ func TestReproductionRepository_FindByPhase_WithMultipleFarms(t *testing.T) {
 	assert.Equal(t, 2, farm1Count)
 	assert.Equal(t, 1, farm2Count)
 }
+
+func TestReproductionRepository_Create(t *testing.T) {
+	db := setupReproductionTestDB(t)
+	reproductionRepo := repository.NewReproductionRepository(db)
+
+	farm := createTestFarmForReproduction(t, db)
+
+	animal := &models.Animal{
+		FarmID:            farm.ID,
+		AnimalName:        "Tata Salt",
+		EarTagNumberLocal: 123,
+		Sex:               0,
+		Breed:             "Holandesa",
+		Type:              "Bovino",
+		AnimalType:        0,
+		Status:            0,
+		Purpose:           0,
+	}
+	require.NoError(t, db.Create(animal).Error)
+
+	reproduction := &models.Reproduction{
+		AnimalID:     animal.ID,
+		CurrentPhase: models.PhaseVazias,
+	}
+
+	err := reproductionRepo.Create(reproduction)
+	assert.NoError(t, err)
+	assert.NotZero(t, reproduction.ID)
+}
+
+func TestReproductionRepository_FindByID(t *testing.T) {
+	db := setupReproductionTestDB(t)
+	reproductionRepo := repository.NewReproductionRepository(db)
+
+	farm := createTestFarmForReproduction(t, db)
+
+	animal := &models.Animal{
+		FarmID:            farm.ID,
+		AnimalName:        "Tata Salt",
+		EarTagNumberLocal: 123,
+		Sex:               0,
+		Breed:             "Holandesa",
+		Type:              "Bovino",
+		AnimalType:        0,
+		Status:            0,
+		Purpose:           0,
+	}
+	require.NoError(t, db.Create(animal).Error)
+
+	reproduction := &models.Reproduction{
+		AnimalID:     animal.ID,
+		CurrentPhase: models.PhaseVazias,
+	}
+	require.NoError(t, db.Create(reproduction).Error)
+
+	found, err := reproductionRepo.FindByID(reproduction.ID)
+	assert.NoError(t, err)
+	assert.NotNil(t, found)
+	assert.Equal(t, reproduction.ID, found.ID)
+	assert.Equal(t, animal.ID, found.AnimalID)
+	assert.NotNil(t, found.Animal)
+	assert.Equal(t, "Tata Salt", found.Animal.AnimalName)
+}
+
+func TestReproductionRepository_FindByID_NotFound(t *testing.T) {
+	db := setupReproductionTestDB(t)
+	reproductionRepo := repository.NewReproductionRepository(db)
+
+	found, err := reproductionRepo.FindByID(999)
+	assert.NoError(t, err)
+	assert.Nil(t, found)
+}
+
+func TestReproductionRepository_FindByAnimalID(t *testing.T) {
+	db := setupReproductionTestDB(t)
+	reproductionRepo := repository.NewReproductionRepository(db)
+
+	farm := createTestFarmForReproduction(t, db)
+
+	animal1 := &models.Animal{
+		FarmID:            farm.ID,
+		AnimalName:        "Tata Salt",
+		EarTagNumberLocal: 123,
+		Sex:               0,
+		Breed:             "Holandesa",
+		Type:              "Bovino",
+		AnimalType:        0,
+		Status:            0,
+		Purpose:           0,
+	}
+	require.NoError(t, db.Create(animal1).Error)
+
+	animal2 := &models.Animal{
+		FarmID:            farm.ID,
+		AnimalName:        "Lays",
+		EarTagNumberLocal: 124,
+		Sex:               0,
+		Breed:             "Holandesa",
+		Type:              "Bovino",
+		AnimalType:        0,
+		Status:            0,
+		Purpose:           0,
+	}
+	require.NoError(t, db.Create(animal2).Error)
+
+	reproduction1 := &models.Reproduction{
+		AnimalID:     animal1.ID,
+		CurrentPhase: models.PhaseVazias,
+	}
+	require.NoError(t, db.Create(reproduction1).Error)
+
+	reproduction2 := &models.Reproduction{
+		AnimalID:     animal2.ID,
+		CurrentPhase: models.PhasePrenhas,
+	}
+	require.NoError(t, db.Create(reproduction2).Error)
+
+	found, err := reproductionRepo.FindByAnimalID(animal1.ID)
+	assert.NoError(t, err)
+	assert.NotNil(t, found)
+	assert.Equal(t, animal1.ID, found.AnimalID)
+	assert.Equal(t, models.PhaseVazias, found.CurrentPhase)
+	assert.NotNil(t, found.Animal)
+	assert.Equal(t, "Tata Salt", found.Animal.AnimalName)
+}
+
+func TestReproductionRepository_FindByAnimalID_NotFound(t *testing.T) {
+	db := setupReproductionTestDB(t)
+	reproductionRepo := repository.NewReproductionRepository(db)
+
+	found, err := reproductionRepo.FindByAnimalID(999)
+	assert.NoError(t, err)
+	assert.Nil(t, found)
+}
+
+func TestReproductionRepository_FindByFarmID(t *testing.T) {
+	db := setupReproductionTestDB(t)
+	reproductionRepo := repository.NewReproductionRepository(db)
+
+	farm1 := createTestFarmForReproduction(t, db)
+
+	company2 := &models.Company{
+		CompanyName: "Test Company 2",
+		FarmCNPJ:    "98765432109876",
+	}
+	require.NoError(t, db.Create(company2).Error)
+	farm2 := &models.Farm{
+		CompanyID: company2.ID,
+		Logo:      "",
+	}
+	require.NoError(t, db.Create(farm2).Error)
+
+	animal1 := &models.Animal{
+		FarmID:            farm1.ID,
+		AnimalName:        "Tata Salt",
+		EarTagNumberLocal: 123,
+		Sex:               0,
+		Breed:             "Holandesa",
+		Type:              "Bovino",
+		AnimalType:        0,
+		Status:            0,
+		Purpose:           0,
+	}
+	require.NoError(t, db.Create(animal1).Error)
+
+	animal2 := &models.Animal{
+		FarmID:            farm1.ID,
+		AnimalName:        "Lays",
+		EarTagNumberLocal: 124,
+		Sex:               0,
+		Breed:             "Holandesa",
+		Type:              "Bovino",
+		AnimalType:        0,
+		Status:            0,
+		Purpose:           0,
+	}
+	require.NoError(t, db.Create(animal2).Error)
+
+	animal3 := &models.Animal{
+		FarmID:            farm2.ID,
+		AnimalName:        "Matilda",
+		EarTagNumberLocal: 125,
+		Sex:               0,
+		Breed:             "Holandesa",
+		Type:              "Bovino",
+		AnimalType:        0,
+		Status:            0,
+		Purpose:           0,
+	}
+	require.NoError(t, db.Create(animal3).Error)
+
+	reproduction1 := &models.Reproduction{
+		AnimalID:     animal1.ID,
+		CurrentPhase: models.PhaseVazias,
+	}
+	require.NoError(t, db.Create(reproduction1).Error)
+
+	reproduction2 := &models.Reproduction{
+		AnimalID:     animal2.ID,
+		CurrentPhase: models.PhasePrenhas,
+	}
+	require.NoError(t, db.Create(reproduction2).Error)
+
+	reproduction3 := &models.Reproduction{
+		AnimalID:     animal3.ID,
+		CurrentPhase: models.PhaseLactacao,
+	}
+	require.NoError(t, db.Create(reproduction3).Error)
+
+	reproductions, err := reproductionRepo.FindByFarmID(farm1.ID)
+	assert.NoError(t, err)
+	assert.Len(t, reproductions, 2)
+	for _, reproduction := range reproductions {
+		assert.Equal(t, farm1.ID, reproduction.Animal.FarmID)
+		assert.NotNil(t, reproduction.Animal)
+	}
+}
+
+func TestReproductionRepository_Update(t *testing.T) {
+	db := setupReproductionTestDB(t)
+	reproductionRepo := repository.NewReproductionRepository(db)
+
+	farm := createTestFarmForReproduction(t, db)
+
+	animal := &models.Animal{
+		FarmID:            farm.ID,
+		AnimalName:        "Tata Salt",
+		EarTagNumberLocal: 123,
+		Sex:               0,
+		Breed:             "Holandesa",
+		Type:              "Bovino",
+		AnimalType:        0,
+		Status:            0,
+		Purpose:           0,
+	}
+	require.NoError(t, db.Create(animal).Error)
+
+	reproduction := &models.Reproduction{
+		AnimalID:     animal.ID,
+		CurrentPhase: models.PhaseVazias,
+	}
+	require.NoError(t, db.Create(reproduction).Error)
+
+	reproduction.CurrentPhase = models.PhasePrenhas
+	now := time.Now()
+	reproduction.PregnancyDate = &now
+	reproduction.Observations = "Atualizado"
+
+	err := reproductionRepo.Update(reproduction)
+	assert.NoError(t, err)
+
+	updated, err := reproductionRepo.FindByID(reproduction.ID)
+	assert.NoError(t, err)
+	assert.Equal(t, models.PhasePrenhas, updated.CurrentPhase)
+	assert.NotNil(t, updated.PregnancyDate)
+	assert.Equal(t, "Atualizado", updated.Observations)
+}
+
+func TestReproductionRepository_Delete(t *testing.T) {
+	db := setupReproductionTestDB(t)
+	reproductionRepo := repository.NewReproductionRepository(db)
+
+	farm := createTestFarmForReproduction(t, db)
+
+	animal := &models.Animal{
+		FarmID:            farm.ID,
+		AnimalName:        "Tata Salt",
+		EarTagNumberLocal: 123,
+		Sex:               0,
+		Breed:             "Holandesa",
+		Type:              "Bovino",
+		AnimalType:        0,
+		Status:            0,
+		Purpose:           0,
+	}
+	require.NoError(t, db.Create(animal).Error)
+
+	reproduction := &models.Reproduction{
+		AnimalID:     animal.ID,
+		CurrentPhase: models.PhaseVazias,
+	}
+	require.NoError(t, db.Create(reproduction).Error)
+
+	err := reproductionRepo.Delete(reproduction.ID)
+	assert.NoError(t, err)
+
+	found, err := reproductionRepo.FindByID(reproduction.ID)
+	assert.NoError(t, err)
+	assert.Nil(t, found)
+}

@@ -3,8 +3,11 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
+	"log"
 	"time"
 
+	"github.com/fazendapro/FazendaPro-api/internal/cache"
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/repository"
 )
@@ -26,12 +29,14 @@ type SaleService interface {
 type saleService struct {
 	saleRepo   repository.SaleRepository
 	animalRepo repository.AnimalRepositoryInterface
+	cache      cache.CacheInterface
 }
 
-func NewSaleService(saleRepo repository.SaleRepository, animalRepo repository.AnimalRepositoryInterface) SaleService {
+func NewSaleService(saleRepo repository.SaleRepository, animalRepo repository.AnimalRepositoryInterface, cacheClient cache.CacheInterface) SaleService {
 	return &saleService{
 		saleRepo:   saleRepo,
 		animalRepo: animalRepo,
+		cache:      cacheClient,
 	}
 }
 
@@ -76,6 +81,8 @@ func (s *saleService) CreateSale(ctx context.Context, sale *models.Sale) error {
 		return errors.New("failed to update animal status")
 	}
 
+	s.invalidateDashboardCache(sale.FarmID)
+
 	return nil
 }
 
@@ -112,11 +119,50 @@ func (s *saleService) GetMonthlySalesData(ctx context.Context, farmID uint, mont
 	if months > 24 {
 		months = 24
 	}
-	return s.saleRepo.GetMonthlySalesData(ctx, farmID, months)
+
+	cacheKey := fmt.Sprintf("dashboard:monthly:%d:%d", farmID, months)
+	var cachedData []repository.MonthlySalesData
+
+	err := s.cache.Get(cacheKey, &cachedData)
+	if err == nil {
+		log.Printf("Cache HIT para dados mensais da fazenda %d (meses: %d)", farmID, months)
+		return cachedData, nil
+	}
+
+	log.Printf("Cache MISS para dados mensais da fazenda %d (meses: %d)", farmID, months)
+	data, err := s.saleRepo.GetMonthlySalesData(ctx, farmID, months)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.cache.Set(cacheKey, data, 900); err != nil {
+		log.Printf("Erro ao salvar no cache (não crítico): %v", err)
+	}
+
+	return data, nil
 }
 
 func (s *saleService) GetOverviewStats(ctx context.Context, farmID uint) (*repository.OverviewStats, error) {
-	return s.saleRepo.GetOverviewStats(ctx, farmID)
+	cacheKey := fmt.Sprintf("dashboard:overview:%d", farmID)
+	var cachedStats repository.OverviewStats
+
+	err := s.cache.Get(cacheKey, &cachedStats)
+	if err == nil {
+		log.Printf("Cache HIT para estatísticas gerais da fazenda %d", farmID)
+		return &cachedStats, nil
+	}
+
+	log.Printf("Cache MISS para estatísticas gerais da fazenda %d", farmID)
+	stats, err := s.saleRepo.GetOverviewStats(ctx, farmID)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.cache.Set(cacheKey, stats, 600); err != nil {
+		log.Printf("Erro ao salvar no cache (não crítico): %v", err)
+	}
+
+	return stats, nil
 }
 
 func (s *saleService) UpdateSale(ctx context.Context, sale *models.Sale) error {
@@ -133,7 +179,14 @@ func (s *saleService) UpdateSale(ctx context.Context, sale *models.Sale) error {
 		return errors.New("sale date is required")
 	}
 
-	return s.saleRepo.Update(ctx, sale)
+	err := s.saleRepo.Update(ctx, sale)
+	if err != nil {
+		return err
+	}
+
+	s.invalidateDashboardCache(sale.FarmID)
+
+	return nil
 }
 
 func (s *saleService) DeleteSale(ctx context.Context, id uint) error {
@@ -153,9 +206,25 @@ func (s *saleService) DeleteSale(ctx context.Context, id uint) error {
 		s.animalRepo.Update(animal)
 	}
 
+	s.invalidateDashboardCache(sale.FarmID)
+
 	return nil
 }
 
 func (s *saleService) GetSalesHistory(ctx context.Context, farmID uint) ([]*models.Sale, error) {
 	return s.saleRepo.GetByFarmID(ctx, farmID)
+}
+
+func (s *saleService) invalidateDashboardCache(farmID uint) {
+	overviewKey := fmt.Sprintf("dashboard:overview:%d", farmID)
+	if err := s.cache.Delete(overviewKey); err != nil {
+		log.Printf("Erro ao invalidar cache de overview (não crítico): %v", err)
+	}
+
+	for months := 6; months <= 24; months += 6 {
+		monthlyKey := fmt.Sprintf("dashboard:monthly:%d:%d", farmID, months)
+		if err := s.cache.Delete(monthlyKey); err != nil {
+			log.Printf("Erro ao invalidar cache mensal (não crítico): %v", err)
+		}
+	}
 }

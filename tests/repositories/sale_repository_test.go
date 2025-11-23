@@ -340,3 +340,15 @@ func TestSaleRepository_GetMonthlySalesCount(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, int64(2), count)
 }
+
+func TestSaleRepository_GetMonthlySalesData(t *testing.T) {
+	t.Skip("GetMonthlySalesData usa EXTRACT() do PostgreSQL, não compatível com SQLite")
+}
+
+func TestSaleRepository_GetMonthlySalesData_Empty(t *testing.T) {
+	t.Skip("GetMonthlySalesData usa EXTRACT() do PostgreSQL, não compatível com SQLite")
+}
+
+func TestSaleRepository_GetMonthlySalesData_MultipleMonths(t *testing.T) {
+	t.Skip("GetMonthlySalesData usa EXTRACT() do PostgreSQL, não compatível com SQLite")
+}

@@ -188,4 +188,145 @@ func TestModels(t *testing.T) {
 			assert.Equal(t, -1, animal.EarTagNumberLocal)
 		})
 	})
+
+	t.Run("Sale_TableName", func(t *testing.T) {
+		sale := models.Sale{}
+		assert.Equal(t, "sales", sale.TableName())
+	})
+
+	t.Run("Company_Model_Validation", func(t *testing.T) {
+		company := &models.Company{
+			ID:          1,
+			CompanyName: "Fazenda Teste",
+			Location:    "São Paulo",
+			FarmCNPJ:    "12345678901234",
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}
+
+		assert.Equal(t, uint(1), company.ID)
+		assert.Equal(t, "Fazenda Teste", company.CompanyName)
+		assert.Equal(t, "São Paulo", company.Location)
+		assert.Equal(t, "12345678901234", company.FarmCNPJ)
+		assert.NotNil(t, company.CreatedAt)
+		assert.NotNil(t, company.UpdatedAt)
+	})
+
+	t.Run("Farm_Model_Validation", func(t *testing.T) {
+		farm := &models.Farm{
+			ID:        1,
+			CompanyID: 1,
+			Logo:      "logo.png",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		}
+
+		assert.Equal(t, uint(1), farm.ID)
+		assert.Equal(t, uint(1), farm.CompanyID)
+		assert.Equal(t, "logo.png", farm.Logo)
+		assert.NotNil(t, farm.CreatedAt)
+		assert.NotNil(t, farm.UpdatedAt)
+	})
+
+	t.Run("Debt_Model_Validation", func(t *testing.T) {
+		debt := &models.Debt{
+			ID:        1,
+			Person:    "João Silva",
+			Value:     1500.50,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		}
+
+		assert.Equal(t, uint(1), debt.ID)
+		assert.Equal(t, "João Silva", debt.Person)
+		assert.Equal(t, 1500.50, debt.Value)
+		assert.NotNil(t, debt.CreatedAt)
+		assert.NotNil(t, debt.UpdatedAt)
+	})
+
+	t.Run("Expense_Model_Validation", func(t *testing.T) {
+		expenseDate := time.Now()
+		expense := &models.Expense{
+			ID:          1,
+			FarmID:      1,
+			Description: "Compra de ração",
+			Amount:      500.00,
+			Category:    "Alimentação",
+			Date:        expenseDate,
+			Notes:       "Ração para o mês",
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}
+
+		assert.Equal(t, uint(1), expense.ID)
+		assert.Equal(t, uint(1), expense.FarmID)
+		assert.Equal(t, "Compra de ração", expense.Description)
+		assert.Equal(t, 500.00, expense.Amount)
+		assert.Equal(t, "Alimentação", expense.Category)
+		assert.Equal(t, expenseDate, expense.Date)
+		assert.Equal(t, "Ração para o mês", expense.Notes)
+		assert.NotNil(t, expense.CreatedAt)
+		assert.NotNil(t, expense.UpdatedAt)
+	})
+
+	t.Run("Weight_Model_Validation", func(t *testing.T) {
+		weightDate := time.Now()
+		weight := &models.Weight{
+			ID:           1,
+			AnimalID:     1,
+			Date:         weightDate,
+			AnimalWeight: 450.5,
+			CreatedAt:    time.Now(),
+			UpdatedAt:    time.Now(),
+		}
+
+		assert.Equal(t, uint(1), weight.ID)
+		assert.Equal(t, uint(1), weight.AnimalID)
+		assert.Equal(t, weightDate, weight.Date)
+		assert.Equal(t, 450.5, weight.AnimalWeight)
+		assert.NotNil(t, weight.CreatedAt)
+		assert.NotNil(t, weight.UpdatedAt)
+	})
+
+	t.Run("UserFarm_Model_Validation", func(t *testing.T) {
+		userFarm := &models.UserFarm{
+			ID:        1,
+			UserID:    1,
+			FarmID:    1,
+			IsPrimary: true,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		}
+
+		assert.Equal(t, uint(1), userFarm.ID)
+		assert.Equal(t, uint(1), userFarm.UserID)
+		assert.Equal(t, uint(1), userFarm.FarmID)
+		assert.True(t, userFarm.IsPrimary)
+		assert.NotNil(t, userFarm.CreatedAt)
+		assert.NotNil(t, userFarm.UpdatedAt)
+	})
+
+	t.Run("Batch_GetBatchByLiters", func(t *testing.T) {
+		assert.Equal(t, models.Batch1, models.GetBatchByLiters(35.0))
+		assert.Equal(t, models.Batch2, models.GetBatchByLiters(25.0))
+		assert.Equal(t, models.Batch3, models.GetBatchByLiters(15.0))
+		assert.Equal(t, models.Batch1, models.GetBatchByLiters(30.1))
+		assert.Equal(t, models.Batch2, models.GetBatchByLiters(20.0))
+		assert.Equal(t, models.Batch2, models.GetBatchByLiters(30.0))
+	})
+
+	t.Run("AnimalStatus_GetStatusName", func(t *testing.T) {
+		assert.Equal(t, "Ativo", models.GetStatusName(models.AnimalStatusActive))
+		assert.Equal(t, "Vendido", models.GetStatusName(models.AnimalStatusSold))
+		assert.Equal(t, "Falecido", models.GetStatusName(models.AnimalStatusDeceased))
+		assert.Equal(t, "Desconhecido", models.GetStatusName(999))
+	})
+
+	t.Run("ReproductionPhase_String", func(t *testing.T) {
+		assert.Equal(t, "Lactação", models.PhaseLactacao.String())
+		assert.Equal(t, "Secando", models.PhaseSecando.String())
+		assert.Equal(t, "Vazias", models.PhaseVazias.String())
+		assert.Equal(t, "Prenhas", models.PhasePrenhas.String())
+		assert.Equal(t, "Desconhecida", models.ReproductionPhase(999).String())
+	})
 }

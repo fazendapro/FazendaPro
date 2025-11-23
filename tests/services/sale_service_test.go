@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fazendapro/FazendaPro-api/internal/cache"
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/repository"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
@@ -88,7 +89,8 @@ func (m *MockSaleRepository) Delete(ctx context.Context, id uint) error {
 func TestSaleService_CreateSale_Success(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	mockCache := new(MockCache)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, mockCache)
 
 	ctx := context.Background()
 	now := time.Now()
@@ -112,6 +114,10 @@ func TestSaleService_CreateSale_Success(t *testing.T) {
 	mockAnimalRepo.On("FindByID", uint(1)).Return(animal, nil)
 	mockSaleRepo.On("Create", ctx, sale).Return(nil)
 	mockAnimalRepo.On("Update", mock.AnythingOfType("*models.Animal")).Return(nil)
+	mockCache.On("Delete", "dashboard:overview:1").Return(nil)
+	for months := 6; months <= 24; months += 6 {
+		mockCache.On("Delete", mock.AnythingOfType("string")).Return(nil)
+	}
 
 	err := saleService.CreateSale(ctx, sale)
 
@@ -123,7 +129,7 @@ func TestSaleService_CreateSale_Success(t *testing.T) {
 func TestSaleService_CreateSale_AnimalNotFound(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, new(MockCache))
 
 	ctx := context.Background()
 	now := time.Now()
@@ -149,7 +155,7 @@ func TestSaleService_CreateSale_AnimalNotFound(t *testing.T) {
 func TestSaleService_CreateSale_AnimalAlreadySold(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, new(MockCache))
 
 	ctx := context.Background()
 	now := time.Now()
@@ -182,7 +188,7 @@ func TestSaleService_CreateSale_AnimalAlreadySold(t *testing.T) {
 func TestSaleService_CreateSale_InvalidData(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, new(MockCache))
 
 	ctx := context.Background()
 
@@ -256,7 +262,7 @@ func TestSaleService_CreateSale_InvalidData(t *testing.T) {
 func TestSaleService_GetSalesByFarmID(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, new(MockCache))
 
 	ctx := context.Background()
 	farmID := uint(1)
@@ -285,7 +291,7 @@ func TestSaleService_GetSalesByFarmID(t *testing.T) {
 func TestSaleService_GetSalesByAnimalID(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, new(MockCache))
 
 	ctx := context.Background()
 	animalID := uint(1)
@@ -314,7 +320,7 @@ func TestSaleService_GetSalesByAnimalID(t *testing.T) {
 func TestSaleService_GetSalesByDateRange(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, new(MockCache))
 
 	ctx := context.Background()
 	farmID := uint(1)
@@ -345,7 +351,7 @@ func TestSaleService_GetSalesByDateRange(t *testing.T) {
 func TestSaleService_GetSalesByDateRange_InvalidDateRange(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, new(MockCache))
 
 	ctx := context.Background()
 	farmID := uint(1)
@@ -362,7 +368,8 @@ func TestSaleService_GetSalesByDateRange_InvalidDateRange(t *testing.T) {
 func TestSaleService_UpdateSale_Success(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	mockCache := new(MockCache)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, mockCache)
 
 	ctx := context.Background()
 
@@ -377,6 +384,10 @@ func TestSaleService_UpdateSale_Success(t *testing.T) {
 	}
 
 	mockSaleRepo.On("Update", ctx, sale).Return(nil)
+	mockCache.On("Delete", "dashboard:overview:1").Return(nil)
+	for months := 6; months <= 24; months += 6 {
+		mockCache.On("Delete", mock.AnythingOfType("string")).Return(nil)
+	}
 
 	err := saleService.UpdateSale(ctx, sale)
 
@@ -387,7 +398,7 @@ func TestSaleService_UpdateSale_Success(t *testing.T) {
 func TestSaleService_UpdateSale_InvalidData(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, new(MockCache))
 
 	ctx := context.Background()
 
@@ -455,7 +466,8 @@ func TestSaleService_UpdateSale_InvalidData(t *testing.T) {
 func TestSaleService_DeleteSale_Success(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	mockCache := new(MockCache)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, mockCache)
 
 	ctx := context.Background()
 	saleID := uint(1)
@@ -480,6 +492,10 @@ func TestSaleService_DeleteSale_Success(t *testing.T) {
 	mockSaleRepo.On("Delete", ctx, saleID).Return(nil)
 	mockAnimalRepo.On("FindByID", uint(1)).Return(animal, nil)
 	mockAnimalRepo.On("Update", mock.AnythingOfType("*models.Animal")).Return(nil)
+	mockCache.On("Delete", "dashboard:overview:1").Return(nil)
+	for months := 6; months <= 24; months += 6 {
+		mockCache.On("Delete", mock.AnythingOfType("string")).Return(nil)
+	}
 
 	err := saleService.DeleteSale(ctx, saleID)
 
@@ -491,7 +507,7 @@ func TestSaleService_DeleteSale_Success(t *testing.T) {
 func TestSaleService_DeleteSale_NotFound(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, new(MockCache))
 
 	ctx := context.Background()
 	saleID := uint(1)
@@ -508,7 +524,8 @@ func TestSaleService_DeleteSale_NotFound(t *testing.T) {
 func TestSaleService_DeleteSale_WithAnimalUpdate(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	mockCache := new(MockCache)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, mockCache)
 
 	ctx := context.Background()
 	saleID := uint(1)
@@ -533,6 +550,10 @@ func TestSaleService_DeleteSale_WithAnimalUpdate(t *testing.T) {
 	mockSaleRepo.On("Delete", ctx, saleID).Return(nil)
 	mockAnimalRepo.On("FindByID", animalID).Return(animal, nil)
 	mockAnimalRepo.On("Update", mock.AnythingOfType("*models.Animal")).Return(nil)
+	mockCache.On("Delete", "dashboard:overview:1").Return(nil)
+	for months := 6; months <= 24; months += 6 {
+		mockCache.On("Delete", mock.AnythingOfType("string")).Return(nil)
+	}
 
 	err := saleService.DeleteSale(ctx, saleID)
 
@@ -544,7 +565,8 @@ func TestSaleService_DeleteSale_WithAnimalUpdate(t *testing.T) {
 func TestSaleService_DeleteSale_AnimalNotFound(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	mockCache := new(MockCache)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, mockCache)
 
 	ctx := context.Background()
 	saleID := uint(1)
@@ -562,6 +584,10 @@ func TestSaleService_DeleteSale_AnimalNotFound(t *testing.T) {
 	mockSaleRepo.On("GetByID", ctx, saleID).Return(sale, nil)
 	mockSaleRepo.On("Delete", ctx, saleID).Return(nil)
 	mockAnimalRepo.On("FindByID", animalID).Return(nil, errors.New("animal not found"))
+	mockCache.On("Delete", "dashboard:overview:1").Return(nil)
+	for months := 6; months <= 24; months += 6 {
+		mockCache.On("Delete", mock.AnythingOfType("string")).Return(nil)
+	}
 
 	err := saleService.DeleteSale(ctx, saleID)
 
@@ -573,7 +599,7 @@ func TestSaleService_DeleteSale_AnimalNotFound(t *testing.T) {
 func TestSaleService_GetSalesHistory(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, new(MockCache))
 
 	ctx := context.Background()
 	farmID := uint(1)
@@ -602,7 +628,8 @@ func TestSaleService_GetSalesHistory(t *testing.T) {
 func TestSaleService_GetOverviewStats_Success(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	mockCache := new(MockCache)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, mockCache)
 
 	ctx := context.Background()
 	farmID := uint(1)
@@ -614,7 +641,9 @@ func TestSaleService_GetOverviewStats_Success(t *testing.T) {
 		TotalRevenue: 15000.50,
 	}
 
+	mockCache.On("Get", "dashboard:overview:1", mock.Anything).Return(cache.ErrCacheMiss)
 	mockSaleRepo.On("GetOverviewStats", ctx, farmID).Return(expectedStats, nil)
+	mockCache.On("Set", "dashboard:overview:1", expectedStats, int32(600)).Return(nil)
 
 	stats, err := saleService.GetOverviewStats(ctx, farmID)
 
@@ -630,11 +659,13 @@ func TestSaleService_GetOverviewStats_Success(t *testing.T) {
 func TestSaleService_GetOverviewStats_RepositoryError(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	mockCache := new(MockCache)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, mockCache)
 
 	ctx := context.Background()
 	farmID := uint(1)
 
+	mockCache.On("Get", "dashboard:overview:1", mock.Anything).Return(cache.ErrCacheMiss)
 	mockSaleRepo.On("GetOverviewStats", ctx, farmID).Return(nil, assert.AnError)
 
 	stats, err := saleService.GetOverviewStats(ctx, farmID)
@@ -647,7 +678,7 @@ func TestSaleService_GetOverviewStats_RepositoryError(t *testing.T) {
 func TestSaleService_GetMonthlySalesCount(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, new(MockCache))
 
 	ctx := context.Background()
 	farmID := uint(1)
@@ -669,7 +700,7 @@ func TestSaleService_GetMonthlySalesCount(t *testing.T) {
 func TestSaleService_GetMonthlySalesCount_InvalidDateRange(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, new(MockCache))
 
 	ctx := context.Background()
 	farmID := uint(1)
@@ -688,7 +719,7 @@ func TestSaleService_GetMonthlySalesCount_InvalidDateRange(t *testing.T) {
 func TestSaleService_GetSaleByID_Success(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, new(MockCache))
 
 	ctx := context.Background()
 	saleID := uint(1)
@@ -714,7 +745,7 @@ func TestSaleService_GetSaleByID_Success(t *testing.T) {
 func TestSaleService_GetSaleByID_NotFound(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, new(MockCache))
 
 	ctx := context.Background()
 	saleID := uint(999)
@@ -731,7 +762,8 @@ func TestSaleService_GetSaleByID_NotFound(t *testing.T) {
 func TestSaleService_GetMonthlySalesData_Success(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	mockCache := new(MockCache)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, mockCache)
 
 	ctx := context.Background()
 	farmID := uint(1)
@@ -742,7 +774,9 @@ func TestSaleService_GetMonthlySalesData_Success(t *testing.T) {
 		{Month: "2024-02", Count: 3},
 	}
 
+	mockCache.On("Get", "dashboard:monthly:1:6", mock.Anything).Return(cache.ErrCacheMiss)
 	mockSaleRepo.On("GetMonthlySalesData", ctx, farmID, months).Return(expectedData, nil)
+	mockCache.On("Set", "dashboard:monthly:1:6", expectedData, int32(900)).Return(nil)
 
 	data, err := saleService.GetMonthlySalesData(ctx, farmID, months)
 
@@ -754,14 +788,17 @@ func TestSaleService_GetMonthlySalesData_Success(t *testing.T) {
 func TestSaleService_GetMonthlySalesData_DefaultMonths(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	mockCache := new(MockCache)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, mockCache)
 
 	ctx := context.Background()
 	farmID := uint(1)
 
 	expectedData := []repository.MonthlySalesData{}
 
+	mockCache.On("Get", "dashboard:monthly:1:12", mock.Anything).Return(cache.ErrCacheMiss)
 	mockSaleRepo.On("GetMonthlySalesData", ctx, farmID, 12).Return(expectedData, nil)
+	mockCache.On("Set", "dashboard:monthly:1:12", expectedData, int32(900)).Return(nil)
 
 	data, err := saleService.GetMonthlySalesData(ctx, farmID, 0)
 
@@ -773,14 +810,17 @@ func TestSaleService_GetMonthlySalesData_DefaultMonths(t *testing.T) {
 func TestSaleService_GetMonthlySalesData_MaxMonths(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	mockCache := new(MockCache)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, mockCache)
 
 	ctx := context.Background()
 	farmID := uint(1)
 
 	expectedData := []repository.MonthlySalesData{}
 
+	mockCache.On("Get", "dashboard:monthly:1:24", mock.Anything).Return(cache.ErrCacheMiss)
 	mockSaleRepo.On("GetMonthlySalesData", ctx, farmID, 24).Return(expectedData, nil)
+	mockCache.On("Set", "dashboard:monthly:1:24", expectedData, int32(900)).Return(nil)
 
 	data, err := saleService.GetMonthlySalesData(ctx, farmID, 30)
 
@@ -792,12 +832,14 @@ func TestSaleService_GetMonthlySalesData_MaxMonths(t *testing.T) {
 func TestSaleService_GetMonthlySalesData_RepositoryError(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	mockCache := new(MockCache)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, mockCache)
 
 	ctx := context.Background()
 	farmID := uint(1)
 	months := 6
 
+	mockCache.On("Get", "dashboard:monthly:1:6", mock.Anything).Return(cache.ErrCacheMiss)
 	mockSaleRepo.On("GetMonthlySalesData", ctx, farmID, months).Return(nil, errors.New("database error"))
 
 	data, err := saleService.GetMonthlySalesData(ctx, farmID, months)
@@ -810,7 +852,7 @@ func TestSaleService_GetMonthlySalesData_RepositoryError(t *testing.T) {
 func TestSaleService_CreateSale_AnimalWrongFarm(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, new(MockCache))
 
 	ctx := context.Background()
 	now := time.Now()
@@ -843,7 +885,7 @@ func TestSaleService_CreateSale_AnimalWrongFarm(t *testing.T) {
 func TestSaleService_CreateSale_UpdateAnimalStatusFails(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, new(MockCache))
 
 	ctx := context.Background()
 	now := time.Now()
@@ -880,13 +922,15 @@ func TestSaleService_CreateSale_UpdateAnimalStatusFails(t *testing.T) {
 func TestSaleService_UpdateSale_RepositoryError(t *testing.T) {
 	mockSaleRepo := new(MockSaleRepository)
 	mockAnimalRepo := new(MockAnimalRepository)
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	mockCache := new(MockCache)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, mockCache)
 
 	ctx := context.Background()
 	now := time.Now()
 
 	sale := &models.Sale{
 		ID:        1,
+		FarmID:    1,
 		BuyerName: "Comprador Atualizado",
 		Price:     2000.0,
 		SaleDate:  now,

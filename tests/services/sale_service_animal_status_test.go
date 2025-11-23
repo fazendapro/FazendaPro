@@ -14,8 +14,9 @@ import (
 func TestCreateSale_UpdatesAnimalStatus(t *testing.T) {
 	mockSaleRepo := &MockSaleRepository{}
 	mockAnimalRepo := &MockAnimalRepository{}
+	mockCache := new(MockCache)
 
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, mockCache)
 
 	animal := &models.Animal{
 		ID:     1,
@@ -37,6 +38,10 @@ func TestCreateSale_UpdatesAnimalStatus(t *testing.T) {
 	mockAnimalRepo.On("Update", mock.MatchedBy(func(a *models.Animal) bool {
 		return a.Status == models.AnimalStatusSold
 	})).Return(nil)
+	mockCache.On("Delete", "dashboard:overview:1").Return(nil)
+	for months := 6; months <= 24; months += 6 {
+		mockCache.On("Delete", mock.AnythingOfType("string")).Return(nil)
+	}
 
 	err := saleService.CreateSale(context.Background(), sale)
 
@@ -49,7 +54,7 @@ func TestCreateSale_PreventsSaleOfAlreadySoldAnimal(t *testing.T) {
 	mockSaleRepo := &MockSaleRepository{}
 	mockAnimalRepo := &MockAnimalRepository{}
 
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, new(MockCache))
 
 	animal := &models.Animal{
 		ID:     1,
@@ -79,8 +84,9 @@ func TestCreateSale_PreventsSaleOfAlreadySoldAnimal(t *testing.T) {
 func TestDeleteSale_RevertsAnimalStatus(t *testing.T) {
 	mockSaleRepo := &MockSaleRepository{}
 	mockAnimalRepo := &MockAnimalRepository{}
+	mockCache := new(MockCache)
 
-	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, mockCache)
 
 	sale := &models.Sale{
 		ID:       1,
@@ -100,6 +106,10 @@ func TestDeleteSale_RevertsAnimalStatus(t *testing.T) {
 	mockAnimalRepo.On("Update", mock.MatchedBy(func(a *models.Animal) bool {
 		return a.Status == models.AnimalStatusActive
 	})).Return(nil)
+	mockCache.On("Delete", "dashboard:overview:1").Return(nil)
+	for months := 6; months <= 24; months += 6 {
+		mockCache.On("Delete", mock.AnythingOfType("string")).Return(nil)
+	}
 
 	err := saleService.DeleteSale(context.Background(), 1)
 
