@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fazendapro/FazendaPro-api/internal/cache"
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
 	"github.com/stretchr/testify/assert"
@@ -14,7 +15,8 @@ import (
 
 func TestAnimalService_CreateAnimal(t *testing.T) {
 	mockRepo := new(MockAnimalRepository)
-	service := service.NewAnimalService(mockRepo)
+	mockCache := new(MockCache)
+	service := service.NewAnimalService(mockRepo, mockCache)
 
 	animal := &models.Animal{
 		FarmID:               1,
@@ -35,6 +37,7 @@ func TestAnimalService_CreateAnimal(t *testing.T) {
 
 	mockRepo.On("FindByEarTagNumber", uint(1), 123).Return((*models.Animal)(nil), nil)
 	mockRepo.On("Create", animal).Return(nil)
+	mockCache.On("Delete", mock.AnythingOfType("string")).Return(nil)
 
 	err := service.CreateAnimal(animal)
 
@@ -44,7 +47,7 @@ func TestAnimalService_CreateAnimal(t *testing.T) {
 
 func TestAnimalService_CreateAnimal_InvalidSex(t *testing.T) {
 	mockRepo := new(MockAnimalRepository)
-	service := service.NewAnimalService(mockRepo)
+	service := service.NewAnimalService(mockRepo, new(MockCache))
 
 	animal := &models.Animal{
 		FarmID:            1,
@@ -70,7 +73,7 @@ func TestAnimalService_CreateAnimal_InvalidSex(t *testing.T) {
 
 func TestAnimalService_CreateAnimal_InvalidAnimalType(t *testing.T) {
 	mockRepo := new(MockAnimalRepository)
-	service := service.NewAnimalService(mockRepo)
+	service := service.NewAnimalService(mockRepo, new(MockCache))
 
 	animal := &models.Animal{
 		FarmID:            1,
@@ -96,7 +99,7 @@ func TestAnimalService_CreateAnimal_InvalidAnimalType(t *testing.T) {
 
 func TestAnimalService_CreateAnimal_InvalidPurpose(t *testing.T) {
 	mockRepo := new(MockAnimalRepository)
-	service := service.NewAnimalService(mockRepo)
+	service := service.NewAnimalService(mockRepo, new(MockCache))
 
 	animal := &models.Animal{
 		FarmID:            1,
@@ -122,7 +125,7 @@ func TestAnimalService_CreateAnimal_InvalidPurpose(t *testing.T) {
 
 func TestAnimalService_GetAnimalByID(t *testing.T) {
 	mockRepo := new(MockAnimalRepository)
-	service := service.NewAnimalService(mockRepo)
+	service := service.NewAnimalService(mockRepo, new(MockCache))
 
 	expectedAnimal := &models.Animal{
 		ID:                   1,
@@ -153,7 +156,7 @@ func TestAnimalService_GetAnimalByID(t *testing.T) {
 
 func TestAnimalService_GetAnimalByID_NotFound(t *testing.T) {
 	mockRepo := new(MockAnimalRepository)
-	service := service.NewAnimalService(mockRepo)
+	service := service.NewAnimalService(mockRepo, new(MockCache))
 
 	mockRepo.On("FindByID", uint(999)).Return(nil, gorm.ErrRecordNotFound)
 
@@ -166,7 +169,8 @@ func TestAnimalService_GetAnimalByID_NotFound(t *testing.T) {
 
 func TestAnimalService_GetAnimalsByFarmID(t *testing.T) {
 	mockRepo := new(MockAnimalRepository)
-	service := service.NewAnimalService(mockRepo)
+	mockCache := new(MockCache)
+	service := service.NewAnimalService(mockRepo, mockCache)
 
 	expectedAnimals := []models.Animal{
 		{
@@ -189,7 +193,9 @@ func TestAnimalService_GetAnimalsByFarmID(t *testing.T) {
 		},
 	}
 
+	mockCache.On("Get", "animals:farm:1", mock.Anything).Return(cache.ErrCacheMiss)
 	mockRepo.On("FindByFarmID", uint(1)).Return(expectedAnimals, nil)
+	mockCache.On("Set", "animals:farm:1", expectedAnimals, int32(300)).Return(nil)
 
 	animals, err := service.GetAnimalsByFarmID(1)
 
@@ -200,7 +206,7 @@ func TestAnimalService_GetAnimalsByFarmID(t *testing.T) {
 
 func TestAnimalService_GetAnimalsByFarmIDAndSex(t *testing.T) {
 	mockRepo := new(MockAnimalRepository)
-	service := service.NewAnimalService(mockRepo)
+	service := service.NewAnimalService(mockRepo, new(MockCache))
 
 	expectedAnimals := []models.Animal{
 		{
@@ -234,7 +240,8 @@ func TestAnimalService_GetAnimalsByFarmIDAndSex(t *testing.T) {
 
 func TestAnimalService_UpdateAnimal(t *testing.T) {
 	mockRepo := new(MockAnimalRepository)
-	service := service.NewAnimalService(mockRepo)
+	mockCache := new(MockCache)
+	service := service.NewAnimalService(mockRepo, mockCache)
 
 	existingAnimal := &models.Animal{
 		ID:                   1,
@@ -278,6 +285,7 @@ func TestAnimalService_UpdateAnimal(t *testing.T) {
 
 	mockRepo.On("FindByID", uint(1)).Return(existingAnimal, nil)
 	mockRepo.On("Update", mock.AnythingOfType("*models.Animal")).Return(nil)
+	mockCache.On("Delete", "animals:farm:1").Return(nil)
 
 	err := service.UpdateAnimal(updatedAnimal)
 
@@ -287,7 +295,7 @@ func TestAnimalService_UpdateAnimal(t *testing.T) {
 
 func TestAnimalService_UpdateAnimal_NotFound(t *testing.T) {
 	mockRepo := new(MockAnimalRepository)
-	service := service.NewAnimalService(mockRepo)
+	service := service.NewAnimalService(mockRepo, new(MockCache))
 
 	animal := &models.Animal{
 		ID:     999,
@@ -305,7 +313,7 @@ func TestAnimalService_UpdateAnimal_NotFound(t *testing.T) {
 
 func TestAnimalService_UpdateAnimal_InvalidSex(t *testing.T) {
 	mockRepo := new(MockAnimalRepository)
-	service := service.NewAnimalService(mockRepo)
+	service := service.NewAnimalService(mockRepo, new(MockCache))
 
 	animal := &models.Animal{
 		ID:     1,
@@ -329,7 +337,8 @@ func TestAnimalService_UpdateAnimal_InvalidSex(t *testing.T) {
 
 func TestAnimalService_DeleteAnimal(t *testing.T) {
 	mockRepo := new(MockAnimalRepository)
-	service := service.NewAnimalService(mockRepo)
+	mockCache := new(MockCache)
+	service := service.NewAnimalService(mockRepo, mockCache)
 
 	existingAnimal := &models.Animal{
 		ID:     1,
@@ -338,6 +347,7 @@ func TestAnimalService_DeleteAnimal(t *testing.T) {
 
 	mockRepo.On("FindByID", uint(1)).Return(existingAnimal, nil)
 	mockRepo.On("Delete", uint(1)).Return(nil)
+	mockCache.On("Delete", "animals:farm:1").Return(nil)
 
 	err := service.DeleteAnimal(1)
 
@@ -347,7 +357,7 @@ func TestAnimalService_DeleteAnimal(t *testing.T) {
 
 func TestAnimalService_DeleteAnimal_NotFound(t *testing.T) {
 	mockRepo := new(MockAnimalRepository)
-	service := service.NewAnimalService(mockRepo)
+	service := service.NewAnimalService(mockRepo, new(MockCache))
 
 	mockRepo.On("FindByID", uint(999)).Return(nil, nil)
 
@@ -360,7 +370,7 @@ func TestAnimalService_DeleteAnimal_NotFound(t *testing.T) {
 
 func TestAnimalService_DeleteAnimal_InvalidID(t *testing.T) {
 	mockRepo := new(MockAnimalRepository)
-	service := service.NewAnimalService(mockRepo)
+	service := service.NewAnimalService(mockRepo, new(MockCache))
 
 	err := service.DeleteAnimal(0)
 
@@ -370,7 +380,7 @@ func TestAnimalService_DeleteAnimal_InvalidID(t *testing.T) {
 
 func TestAnimalService_UpdateAnimal_InvalidID(t *testing.T) {
 	mockRepo := new(MockAnimalRepository)
-	service := service.NewAnimalService(mockRepo)
+	service := service.NewAnimalService(mockRepo, new(MockCache))
 
 	animal := &models.Animal{
 		ID: 0,
@@ -384,12 +394,12 @@ func TestAnimalService_UpdateAnimal_InvalidID(t *testing.T) {
 
 func TestAnimalService_CreateAnimal_MissingFields(t *testing.T) {
 	mockRepo := new(MockAnimalRepository)
-	service := service.NewAnimalService(mockRepo)
+	service := service.NewAnimalService(mockRepo, new(MockCache))
 
 	testCases := []struct {
-		name      string
-		animal    *models.Animal
-		errorMsg  string
+		name     string
+		animal   *models.Animal
+		errorMsg string
 	}{
 		{
 			name:     "MissingFarmID",
@@ -429,7 +439,7 @@ func TestAnimalService_CreateAnimal_MissingFields(t *testing.T) {
 
 func TestAnimalService_CreateAnimal_RepositoryError(t *testing.T) {
 	mockRepo := new(MockAnimalRepository)
-	service := service.NewAnimalService(mockRepo)
+	service := service.NewAnimalService(mockRepo, new(MockCache))
 
 	animal := &models.Animal{
 		FarmID:            1,
@@ -453,7 +463,7 @@ func TestAnimalService_CreateAnimal_RepositoryError(t *testing.T) {
 
 func TestAnimalService_UpdateAnimal_RepositoryError(t *testing.T) {
 	mockRepo := new(MockAnimalRepository)
-	service := service.NewAnimalService(mockRepo)
+	service := service.NewAnimalService(mockRepo, new(MockCache))
 
 	animal := &models.Animal{
 		ID:     1,
@@ -471,7 +481,7 @@ func TestAnimalService_UpdateAnimal_RepositoryError(t *testing.T) {
 
 func TestAnimalService_DeleteAnimal_RepositoryError(t *testing.T) {
 	mockRepo := new(MockAnimalRepository)
-	service := service.NewAnimalService(mockRepo)
+	service := service.NewAnimalService(mockRepo, new(MockCache))
 
 	mockRepo.On("FindByID", uint(1)).Return(nil, errors.New("database error"))
 
