@@ -125,3 +125,27 @@ func (m *MockRefreshTokenRepository) DeleteExpired() error {
 	args := m.Called()
 	return args.Error(0)
 }
+
+type MockCache struct {
+	mock.Mock
+}
+
+func (m *MockCache) Get(key string, dest interface{}) error {
+	args := m.Called(key, dest)
+	return args.Error(0)
+}
+
+func (m *MockCache) Set(key string, value interface{}, expiration int32) error {
+	args := m.Called(key, value, expiration)
+	return args.Error(0)
+}
+
+func (m *MockCache) Delete(key string) error {
+	args := m.Called(key)
+	return args.Error(0)
+}
+
+func (m *MockCache) Increment(key string, delta uint64) (uint64, error) {
+	args := m.Called(key, delta)
+	return args.Get(0).(uint64), args.Error(1)
+}

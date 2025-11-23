@@ -340,3 +340,145 @@ func TestSaleRepository_GetMonthlySalesCount(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, int64(2), count)
 }
+
+func TestSaleRepository_GetMonthlySalesData(t *testing.T) {
+	db := setupSaleTestDB(t)
+	repo := repository.NewSaleRepository(db)
+
+	farm := createTestFarm(t, db)
+
+	animal := &models.Animal{
+		FarmID:     farm.ID,
+		AnimalName: "Test Animal",
+		Sex:        0,
+		Breed:      "Holstein",
+		Type:       "Cattle",
+		AnimalType: 0,
+		Status:     0,
+		Purpose:    0,
+	}
+	db.Create(animal)
+
+	now := time.Now()
+	currentYear := now.Year()
+	currentMonth := int(now.Month())
+
+	sale1 := &models.Sale{
+		AnimalID:  animal.ID,
+		FarmID:    farm.ID,
+		BuyerName: "Buyer 1",
+		Price:     1500.50,
+		SaleDate:  time.Date(currentYear, time.Month(currentMonth), 5, 0, 0, 0, 0, time.UTC),
+	}
+	db.Create(sale1)
+
+	sale2 := &models.Sale{
+		AnimalID:  animal.ID,
+		FarmID:    farm.ID,
+		BuyerName: "Buyer 2",
+		Price:     2000.00,
+		SaleDate:  time.Date(currentYear, time.Month(currentMonth), 15, 0, 0, 0, 0, time.UTC),
+	}
+	db.Create(sale2)
+
+	lastMonth := currentMonth - 1
+	if lastMonth == 0 {
+		lastMonth = 12
+		currentYear--
+	}
+	sale3 := &models.Sale{
+		AnimalID:  animal.ID,
+		FarmID:    farm.ID,
+		BuyerName: "Buyer 3",
+		Price:     1800.00,
+		SaleDate:  time.Date(currentYear, time.Month(lastMonth), 10, 0, 0, 0, 0, time.UTC),
+	}
+	db.Create(sale3)
+
+	monthlyData, err := repo.GetMonthlySalesData(context.Background(), farm.ID, 6)
+	assert.NoError(t, err)
+	assert.Len(t, monthlyData, 6)
+
+	for i := 0; i < len(monthlyData)-1; i++ {
+		if monthlyData[i].Year == monthlyData[i+1].Year {
+			assert.True(t, monthlyData[i].Month <= monthlyData[i+1].Month)
+		} else {
+			assert.True(t, monthlyData[i].Year < monthlyData[i+1].Year)
+		}
+	}
+
+	validMonths := []string{"Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"}
+	for _, data := range monthlyData {
+		assert.Contains(t, validMonths, data.Month)
+	}
+}
+
+func TestSaleRepository_GetMonthlySalesData_Empty(t *testing.T) {
+	db := setupSaleTestDB(t)
+	repo := repository.NewSaleRepository(db)
+
+	farm := createTestFarm(t, db)
+
+	monthlyData, err := repo.GetMonthlySalesData(context.Background(), farm.ID, 6)
+	assert.NoError(t, err)
+	assert.Len(t, monthlyData, 6)
+
+	for _, data := range monthlyData {
+		assert.Equal(t, 0.0, data.Sales)
+		assert.Equal(t, int64(0), data.Count)
+	}
+}
+
+func TestSaleRepository_GetMonthlySalesData_MultipleMonths(t *testing.T) {
+	db := setupSaleTestDB(t)
+	repo := repository.NewSaleRepository(db)
+
+	farm := createTestFarm(t, db)
+
+	animal := &models.Animal{
+		FarmID:     farm.ID,
+		AnimalName: "Test Animal",
+		Sex:        0,
+		Breed:      "Holstein",
+		Type:       "Cattle",
+		AnimalType: 0,
+		Status:     0,
+		Purpose:    0,
+	}
+	db.Create(animal)
+
+	now := time.Now()
+	currentYear := now.Year()
+	currentMonth := int(now.Month())
+
+	for i := 0; i < 3; i++ {
+		month := currentMonth - i
+		year := currentYear
+		if month <= 0 {
+			month += 12
+			year--
+		}
+
+		sale := &models.Sale{
+			AnimalID:  animal.ID,
+			FarmID:    farm.ID,
+			BuyerName: "Buyer",
+			Price:     1000.0 * float64(i+1),
+			SaleDate:  time.Date(year, time.Month(month), 10, 0, 0, 0, 0, time.UTC),
+		}
+		db.Create(sale)
+	}
+
+	monthlyData, err := repo.GetMonthlySalesData(context.Background(), farm.ID, 6)
+	assert.NoError(t, err)
+	assert.Len(t, monthlyData, 6)
+
+	hasData := false
+	for _, data := range monthlyData {
+		if data.Sales > 0 || data.Count > 0 {
+			hasData = true
+			break
+		}
+	}
+	assert.True(t, hasData)
+}
