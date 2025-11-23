@@ -11,15 +11,17 @@ import (
 )
 
 type Config struct {
-	Port      string
-	JWTSecret string
-	SentryDSN string
-	DBHost    string
-	DBPort    string
-	User      string
-	Password  string
-	Name      string
-	CORS      CORSConfig
+	Port         string
+	JWTSecret    string
+	SentryDSN    string
+	DBHost       string
+	DBPort       string
+	User         string
+	Password     string
+	Name         string
+	MemcachedHost string
+	MemcachedPort string
+	CORS         CORSConfig
 }
 
 type CORSConfig struct {
@@ -72,15 +74,17 @@ func Load() (*Config, error) {
 		dbName)
 
 	return &Config{
-		Port:      getEnvWithDefault("PORT", "8080"),
-		JWTSecret: getEnvWithDefault("JWT_SECRET", "dev-secret-key"),
-		SentryDSN: getEnvWithDefault("SENTRY_DSN", ""),
-		DBHost:    dbHost,
-		DBPort:    dbPort,
-		User:      dbUser,
-		Password:  dbPassword,
-		Name:      dbName,
-		CORS:      loadCORSConfig(),
+		Port:          getEnvWithDefault("PORT", "8080"),
+		JWTSecret:     getEnvWithDefault("JWT_SECRET", "dev-secret-key"),
+		SentryDSN:     getEnvWithDefault("SENTRY_DSN", ""),
+		DBHost:        dbHost,
+		DBPort:        dbPort,
+		User:          dbUser,
+		Password:      dbPassword,
+		Name:          dbName,
+		MemcachedHost: getEnvWithDefault("MEMCACHED_HOST", "localhost"),
+		MemcachedPort: getEnvWithDefault("MEMCACHED_PORT", "11211"),
+		CORS:          loadCORSConfig(),
 	}, nil
 }
 

@@ -8,6 +8,7 @@ import (
 	"github.com/fazendapro/FazendaPro-api/config"
 	"github.com/fazendapro/FazendaPro-api/internal/api/handlers"
 	"github.com/fazendapro/FazendaPro-api/internal/api/middleware"
+	"github.com/fazendapro/FazendaPro-api/internal/cache"
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/repository"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
@@ -42,8 +43,15 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 		w.Write([]byte("FazendaPro API is running!"))
 	})
 
+	var cacheClient cache.CacheInterface
 	if db != nil && db.DB != nil {
-		repoFactory := repository.NewRepositoryFactory(db)
+		memcachedServer := fmt.Sprintf("%s:%s", cfg.MemcachedHost, cfg.MemcachedPort)
+		cacheClient = cache.NewMemcacheClient(memcachedServer)
+		app.Logger.Printf("Cache Memcached inicializado em %s", memcachedServer)
+	}
+
+	if db != nil && db.DB != nil {
+		repoFactory := repository.NewRepositoryFactory(db, cacheClient)
 		serviceFactory := service.NewServiceFactory(repoFactory)
 		debtService := serviceFactory.CreateDebtService()
 		debtHandler := handlers.NewDebtHandler(debtService)
@@ -96,7 +104,7 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 
 	if db != nil && db.DB != nil {
 		app.Logger.Println("Database conectado - configurando rotas de dados")
-		repoFactory := repository.NewRepositoryFactory(db)
+		repoFactory := repository.NewRepositoryFactory(db, cacheClient)
 		serviceFactory := service.NewServiceFactory(repoFactory)
 
 		r.Route("/api/v1", func(r chi.Router) {
