@@ -7,6 +7,7 @@ const (
 	ErrInternalServer         = "Erro interno do servidor"
 	ErrGenerateToken          = "Erro ao gerar token"
 	ErrFarmIDNotFound         = "Farm ID not found in context"
+	ErrInvalidFarmID          = "ID da fazenda inválido"
 	ErrInvalidSaleID          = "Invalid sale ID"
 	ErrSaleNotFound           = "Sale not found"
 	ErrSaleNotBelongsToFarm   = "Sale does not belong to the specified farm"

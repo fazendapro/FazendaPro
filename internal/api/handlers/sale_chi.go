@@ -419,10 +419,23 @@ func (h *SaleChiHandler) GetMonthlySalesStats(w http.ResponseWriter, r *http.Req
 }
 
 func (h *SaleChiHandler) GetMonthlySalesAndPurchases(w http.ResponseWriter, r *http.Request) {
-	farmID, ok := r.Context().Value("farm_id").(uint)
-	if !ok {
-		SendErrorResponse(w, ErrFarmIDNotFound, http.StatusUnauthorized)
-		return
+	farmIDStr := r.URL.Query().Get("farmId")
+	var farmID uint
+
+	if farmIDStr != "" {
+		id, parseErr := strconv.ParseUint(farmIDStr, 10, 32)
+		if parseErr != nil {
+			SendErrorResponse(w, ErrInvalidFarmID, http.StatusBadRequest)
+			return
+		}
+		farmID = uint(id)
+	} else {
+		farmIDFromContext, ok := r.Context().Value("farm_id").(uint)
+		if !ok {
+			SendErrorResponse(w, ErrFarmIDNotFound, http.StatusUnauthorized)
+			return
+		}
+		farmID = farmIDFromContext
 	}
 
 	monthsStr := r.URL.Query().Get("months")
