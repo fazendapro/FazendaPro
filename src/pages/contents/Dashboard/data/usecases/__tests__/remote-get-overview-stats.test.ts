@@ -47,6 +47,7 @@ describe('RemoteGetOverviewStats', () => {
     expect(mockApiInstance.get).toHaveBeenCalledWith(
       '/sales/overview',
       {
+        params: { farmId: 1 },
         headers: { 'Content-Type': 'application/json' }
       }
     );

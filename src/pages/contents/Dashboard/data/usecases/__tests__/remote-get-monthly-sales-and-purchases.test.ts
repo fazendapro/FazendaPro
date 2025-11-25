@@ -54,7 +54,7 @@ describe('RemoteGetMonthlySalesAndPurchases', () => {
     expect(mockApiInstance.get).toHaveBeenCalledWith(
       '/sales/monthly-data',
       {
-        params: { months: 12 },
+        params: { farmId: 1, months: 12 },
         headers: { 'Content-Type': 'application/json' }
       }
     );
@@ -91,7 +91,7 @@ describe('RemoteGetMonthlySalesAndPurchases', () => {
     expect(mockApiInstance.get).toHaveBeenCalledWith(
       '/sales/monthly-data',
       {
-        params: {},
+        params: { farmId: 1 },
         headers: { 'Content-Type': 'application/json' }
       }
     );
@@ -225,7 +225,7 @@ describe('RemoteGetMonthlySalesAndPurchases', () => {
     expect(mockApiInstance.get).toHaveBeenCalledWith(
       '/sales/monthly-data',
       {
-        params: { months: 6 },
+        params: { farmId: 2, months: 6 },
         headers: { 'Content-Type': 'application/json' }
       }
     );
