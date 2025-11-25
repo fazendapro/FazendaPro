@@ -14,15 +14,15 @@ import (
 
 type SaleService interface {
 	CreateSale(ctx context.Context, sale *models.Sale) error
-	GetSaleByID(ctx context.Context, id uint) (*models.Sale, error)
+	GetSaleByID(ctx context.Context, id uint, farmID uint) (*models.Sale, error)
 	GetSalesByFarmID(ctx context.Context, farmID uint) ([]*models.Sale, error)
-	GetSalesByAnimalID(ctx context.Context, animalID uint) ([]*models.Sale, error)
+	GetSalesByAnimalID(ctx context.Context, animalID uint, farmID uint) ([]*models.Sale, error)
 	GetSalesByDateRange(ctx context.Context, farmID uint, startDate, endDate time.Time) ([]*models.Sale, error)
 	GetMonthlySalesCount(ctx context.Context, farmID uint, startDate, endDate time.Time) (int64, error)
 	GetMonthlySalesData(ctx context.Context, farmID uint, months int) ([]repository.MonthlySalesData, error)
 	GetOverviewStats(ctx context.Context, farmID uint) (*repository.OverviewStats, error)
-	UpdateSale(ctx context.Context, sale *models.Sale) error
-	DeleteSale(ctx context.Context, id uint) error
+	UpdateSale(ctx context.Context, sale *models.Sale, farmID uint) error
+	DeleteSale(ctx context.Context, id uint, farmID uint) error
 	GetSalesHistory(ctx context.Context, farmID uint) ([]*models.Sale, error)
 }
 
@@ -77,7 +77,7 @@ func (s *saleService) CreateSale(ctx context.Context, sale *models.Sale) error {
 	animal.Status = models.AnimalStatusSold
 	err = s.animalRepo.Update(animal)
 	if err != nil {
-		s.saleRepo.Delete(ctx, sale.ID)
+		s.saleRepo.Delete(ctx, sale.ID, sale.FarmID)
 		return errors.New("failed to update animal status")
 	}
 
@@ -86,16 +86,28 @@ func (s *saleService) CreateSale(ctx context.Context, sale *models.Sale) error {
 	return nil
 }
 
-func (s *saleService) GetSaleByID(ctx context.Context, id uint) (*models.Sale, error) {
-	return s.saleRepo.GetByID(ctx, id)
+func (s *saleService) GetSaleByID(ctx context.Context, id uint, farmID uint) (*models.Sale, error) {
+	return s.saleRepo.GetByID(ctx, id, farmID)
 }
 
 func (s *saleService) GetSalesByFarmID(ctx context.Context, farmID uint) ([]*models.Sale, error) {
 	return s.saleRepo.GetByFarmID(ctx, farmID)
 }
 
-func (s *saleService) GetSalesByAnimalID(ctx context.Context, animalID uint) ([]*models.Sale, error) {
-	return s.saleRepo.GetByAnimalID(ctx, animalID)
+func (s *saleService) GetSalesByAnimalID(ctx context.Context, animalID uint, farmID uint) ([]*models.Sale, error) {
+	// Validar que o animal pertence à fazenda
+	animal, err := s.animalRepo.FindByID(animalID)
+	if err != nil {
+		return nil, errors.New("animal not found")
+	}
+	if animal == nil {
+		return nil, errors.New("animal not found")
+	}
+	if animal.FarmID != farmID {
+		return nil, errors.New("animal does not belong to the specified farm")
+	}
+	
+	return s.saleRepo.GetByAnimalID(ctx, animalID, farmID)
 }
 
 func (s *saleService) GetSalesByDateRange(ctx context.Context, farmID uint, startDate, endDate time.Time) ([]*models.Sale, error) {
@@ -165,7 +177,7 @@ func (s *saleService) GetOverviewStats(ctx context.Context, farmID uint) (*repos
 	return stats, nil
 }
 
-func (s *saleService) UpdateSale(ctx context.Context, sale *models.Sale) error {
+func (s *saleService) UpdateSale(ctx context.Context, sale *models.Sale, farmID uint) error {
 	if sale.ID == 0 {
 		return errors.New("sale ID is required")
 	}
@@ -179,34 +191,51 @@ func (s *saleService) UpdateSale(ctx context.Context, sale *models.Sale) error {
 		return errors.New("sale date is required")
 	}
 
-	err := s.saleRepo.Update(ctx, sale)
+	// Validar que a venda pertence à fazenda
+	existingSale, err := s.saleRepo.GetByID(ctx, sale.ID, farmID)
+	if err != nil {
+		return errors.New("sale not found or does not belong to farm")
+	}
+	if existingSale == nil {
+		return errors.New("sale not found or does not belong to farm")
+	}
+
+	// Garantir que o FarmID não pode ser alterado
+	sale.FarmID = farmID
+	sale.AnimalID = existingSale.AnimalID
+
+	err = s.saleRepo.Update(ctx, sale)
 	if err != nil {
 		return err
 	}
 
-	s.invalidateDashboardCache(sale.FarmID)
+	s.invalidateDashboardCache(farmID)
 
 	return nil
 }
 
-func (s *saleService) DeleteSale(ctx context.Context, id uint) error {
-	sale, err := s.saleRepo.GetByID(ctx, id)
+func (s *saleService) DeleteSale(ctx context.Context, id uint, farmID uint) error {
+	// Validar que a venda pertence à fazenda
+	sale, err := s.saleRepo.GetByID(ctx, id, farmID)
 	if err != nil {
-		return errors.New("sale not found")
+		return errors.New("sale not found or does not belong to farm")
+	}
+	if sale == nil {
+		return errors.New("sale not found or does not belong to farm")
 	}
 
-	err = s.saleRepo.Delete(ctx, id)
+	err = s.saleRepo.Delete(ctx, id, farmID)
 	if err != nil {
 		return err
 	}
 
 	animal, err := s.animalRepo.FindByID(sale.AnimalID)
-	if err == nil {
+	if err == nil && animal != nil {
 		animal.Status = models.AnimalStatusActive
 		s.animalRepo.Update(animal)
 	}
 
-	s.invalidateDashboardCache(sale.FarmID)
+	s.invalidateDashboardCache(farmID)
 
 	return nil
 }

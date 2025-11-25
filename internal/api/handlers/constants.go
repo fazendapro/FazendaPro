@@ -1,13 +1,17 @@
 package handlers
 
 const (
-	ErrMethodNotAllowed = "Método não permitido"
-	ErrAnimalIDRequired = "ID do animal é obrigatório"
-	ErrDecodeJSON       = "Erro ao decodificar JSON: "
-	ErrInternalServer   = "Erro interno do servidor"
-	ErrGenerateToken    = "Erro ao gerar token"
-	ErrFarmIDNotFound   = "Farm ID not found in context"
-	ErrInvalidSaleID    = "Invalid sale ID"
+	ErrMethodNotAllowed       = "Método não permitido"
+	ErrAnimalIDRequired       = "ID do animal é obrigatório"
+	ErrDecodeJSON             = "Erro ao decodificar JSON: "
+	ErrInternalServer         = "Erro interno do servidor"
+	ErrGenerateToken          = "Erro ao gerar token"
+	ErrFarmIDNotFound         = "Farm ID not found in context"
+	ErrInvalidSaleID          = "Invalid sale ID"
+	ErrSaleNotFound           = "Sale not found"
+	ErrSaleNotBelongsToFarm   = "Sale does not belong to the specified farm"
+	ErrAnimalNotBelongsToFarm = "Animal does not belong to the specified farm"
+	ErrInvalidMonthsParam     = "Invalid months parameter"
 )
 
 const (
