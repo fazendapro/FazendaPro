@@ -91,7 +91,7 @@ func TestSaleRepository_GetByID(t *testing.T) {
 	}
 	db.Create(sale)
 
-	retrievedSale, err := repo.GetByID(context.Background(), sale.ID)
+	retrievedSale, err := repo.GetByID(context.Background(), sale.ID, sale.FarmID)
 	assert.NoError(t, err)
 	assert.Equal(t, sale.ID, retrievedSale.ID)
 	assert.Equal(t, "João Silva", retrievedSale.BuyerName)
@@ -165,7 +165,7 @@ func TestSaleRepository_GetByAnimalID(t *testing.T) {
 	}
 	db.Create(sale)
 
-	sales, err := repo.GetByAnimalID(context.Background(), animal.ID)
+	sales, err := repo.GetByAnimalID(context.Background(), animal.ID, animal.FarmID)
 	assert.NoError(t, err)
 	assert.Len(t, sales, 1)
 	assert.Equal(t, sale.ID, sales[0].ID)
@@ -248,7 +248,7 @@ func TestSaleRepository_Update(t *testing.T) {
 	err := repo.Update(context.Background(), sale)
 	assert.NoError(t, err)
 
-	updatedSale, err := repo.GetByID(context.Background(), sale.ID)
+	updatedSale, err := repo.GetByID(context.Background(), sale.ID, sale.FarmID)
 	assert.NoError(t, err)
 	assert.Equal(t, "Updated Buyer", updatedSale.BuyerName)
 	assert.Equal(t, 2000.00, updatedSale.Price)
@@ -280,10 +280,10 @@ func TestSaleRepository_Delete(t *testing.T) {
 	}
 	db.Create(sale)
 
-	err := repo.Delete(context.Background(), sale.ID)
+	err := repo.Delete(context.Background(), sale.ID, sale.FarmID)
 	assert.NoError(t, err)
 
-	_, err = repo.GetByID(context.Background(), sale.ID)
+	_, err = repo.GetByID(context.Background(), sale.ID, sale.FarmID)
 	assert.Error(t, err)
 }
 

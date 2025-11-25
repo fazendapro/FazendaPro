@@ -26,15 +26,15 @@ type OverviewStats struct {
 
 type SaleRepository interface {
 	Create(ctx context.Context, sale *models.Sale) error
-	GetByID(ctx context.Context, id uint) (*models.Sale, error)
+	GetByID(ctx context.Context, id uint, farmID uint) (*models.Sale, error)
 	GetByFarmID(ctx context.Context, farmID uint) ([]*models.Sale, error)
-	GetByAnimalID(ctx context.Context, animalID uint) ([]*models.Sale, error)
+	GetByAnimalID(ctx context.Context, animalID uint, farmID uint) ([]*models.Sale, error)
 	GetByDateRange(ctx context.Context, farmID uint, startDate, endDate time.Time) ([]*models.Sale, error)
 	GetMonthlySalesCount(ctx context.Context, farmID uint, startDate, endDate time.Time) (int64, error)
 	GetMonthlySalesData(ctx context.Context, farmID uint, months int) ([]MonthlySalesData, error)
 	GetOverviewStats(ctx context.Context, farmID uint) (*OverviewStats, error)
 	Update(ctx context.Context, sale *models.Sale) error
-	Delete(ctx context.Context, id uint) error
+	Delete(ctx context.Context, id uint, farmID uint) error
 }
 
 type saleRepository struct {
@@ -49,9 +49,9 @@ func (r *saleRepository) Create(ctx context.Context, sale *models.Sale) error {
 	return r.db.WithContext(ctx).Create(sale).Error
 }
 
-func (r *saleRepository) GetByID(ctx context.Context, id uint) (*models.Sale, error) {
+func (r *saleRepository) GetByID(ctx context.Context, id uint, farmID uint) (*models.Sale, error) {
 	var sale models.Sale
-	err := r.db.WithContext(ctx).Preload("Animal").Preload("Farm").First(&sale, id).Error
+	err := r.db.WithContext(ctx).Preload("Animal").Preload("Farm").Where(SQLWhereID+" AND "+SQLWhereFarmID, id, farmID).First(&sale).Error
 	if err != nil {
 		return nil, err
 	}
@@ -67,9 +67,9 @@ func (r *saleRepository) GetByFarmID(ctx context.Context, farmID uint) ([]*model
 	return sales, nil
 }
 
-func (r *saleRepository) GetByAnimalID(ctx context.Context, animalID uint) ([]*models.Sale, error) {
+func (r *saleRepository) GetByAnimalID(ctx context.Context, animalID uint, farmID uint) ([]*models.Sale, error) {
 	var sales []*models.Sale
-	err := r.db.WithContext(ctx).Preload("Animal").Where(SQLWhereAnimalID, animalID).Order(SQLOrderSaleDateDESC).Find(&sales).Error
+	err := r.db.WithContext(ctx).Preload("Animal").Where(SQLWhereAnimalID+" AND "+SQLWhereFarmID, animalID, farmID).Order(SQLOrderSaleDateDESC).Find(&sales).Error
 	if err != nil {
 		return nil, err
 	}
@@ -162,8 +162,15 @@ func (r *saleRepository) Update(ctx context.Context, sale *models.Sale) error {
 	return r.db.WithContext(ctx).Save(sale).Error
 }
 
-func (r *saleRepository) Delete(ctx context.Context, id uint) error {
-	return r.db.WithContext(ctx).Delete(&models.Sale{}, id).Error
+func (r *saleRepository) Delete(ctx context.Context, id uint, farmID uint) error {
+	result := r.db.WithContext(ctx).Where(SQLWhereID+" AND "+SQLWhereFarmID, id, farmID).Delete(&models.Sale{})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("sale not found or does not belong to farm")
+	}
+	return nil
 }
 
 func (r *saleRepository) GetOverviewStats(ctx context.Context, farmID uint) (*OverviewStats, error) {

@@ -218,16 +218,22 @@ func (h *SaleChiHandler) GetSalesByDateRange(w http.ResponseWriter, r *http.Requ
 }
 
 func (h *SaleChiHandler) GetSaleByID(w http.ResponseWriter, r *http.Request) {
-	idStr := chi.URLParam(r, "id")
-	id, err := strconv.ParseUint(idStr, 10, 32)
-	if err != nil {
-		http.Error(w, ErrInvalidSaleID, http.StatusBadRequest)
+	farmID, ok := r.Context().Value("farm_id").(uint)
+	if !ok {
+		SendErrorResponse(w, ErrFarmIDNotFound, http.StatusUnauthorized)
 		return
 	}
 
-	sale, err := h.service.GetSaleByID(r.Context(), uint(id))
+	idStr := chi.URLParam(r, "id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
-		http.Error(w, "Sale not found", http.StatusNotFound)
+		SendErrorResponse(w, ErrInvalidSaleID, http.StatusBadRequest)
+		return
+	}
+
+	sale, err := h.service.GetSaleByID(r.Context(), uint(id), farmID)
+	if err != nil {
+		SendErrorResponse(w, ErrSaleNotFound, http.StatusForbidden)
 		return
 	}
 
@@ -249,57 +255,68 @@ func (h *SaleChiHandler) GetSaleByID(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *SaleChiHandler) UpdateSale(w http.ResponseWriter, r *http.Request) {
+	farmID, ok := r.Context().Value("farm_id").(uint)
+	if !ok {
+		SendErrorResponse(w, ErrFarmIDNotFound, http.StatusUnauthorized)
+		return
+	}
+
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
-		http.Error(w, ErrInvalidSaleID, http.StatusBadRequest)
+		SendErrorResponse(w, ErrInvalidSaleID, http.StatusBadRequest)
 		return
 	}
 
 	var req UpdateSaleRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request data", http.StatusBadRequest)
+		SendErrorResponse(w, ErrDecodeJSON+err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	saleDate, err := time.Parse(DateFormatISO, req.SaleDate)
 	if err != nil {
-		http.Error(w, "Invalid date format", http.StatusBadRequest)
-		return
-	}
-
-	existingSale, err := h.service.GetSaleByID(r.Context(), uint(id))
-	if err != nil {
-		http.Error(w, "Sale not found", http.StatusNotFound)
+		SendErrorResponse(w, "Invalid date format", http.StatusBadRequest)
 		return
 	}
 
 	sale := &models.Sale{
 		ID:        uint(id),
-		AnimalID:  existingSale.AnimalID,
-		FarmID:    existingSale.FarmID,
+		FarmID:    farmID,
 		BuyerName: req.BuyerName,
 		Price:     req.Price,
 		SaleDate:  saleDate,
 		Notes:     req.Notes,
 	}
 
-	err = h.service.UpdateSale(r.Context(), sale)
+	err = h.service.UpdateSale(r.Context(), sale, farmID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		if err.Error() == "sale not found or does not belong to farm" {
+			SendErrorResponse(w, ErrSaleNotBelongsToFarm, http.StatusForbidden)
+		} else {
+			SendErrorResponse(w, err.Error(), http.StatusBadRequest)
+		}
+		return
+	}
+
+	// Buscar a venda atualizada para retornar dados completos
+	updatedSale, err := h.service.GetSaleByID(r.Context(), uint(id), farmID)
+	if err != nil {
+		SendErrorResponse(w, ErrSaleNotFound, http.StatusInternalServerError)
 		return
 	}
 
 	response := SaleResponse{
-		ID:        sale.ID,
-		AnimalID:  sale.AnimalID,
-		FarmID:    sale.FarmID,
-		BuyerName: sale.BuyerName,
-		Price:     sale.Price,
-		SaleDate:  sale.SaleDate,
-		Notes:     sale.Notes,
-		CreatedAt: sale.CreatedAt,
-		UpdatedAt: sale.UpdatedAt,
+		ID:        updatedSale.ID,
+		AnimalID:  updatedSale.AnimalID,
+		FarmID:    updatedSale.FarmID,
+		BuyerName: updatedSale.BuyerName,
+		Price:     updatedSale.Price,
+		SaleDate:  updatedSale.SaleDate,
+		Notes:     updatedSale.Notes,
+		CreatedAt: updatedSale.CreatedAt,
+		UpdatedAt: updatedSale.UpdatedAt,
+		Animal:    &updatedSale.Animal,
 	}
 
 	w.Header().Set(HeaderContentType, ContentTypeJSON)
@@ -307,34 +324,53 @@ func (h *SaleChiHandler) UpdateSale(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *SaleChiHandler) DeleteSale(w http.ResponseWriter, r *http.Request) {
+	farmID, ok := r.Context().Value("farm_id").(uint)
+	if !ok {
+		SendErrorResponse(w, ErrFarmIDNotFound, http.StatusUnauthorized)
+		return
+	}
+
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
-		http.Error(w, ErrInvalidSaleID, http.StatusBadRequest)
+		SendErrorResponse(w, ErrInvalidSaleID, http.StatusBadRequest)
 		return
 	}
 
-	err = h.service.DeleteSale(r.Context(), uint(id))
+	err = h.service.DeleteSale(r.Context(), uint(id), farmID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		if err.Error() == "sale not found or does not belong to farm" {
+			SendErrorResponse(w, ErrSaleNotBelongsToFarm, http.StatusForbidden)
+		} else {
+			SendErrorResponse(w, err.Error(), http.StatusNotFound)
+		}
 		return
 	}
 
-	w.Header().Set(HeaderContentType, ContentTypeJSON)
-	json.NewEncoder(w).Encode(map[string]string{"message": "Sale deleted successfully"})
+	SendSuccessResponse(w, nil, "Sale deleted successfully", http.StatusOK)
 }
 
 func (h *SaleChiHandler) GetSalesByAnimal(w http.ResponseWriter, r *http.Request) {
-	animalIDStr := chi.URLParam(r, "animal_id")
-	animalID, err := strconv.ParseUint(animalIDStr, 10, 32)
-	if err != nil {
-		http.Error(w, "Invalid animal ID", http.StatusBadRequest)
+	farmID, ok := r.Context().Value("farm_id").(uint)
+	if !ok {
+		SendErrorResponse(w, ErrFarmIDNotFound, http.StatusUnauthorized)
 		return
 	}
 
-	sales, err := h.service.GetSalesByAnimalID(r.Context(), uint(animalID))
+	animalIDStr := chi.URLParam(r, "animal_id")
+	animalID, err := strconv.ParseUint(animalIDStr, 10, 32)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		SendErrorResponse(w, "Invalid animal ID", http.StatusBadRequest)
+		return
+	}
+
+	sales, err := h.service.GetSalesByAnimalID(r.Context(), uint(animalID), farmID)
+	if err != nil {
+		if err.Error() == "animal does not belong to the specified farm" {
+			SendErrorResponse(w, ErrAnimalNotBelongsToFarm, http.StatusForbidden)
+		} else {
+			SendErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		}
 		return
 	}
 
@@ -392,14 +428,12 @@ func (h *SaleChiHandler) GetMonthlySalesAndPurchases(w http.ResponseWriter, r *h
 	monthsStr := r.URL.Query().Get("months")
 	months := 12
 	if monthsStr != "" {
-		var err error
-		if parsed, err := strconv.Atoi(monthsStr); err == nil && parsed > 0 && parsed <= 24 {
-			months = parsed
-		}
-		if err != nil {
-			SendErrorResponse(w, "Invalid months parameter", http.StatusBadRequest)
+		parsed, err := strconv.Atoi(monthsStr)
+		if err != nil || parsed <= 0 || parsed > 24 {
+			SendErrorResponse(w, ErrInvalidMonthsParam, http.StatusBadRequest)
 			return
 		}
+		months = parsed
 	}
 
 	salesData, err := h.service.GetMonthlySalesData(r.Context(), farmID, months)

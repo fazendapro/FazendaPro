@@ -23,8 +23,8 @@ func (m *MockSaleRepository) Create(ctx context.Context, sale *models.Sale) erro
 	return args.Error(0)
 }
 
-func (m *MockSaleRepository) GetByID(ctx context.Context, id uint) (*models.Sale, error) {
-	args := m.Called(ctx, id)
+func (m *MockSaleRepository) GetByID(ctx context.Context, id uint, farmID uint) (*models.Sale, error) {
+	args := m.Called(ctx, id, farmID)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
@@ -39,8 +39,8 @@ func (m *MockSaleRepository) GetByFarmID(ctx context.Context, farmID uint) ([]*m
 	return args.Get(0).([]*models.Sale), args.Error(1)
 }
 
-func (m *MockSaleRepository) GetByAnimalID(ctx context.Context, animalID uint) ([]*models.Sale, error) {
-	args := m.Called(ctx, animalID)
+func (m *MockSaleRepository) GetByAnimalID(ctx context.Context, animalID uint, farmID uint) ([]*models.Sale, error) {
+	args := m.Called(ctx, animalID, farmID)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
@@ -81,8 +81,8 @@ func (m *MockSaleRepository) Update(ctx context.Context, sale *models.Sale) erro
 	return args.Error(0)
 }
 
-func (m *MockSaleRepository) Delete(ctx context.Context, id uint) error {
-	args := m.Called(ctx, id)
+func (m *MockSaleRepository) Delete(ctx context.Context, id uint, farmID uint) error {
+	args := m.Called(ctx, id, farmID)
 	return args.Error(0)
 }
 
@@ -295,21 +295,27 @@ func TestSaleService_GetSalesByAnimalID(t *testing.T) {
 
 	ctx := context.Background()
 	animalID := uint(1)
+	farmID := uint(1)
 
 	expectedSales := []*models.Sale{
 		{
 			ID:        1,
 			AnimalID:  animalID,
-			FarmID:    1,
+			FarmID:    farmID,
 			BuyerName: "João Silva",
 			Price:     1500.50,
 			SaleDate:  time.Now(),
 		},
 	}
 
-	mockSaleRepo.On("GetByAnimalID", ctx, animalID).Return(expectedSales, nil)
+	animal := &models.Animal{
+		ID:     animalID,
+		FarmID: farmID,
+	}
+	mockAnimalRepo.On("FindByID", animalID).Return(animal, nil)
+	mockSaleRepo.On("GetByAnimalID", ctx, animalID, farmID).Return(expectedSales, nil)
 
-	sales, err := saleService.GetSalesByAnimalID(ctx, animalID)
+	sales, err := saleService.GetSalesByAnimalID(ctx, animalID, farmID)
 
 	assert.NoError(t, err)
 	assert.Len(t, sales, 1)
@@ -372,24 +378,35 @@ func TestSaleService_UpdateSale_Success(t *testing.T) {
 	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, mockCache)
 
 	ctx := context.Background()
+	farmID := uint(1)
 
 	sale := &models.Sale{
 		ID:        1,
 		AnimalID:  1,
-		FarmID:    1,
+		FarmID:    farmID,
 		BuyerName: "Updated Buyer",
 		Price:     2000.00,
 		SaleDate:  time.Now(),
 		Notes:     "Updated notes",
 	}
 
+	existingSale := &models.Sale{
+		ID:        1,
+		AnimalID:  1,
+		FarmID:    farmID,
+		BuyerName: "Old Buyer",
+		Price:     1000.00,
+		SaleDate:  time.Now(),
+	}
+
+	mockSaleRepo.On("GetByID", ctx, sale.ID, farmID).Return(existingSale, nil)
 	mockSaleRepo.On("Update", ctx, sale).Return(nil)
 	mockCache.On("Delete", "dashboard:overview:1").Return(nil)
 	for months := 6; months <= 24; months += 6 {
 		mockCache.On("Delete", mock.AnythingOfType("string")).Return(nil)
 	}
 
-	err := saleService.UpdateSale(ctx, sale)
+	err := saleService.UpdateSale(ctx, sale, farmID)
 
 	assert.NoError(t, err)
 	mockSaleRepo.AssertExpectations(t)
@@ -402,6 +419,7 @@ func TestSaleService_UpdateSale_InvalidData(t *testing.T) {
 
 	ctx := context.Background()
 
+	farmID := uint(1)
 	testCases := []struct {
 		name          string
 		sale          *models.Sale
@@ -411,7 +429,7 @@ func TestSaleService_UpdateSale_InvalidData(t *testing.T) {
 			name: "Missing Sale ID",
 			sale: &models.Sale{
 				AnimalID:  1,
-				FarmID:    1,
+				FarmID:    farmID,
 				BuyerName: "João Silva",
 				Price:     1500.50,
 				SaleDate:  time.Now(),
@@ -423,7 +441,7 @@ func TestSaleService_UpdateSale_InvalidData(t *testing.T) {
 			sale: &models.Sale{
 				ID:       1,
 				AnimalID: 1,
-				FarmID:   1,
+				FarmID:   farmID,
 				Price:    1500.50,
 				SaleDate: time.Now(),
 			},
@@ -434,7 +452,7 @@ func TestSaleService_UpdateSale_InvalidData(t *testing.T) {
 			sale: &models.Sale{
 				ID:        1,
 				AnimalID:  1,
-				FarmID:    1,
+				FarmID:    farmID,
 				BuyerName: "João Silva",
 				Price:     0,
 				SaleDate:  time.Now(),
@@ -446,7 +464,7 @@ func TestSaleService_UpdateSale_InvalidData(t *testing.T) {
 			sale: &models.Sale{
 				ID:        1,
 				AnimalID:  1,
-				FarmID:    1,
+				FarmID:    farmID,
 				BuyerName: "João Silva",
 				Price:     1500.50,
 			},
@@ -456,7 +474,18 @@ func TestSaleService_UpdateSale_InvalidData(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			err := saleService.UpdateSale(ctx, tc.sale)
+			if tc.sale.ID != 0 {
+				existingSale := &models.Sale{
+					ID:        tc.sale.ID,
+					AnimalID:  tc.sale.AnimalID,
+					FarmID:    farmID,
+					BuyerName: "Old Buyer",
+					Price:     1000.00,
+					SaleDate:  time.Now(),
+				}
+				mockSaleRepo.On("GetByID", ctx, tc.sale.ID, farmID).Return(existingSale, nil)
+			}
+			err := saleService.UpdateSale(ctx, tc.sale, farmID)
 			assert.Error(t, err)
 			assert.Contains(t, err.Error(), tc.expectedError)
 		})
@@ -488,8 +517,9 @@ func TestSaleService_DeleteSale_Success(t *testing.T) {
 		Status:     1, // Sold
 	}
 
-	mockSaleRepo.On("GetByID", ctx, saleID).Return(sale, nil)
-	mockSaleRepo.On("Delete", ctx, saleID).Return(nil)
+	farmID := uint(1)
+	mockSaleRepo.On("GetByID", ctx, saleID, farmID).Return(sale, nil)
+	mockSaleRepo.On("Delete", ctx, saleID, farmID).Return(nil)
 	mockAnimalRepo.On("FindByID", uint(1)).Return(animal, nil)
 	mockAnimalRepo.On("Update", mock.AnythingOfType("*models.Animal")).Return(nil)
 	mockCache.On("Delete", "dashboard:overview:1").Return(nil)
@@ -497,7 +527,7 @@ func TestSaleService_DeleteSale_Success(t *testing.T) {
 		mockCache.On("Delete", mock.AnythingOfType("string")).Return(nil)
 	}
 
-	err := saleService.DeleteSale(ctx, saleID)
+	err := saleService.DeleteSale(ctx, saleID, farmID)
 
 	assert.NoError(t, err)
 	mockSaleRepo.AssertExpectations(t)
@@ -511,10 +541,11 @@ func TestSaleService_DeleteSale_NotFound(t *testing.T) {
 
 	ctx := context.Background()
 	saleID := uint(1)
+	farmID := uint(1)
 
-	mockSaleRepo.On("GetByID", ctx, saleID).Return(nil, errors.New("sale not found"))
+	mockSaleRepo.On("GetByID", ctx, saleID, farmID).Return(nil, errors.New("sale not found"))
 
-	err := saleService.DeleteSale(ctx, saleID)
+	err := saleService.DeleteSale(ctx, saleID, farmID)
 
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "sale not found")
@@ -546,8 +577,9 @@ func TestSaleService_DeleteSale_WithAnimalUpdate(t *testing.T) {
 		Status: models.AnimalStatusSold,
 	}
 
-	mockSaleRepo.On("GetByID", ctx, saleID).Return(sale, nil)
-	mockSaleRepo.On("Delete", ctx, saleID).Return(nil)
+	farmID := uint(1)
+	mockSaleRepo.On("GetByID", ctx, saleID, farmID).Return(sale, nil)
+	mockSaleRepo.On("Delete", ctx, saleID, farmID).Return(nil)
 	mockAnimalRepo.On("FindByID", animalID).Return(animal, nil)
 	mockAnimalRepo.On("Update", mock.AnythingOfType("*models.Animal")).Return(nil)
 	mockCache.On("Delete", "dashboard:overview:1").Return(nil)
@@ -555,7 +587,7 @@ func TestSaleService_DeleteSale_WithAnimalUpdate(t *testing.T) {
 		mockCache.On("Delete", mock.AnythingOfType("string")).Return(nil)
 	}
 
-	err := saleService.DeleteSale(ctx, saleID)
+	err := saleService.DeleteSale(ctx, saleID, farmID)
 
 	assert.NoError(t, err)
 	mockSaleRepo.AssertExpectations(t)
@@ -581,15 +613,16 @@ func TestSaleService_DeleteSale_AnimalNotFound(t *testing.T) {
 		SaleDate:  time.Now(),
 	}
 
-	mockSaleRepo.On("GetByID", ctx, saleID).Return(sale, nil)
-	mockSaleRepo.On("Delete", ctx, saleID).Return(nil)
+	farmID := uint(1)
+	mockSaleRepo.On("GetByID", ctx, saleID, farmID).Return(sale, nil)
+	mockSaleRepo.On("Delete", ctx, saleID, farmID).Return(nil)
 	mockAnimalRepo.On("FindByID", animalID).Return(nil, errors.New("animal not found"))
 	mockCache.On("Delete", "dashboard:overview:1").Return(nil)
 	for months := 6; months <= 24; months += 6 {
 		mockCache.On("Delete", mock.AnythingOfType("string")).Return(nil)
 	}
 
-	err := saleService.DeleteSale(ctx, saleID)
+	err := saleService.DeleteSale(ctx, saleID, farmID)
 
 	assert.NoError(t, err)
 	mockSaleRepo.AssertExpectations(t)
@@ -732,9 +765,10 @@ func TestSaleService_GetSaleByID_Success(t *testing.T) {
 		SaleDate:  time.Now(),
 	}
 
-	mockSaleRepo.On("GetByID", ctx, saleID).Return(expectedSale, nil)
+	farmID := uint(1)
+	mockSaleRepo.On("GetByID", ctx, saleID, farmID).Return(expectedSale, nil)
 
-	sale, err := saleService.GetSaleByID(ctx, saleID)
+	sale, err := saleService.GetSaleByID(ctx, saleID, farmID)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, sale)
@@ -750,9 +784,10 @@ func TestSaleService_GetSaleByID_NotFound(t *testing.T) {
 	ctx := context.Background()
 	saleID := uint(999)
 
-	mockSaleRepo.On("GetByID", ctx, saleID).Return(nil, errors.New("not found"))
+	farmID := uint(1)
+	mockSaleRepo.On("GetByID", ctx, saleID, farmID).Return(nil, errors.New("not found"))
 
-	sale, err := saleService.GetSaleByID(ctx, saleID)
+	sale, err := saleService.GetSaleByID(ctx, saleID, farmID)
 
 	assert.Error(t, err)
 	assert.Nil(t, sale)
@@ -909,7 +944,7 @@ func TestSaleService_CreateSale_UpdateAnimalStatusFails(t *testing.T) {
 	mockAnimalRepo.On("FindByID", uint(1)).Return(animal, nil)
 	mockSaleRepo.On("Create", ctx, sale).Return(nil)
 	mockAnimalRepo.On("Update", mock.AnythingOfType("*models.Animal")).Return(errors.New("update failed"))
-	mockSaleRepo.On("Delete", ctx, uint(1)).Return(nil)
+	mockSaleRepo.On("Delete", ctx, uint(1), uint(1)).Return(nil)
 
 	err := saleService.CreateSale(ctx, sale)
 
@@ -936,9 +971,19 @@ func TestSaleService_UpdateSale_RepositoryError(t *testing.T) {
 		SaleDate:  now,
 	}
 
+	farmID := uint(1)
+	existingSale := &models.Sale{
+		ID:        sale.ID,
+		AnimalID:  sale.AnimalID,
+		FarmID:    farmID,
+		BuyerName: "Old Buyer",
+		Price:     1000.00,
+		SaleDate:  time.Now(),
+	}
+	mockSaleRepo.On("GetByID", ctx, sale.ID, farmID).Return(existingSale, nil)
 	mockSaleRepo.On("Update", ctx, sale).Return(errors.New("database error"))
 
-	err := saleService.UpdateSale(ctx, sale)
+	err := saleService.UpdateSale(ctx, sale, farmID)
 
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "database error")

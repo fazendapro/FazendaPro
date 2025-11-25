@@ -100,8 +100,9 @@ func TestDeleteSale_RevertsAnimalStatus(t *testing.T) {
 		Status: models.AnimalStatusSold,
 	}
 
-	mockSaleRepo.On("GetByID", mock.Anything, uint(1)).Return(sale, nil)
-	mockSaleRepo.On("Delete", mock.Anything, uint(1)).Return(nil)
+	farmID := uint(1)
+	mockSaleRepo.On("GetByID", mock.Anything, uint(1), farmID).Return(sale, nil)
+	mockSaleRepo.On("Delete", mock.Anything, uint(1), farmID).Return(nil)
 	mockAnimalRepo.On("FindByID", uint(1)).Return(animal, nil)
 	mockAnimalRepo.On("Update", mock.MatchedBy(func(a *models.Animal) bool {
 		return a.Status == models.AnimalStatusActive
@@ -111,7 +112,7 @@ func TestDeleteSale_RevertsAnimalStatus(t *testing.T) {
 		mockCache.On("Delete", mock.AnythingOfType("string")).Return(nil)
 	}
 
-	err := saleService.DeleteSale(context.Background(), 1)
+	err := saleService.DeleteSale(context.Background(), 1, farmID)
 
 	assert.NoError(t, err)
 	mockAnimalRepo.AssertExpectations(t)

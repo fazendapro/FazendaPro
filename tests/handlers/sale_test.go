@@ -30,8 +30,8 @@ func (m *MockSaleService) CreateSale(ctx context.Context, sale *models.Sale) err
 	return args.Error(0)
 }
 
-func (m *MockSaleService) GetSaleByID(ctx context.Context, id uint) (*models.Sale, error) {
-	args := m.Called(ctx, id)
+func (m *MockSaleService) GetSaleByID(ctx context.Context, id uint, farmID uint) (*models.Sale, error) {
+	args := m.Called(ctx, id, farmID)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
@@ -46,8 +46,8 @@ func (m *MockSaleService) GetSalesByFarmID(ctx context.Context, farmID uint) ([]
 	return args.Get(0).([]*models.Sale), args.Error(1)
 }
 
-func (m *MockSaleService) GetSalesByAnimalID(ctx context.Context, animalID uint) ([]*models.Sale, error) {
-	args := m.Called(ctx, animalID)
+func (m *MockSaleService) GetSalesByAnimalID(ctx context.Context, animalID uint, farmID uint) ([]*models.Sale, error) {
+	args := m.Called(ctx, animalID, farmID)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
@@ -67,13 +67,13 @@ func (m *MockSaleService) GetMonthlySalesCount(ctx context.Context, farmID uint,
 	return args.Get(0).(int64), args.Error(1)
 }
 
-func (m *MockSaleService) UpdateSale(ctx context.Context, sale *models.Sale) error {
-	args := m.Called(ctx, sale)
+func (m *MockSaleService) UpdateSale(ctx context.Context, sale *models.Sale, farmID uint) error {
+	args := m.Called(ctx, sale, farmID)
 	return args.Error(0)
 }
 
-func (m *MockSaleService) DeleteSale(ctx context.Context, id uint) error {
-	args := m.Called(ctx, id)
+func (m *MockSaleService) DeleteSale(ctx context.Context, id uint, farmID uint) error {
+	args := m.Called(ctx, id, farmID)
 	return args.Error(0)
 }
 
@@ -267,7 +267,7 @@ func TestSaleHandler_GetSaleByID_Success(t *testing.T) {
 		},
 	}
 
-	mockService.On("GetSaleByID", mock.Anything, uint(1)).Return(expectedSale, nil)
+	mockService.On("GetSaleByID", mock.Anything, uint(1), uint(1)).Return(expectedSale, nil)
 
 	req, _ := http.NewRequest("GET", tests.EndpointSalesID, nil)
 	w := httptest.NewRecorder()
@@ -288,13 +288,13 @@ func TestSaleHandler_GetSaleByID_Success(t *testing.T) {
 func TestSaleHandler_GetSaleByID_NotFound(t *testing.T) {
 	router, mockService := setupSaleTestRouter()
 
-	mockService.On("GetSaleByID", mock.Anything, uint(1)).Return(nil, errors.New(tests.TestErrorSaleNotFound))
+	mockService.On("GetSaleByID", mock.Anything, uint(1), uint(1)).Return(nil, errors.New(tests.TestErrorSaleNotFound))
 
 	req, _ := http.NewRequest("GET", tests.EndpointSalesID, nil)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
-	assert.Equal(t, http.StatusNotFound, w.Code)
+	assert.Equal(t, http.StatusForbidden, w.Code)
 	bodyStr := w.Body.String()
 	assert.Contains(t, bodyStr, "Sale not found")
 
@@ -394,7 +394,7 @@ func TestSaleHandler_GetSalesByAnimal_Success(t *testing.T) {
 		},
 	}
 
-	mockService.On("GetSalesByAnimalID", mock.Anything, uint(1)).Return(expectedSales, nil)
+	mockService.On("GetSalesByAnimalID", mock.Anything, uint(1), uint(1)).Return(expectedSales, nil)
 
 	req, _ := http.NewRequest("GET", "/animals/1/sales", nil)
 	w := httptest.NewRecorder()
@@ -475,20 +475,24 @@ func TestSaleHandler_UpdateSale_Success(t *testing.T) {
 	router, mockService := setupSaleTestRouter()
 
 	now := time.Now()
-	existingSale := &models.Sale{
+	updatedSale := &models.Sale{
 		ID:        1,
 		AnimalID:  1,
 		FarmID:    1,
-		BuyerName: "Original Buyer",
-		Price:     1000.00,
-		SaleDate:  now.Add(-24 * time.Hour),
-		Notes:     "Original notes",
+		BuyerName: "Updated Buyer",
+		Price:     2000.00,
+		SaleDate:  now,
+		Notes:     "Updated notes",
 		CreatedAt: now.Add(-24 * time.Hour),
-		UpdatedAt: now.Add(-24 * time.Hour),
+		UpdatedAt: now,
+		Animal: models.Animal{
+			ID:         1,
+			AnimalName: "Test Animal",
+		},
 	}
 
-	mockService.On("GetSaleByID", mock.Anything, uint(1)).Return(existingSale, nil)
-	mockService.On("UpdateSale", mock.Anything, mock.AnythingOfType("*models.Sale")).Return(nil)
+	mockService.On("UpdateSale", mock.Anything, mock.AnythingOfType("*models.Sale"), uint(1)).Return(nil)
+	mockService.On("GetSaleByID", mock.Anything, uint(1), uint(1)).Return(updatedSale, nil)
 
 	reqBody := map[string]interface{}{
 		"buyer_name": "Updated Buyer",
@@ -519,7 +523,7 @@ func TestSaleHandler_UpdateSale_Success(t *testing.T) {
 func TestSaleHandler_DeleteSale_Success(t *testing.T) {
 	router, mockService := setupSaleTestRouter()
 
-	mockService.On("DeleteSale", mock.Anything, uint(1)).Return(nil)
+	mockService.On("DeleteSale", mock.Anything, uint(1), uint(1)).Return(nil)
 
 	req, _ := http.NewRequest("DELETE", "/sales/1", nil)
 	w := httptest.NewRecorder()
@@ -538,7 +542,7 @@ func TestSaleHandler_DeleteSale_Success(t *testing.T) {
 func TestSaleHandler_DeleteSale_NotFound(t *testing.T) {
 	router, mockService := setupSaleTestRouter()
 
-	mockService.On("DeleteSale", mock.Anything, uint(1)).Return(errors.New("sale not found"))
+	mockService.On("DeleteSale", mock.Anything, uint(1), uint(1)).Return(errors.New("sale not found"))
 
 	req, _ := http.NewRequest("DELETE", "/sales/1", nil)
 	w := httptest.NewRecorder()
