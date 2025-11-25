@@ -99,10 +99,23 @@ func (h *SaleChiHandler) CreateSale(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *SaleChiHandler) GetSalesByFarm(w http.ResponseWriter, r *http.Request) {
-	farmID, ok := r.Context().Value("farm_id").(uint)
-	if !ok {
-		http.Error(w, ErrFarmIDNotFound, http.StatusUnauthorized)
-		return
+	farmIDStr := r.URL.Query().Get("farmId")
+	var farmID uint
+
+	if farmIDStr != "" {
+		id, parseErr := strconv.ParseUint(farmIDStr, 10, 32)
+		if parseErr != nil {
+			SendErrorResponse(w, ErrInvalidFarmID, http.StatusBadRequest)
+			return
+		}
+		farmID = uint(id)
+	} else {
+		farmIDFromContext, ok := r.Context().Value("farm_id").(uint)
+		if !ok {
+			SendErrorResponse(w, ErrFarmIDNotFound, http.StatusUnauthorized)
+			return
+		}
+		farmID = farmIDFromContext
 	}
 
 	sales, err := h.service.GetSalesByFarmID(r.Context(), farmID)
@@ -132,10 +145,23 @@ func (h *SaleChiHandler) GetSalesByFarm(w http.ResponseWriter, r *http.Request) 
 }
 
 func (h *SaleChiHandler) GetSalesHistory(w http.ResponseWriter, r *http.Request) {
-	farmID, ok := r.Context().Value("farm_id").(uint)
-	if !ok {
-		http.Error(w, ErrFarmIDNotFound, http.StatusUnauthorized)
-		return
+	farmIDStr := r.URL.Query().Get("farmId")
+	var farmID uint
+
+	if farmIDStr != "" {
+		id, parseErr := strconv.ParseUint(farmIDStr, 10, 32)
+		if parseErr != nil {
+			SendErrorResponse(w, ErrInvalidFarmID, http.StatusBadRequest)
+			return
+		}
+		farmID = uint(id)
+	} else {
+		farmIDFromContext, ok := r.Context().Value("farm_id").(uint)
+		if !ok {
+			SendErrorResponse(w, ErrFarmIDNotFound, http.StatusUnauthorized)
+			return
+		}
+		farmID = farmIDFromContext
 	}
 
 	sales, err := h.service.GetSalesHistory(r.Context(), farmID)
@@ -165,10 +191,23 @@ func (h *SaleChiHandler) GetSalesHistory(w http.ResponseWriter, r *http.Request)
 }
 
 func (h *SaleChiHandler) GetSalesByDateRange(w http.ResponseWriter, r *http.Request) {
-	farmID, ok := r.Context().Value("farm_id").(uint)
-	if !ok {
-		http.Error(w, ErrFarmIDNotFound, http.StatusUnauthorized)
-		return
+	farmIDStr := r.URL.Query().Get("farmId")
+	var farmID uint
+
+	if farmIDStr != "" {
+		id, parseErr := strconv.ParseUint(farmIDStr, 10, 32)
+		if parseErr != nil {
+			SendErrorResponse(w, ErrInvalidFarmID, http.StatusBadRequest)
+			return
+		}
+		farmID = uint(id)
+	} else {
+		farmIDFromContext, ok := r.Context().Value("farm_id").(uint)
+		if !ok {
+			SendErrorResponse(w, ErrFarmIDNotFound, http.StatusUnauthorized)
+			return
+		}
+		farmID = farmIDFromContext
 	}
 
 	startDateStr := r.URL.Query().Get("start_date")
@@ -299,7 +338,6 @@ func (h *SaleChiHandler) UpdateSale(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Buscar a venda atualizada para retornar dados completos
 	updatedSale, err := h.service.GetSaleByID(r.Context(), uint(id), farmID)
 	if err != nil {
 		SendErrorResponse(w, ErrSaleNotFound, http.StatusInternalServerError)
@@ -395,10 +433,23 @@ func (h *SaleChiHandler) GetSalesByAnimal(w http.ResponseWriter, r *http.Request
 }
 
 func (h *SaleChiHandler) GetMonthlySalesStats(w http.ResponseWriter, r *http.Request) {
-	farmID, ok := r.Context().Value("farm_id").(uint)
-	if !ok {
-		SendErrorResponse(w, ErrFarmIDNotFound, http.StatusUnauthorized)
-		return
+	farmIDStr := r.URL.Query().Get("farmId")
+	var farmID uint
+
+	if farmIDStr != "" {
+		id, parseErr := strconv.ParseUint(farmIDStr, 10, 32)
+		if parseErr != nil {
+			SendErrorResponse(w, ErrInvalidFarmID, http.StatusBadRequest)
+			return
+		}
+		farmID = uint(id)
+	} else {
+		farmIDFromContext, ok := r.Context().Value("farm_id").(uint)
+		if !ok {
+			SendErrorResponse(w, ErrFarmIDNotFound, http.StatusUnauthorized)
+			return
+		}
+		farmID = farmIDFromContext
 	}
 
 	now := time.Now()
@@ -473,10 +524,23 @@ func (h *SaleChiHandler) GetMonthlySalesAndPurchases(w http.ResponseWriter, r *h
 }
 
 func (h *SaleChiHandler) GetOverviewStats(w http.ResponseWriter, r *http.Request) {
-	farmID, ok := r.Context().Value("farm_id").(uint)
-	if !ok {
-		SendErrorResponse(w, ErrFarmIDNotFound, http.StatusUnauthorized)
-		return
+	farmIDStr := r.URL.Query().Get("farmId")
+	var farmID uint
+
+	if farmIDStr != "" {
+		id, parseErr := strconv.ParseUint(farmIDStr, 10, 32)
+		if parseErr != nil {
+			SendErrorResponse(w, ErrInvalidFarmID, http.StatusBadRequest)
+			return
+		}
+		farmID = uint(id)
+	} else {
+		farmIDFromContext, ok := r.Context().Value("farm_id").(uint)
+		if !ok {
+			SendErrorResponse(w, ErrFarmIDNotFound, http.StatusUnauthorized)
+			return
+		}
+		farmID = farmIDFromContext
 	}
 
 	stats, err := h.service.GetOverviewStats(r.Context(), farmID)
