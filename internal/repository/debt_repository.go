@@ -43,7 +43,7 @@ func (r *DebtRepository) FindAllWithPagination(page, limit int, year, month *int
 	if year != nil {
 		startOfYear := time.Date(*year, 1, 1, 0, 0, 0, 0, time.UTC)
 		endOfYear := time.Date(*year+1, 1, 1, 0, 0, 0, 0, time.UTC)
-		query = query.Where("created_at >= ? AND created_at < ?", startOfYear, endOfYear)
+		query = query.Where(SQLWhereCreatedAtRange, startOfYear, endOfYear)
 	}
 
 	if month != nil && year != nil {
@@ -54,16 +54,16 @@ func (r *DebtRepository) FindAllWithPagination(page, limit int, year, month *int
 		} else {
 			endOfMonth = time.Date(*year, time.Month(*month+1), 1, 0, 0, 0, 0, time.UTC)
 		}
-		query = query.Where("created_at >= ? AND created_at < ?", startOfMonth, endOfMonth)
+		query = query.Where(SQLWhereCreatedAtRange, startOfMonth, endOfMonth)
 	}
 
 	if err := query.Count(&total).Error; err != nil {
-		return nil, 0, fmt.Errorf("error counting debts: %w", err)
+		return nil, 0, fmt.Errorf(ErrCountingDebts, err)
 	}
 
 	offset := (page - 1) * limit
 	if err := query.Order("created_at DESC").Offset(offset).Limit(limit).Find(&debts).Error; err != nil {
-		return nil, 0, fmt.Errorf("error finding debts: %w", err)
+		return nil, 0, fmt.Errorf(ErrFindingDebts, err)
 	}
 
 	return debts, total, nil
@@ -86,13 +86,13 @@ func (r *DebtRepository) GetTotalByPersonInMonth(year, month int) ([]PersonTotal
 
 	err := r.db.Model(&models.Debt{}).
 		Select("person, SUM(value) as total").
-		Where("created_at >= ? AND created_at < ?", startOfMonth, endOfMonth).
+		Where(SQLWhereCreatedAtRange, startOfMonth, endOfMonth).
 		Group("person").
 		Order("total DESC").
 		Scan(&results).Error
 
 	if err != nil {
-		return nil, fmt.Errorf("error calculating total by person: %w", err)
+		return nil, fmt.Errorf(ErrCalculatingTotal, err)
 	}
 
 	return results, nil
