@@ -6,11 +6,14 @@ const (
 	ErrDecodeJSON       = "Erro ao decodificar JSON: "
 	ErrInternalServer   = "Erro interno do servidor"
 	ErrGenerateToken    = "Erro ao gerar token"
+	ErrFarmIDNotFound   = "Farm ID not found in context"
+	ErrInvalidSaleID    = "Invalid sale ID"
 )
 
 const (
-	HeaderContentType = "Content-Type"
-	ContentTypeJSON   = "application/json"
+	HeaderContentType              = "Content-Type"
+	ContentTypeJSON                = "application/json"
+	HeaderAccessControlAllowOrigin = "Access-Control-Allow-Origin"
 )
 
 const (

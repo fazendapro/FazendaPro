@@ -54,7 +54,7 @@ func (h *SaleChiHandler) CreateSale(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	saleDate, err := time.Parse("2006-01-02", req.SaleDate)
+	saleDate, err := time.Parse(DateFormatISO, req.SaleDate)
 	if err != nil {
 		http.Error(w, "Invalid date format", http.StatusBadRequest)
 		return
@@ -62,7 +62,7 @@ func (h *SaleChiHandler) CreateSale(w http.ResponseWriter, r *http.Request) {
 
 	farmID, ok := r.Context().Value("farm_id").(uint)
 	if !ok {
-		http.Error(w, "Farm ID not found in context", http.StatusUnauthorized)
+		http.Error(w, ErrFarmIDNotFound, http.StatusUnauthorized)
 		return
 	}
 
@@ -93,7 +93,7 @@ func (h *SaleChiHandler) CreateSale(w http.ResponseWriter, r *http.Request) {
 		UpdatedAt: sale.UpdatedAt,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(response)
 }
@@ -101,7 +101,7 @@ func (h *SaleChiHandler) CreateSale(w http.ResponseWriter, r *http.Request) {
 func (h *SaleChiHandler) GetSalesByFarm(w http.ResponseWriter, r *http.Request) {
 	farmID, ok := r.Context().Value("farm_id").(uint)
 	if !ok {
-		http.Error(w, "Farm ID not found in context", http.StatusUnauthorized)
+		http.Error(w, ErrFarmIDNotFound, http.StatusUnauthorized)
 		return
 	}
 
@@ -127,14 +127,14 @@ func (h *SaleChiHandler) GetSalesByFarm(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	json.NewEncoder(w).Encode(responses)
 }
 
 func (h *SaleChiHandler) GetSalesHistory(w http.ResponseWriter, r *http.Request) {
 	farmID, ok := r.Context().Value("farm_id").(uint)
 	if !ok {
-		http.Error(w, "Farm ID not found in context", http.StatusUnauthorized)
+		http.Error(w, ErrFarmIDNotFound, http.StatusUnauthorized)
 		return
 	}
 
@@ -160,14 +160,14 @@ func (h *SaleChiHandler) GetSalesHistory(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	json.NewEncoder(w).Encode(responses)
 }
 
 func (h *SaleChiHandler) GetSalesByDateRange(w http.ResponseWriter, r *http.Request) {
 	farmID, ok := r.Context().Value("farm_id").(uint)
 	if !ok {
-		http.Error(w, "Farm ID not found in context", http.StatusUnauthorized)
+		http.Error(w, ErrFarmIDNotFound, http.StatusUnauthorized)
 		return
 	}
 
@@ -213,7 +213,7 @@ func (h *SaleChiHandler) GetSalesByDateRange(w http.ResponseWriter, r *http.Requ
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	json.NewEncoder(w).Encode(responses)
 }
 
@@ -221,7 +221,7 @@ func (h *SaleChiHandler) GetSaleByID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
-		http.Error(w, "Invalid sale ID", http.StatusBadRequest)
+		http.Error(w, ErrInvalidSaleID, http.StatusBadRequest)
 		return
 	}
 
@@ -244,7 +244,7 @@ func (h *SaleChiHandler) GetSaleByID(w http.ResponseWriter, r *http.Request) {
 		Animal:    &sale.Animal,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -252,7 +252,7 @@ func (h *SaleChiHandler) UpdateSale(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
-		http.Error(w, "Invalid sale ID", http.StatusBadRequest)
+		http.Error(w, ErrInvalidSaleID, http.StatusBadRequest)
 		return
 	}
 
@@ -262,7 +262,7 @@ func (h *SaleChiHandler) UpdateSale(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	saleDate, err := time.Parse("2006-01-02", req.SaleDate)
+	saleDate, err := time.Parse(DateFormatISO, req.SaleDate)
 	if err != nil {
 		http.Error(w, "Invalid date format", http.StatusBadRequest)
 		return
@@ -302,7 +302,7 @@ func (h *SaleChiHandler) UpdateSale(w http.ResponseWriter, r *http.Request) {
 		UpdatedAt: sale.UpdatedAt,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -310,7 +310,7 @@ func (h *SaleChiHandler) DeleteSale(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
-		http.Error(w, "Invalid sale ID", http.StatusBadRequest)
+		http.Error(w, ErrInvalidSaleID, http.StatusBadRequest)
 		return
 	}
 
@@ -320,7 +320,7 @@ func (h *SaleChiHandler) DeleteSale(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Sale deleted successfully"})
 }
 
@@ -354,14 +354,14 @@ func (h *SaleChiHandler) GetSalesByAnimal(w http.ResponseWriter, r *http.Request
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	json.NewEncoder(w).Encode(responses)
 }
 
 func (h *SaleChiHandler) GetMonthlySalesStats(w http.ResponseWriter, r *http.Request) {
 	farmID, ok := r.Context().Value("farm_id").(uint)
 	if !ok {
-		SendErrorResponse(w, "Farm ID not found in context", http.StatusUnauthorized)
+		SendErrorResponse(w, ErrFarmIDNotFound, http.StatusUnauthorized)
 		return
 	}
 
@@ -385,7 +385,7 @@ func (h *SaleChiHandler) GetMonthlySalesStats(w http.ResponseWriter, r *http.Req
 func (h *SaleChiHandler) GetMonthlySalesAndPurchases(w http.ResponseWriter, r *http.Request) {
 	farmID, ok := r.Context().Value("farm_id").(uint)
 	if !ok {
-		SendErrorResponse(w, "Farm ID not found in context", http.StatusUnauthorized)
+		SendErrorResponse(w, ErrFarmIDNotFound, http.StatusUnauthorized)
 		return
 	}
 
@@ -428,7 +428,7 @@ func (h *SaleChiHandler) GetMonthlySalesAndPurchases(w http.ResponseWriter, r *h
 func (h *SaleChiHandler) GetOverviewStats(w http.ResponseWriter, r *http.Request) {
 	farmID, ok := r.Context().Value("farm_id").(uint)
 	if !ok {
-		SendErrorResponse(w, "Farm ID not found in context", http.StatusUnauthorized)
+		SendErrorResponse(w, ErrFarmIDNotFound, http.StatusUnauthorized)
 		return
 	}
 
