@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, ReactNode, useCallback, use
 import { Sale, CreateSaleRequest, UpdateSaleRequest, SaleFilters } from '../types/sale';
 import { saleService } from '../components/services/saleService';
 import { toast } from 'react-toastify';
+import { useFarm } from '../hooks/useFarm';
 
 const getErrorMessage = (err: unknown, defaultMessage: string): string => {
   if (err instanceof Error && 'response' in err) {
@@ -35,6 +36,7 @@ interface SaleProviderProps {
 }
 
 export const SaleProvider: React.FC<SaleProviderProps> = ({ children }) => {
+  const { farm } = useFarm();
   const [sales, setSales] = useState<Sale[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -96,7 +98,7 @@ export const SaleProvider: React.FC<SaleProviderProps> = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-      const farmSales = await saleService.getSalesByFarm();
+      const farmSales = await saleService.getSalesByFarm(farm?.id);
       setSales(farmSales);
     } catch (err: unknown) {
       const errorMessage = getErrorMessage(err, 'Erro ao carregar vendas');
@@ -105,13 +107,13 @@ export const SaleProvider: React.FC<SaleProviderProps> = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [farm?.id]);
 
   const getSalesHistory = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-        const history = await saleService.getSalesHistory();
+        const history = await saleService.getSalesHistory(farm?.id);
         setSales(history);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error && 'response' in err 
@@ -124,31 +126,31 @@ export const SaleProvider: React.FC<SaleProviderProps> = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [farm?.id]);
 
   const getSalesByAnimal = useCallback(async (animalId: number): Promise<Sale[]> => {
     try {
       setError(null);
-      return await saleService.getSalesByAnimal(animalId);
+      return await saleService.getSalesByAnimal(animalId, farm?.id);
     } catch (err: unknown) {
       const errorMessage = getErrorMessage(err, 'Erro ao carregar vendas do animal');
       setError(errorMessage);
       toast.error(errorMessage);
       return [];
     }
-  }, []);
+  }, [farm?.id]);
 
   const getSalesByDateRange = useCallback(async (filters: SaleFilters): Promise<Sale[]> => {
     try {
       setError(null);
-      return await saleService.getSalesByDateRange(filters);
+      return await saleService.getSalesByDateRange(filters, farm?.id);
     } catch (err: unknown) {
       const errorMessage = getErrorMessage(err, 'Erro ao carregar vendas por período');
       setError(errorMessage);
       toast.error(errorMessage);
       return [];
     }
-  }, []);
+  }, [farm?.id]);
 
   const value: SaleContextType = useMemo(() => ({
     sales,

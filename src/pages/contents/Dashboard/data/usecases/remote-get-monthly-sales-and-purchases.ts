@@ -8,8 +8,10 @@ export class RemoteGetMonthlySalesAndPurchases implements GetMonthlySalesAndPurc
 
   async getMonthlySalesAndPurchases(params: GetMonthlySalesAndPurchasesParams): Promise<GetMonthlySalesAndPurchasesResponse> {
     try {
-      const queryParams: Record<string, string | number> = {};
-      
+      const queryParams: Record<string, string | number> = {
+        farmId: params.farm_id
+      };
+
       if (params.months) {
         queryParams.months = params.months;
       }

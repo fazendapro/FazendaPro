@@ -7,25 +7,29 @@ export const saleService = {
     return response.data;
   },
 
-  async getSalesByFarm(): Promise<Sale[]> {
-    const response = await api.get('/sales');
+  async getSalesByFarm(farmId?: number): Promise<Sale[]> {
+    const params = farmId ? `?farmId=${farmId}` : '';
+    const response = await api.get(`/sales${params}`);
     return response.data;
   },
 
-  async getSalesHistory(): Promise<Sale[]> {
-    const response = await api.get('/sales/history');
+  async getSalesHistory(farmId?: number): Promise<Sale[]> {
+    const params = farmId ? `?farmId=${farmId}` : '';
+    const response = await api.get(`/sales/history${params}`);
     return response.data;
   },
 
-  async getSalesByAnimal(animalId: number): Promise<Sale[]> {
-    const response = await api.get(`/animals/${animalId}/sales`);
+  async getSalesByAnimal(animalId: number, farmId?: number): Promise<Sale[]> {
+    const params = farmId ? `?farmId=${farmId}` : '';
+    const response = await api.get(`/animals/${animalId}/sales${params}`);
     return response.data;
   },
 
-  async getSalesByDateRange(filters: SaleFilters): Promise<Sale[]> {
+  async getSalesByDateRange(filters: SaleFilters, farmId?: number): Promise<Sale[]> {
     const params = new URLSearchParams();
     if (filters.start_date) params.append('start_date', filters.start_date);
     if (filters.end_date) params.append('end_date', filters.end_date);
+    if (farmId) params.append('farmId', farmId.toString());
 
     const url = `/sales/date-range?${params.toString()}`;
     const response = await api.get(url);
