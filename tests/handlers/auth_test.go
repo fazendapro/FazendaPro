@@ -12,6 +12,7 @@ import (
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
 	"github.com/fazendapro/FazendaPro-api/internal/utils"
+	"github.com/fazendapro/FazendaPro-api/tests"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -24,29 +25,29 @@ func TestAuthHandler_RefreshToken_Success(t *testing.T) {
 		ID:     1,
 		FarmID: 1,
 		Person: &models.Person{
-			Email: "test@example.com",
+			Email: tests.TestEmailExample,
 		},
 	}
 
 	refreshToken := &models.RefreshToken{
 		ID:     1,
 		UserID: 1,
-		Token:  "valid-refresh-token",
+		Token:  tests.TestRefreshTokenValid,
 	}
 	refreshToken.User = *user
 
-	mockRefreshTokenRepo.On("FindByToken", "valid-refresh-token").Return(refreshToken, nil)
+	mockRefreshTokenRepo.On("FindByToken", tests.TestRefreshTokenValid).Return(refreshToken, nil)
 
 	userService := service.NewUserService(mockUserRepo)
-	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, "test-secret")
+	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, tests.TestSecret)
 
 	reqData := map[string]string{
-		"refresh_token": "valid-refresh-token",
+		"refresh_token": tests.TestRefreshTokenValid,
 	}
 	jsonData, _ := json.Marshal(reqData)
 
-	req := httptest.NewRequest("POST", "/api/auth/refresh", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest("POST", tests.EndpointAPIAuthRefresh, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	authHandler.RefreshToken(w, req)
@@ -64,7 +65,7 @@ func TestAuthHandler_RefreshToken_InvalidMethod(t *testing.T) {
 	mockRefreshTokenRepo := &MockRefreshTokenRepository{}
 
 	userService := service.NewUserService(mockUserRepo)
-	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, "test-secret")
+	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, tests.TestSecret)
 
 	req := httptest.NewRequest("GET", "/api/auth/refresh", nil)
 	w := httptest.NewRecorder()
@@ -79,10 +80,10 @@ func TestAuthHandler_RefreshToken_InvalidJSON(t *testing.T) {
 	mockRefreshTokenRepo := &MockRefreshTokenRepository{}
 
 	userService := service.NewUserService(mockUserRepo)
-	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, "test-secret")
+	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, tests.TestSecret)
 
-	req := httptest.NewRequest("POST", "/api/auth/refresh", bytes.NewBuffer([]byte("invalid json")))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest("POST", tests.EndpointAPIAuthRefresh, bytes.NewBuffer([]byte(tests.TestErrorInvalidJSON)))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	authHandler.RefreshToken(w, req)
@@ -97,15 +98,15 @@ func TestAuthHandler_RefreshToken_InvalidToken(t *testing.T) {
 	mockRefreshTokenRepo.On("FindByToken", "invalid-token").Return(nil, nil)
 
 	userService := service.NewUserService(mockUserRepo)
-	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, "test-secret")
+	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, tests.TestSecret)
 
 	reqData := map[string]string{
 		"refresh_token": "invalid-token",
 	}
 	jsonData, _ := json.Marshal(reqData)
 
-	req := httptest.NewRequest("POST", "/api/auth/refresh", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest("POST", tests.EndpointAPIAuthRefresh, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	authHandler.RefreshToken(w, req)
@@ -121,15 +122,15 @@ func TestAuthHandler_RefreshToken_RepositoryError(t *testing.T) {
 	mockRefreshTokenRepo.On("FindByToken", "token").Return(nil, errors.New("erro ao buscar"))
 
 	userService := service.NewUserService(mockUserRepo)
-	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, "test-secret")
+	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, tests.TestSecret)
 
 	reqData := map[string]string{
 		"refresh_token": "token",
 	}
 	jsonData, _ := json.Marshal(reqData)
 
-	req := httptest.NewRequest("POST", "/api/auth/refresh", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest("POST", tests.EndpointAPIAuthRefresh, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	authHandler.RefreshToken(w, req)
@@ -142,18 +143,18 @@ func TestAuthHandler_Logout_Success(t *testing.T) {
 	mockUserRepo := &MockUserRepository{}
 	mockRefreshTokenRepo := &MockRefreshTokenRepository{}
 
-	mockRefreshTokenRepo.On("DeleteByToken", "refresh-token").Return(nil)
+	mockRefreshTokenRepo.On("DeleteByToken", tests.TestRefreshToken).Return(nil)
 
 	userService := service.NewUserService(mockUserRepo)
-	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, "test-secret")
+	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, tests.TestSecret)
 
 	reqData := map[string]string{
 		"refresh_token": "refresh-token",
 	}
 	jsonData, _ := json.Marshal(reqData)
 
-	req := httptest.NewRequest("POST", "/api/auth/logout", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest("POST", tests.EndpointAPIAuthLogout, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	authHandler.Logout(w, req)
@@ -170,7 +171,7 @@ func TestAuthHandler_Logout_InvalidMethod(t *testing.T) {
 	mockRefreshTokenRepo := &MockRefreshTokenRepository{}
 
 	userService := service.NewUserService(mockUserRepo)
-	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, "test-secret")
+	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, tests.TestSecret)
 
 	req := httptest.NewRequest("GET", "/api/auth/logout", nil)
 	w := httptest.NewRecorder()
@@ -185,7 +186,7 @@ func TestAuthHandler_Logout_InvalidJSON(t *testing.T) {
 	mockRefreshTokenRepo := &MockRefreshTokenRepository{}
 
 	userService := service.NewUserService(mockUserRepo)
-	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, "test-secret")
+	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, tests.TestSecret)
 
 	req := httptest.NewRequest("POST", "/api/auth/logout", bytes.NewBuffer([]byte("invalid json")))
 	req.Header.Set("Content-Type", "application/json")
@@ -203,15 +204,15 @@ func TestAuthHandler_Logout_RepositoryError(t *testing.T) {
 	mockRefreshTokenRepo.On("DeleteByToken", "token").Return(errors.New("erro ao deletar"))
 
 	userService := service.NewUserService(mockUserRepo)
-	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, "test-secret")
+	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, tests.TestSecret)
 
 	reqData := map[string]string{
 		"refresh_token": "token",
 	}
 	jsonData, _ := json.Marshal(reqData)
 
-	req := httptest.NewRequest("POST", "/api/auth/logout", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest("POST", tests.EndpointAPIAuthLogout, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	authHandler.Logout(w, req)
@@ -225,7 +226,7 @@ func TestAuthHandler_Register_InvalidData(t *testing.T) {
 	mockRefreshTokenRepo := &MockRefreshTokenRepository{}
 
 	userService := service.NewUserService(mockUserRepo)
-	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, "test-secret")
+	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, tests.TestSecret)
 
 	reqData := map[string]interface{}{
 		"user": map[string]interface{}{
@@ -240,8 +241,8 @@ func TestAuthHandler_Register_InvalidData(t *testing.T) {
 	}
 	jsonData, _ := json.Marshal(reqData)
 
-	req := httptest.NewRequest("POST", "/api/auth/register", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest("POST", tests.EndpointAPIAuthRegister, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	authHandler.Register(w, req)
@@ -266,7 +267,7 @@ func TestAuthHandler_Login_InvalidCredentials(t *testing.T) {
 	mockUserRepo.On("FindByPersonEmail", "test@example.com").Return(expectedUser, nil).Twice()
 
 	userService := service.NewUserService(mockUserRepo)
-	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, "test-secret")
+	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, tests.TestSecret)
 
 	loginData := map[string]string{
 		"email":    "test@example.com",
@@ -274,8 +275,8 @@ func TestAuthHandler_Login_InvalidCredentials(t *testing.T) {
 	}
 	jsonData, _ := json.Marshal(loginData)
 
-	req := httptest.NewRequest("POST", "/api/auth/login", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest("POST", tests.EndpointAPIAuthLogin, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	authHandler.Login(w, req)
@@ -298,7 +299,7 @@ func TestAuthHandler_Register_GetUserByEmailError(t *testing.T) {
 		"person": map[string]interface{}{
 			"first_name": "João",
 			"last_name":  "Silva",
-			"email":      "joao@example.com",
+			"email":      tests.TestEmailJoao,
 			"password":   "password123",
 			"cpf":        "12345678901",
 		},
@@ -306,19 +307,19 @@ func TestAuthHandler_Register_GetUserByEmailError(t *testing.T) {
 	jsonData, _ := json.Marshal(reqData)
 
 	mockUserRepo.On("FarmExists", uint(1)).Return(true, nil)
-	mockUserRepo.On("CreateWithPerson", mock.AnythingOfType("*models.User"), mock.AnythingOfType("*models.Person")).Return(nil).Run(func(args mock.Arguments) {
+	mockUserRepo.On("CreateWithPerson", mock.AnythingOfType(tests.TypeModelsUser), mock.AnythingOfType(tests.TypeModelsPerson)).Return(nil).Run(func(args mock.Arguments) {
 		user := args.Get(0).(*models.User)
 		user.ID = 1
 	})
 	mockUserRepo.On("FindByIDWithPerson", uint(1)).Return(&models.User{ID: 1, FarmID: 1}, nil)
-	mockUserRepo.On("CreateUserFarm", mock.AnythingOfType("*models.UserFarm")).Return(nil)
-	mockUserRepo.On("FindByPersonEmail", "joao@example.com").Return(nil, errors.New("database error"))
+	mockUserRepo.On("CreateUserFarm", mock.AnythingOfType(tests.TypeModelsUserFarm)).Return(nil)
+	mockUserRepo.On("FindByPersonEmail", tests.TestEmailJoao).Return(nil, errors.New(tests.TestErrorDatabaseError))
 
 	userService := service.NewUserService(mockUserRepo)
-	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, "test-secret")
+	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, tests.TestSecret)
 
-	req := httptest.NewRequest("POST", "/api/auth/register", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest("POST", tests.EndpointAPIAuthRegister, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	authHandler.Register(w, req)
@@ -338,7 +339,7 @@ func TestAuthHandler_Register_UserNotFoundAfterCreation(t *testing.T) {
 		"person": map[string]interface{}{
 			"first_name": "João",
 			"last_name":  "Silva",
-			"email":      "joao@example.com",
+			"email":      tests.TestEmailJoao,
 			"password":   "password123",
 			"cpf":        "12345678901",
 		},
@@ -346,19 +347,19 @@ func TestAuthHandler_Register_UserNotFoundAfterCreation(t *testing.T) {
 	jsonData, _ := json.Marshal(reqData)
 
 	mockUserRepo.On("FarmExists", uint(1)).Return(true, nil)
-	mockUserRepo.On("CreateWithPerson", mock.AnythingOfType("*models.User"), mock.AnythingOfType("*models.Person")).Return(nil).Run(func(args mock.Arguments) {
+	mockUserRepo.On("CreateWithPerson", mock.AnythingOfType(tests.TypeModelsUser), mock.AnythingOfType(tests.TypeModelsPerson)).Return(nil).Run(func(args mock.Arguments) {
 		user := args.Get(0).(*models.User)
 		user.ID = 1
 	})
 	mockUserRepo.On("FindByIDWithPerson", uint(1)).Return(&models.User{ID: 1, FarmID: 1}, nil)
-	mockUserRepo.On("CreateUserFarm", mock.AnythingOfType("*models.UserFarm")).Return(nil)
-	mockUserRepo.On("FindByPersonEmail", "joao@example.com").Return(nil, nil)
+	mockUserRepo.On("CreateUserFarm", mock.AnythingOfType(tests.TypeModelsUserFarm)).Return(nil)
+	mockUserRepo.On("FindByPersonEmail", tests.TestEmailJoao).Return(nil, nil)
 
 	userService := service.NewUserService(mockUserRepo)
-	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, "test-secret")
+	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, tests.TestSecret)
 
-	req := httptest.NewRequest("POST", "/api/auth/register", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest("POST", tests.EndpointAPIAuthRegister, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	authHandler.Register(w, req)
@@ -379,7 +380,7 @@ func TestAuthHandler_Register_RefreshTokenCreationError(t *testing.T) {
 			ID:        1,
 			FirstName: "João",
 			LastName:  "Silva",
-			Email:     "joao@example.com",
+			Email:     tests.TestEmailJoao,
 			Password:  hashedPassword,
 		},
 	}
@@ -391,7 +392,7 @@ func TestAuthHandler_Register_RefreshTokenCreationError(t *testing.T) {
 		"person": map[string]interface{}{
 			"first_name": "João",
 			"last_name":  "Silva",
-			"email":      "joao@example.com",
+			"email":      tests.TestEmailJoao,
 			"password":   "password123",
 			"cpf":        "12345678901",
 		},
@@ -399,20 +400,20 @@ func TestAuthHandler_Register_RefreshTokenCreationError(t *testing.T) {
 	jsonData, _ := json.Marshal(reqData)
 
 	mockUserRepo.On("FarmExists", uint(1)).Return(true, nil)
-	mockUserRepo.On("CreateWithPerson", mock.AnythingOfType("*models.User"), mock.AnythingOfType("*models.Person")).Return(nil).Run(func(args mock.Arguments) {
+	mockUserRepo.On("CreateWithPerson", mock.AnythingOfType(tests.TypeModelsUser), mock.AnythingOfType(tests.TypeModelsPerson)).Return(nil).Run(func(args mock.Arguments) {
 		user := args.Get(0).(*models.User)
 		user.ID = 1
 	})
 	mockUserRepo.On("FindByIDWithPerson", uint(1)).Return(&models.User{ID: 1, FarmID: 1}, nil)
-	mockUserRepo.On("CreateUserFarm", mock.AnythingOfType("*models.UserFarm")).Return(nil)
-	mockUserRepo.On("FindByPersonEmail", "joao@example.com").Return(expectedUser, nil)
+	mockUserRepo.On("CreateUserFarm", mock.AnythingOfType(tests.TypeModelsUserFarm)).Return(nil)
+	mockUserRepo.On("FindByPersonEmail", tests.TestEmailJoao).Return(expectedUser, nil)
 	mockRefreshTokenRepo.On("Create", uint(1), mock.AnythingOfType("time.Time")).Return(nil, errors.New("database error"))
 
 	userService := service.NewUserService(mockUserRepo)
-	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, "test-secret")
+	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, tests.TestSecret)
 
-	req := httptest.NewRequest("POST", "/api/auth/register", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest("POST", tests.EndpointAPIAuthRegister, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	authHandler.Register(w, req)
@@ -427,7 +428,7 @@ func TestAuthHandler_Login_InvalidMethod(t *testing.T) {
 	mockRefreshTokenRepo := &MockRefreshTokenRepository{}
 
 	userService := service.NewUserService(mockUserRepo)
-	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, "test-secret")
+	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, tests.TestSecret)
 
 	req := httptest.NewRequest("GET", "/api/auth/login", nil)
 	w := httptest.NewRecorder()
@@ -442,10 +443,10 @@ func TestAuthHandler_Login_InvalidJSON(t *testing.T) {
 	mockRefreshTokenRepo := &MockRefreshTokenRepository{}
 
 	userService := service.NewUserService(mockUserRepo)
-	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, "test-secret")
+	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, tests.TestSecret)
 
-	req := httptest.NewRequest("POST", "/api/auth/login", bytes.NewBuffer([]byte("invalid json")))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest("POST", tests.EndpointAPIAuthLogin, bytes.NewBuffer([]byte(tests.TestErrorInvalidJSON)))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	authHandler.Login(w, req)
@@ -460,7 +461,7 @@ func TestAuthHandler_Login_GetUserByEmailError(t *testing.T) {
 	mockUserRepo.On("FindByPersonEmail", "test@example.com").Return(nil, errors.New("database error"))
 
 	userService := service.NewUserService(mockUserRepo)
-	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, "test-secret")
+	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, tests.TestSecret)
 
 	loginData := map[string]string{
 		"email":    "test@example.com",
@@ -468,8 +469,8 @@ func TestAuthHandler_Login_GetUserByEmailError(t *testing.T) {
 	}
 	jsonData, _ := json.Marshal(loginData)
 
-	req := httptest.NewRequest("POST", "/api/auth/login", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest("POST", tests.EndpointAPIAuthLogin, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	authHandler.Login(w, req)
@@ -485,7 +486,7 @@ func TestAuthHandler_Login_UserNotFound(t *testing.T) {
 	mockUserRepo.On("FindByPersonEmail", "test@example.com").Return(nil, nil)
 
 	userService := service.NewUserService(mockUserRepo)
-	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, "test-secret")
+	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, tests.TestSecret)
 
 	loginData := map[string]string{
 		"email":    "test@example.com",
@@ -493,8 +494,8 @@ func TestAuthHandler_Login_UserNotFound(t *testing.T) {
 	}
 	jsonData, _ := json.Marshal(loginData)
 
-	req := httptest.NewRequest("POST", "/api/auth/login", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest("POST", tests.EndpointAPIAuthLogin, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	authHandler.Login(w, req)
@@ -527,7 +528,7 @@ func TestAuthHandler_Login_ValidatePasswordError(t *testing.T) {
 	mockRefreshTokenRepo.On("Create", uint(1), mock.AnythingOfType("time.Time")).Return(refreshToken, nil)
 
 	userService := service.NewUserService(mockUserRepo)
-	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, "test-secret")
+	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, tests.TestSecret)
 
 	loginData := map[string]string{
 		"email":    "test@example.com",
@@ -535,8 +536,8 @@ func TestAuthHandler_Login_ValidatePasswordError(t *testing.T) {
 	}
 	jsonData, _ := json.Marshal(loginData)
 
-	req := httptest.NewRequest("POST", "/api/auth/login", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest("POST", tests.EndpointAPIAuthLogin, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	authHandler.Login(w, req)
@@ -545,7 +546,6 @@ func TestAuthHandler_Login_ValidatePasswordError(t *testing.T) {
 	mockUserRepo.AssertExpectations(t)
 	mockRefreshTokenRepo.AssertExpectations(t)
 }
-
 
 func TestAuthHandler_Login_RefreshTokenError(t *testing.T) {
 	mockUserRepo := &MockUserRepository{}
@@ -565,7 +565,7 @@ func TestAuthHandler_Login_RefreshTokenError(t *testing.T) {
 	mockRefreshTokenRepo.On("Create", uint(1), mock.AnythingOfType("time.Time")).Return(nil, errors.New("database error"))
 
 	userService := service.NewUserService(mockUserRepo)
-	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, "test-secret")
+	authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, tests.TestSecret)
 
 	loginData := map[string]string{
 		"email":    "test@example.com",
@@ -573,8 +573,8 @@ func TestAuthHandler_Login_RefreshTokenError(t *testing.T) {
 	}
 	jsonData, _ := json.Marshal(loginData)
 
-	req := httptest.NewRequest("POST", "/api/auth/login", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest("POST", tests.EndpointAPIAuthLogin, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	authHandler.Login(w, req)

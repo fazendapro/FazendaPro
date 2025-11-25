@@ -11,6 +11,7 @@ import (
 	"github.com/fazendapro/FazendaPro-api/internal/api/handlers"
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
+	"github.com/fazendapro/FazendaPro-api/tests"
 	"github.com/fazendapro/FazendaPro-api/tests/services"
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
@@ -21,10 +22,10 @@ func setupUserRouter(mockRepo *services.MockUserRepository) (*chi.Mux, *services
 	userService := service.NewUserService(mockRepo)
 	userHandler := handlers.NewUserHandler(userService)
 	r := chi.NewRouter()
-	r.Get("/users", userHandler.GetUser)
-	r.Post("/users", userHandler.CreateUser)
-	r.Get("/users/person", userHandler.GetUserWithPerson)
-	r.Put("/users/person", userHandler.UpdatePersonData)
+	r.Get(tests.EndpointUsers, userHandler.GetUser)
+	r.Post(tests.EndpointUsers, userHandler.CreateUser)
+	r.Get(tests.EndpointUsersPerson, userHandler.GetUserWithPerson)
+	r.Put(tests.EndpointUsersPerson, userHandler.UpdatePersonData)
 	return r, mockRepo
 }
 
@@ -36,16 +37,16 @@ func TestUserHandler_GetUser_Success(t *testing.T) {
 		ID:     1,
 		FarmID: 1,
 		Person: &models.Person{
-			Email:     "test@example.com",
+			Email:     tests.TestEmailExample,
 			FirstName: "João",
 			LastName:  "Silva",
 		},
 	}
 
-	req, _ := http.NewRequest("GET", "/users?email=test@example.com", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointUsers+"?email="+tests.TestEmailExample, nil)
 	w := httptest.NewRecorder()
 
-	mockRepo.On("FindByPersonEmail", "test@example.com").Return(expectedUser, nil)
+	mockRepo.On("FindByPersonEmail", tests.TestEmailExample).Return(expectedUser, nil)
 
 	router.ServeHTTP(w, req)
 
@@ -60,7 +61,7 @@ func TestUserHandler_GetUser_MissingEmail(t *testing.T) {
 	mockRepo := new(services.MockUserRepository)
 	router, _ := setupUserRouter(mockRepo)
 
-	req, _ := http.NewRequest("GET", "/users", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointUsers, nil)
 	w := httptest.NewRecorder()
 
 	router.ServeHTTP(w, req)
@@ -107,7 +108,7 @@ func TestUserHandler_CreateUser_Success(t *testing.T) {
 
 	mockRepo.On("FarmExists", uint(1)).Return(true, nil)
 	personID := uint(1)
-	mockRepo.On("CreateWithPerson", mock.AnythingOfType("*models.User"), mock.AnythingOfType("*models.Person")).Return(nil).Run(func(args mock.Arguments) {
+	mockRepo.On("CreateWithPerson", mock.AnythingOfType(tests.TypeModelsUser), mock.AnythingOfType(tests.TypeModelsPerson)).Return(nil).Run(func(args mock.Arguments) {
 		user := args.Get(0).(*models.User)
 		user.ID = 1
 		user.PersonID = &personID
@@ -129,7 +130,7 @@ func TestUserHandler_CreateUser_InvalidMethod(t *testing.T) {
 	userService := service.NewUserService(mockRepo)
 	userHandler := handlers.NewUserHandler(userService)
 
-	req, _ := http.NewRequest("GET", "/users", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointUsers, nil)
 	w := httptest.NewRecorder()
 
 	userHandler.CreateUser(w, req)
@@ -187,13 +188,13 @@ func TestUserHandler_GetUserWithPerson_Success(t *testing.T) {
 		PersonID: &personID,
 		FarmID:   1,
 		Person: &models.Person{
-			Email:     "test@example.com",
+			Email:     tests.TestEmailExample,
 			FirstName: "João",
 			LastName:  "Silva",
 		},
 	}
 
-	req, _ := http.NewRequest("GET", "/users/person?id=1", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointUsersPersonWithID, nil)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("FindByIDWithPerson", uint(1)).Return(expectedUser, nil).Once()
@@ -223,7 +224,7 @@ func TestUserHandler_GetUserWithPerson_NotFound(t *testing.T) {
 	mockRepo := new(services.MockUserRepository)
 	router, _ := setupUserRouter(mockRepo)
 
-	req, _ := http.NewRequest("GET", "/users/person?id=1", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointUsersPersonWithID, nil)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("FindByIDWithPerson", uint(1)).Return(nil, nil)
@@ -324,7 +325,7 @@ func TestUserHandler_GetUserWithPerson_ServiceError(t *testing.T) {
 	mockRepo := new(services.MockUserRepository)
 	router, _ := setupUserRouter(mockRepo)
 
-	req, _ := http.NewRequest("GET", "/users/person?id=1", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointUsersPersonWithID, nil)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("FindByIDWithPerson", uint(1)).Return(nil, errors.New("database error"))

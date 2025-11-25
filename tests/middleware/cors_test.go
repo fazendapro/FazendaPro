@@ -7,6 +7,7 @@ import (
 
 	"github.com/fazendapro/FazendaPro-api/config"
 	"github.com/fazendapro/FazendaPro-api/internal/api/middleware"
+	"github.com/fazendapro/FazendaPro-api/tests"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,7 +16,7 @@ func TestCORSMiddleware_AllowAll(t *testing.T) {
 		CORS: config.CORSConfig{
 			AllowedOrigins: []string{"*"},
 			AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
-			AllowedHeaders: []string{"Content-Type", "Authorization"},
+			AllowedHeaders: []string{tests.HeaderContentType, tests.HeaderAuthorization},
 		},
 	}
 
@@ -25,12 +26,12 @@ func TestCORSMiddleware_AllowAll(t *testing.T) {
 	}))
 
 	req := httptest.NewRequest("GET", "/test", nil)
-	req.Header.Set("Origin", "http://localhost:3000")
+	req.Header.Set("Origin", tests.TestOriginLocalhost)
 	w := httptest.NewRecorder()
 
 	handler.ServeHTTP(w, req)
 
-	assert.Equal(t, "*", w.Header().Get("Access-Control-Allow-Origin"))
+	assert.Equal(t, "*", w.Header().Get(tests.HeaderAccessControlAllowOrigin))
 	assert.Equal(t, http.StatusOK, w.Code)
 }
 
@@ -39,7 +40,7 @@ func TestCORSMiddleware_SpecificOrigin(t *testing.T) {
 		CORS: config.CORSConfig{
 			AllowedOrigins: []string{"http://localhost:3000"},
 			AllowedMethods: []string{"GET", "POST"},
-			AllowedHeaders: []string{"Content-Type"},
+			AllowedHeaders: []string{tests.HeaderContentType},
 		},
 	}
 
@@ -49,12 +50,12 @@ func TestCORSMiddleware_SpecificOrigin(t *testing.T) {
 	}))
 
 	req := httptest.NewRequest("GET", "/test", nil)
-	req.Header.Set("Origin", "http://localhost:3000")
+	req.Header.Set("Origin", tests.TestOriginLocalhost)
 	w := httptest.NewRecorder()
 
 	handler.ServeHTTP(w, req)
 
-	assert.Equal(t, "http://localhost:3000", w.Header().Get("Access-Control-Allow-Origin"))
+	assert.Equal(t, tests.TestOriginLocalhost, w.Header().Get(tests.HeaderAccessControlAllowOrigin))
 	assert.Equal(t, http.StatusOK, w.Code)
 }
 
@@ -63,7 +64,7 @@ func TestCORSMiddleware_NotAllowedOrigin(t *testing.T) {
 		CORS: config.CORSConfig{
 			AllowedOrigins: []string{"http://localhost:3000"},
 			AllowedMethods: []string{"GET", "POST"},
-			AllowedHeaders: []string{"Content-Type"},
+			AllowedHeaders: []string{tests.HeaderContentType},
 		},
 	}
 
@@ -78,7 +79,7 @@ func TestCORSMiddleware_NotAllowedOrigin(t *testing.T) {
 
 	handler.ServeHTTP(w, req)
 
-	assert.Empty(t, w.Header().Get("Access-Control-Allow-Origin"))
+	assert.Empty(t, w.Header().Get(tests.HeaderAccessControlAllowOrigin))
 	assert.Equal(t, http.StatusOK, w.Code)
 }
 
@@ -87,7 +88,7 @@ func TestCORSMiddleware_OPTIONSRequest(t *testing.T) {
 		CORS: config.CORSConfig{
 			AllowedOrigins: []string{"http://localhost:3000"},
 			AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
-			AllowedHeaders: []string{"Content-Type", "Authorization"},
+			AllowedHeaders: []string{tests.HeaderContentType, tests.HeaderAuthorization},
 		},
 	}
 
@@ -97,12 +98,12 @@ func TestCORSMiddleware_OPTIONSRequest(t *testing.T) {
 	}))
 
 	req := httptest.NewRequest("OPTIONS", "/test", nil)
-	req.Header.Set("Origin", "http://localhost:3000")
+	req.Header.Set("Origin", tests.TestOriginLocalhost)
 	w := httptest.NewRecorder()
 
 	handler.ServeHTTP(w, req)
 
-	assert.Equal(t, "http://localhost:3000", w.Header().Get("Access-Control-Allow-Origin"))
+	assert.Equal(t, tests.TestOriginLocalhost, w.Header().Get(tests.HeaderAccessControlAllowOrigin))
 	assert.Equal(t, "GET, POST, PUT, DELETE", w.Header().Get("Access-Control-Allow-Methods"))
 	assert.Equal(t, "Content-Type, Authorization", w.Header().Get("Access-Control-Allow-Headers"))
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -122,7 +123,7 @@ func TestCORSMiddleware_ExposedHeaders(t *testing.T) {
 	}))
 
 	req := httptest.NewRequest("GET", "/test", nil)
-	req.Header.Set("Origin", "http://localhost:3000")
+	req.Header.Set("Origin", tests.TestOriginLocalhost)
 	w := httptest.NewRecorder()
 
 	handler.ServeHTTP(w, req)
@@ -133,7 +134,7 @@ func TestCORSMiddleware_ExposedHeaders(t *testing.T) {
 func TestCORSMiddleware_AllowCredentials(t *testing.T) {
 	cfg := &config.Config{
 		CORS: config.CORSConfig{
-			AllowedOrigins:  []string{"http://localhost:3000"},
+			AllowedOrigins:   []string{"http://localhost:3000"},
 			AllowCredentials: true,
 		},
 	}
@@ -144,7 +145,7 @@ func TestCORSMiddleware_AllowCredentials(t *testing.T) {
 	}))
 
 	req := httptest.NewRequest("GET", "/test", nil)
-	req.Header.Set("Origin", "http://localhost:3000")
+	req.Header.Set("Origin", tests.TestOriginLocalhost)
 	w := httptest.NewRecorder()
 
 	handler.ServeHTTP(w, req)
@@ -166,11 +167,10 @@ func TestCORSMiddleware_MaxAge(t *testing.T) {
 	}))
 
 	req := httptest.NewRequest("OPTIONS", "/test", nil)
-	req.Header.Set("Origin", "http://localhost:3000")
+	req.Header.Set("Origin", tests.TestOriginLocalhost)
 	w := httptest.NewRecorder()
 
 	handler.ServeHTTP(w, req)
 
 	assert.Equal(t, "3600", w.Header().Get("Access-Control-Max-Age"))
 }
-

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/fazendapro/FazendaPro-api/internal/api/middleware"
+	"github.com/fazendapro/FazendaPro-api/tests"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/assert"
 )
@@ -14,7 +15,7 @@ import (
 func generateValidToken(secret string, farmID uint) string {
 	claims := jwt.MapClaims{
 		"sub":     1,
-		"email":   "test@example.com",
+		"email":   tests.TestEmailExample,
 		"farm_id": farmID,
 		"iat":     time.Now().Unix(),
 		"exp":     time.Now().Add(time.Hour * 24).Unix(),
@@ -26,7 +27,7 @@ func generateValidToken(secret string, farmID uint) string {
 }
 
 func TestAuthMiddleware_ValidToken(t *testing.T) {
-	jwtSecret := "test-secret"
+	jwtSecret := tests.TestSecret
 	authMiddleware := middleware.Auth(jwtSecret)
 
 	handler := authMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -38,7 +39,7 @@ func TestAuthMiddleware_ValidToken(t *testing.T) {
 
 	token := generateValidToken(jwtSecret, 1)
 	req := httptest.NewRequest("GET", "/test", nil)
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set(tests.HeaderAuthorization, tests.BearerPrefix+token)
 	w := httptest.NewRecorder()
 
 	handler.ServeHTTP(w, req)
@@ -47,7 +48,7 @@ func TestAuthMiddleware_ValidToken(t *testing.T) {
 }
 
 func TestAuthMiddleware_MissingToken(t *testing.T) {
-	jwtSecret := "test-secret"
+	jwtSecret := tests.TestSecret
 	authMiddleware := middleware.Auth(jwtSecret)
 
 	handler := authMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -63,7 +64,7 @@ func TestAuthMiddleware_MissingToken(t *testing.T) {
 }
 
 func TestAuthMiddleware_InvalidToken(t *testing.T) {
-	jwtSecret := "test-secret"
+	jwtSecret := tests.TestSecret
 	authMiddleware := middleware.Auth(jwtSecret)
 
 	handler := authMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -80,7 +81,7 @@ func TestAuthMiddleware_InvalidToken(t *testing.T) {
 }
 
 func TestAuthMiddleware_WrongSecret(t *testing.T) {
-	jwtSecret := "test-secret"
+	jwtSecret := tests.TestSecret
 	authMiddleware := middleware.Auth(jwtSecret)
 
 	handler := authMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -89,7 +90,7 @@ func TestAuthMiddleware_WrongSecret(t *testing.T) {
 
 	token := generateValidToken("wrong-secret", 1)
 	req := httptest.NewRequest("GET", "/test", nil)
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set(tests.HeaderAuthorization, tests.BearerPrefix+token)
 	w := httptest.NewRecorder()
 
 	handler.ServeHTTP(w, req)
@@ -98,7 +99,7 @@ func TestAuthMiddleware_WrongSecret(t *testing.T) {
 }
 
 func TestAuthMiddleware_ExpiredToken(t *testing.T) {
-	jwtSecret := "test-secret"
+	jwtSecret := tests.TestSecret
 	authMiddleware := middleware.Auth(jwtSecret)
 
 	handler := authMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -107,7 +108,7 @@ func TestAuthMiddleware_ExpiredToken(t *testing.T) {
 
 	claims := jwt.MapClaims{
 		"sub":     1,
-		"email":   "test@example.com",
+		"email":   tests.TestEmailExample,
 		"farm_id": 1,
 		"iat":     time.Now().Add(-time.Hour * 25).Unix(),
 		"exp":     time.Now().Add(-time.Hour).Unix(),
@@ -126,7 +127,7 @@ func TestAuthMiddleware_ExpiredToken(t *testing.T) {
 }
 
 func TestAuthMiddleware_NoBearerPrefix(t *testing.T) {
-	jwtSecret := "test-secret"
+	jwtSecret := tests.TestSecret
 	authMiddleware := middleware.Auth(jwtSecret)
 
 	handler := authMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -141,4 +142,3 @@ func TestAuthMiddleware_NoBearerPrefix(t *testing.T) {
 
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
 }
-

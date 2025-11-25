@@ -14,6 +14,7 @@ import (
 	"github.com/fazendapro/FazendaPro-api/internal/api/handlers"
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/repository"
+	"github.com/fazendapro/FazendaPro-api/tests"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/stretchr/testify/assert"
@@ -114,16 +115,16 @@ func setupSaleTestRouter() (*chi.Mux, *MockSaleService) {
 		})
 	})
 
-	router.Post("/sales", saleHandler.CreateSale)
-	router.Get("/sales/{id}", saleHandler.GetSaleByID)
-	router.Get("/sales", saleHandler.GetSalesByFarm)
+	router.Post(tests.EndpointSales, saleHandler.CreateSale)
+	router.Get(tests.EndpointSalesWithID, saleHandler.GetSaleByID)
+	router.Get(tests.EndpointSales, saleHandler.GetSalesByFarm)
 	router.Get("/animals/{animal_id}/sales", saleHandler.GetSalesByAnimal)
 	router.Get("/sales/date-range", saleHandler.GetSalesByDateRange)
-	router.Put("/sales/{id}", saleHandler.UpdateSale)
-	router.Delete("/sales/{id}", saleHandler.DeleteSale)
+	router.Put(tests.EndpointSalesWithID, saleHandler.UpdateSale)
+	router.Delete(tests.EndpointSalesWithID, saleHandler.DeleteSale)
 	router.Get("/sales/history", saleHandler.GetSalesHistory)
-	router.Get("/sales/monthly-stats", saleHandler.GetMonthlySalesStats)
-	router.Get("/sales/overview", saleHandler.GetOverviewStats)
+	router.Get(tests.EndpointSalesMonthlyStats, saleHandler.GetMonthlySalesStats)
+	router.Get(tests.EndpointSalesOverview, saleHandler.GetOverviewStats)
 
 	return router, mockSaleService
 }
@@ -133,7 +134,7 @@ func TestSaleHandler_CreateSale_Success(t *testing.T) {
 
 	now := time.Now()
 
-	mockService.On("CreateSale", mock.Anything, mock.AnythingOfType("*models.Sale")).Return(nil).Run(func(args mock.Arguments) {
+	mockService.On("CreateSale", mock.Anything, mock.AnythingOfType(tests.TypeModelsSale)).Return(nil).Run(func(args mock.Arguments) {
 		sale := args.Get(1).(*models.Sale)
 		sale.ID = 1
 		sale.CreatedAt = now
@@ -142,15 +143,15 @@ func TestSaleHandler_CreateSale_Success(t *testing.T) {
 
 	reqBody := map[string]interface{}{
 		"animal_id":  1,
-		"buyer_name": "João Silva",
+		"buyer_name": tests.TestNameJoaoSilva,
 		"price":      1500.50,
-		"sale_date":  now.Format("2006-01-02"),
-		"notes":      "Test sale",
+		"sale_date":  now.Format(tests.TestDateFormat),
+		"notes":      tests.TestNameTestSale,
 	}
 
 	jsonBody, _ := json.Marshal(reqBody)
-	req, _ := http.NewRequest("POST", "/sales", bytes.NewBuffer(jsonBody))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("POST", tests.EndpointSales, bytes.NewBuffer(jsonBody))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
@@ -161,7 +162,7 @@ func TestSaleHandler_CreateSale_Success(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.NoError(t, err)
 	assert.Equal(t, float64(1), response["id"])
-	assert.Equal(t, "João Silva", response["buyer_name"])
+	assert.Equal(t, tests.TestNameJoaoSilva, response["buyer_name"])
 	assert.Equal(t, 1500.50, response["price"])
 
 	mockService.AssertExpectations(t)
@@ -176,8 +177,8 @@ func TestSaleHandler_CreateSale_InvalidData(t *testing.T) {
 	}
 
 	jsonBody, _ := json.Marshal(reqBody)
-	req, _ := http.NewRequest("POST", "/sales", bytes.NewBuffer(jsonBody))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("POST", tests.EndpointSales, bytes.NewBuffer(jsonBody))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
@@ -198,15 +199,15 @@ func TestSaleHandler_CreateSale_InvalidDate(t *testing.T) {
 
 	reqBody := map[string]interface{}{
 		"animal_id":  1,
-		"buyer_name": "João Silva",
+		"buyer_name": tests.TestNameJoaoSilva,
 		"price":      1500.50,
 		"sale_date":  "invalid-date",
-		"notes":      "Test sale",
+		"notes":      tests.TestNameTestSale,
 	}
 
 	jsonBody, _ := json.Marshal(reqBody)
-	req, _ := http.NewRequest("POST", "/sales", bytes.NewBuffer(jsonBody))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("POST", tests.EndpointSales, bytes.NewBuffer(jsonBody))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
@@ -226,15 +227,15 @@ func TestSaleHandler_CreateSale_ServiceError(t *testing.T) {
 	now := time.Now()
 	reqBody := map[string]interface{}{
 		"animal_id":  1,
-		"buyer_name": "João Silva",
+		"buyer_name": tests.TestNameJoaoSilva,
 		"price":      1500.50,
-		"sale_date":  now.Format("2006-01-02"),
-		"notes":      "Test sale",
+		"sale_date":  now.Format(tests.TestDateFormat),
+		"notes":      tests.TestNameTestSale,
 	}
 
 	jsonBody, _ := json.Marshal(reqBody)
-	req, _ := http.NewRequest("POST", "/sales", bytes.NewBuffer(jsonBody))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("POST", tests.EndpointSales, bytes.NewBuffer(jsonBody))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
@@ -254,21 +255,21 @@ func TestSaleHandler_GetSaleByID_Success(t *testing.T) {
 		ID:        1,
 		AnimalID:  1,
 		FarmID:    1,
-		BuyerName: "João Silva",
+		BuyerName: tests.TestNameJoaoSilva,
 		Price:     1500.50,
 		SaleDate:  now,
-		Notes:     "Test sale",
+		Notes:     tests.TestNameTestSale,
 		CreatedAt: now,
 		UpdatedAt: now,
 		Animal: models.Animal{
 			ID:         1,
-			AnimalName: "Test Animal",
+			AnimalName: tests.TestNameTestAnimal,
 		},
 	}
 
 	mockService.On("GetSaleByID", mock.Anything, uint(1)).Return(expectedSale, nil)
 
-	req, _ := http.NewRequest("GET", "/sales/1", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointSalesID, nil)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
@@ -278,7 +279,7 @@ func TestSaleHandler_GetSaleByID_Success(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.NoError(t, err)
 	assert.Equal(t, float64(1), response["id"])
-	assert.Equal(t, "João Silva", response["buyer_name"])
+	assert.Equal(t, tests.TestNameJoaoSilva, response["buyer_name"])
 	assert.Equal(t, 1500.50, response["price"])
 
 	mockService.AssertExpectations(t)
@@ -287,9 +288,9 @@ func TestSaleHandler_GetSaleByID_Success(t *testing.T) {
 func TestSaleHandler_GetSaleByID_NotFound(t *testing.T) {
 	router, mockService := setupSaleTestRouter()
 
-	mockService.On("GetSaleByID", mock.Anything, uint(1)).Return(nil, errors.New("sale not found"))
+	mockService.On("GetSaleByID", mock.Anything, uint(1)).Return(nil, errors.New(tests.TestErrorSaleNotFound))
 
-	req, _ := http.NewRequest("GET", "/sales/1", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointSalesID, nil)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
@@ -323,7 +324,7 @@ func TestSaleHandler_GetSalesByFarm_Success(t *testing.T) {
 			ID:        1,
 			AnimalID:  1,
 			FarmID:    1,
-			BuyerName: "João Silva",
+			BuyerName: tests.TestNameJoaoSilva,
 			Price:     1500.50,
 			SaleDate:  now,
 			Notes:     "Test sale 1",
@@ -353,7 +354,7 @@ func TestSaleHandler_GetSalesByFarm_Success(t *testing.T) {
 
 	mockService.On("GetSalesByFarmID", mock.Anything, uint(1)).Return(expectedSales, nil)
 
-	req, _ := http.NewRequest("GET", "/sales", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointSales, nil)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
@@ -380,15 +381,15 @@ func TestSaleHandler_GetSalesByAnimal_Success(t *testing.T) {
 			ID:        1,
 			AnimalID:  1,
 			FarmID:    1,
-			BuyerName: "João Silva",
+			BuyerName: tests.TestNameJoaoSilva,
 			Price:     1500.50,
 			SaleDate:  now,
-			Notes:     "Test sale",
+			Notes:     tests.TestNameTestSale,
 			CreatedAt: now,
 			UpdatedAt: now,
 			Animal: models.Animal{
 				ID:         1,
-				AnimalName: "Test Animal",
+				AnimalName: tests.TestNameTestAnimal,
 			},
 		},
 	}
@@ -423,15 +424,15 @@ func TestSaleHandler_GetSalesByDateRange_Success(t *testing.T) {
 			ID:        1,
 			AnimalID:  1,
 			FarmID:    1,
-			BuyerName: "João Silva",
+			BuyerName: tests.TestNameJoaoSilva,
 			Price:     1500.50,
 			SaleDate:  now.Add(-3 * 24 * time.Hour),
-			Notes:     "Test sale",
+			Notes:     tests.TestNameTestSale,
 			CreatedAt: now.Add(-3 * 24 * time.Hour),
 			UpdatedAt: now.Add(-3 * 24 * time.Hour),
 			Animal: models.Animal{
 				ID:         1,
-				AnimalName: "Test Animal",
+				AnimalName: tests.TestNameTestAnimal,
 			},
 		},
 	}
@@ -492,7 +493,7 @@ func TestSaleHandler_UpdateSale_Success(t *testing.T) {
 	reqBody := map[string]interface{}{
 		"buyer_name": "Updated Buyer",
 		"price":      2000.00,
-		"sale_date":  now.Format("2006-01-02"),
+		"sale_date":  now.Format(tests.TestDateFormat),
 		"notes":      "Updated notes",
 	}
 
@@ -559,15 +560,15 @@ func TestSaleHandler_GetSalesHistory_Success(t *testing.T) {
 			ID:        1,
 			AnimalID:  1,
 			FarmID:    1,
-			BuyerName: "João Silva",
+			BuyerName: tests.TestNameJoaoSilva,
 			Price:     1500.50,
 			SaleDate:  now,
-			Notes:     "Test sale",
+			Notes:     tests.TestNameTestSale,
 			CreatedAt: now,
 			UpdatedAt: now,
 			Animal: models.Animal{
 				ID:         1,
-				AnimalName: "Test Animal",
+				AnimalName: tests.TestNameTestAnimal,
 			},
 		},
 	}
