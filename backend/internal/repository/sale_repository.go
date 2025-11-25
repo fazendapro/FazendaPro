@@ -26,15 +26,15 @@ type OverviewStats struct {
 
 type SaleRepository interface {
 	Create(ctx context.Context, sale *models.Sale) error
-	GetByID(ctx context.Context, id uint) (*models.Sale, error)
+	GetByID(ctx context.Context, id uint, farmID uint) (*models.Sale, error)
 	GetByFarmID(ctx context.Context, farmID uint) ([]*models.Sale, error)
-	GetByAnimalID(ctx context.Context, animalID uint) ([]*models.Sale, error)
+	GetByAnimalID(ctx context.Context, animalID uint, farmID uint) ([]*models.Sale, error)
 	GetByDateRange(ctx context.Context, farmID uint, startDate, endDate time.Time) ([]*models.Sale, error)
 	GetMonthlySalesCount(ctx context.Context, farmID uint, startDate, endDate time.Time) (int64, error)
 	GetMonthlySalesData(ctx context.Context, farmID uint, months int) ([]MonthlySalesData, error)
 	GetOverviewStats(ctx context.Context, farmID uint) (*OverviewStats, error)
 	Update(ctx context.Context, sale *models.Sale) error
-	Delete(ctx context.Context, id uint) error
+	Delete(ctx context.Context, id uint, farmID uint) error
 }
 
 type saleRepository struct {
@@ -49,9 +49,9 @@ func (r *saleRepository) Create(ctx context.Context, sale *models.Sale) error {
 	return r.db.WithContext(ctx).Create(sale).Error
 }
 
-func (r *saleRepository) GetByID(ctx context.Context, id uint) (*models.Sale, error) {
+func (r *saleRepository) GetByID(ctx context.Context, id uint, farmID uint) (*models.Sale, error) {
 	var sale models.Sale
-	err := r.db.WithContext(ctx).Preload("Animal").Preload("Farm").First(&sale, id).Error
+	err := r.db.WithContext(ctx).Preload("Animal").Preload("Farm").Where(SQLWhereID+" AND "+SQLWhereFarmID, id, farmID).First(&sale).Error
 	if err != nil {
 		return nil, err
 	}
@@ -60,16 +60,16 @@ func (r *saleRepository) GetByID(ctx context.Context, id uint) (*models.Sale, er
 
 func (r *saleRepository) GetByFarmID(ctx context.Context, farmID uint) ([]*models.Sale, error) {
 	var sales []*models.Sale
-	err := r.db.WithContext(ctx).Preload("Animal").Where("farm_id = ?", farmID).Order("sale_date DESC").Find(&sales).Error
+	err := r.db.WithContext(ctx).Preload("Animal").Where(SQLWhereFarmID, farmID).Order(SQLOrderSaleDateDESC).Find(&sales).Error
 	if err != nil {
 		return nil, err
 	}
 	return sales, nil
 }
 
-func (r *saleRepository) GetByAnimalID(ctx context.Context, animalID uint) ([]*models.Sale, error) {
+func (r *saleRepository) GetByAnimalID(ctx context.Context, animalID uint, farmID uint) ([]*models.Sale, error) {
 	var sales []*models.Sale
-	err := r.db.WithContext(ctx).Preload("Animal").Where("animal_id = ?", animalID).Order("sale_date DESC").Find(&sales).Error
+	err := r.db.WithContext(ctx).Preload("Animal").Where(SQLWhereAnimalID+" AND "+SQLWhereFarmID, animalID, farmID).Order(SQLOrderSaleDateDESC).Find(&sales).Error
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (r *saleRepository) GetByAnimalID(ctx context.Context, animalID uint) ([]*m
 
 func (r *saleRepository) GetByDateRange(ctx context.Context, farmID uint, startDate, endDate time.Time) ([]*models.Sale, error) {
 	var sales []*models.Sale
-	err := r.db.WithContext(ctx).Preload("Animal").Where("farm_id = ? AND sale_date BETWEEN ? AND ?", farmID, startDate, endDate).Order("sale_date DESC").Find(&sales).Error
+	err := r.db.WithContext(ctx).Preload("Animal").Where("farm_id = ? AND sale_date BETWEEN ? AND ?", farmID, startDate, endDate).Order(SQLOrderSaleDateDESC).Find(&sales).Error
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (r *saleRepository) GetByDateRange(ctx context.Context, farmID uint, startD
 func (r *saleRepository) GetMonthlySalesCount(ctx context.Context, farmID uint, startDate, endDate time.Time) (int64, error) {
 	var count int64
 	err := r.db.WithContext(ctx).Model(&models.Sale{}).
-		Where("farm_id = ? AND sale_date BETWEEN ? AND ?", farmID, startDate, endDate).
+		Where(SQLWhereFarmID+" AND sale_date BETWEEN ? AND ?", farmID, startDate, endDate).
 		Count(&count).Error
 	if err != nil {
 		return 0, err
@@ -112,7 +112,7 @@ func (r *saleRepository) GetMonthlySalesData(ctx context.Context, farmID uint, m
 	err := r.db.WithContext(ctx).
 		Table("sales").
 		Select("EXTRACT(YEAR FROM sale_date)::int as year, EXTRACT(MONTH FROM sale_date)::int as month, COALESCE(SUM(price), 0) as sales, COUNT(*)::bigint as count").
-		Where("farm_id = ? AND sale_date >= ? AND sale_date <= ?", farmID, startDate, endDate).
+		Where(SQLWhereFarmID+" AND sale_date >= ? AND sale_date <= ?", farmID, startDate, endDate).
 		Group("EXTRACT(YEAR FROM sale_date), EXTRACT(MONTH FROM sale_date)").
 		Order("year ASC, month ASC").
 		Find(&results).Error
@@ -162,41 +162,48 @@ func (r *saleRepository) Update(ctx context.Context, sale *models.Sale) error {
 	return r.db.WithContext(ctx).Save(sale).Error
 }
 
-func (r *saleRepository) Delete(ctx context.Context, id uint) error {
-	return r.db.WithContext(ctx).Delete(&models.Sale{}, id).Error
+func (r *saleRepository) Delete(ctx context.Context, id uint, farmID uint) error {
+	result := r.db.WithContext(ctx).Where(SQLWhereID+" AND "+SQLWhereFarmID, id, farmID).Delete(&models.Sale{})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("sale not found or does not belong to farm")
+	}
+	return nil
 }
 
 func (r *saleRepository) GetOverviewStats(ctx context.Context, farmID uint) (*OverviewStats, error) {
 	stats := &OverviewStats{}
 
 	var malesCount int64
-	err := r.db.WithContext(ctx).Model(&models.Animal{}).Where("farm_id = ? AND sex = ?", farmID, 1).Count(&malesCount).Error
+	err := r.db.WithContext(ctx).Model(&models.Animal{}).Where(SQLWhereFarmIDAndSex, farmID, 1).Count(&malesCount).Error
 	if err != nil {
-		return nil, fmt.Errorf("error counting males: %w", err)
+		return nil, fmt.Errorf(ErrCountingMales, err)
 	}
 	stats.MalesCount = malesCount
 
 	var femalesCount int64
-	err = r.db.WithContext(ctx).Model(&models.Animal{}).Where("farm_id = ? AND sex = ?", farmID, 0).Count(&femalesCount).Error
+	err = r.db.WithContext(ctx).Model(&models.Animal{}).Where(SQLWhereFarmIDAndSex, farmID, 0).Count(&femalesCount).Error
 	if err != nil {
-		return nil, fmt.Errorf("error counting females: %w", err)
+		return nil, fmt.Errorf(ErrCountingFemales, err)
 	}
 	stats.FemalesCount = femalesCount
 
 	var totalSold int64
-	err = r.db.WithContext(ctx).Model(&models.Sale{}).Where("farm_id = ?", farmID).Count(&totalSold).Error
+	err = r.db.WithContext(ctx).Model(&models.Sale{}).Where(SQLWhereFarmID, farmID).Count(&totalSold).Error
 	if err != nil {
-		return nil, fmt.Errorf("error counting total sold: %w", err)
+		return nil, fmt.Errorf(ErrCountingTotalSold, err)
 	}
 	stats.TotalSold = totalSold
 
 	var totalRevenue float64
 	err = r.db.WithContext(ctx).Model(&models.Sale{}).
-		Where("farm_id = ?", farmID).
+		Where(SQLWhereFarmID, farmID).
 		Select("COALESCE(SUM(price), 0)").
 		Scan(&totalRevenue).Error
 	if err != nil {
-		return nil, fmt.Errorf("error calculating total revenue: %w", err)
+		return nil, fmt.Errorf(ErrCalculatingRevenue, err)
 	}
 	stats.TotalRevenue = totalRevenue
 

@@ -14,7 +14,8 @@ func NewServiceFactory(repoFactory *repository.RepositoryFactory) *ServiceFactor
 
 func (f *ServiceFactory) CreateAnimalService() *AnimalService {
 	animalRepo := f.repoFactory.CreateAnimalRepository()
-	return NewAnimalService(animalRepo)
+	cacheClient := f.repoFactory.GetCache()
+	return NewAnimalService(animalRepo, cacheClient)
 }
 
 func (f *ServiceFactory) CreateUserService() *UserService {
@@ -42,7 +43,8 @@ func (f *ServiceFactory) CreateFarmService() *FarmService {
 func (f *ServiceFactory) CreateSaleService() SaleService {
 	saleRepo := f.repoFactory.CreateSaleRepository()
 	animalRepo := f.repoFactory.CreateAnimalRepository()
-	return NewSaleService(saleRepo, animalRepo)
+	cacheClient := f.repoFactory.GetCache()
+	return NewSaleService(saleRepo, animalRepo, cacheClient)
 }
 
 func (f *ServiceFactory) CreateDebtService() *DebtService {

@@ -33,7 +33,7 @@ func (r *ReproductionRepository) FindByID(id uint) (*models.Reproduction, error)
 
 func (r *ReproductionRepository) FindByAnimalID(animalID uint) (*models.Reproduction, error) {
 	var reproduction models.Reproduction
-	err := r.db.Preload("Animal").Where("animal_id = ?", animalID).First(&reproduction).Error
+	err := r.db.Preload("Animal").Where(SQLWhereAnimalID, animalID).First(&reproduction).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -47,7 +47,7 @@ func (r *ReproductionRepository) FindByFarmID(farmID uint) ([]models.Reproductio
 	var reproductions []models.Reproduction
 	err := r.db.Preload("Animal").
 		Joins("JOIN animals ON reproductions.animal_id = animals.id").
-		Where("animals.farm_id = ?", farmID).
+		Where(SQLWhereAnimalsFarmID, farmID).
 		Find(&reproductions).Error
 	return reproductions, err
 }

@@ -13,7 +13,7 @@ type ErrorResponse struct {
 }
 
 func SendErrorResponse(w http.ResponseWriter, message string, statusCode int) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	w.WriteHeader(statusCode)
 
 	response := ErrorResponse{
@@ -27,7 +27,7 @@ func SendErrorResponse(w http.ResponseWriter, message string, statusCode int) {
 }
 
 func SendSuccessResponse(w http.ResponseWriter, data interface{}, message string, statusCode int) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	w.WriteHeader(statusCode)
 
 	response := map[string]interface{}{

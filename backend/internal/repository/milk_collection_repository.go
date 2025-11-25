@@ -24,7 +24,7 @@ func (r *MilkCollectionRepository) FindByID(id uint) (*models.MilkCollection, er
 	var milkCollection models.MilkCollection
 	fmt.Printf("DEBUG: Repository FindByID - Looking for ID: %d\n", id)
 
-	err := r.db.Preload("Animal").Where("id = ?", id).First(&milkCollection).Error
+	err := r.db.Preload("Animal").Where(SQLWhereID, id).First(&milkCollection).Error
 	if err != nil {
 		fmt.Printf("DEBUG: Repository FindByID Error: %v\n", err)
 		return nil, err
@@ -37,9 +37,9 @@ func (r *MilkCollectionRepository) FindByID(id uint) (*models.MilkCollection, er
 
 func (r *MilkCollectionRepository) FindByFarmID(farmID uint) ([]models.MilkCollection, error) {
 	var milkCollections []models.MilkCollection
-	err := r.db.Preload("Animal", "farm_id = ?", farmID).
+	err := r.db.Preload("Animal", SQLWhereFarmID, farmID).
 		Joins("JOIN animals ON milk_collections.animal_id = animals.id").
-		Where("animals.farm_id = ?", farmID).
+		Where(SQLWhereAnimalsFarmID, farmID).
 		Order("milk_collections.date DESC").
 		Find(&milkCollections).Error
 	return milkCollections, err
@@ -47,9 +47,9 @@ func (r *MilkCollectionRepository) FindByFarmID(farmID uint) ([]models.MilkColle
 
 func (r *MilkCollectionRepository) FindByFarmIDWithDateRange(farmID uint, startDate, endDate *time.Time) ([]models.MilkCollection, error) {
 	var milkCollections []models.MilkCollection
-	query := r.db.Preload("Animal", "farm_id = ?", farmID).
+	query := r.db.Preload("Animal", SQLWhereFarmID, farmID).
 		Joins("JOIN animals ON milk_collections.animal_id = animals.id").
-		Where("animals.farm_id = ?", farmID)
+		Where(SQLWhereAnimalsFarmID, farmID)
 
 	if startDate != nil {
 		query = query.Where("milk_collections.date >= ?", *startDate)
@@ -65,7 +65,7 @@ func (r *MilkCollectionRepository) FindByFarmIDWithDateRange(farmID uint, startD
 func (r *MilkCollectionRepository) FindByAnimalID(animalID uint) ([]models.MilkCollection, error) {
 	var milkCollections []models.MilkCollection
 	err := r.db.Preload("Animal").
-		Where("animal_id = ?", animalID).
+		Where(SQLWhereAnimalID, animalID).
 		Order("date DESC").
 		Find(&milkCollections).Error
 	return milkCollections, err
@@ -76,7 +76,7 @@ func (r *MilkCollectionRepository) Update(milkCollection *models.MilkCollection)
 		milkCollection.ID, milkCollection.AnimalID, milkCollection.Liters)
 
 	var existingMilkCollection models.MilkCollection
-	err := r.db.Where("id = ?", milkCollection.ID).First(&existingMilkCollection).Error
+	err := r.db.Where(SQLWhereID, milkCollection.ID).First(&existingMilkCollection).Error
 	if err != nil {
 		fmt.Printf("DEBUG: Record not found with ID %d: %v\n", milkCollection.ID, err)
 		return err
@@ -85,7 +85,7 @@ func (r *MilkCollectionRepository) Update(milkCollection *models.MilkCollection)
 	fmt.Printf("DEBUG: Found existing record - ID: %d, Liters: %.2f\n",
 		existingMilkCollection.ID, existingMilkCollection.Liters)
 
-	result := r.db.Model(&models.MilkCollection{}).Where("id = ?", milkCollection.ID).Updates(map[string]interface{}{
+	result := r.db.Model(&models.MilkCollection{}).Where(SQLWhereID, milkCollection.ID).Updates(map[string]interface{}{
 		"animal_id": milkCollection.AnimalID,
 		"liters":    milkCollection.Liters,
 		"date":      milkCollection.Date,

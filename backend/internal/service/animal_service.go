@@ -2,19 +2,25 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"time"
 
+	"github.com/fazendapro/FazendaPro-api/internal/cache"
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/repository"
 )
 
 type AnimalService struct {
 	repository repository.AnimalRepositoryInterface
+	cache      cache.CacheInterface
 }
 
-func NewAnimalService(repository repository.AnimalRepositoryInterface) *AnimalService {
-	return &AnimalService{repository: repository}
+func NewAnimalService(repository repository.AnimalRepositoryInterface, cacheClient cache.CacheInterface) *AnimalService {
+	return &AnimalService{
+		repository: repository,
+		cache:      cacheClient,
+	}
 }
 
 func (s *AnimalService) CreateAnimal(animal *models.Animal) error {
@@ -68,7 +74,17 @@ func (s *AnimalService) CreateAnimal(animal *models.Animal) error {
 	animal.CreatedAt = now
 	animal.UpdatedAt = now
 
-	return s.repository.Create(animal)
+	err = s.repository.Create(animal)
+	if err != nil {
+		return err
+	}
+
+	cacheKey := fmt.Sprintf("animals:farm:%d", animal.FarmID)
+	if err := s.cache.Delete(cacheKey); err != nil {
+		log.Printf("Erro ao invalidar cache (não crítico): %v", err)
+	}
+
+	return nil
 }
 
 func (s *AnimalService) GetAnimalByID(id uint) (*models.Animal, error) {
@@ -76,7 +92,26 @@ func (s *AnimalService) GetAnimalByID(id uint) (*models.Animal, error) {
 }
 
 func (s *AnimalService) GetAnimalsByFarmID(farmID uint) ([]models.Animal, error) {
-	return s.repository.FindByFarmID(farmID)
+	cacheKey := fmt.Sprintf("animals:farm:%d", farmID)
+	var cachedAnimals []models.Animal
+
+	err := s.cache.Get(cacheKey, &cachedAnimals)
+	if err == nil {
+		log.Printf("Cache HIT para animais da fazenda %d", farmID)
+		return cachedAnimals, nil
+	}
+
+	log.Printf("Cache MISS para animais da fazenda %d", farmID)
+	animals, err := s.repository.FindByFarmID(farmID)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.cache.Set(cacheKey, animals, 300); err != nil {
+		log.Printf("Erro ao salvar no cache (não crítico): %v", err)
+	}
+
+	return animals, nil
 }
 
 func (s *AnimalService) UpdateAnimal(animal *models.Animal) error {
@@ -110,7 +145,17 @@ func (s *AnimalService) UpdateAnimal(animal *models.Animal) error {
 	now := time.Now()
 	animal.UpdatedAt = now
 
-	return s.repository.Update(animal)
+	err = s.repository.Update(animal)
+	if err != nil {
+		return err
+	}
+
+	cacheKey := fmt.Sprintf("animals:farm:%d", animal.FarmID)
+	if err := s.cache.Delete(cacheKey); err != nil {
+		log.Printf("Erro ao invalidar cache (não crítico): %v", err)
+	}
+
+	return nil
 }
 
 func (s *AnimalService) DeleteAnimal(id uint) error {
@@ -127,7 +172,18 @@ func (s *AnimalService) DeleteAnimal(id uint) error {
 		return errors.New("animal não encontrado")
 	}
 
-	return s.repository.Delete(id)
+	farmID := existingAnimal.FarmID
+	err = s.repository.Delete(id)
+	if err != nil {
+		return err
+	}
+
+	cacheKey := fmt.Sprintf("animals:farm:%d", farmID)
+	if err := s.cache.Delete(cacheKey); err != nil {
+		log.Printf("Erro ao invalidar cache (não crítico): %v", err)
+	}
+
+	return nil
 }
 
 func (s *AnimalService) GetAnimalsByFarmIDAndSex(farmID uint, sex int) ([]models.Animal, error) {

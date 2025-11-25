@@ -22,7 +22,7 @@ func (r *UserRepository) FindByPersonEmail(email string) (*models.User, error) {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
 		}
-		return nil, fmt.Errorf("error finding user: %w", err)
+		return nil, fmt.Errorf(ErrFindingUser, err)
 	}
 	return &user, nil
 }
@@ -35,14 +35,14 @@ func (r *UserRepository) CreateWithPerson(user *models.User, personData *models.
 
 	if err := tx.Create(personData).Error; err != nil {
 		tx.Rollback()
-		return fmt.Errorf("error creating person: %w", err)
+		return fmt.Errorf(ErrCreatingPerson, err)
 	}
 
 	user.PersonID = &personData.ID
 
 	if err := tx.Create(user).Error; err != nil {
 		tx.Rollback()
-		return fmt.Errorf("error creating user: %w", err)
+		return fmt.Errorf(ErrCreatingUser, err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
@@ -54,23 +54,23 @@ func (r *UserRepository) CreateWithPerson(user *models.User, personData *models.
 
 func (r *UserRepository) FindByIDWithPerson(userID uint) (*models.User, error) {
 	var user models.User
-	if err := r.db.DB.Preload("Person").Preload("Farm").Where("id = ?", userID).First(&user).Error; err != nil {
+	if err := r.db.DB.Preload("Person").Preload("Farm").Where(SQLWhereID, userID).First(&user).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
 		}
-		return nil, fmt.Errorf("error finding user: %w", err)
+		return nil, fmt.Errorf(ErrFindingUser, err)
 	}
 	return &user, nil
 }
 
 func (r *UserRepository) UpdatePersonData(userID uint, personData *models.Person) error {
 	var user models.User
-	if err := r.db.DB.Where("id = ?", userID).First(&user).Error; err != nil {
-		return fmt.Errorf("error finding user: %w", err)
+	if err := r.db.DB.Where(SQLWhereID, userID).First(&user).Error; err != nil {
+		return fmt.Errorf(ErrFindingUser, err)
 	}
 
-	if err := r.db.DB.Model(&models.Person{}).Where("id = ?", user.PersonID).Updates(personData).Error; err != nil {
-		return fmt.Errorf("error updating person data: %w", err)
+	if err := r.db.DB.Model(&models.Person{}).Where(SQLWhereID, user.PersonID).Updates(personData).Error; err != nil {
+		return fmt.Errorf(ErrUpdatingPersonData, err)
 	}
 
 	return nil
@@ -78,8 +78,8 @@ func (r *UserRepository) UpdatePersonData(userID uint, personData *models.Person
 
 func (r *UserRepository) ValidatePassword(userID uint, password string) (bool, error) {
 	var user models.User
-	if err := r.db.DB.Preload("Person").Where("id = ?", userID).First(&user).Error; err != nil {
-		return false, fmt.Errorf("error finding user: %w", err)
+	if err := r.db.DB.Preload("Person").Where(SQLWhereID, userID).First(&user).Error; err != nil {
+		return false, fmt.Errorf(ErrFindingUser, err)
 	}
 
 	return user.Person.Password == password, nil
@@ -95,7 +95,7 @@ func (r *UserRepository) Create(user *models.User) error {
 
 func (r *UserRepository) FarmExists(farmID uint) (bool, error) {
 	var count int64
-	if err := r.db.DB.Model(&models.Farm{}).Where("id = ?", farmID).Count(&count).Error; err != nil {
+	if err := r.db.DB.Model(&models.Farm{}).Where(SQLWhereID, farmID).Count(&count).Error; err != nil {
 		return false, fmt.Errorf("error checking farm existence: %w", err)
 	}
 	return count > 0, nil
@@ -106,7 +106,7 @@ func (r *UserRepository) CreateDefaultFarm(farmID uint) error {
 		CompanyName: "FazendaPro Demo",
 	}
 	if err := r.db.DB.Create(company).Error; err != nil {
-		return fmt.Errorf("error creating company: %w", err)
+		return fmt.Errorf(ErrCreatingCompany, err)
 	}
 
 	farm := &models.Farm{
@@ -115,7 +115,7 @@ func (r *UserRepository) CreateDefaultFarm(farmID uint) error {
 		Logo:      "",
 	}
 	if err := r.db.DB.Create(farm).Error; err != nil {
-		return fmt.Errorf("error creating farm: %w", err)
+		return fmt.Errorf(ErrCreatingFarm, err)
 	}
 
 	return nil
@@ -123,8 +123,8 @@ func (r *UserRepository) CreateDefaultFarm(farmID uint) error {
 
 func (r *UserRepository) GetUserFarms(userID uint) ([]models.Farm, error) {
 	var userFarms []models.UserFarm
-	if err := r.db.DB.Preload("Farm.Company").Where("user_id = ?", userID).Find(&userFarms).Error; err != nil {
-		return nil, fmt.Errorf("error finding user farms: %w", err)
+	if err := r.db.DB.Preload("Farm.Company").Where(SQLWhereUserID, userID).Find(&userFarms).Error; err != nil {
+		return nil, fmt.Errorf(ErrFindingUserFarms, err)
 	}
 
 	var farms []models.Farm
@@ -137,8 +137,8 @@ func (r *UserRepository) GetUserFarms(userID uint) ([]models.Farm, error) {
 
 func (r *UserRepository) GetUserFarmCount(userID uint) (int64, error) {
 	var count int64
-	if err := r.db.DB.Model(&models.UserFarm{}).Where("user_id = ?", userID).Count(&count).Error; err != nil {
-		return 0, fmt.Errorf("error counting user farms: %w", err)
+	if err := r.db.DB.Model(&models.UserFarm{}).Where(SQLWhereUserID, userID).Count(&count).Error; err != nil {
+		return 0, fmt.Errorf(ErrCountingUserFarms, err)
 	}
 
 	return count, nil
@@ -146,11 +146,11 @@ func (r *UserRepository) GetUserFarmCount(userID uint) (int64, error) {
 
 func (r *UserRepository) GetUserFarmByID(userID, farmID uint) (*models.Farm, error) {
 	var userFarm models.UserFarm
-	if err := r.db.DB.Preload("Farm.Company").Where("user_id = ? AND farm_id = ?", userID, farmID).First(&userFarm).Error; err != nil {
+	if err := r.db.DB.Preload("Farm.Company").Where(SQLWhereUserIDAndFarmID, userID, farmID).First(&userFarm).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, gorm.ErrRecordNotFound
 		}
-		return nil, fmt.Errorf("error finding user farm: %w", err)
+		return nil, fmt.Errorf(ErrFindingUserFarm, err)
 	}
 
 	return &userFarm.Farm, nil

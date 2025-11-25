@@ -1,11 +1,19 @@
 package repository
 
+import (
+	"github.com/fazendapro/FazendaPro-api/internal/cache"
+)
+
 type RepositoryFactory struct {
-	db *Database
+	db    *Database
+	cache cache.CacheInterface
 }
 
-func NewRepositoryFactory(db *Database) *RepositoryFactory {
-	return &RepositoryFactory{db: db}
+func NewRepositoryFactory(db *Database, cacheClient cache.CacheInterface) *RepositoryFactory {
+	return &RepositoryFactory{
+		db:    db,
+		cache: cacheClient,
+	}
 }
 
 func (f *RepositoryFactory) CreateAnimalRepository() AnimalRepositoryInterface {
@@ -38,4 +46,8 @@ func (f *RepositoryFactory) CreateSaleRepository() SaleRepository {
 
 func (f *RepositoryFactory) CreateDebtRepository() DebtRepositoryInterface {
 	return NewDebtRepository(f.db.DB)
+}
+
+func (f *RepositoryFactory) GetCache() cache.CacheInterface {
+	return f.cache
 }

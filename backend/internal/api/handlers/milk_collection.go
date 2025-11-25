@@ -55,7 +55,7 @@ func (h *MilkCollectionHandler) CreateMilkCollection(w http.ResponseWriter, r *h
 		return
 	}
 
-	date, err := time.Parse("2006-01-02", req.Date)
+	date, err := time.Parse(DateFormatISO, req.Date)
 	if err != nil {
 		http.Error(w, "Invalid date format. Use YYYY-MM-DD", http.StatusBadRequest)
 		return
@@ -84,7 +84,7 @@ func (h *MilkCollectionHandler) CreateMilkCollection(w http.ResponseWriter, r *h
 		Message: "Milk collection created successfully",
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(response)
 }
@@ -103,7 +103,7 @@ func (h *MilkCollectionHandler) UpdateMilkCollection(w http.ResponseWriter, r *h
 		return
 	}
 
-	date, err := time.Parse("2006-01-02", req.Date)
+	date, err := time.Parse(DateFormatISO, req.Date)
 	if err != nil {
 		http.Error(w, "Invalid date format. Use YYYY-MM-DD", http.StatusBadRequest)
 		return
@@ -116,26 +116,16 @@ func (h *MilkCollectionHandler) UpdateMilkCollection(w http.ResponseWriter, r *h
 		Date:     date,
 	}
 
-	fmt.Printf("DEBUG: Updating milk collection with ID: %d, AnimalID: %d, Liters: %.2f, Date: %s\n",
-		milkCollection.ID, milkCollection.AnimalID, milkCollection.Liters, milkCollection.Date.Format("2006-01-02"))
-
 	if err := h.service.UpdateMilkCollection(milkCollection); err != nil {
-		fmt.Printf("DEBUG: Error updating milk collection: %v\n", err)
 		http.Error(w, "Failed to update milk collection", http.StatusInternalServerError)
 		return
 	}
 
-	fmt.Printf("DEBUG: Milk collection updated successfully\n")
-
 	updatedMilkCollection, err := h.service.GetMilkCollectionByID(milkCollection.ID)
 	if err != nil {
-		fmt.Printf("DEBUG: Error retrieving updated milk collection: %v\n", err)
 		http.Error(w, "Failed to retrieve updated milk collection", http.StatusInternalServerError)
 		return
 	}
-
-	fmt.Printf("DEBUG: Retrieved updated milk collection: ID=%d, Liters=%.2f\n",
-		updatedMilkCollection.ID, updatedMilkCollection.Liters)
 
 	response := MilkCollectionResponse{
 		Success: true,
@@ -143,7 +133,7 @@ func (h *MilkCollectionHandler) UpdateMilkCollection(w http.ResponseWriter, r *h
 		Message: "Milk collection updated successfully",
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
 }
@@ -162,13 +152,13 @@ func (h *MilkCollectionHandler) GetMilkCollectionsByFarmID(w http.ResponseWriter
 	var startDate, endDate *time.Time
 
 	if startDateStr != "" {
-		if parsed, err := time.Parse("2006-01-02", startDateStr); err == nil {
+		if parsed, err := time.Parse(DateFormatISO, startDateStr); err == nil {
 			startDate = &parsed
 		}
 	}
 
 	if endDateStr != "" {
-		if parsed, err := time.Parse("2006-01-02", endDateStr); err == nil {
+		if parsed, err := time.Parse(DateFormatISO, endDateStr); err == nil {
 			endDate = &parsed
 		}
 	}
@@ -196,7 +186,7 @@ func (h *MilkCollectionHandler) GetMilkCollectionsByFarmID(w http.ResponseWriter
 		Message: "Milk collections retrieved successfully",
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -225,7 +215,7 @@ func (h *MilkCollectionHandler) GetMilkCollectionsByAnimalID(w http.ResponseWrit
 		Message: "Milk collections retrieved successfully",
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -262,7 +252,7 @@ func formatBirthDate(birthDate *time.Time) string {
 	if birthDate == nil {
 		return ""
 	}
-	return birthDate.Format("2006-01-02")
+	return birthDate.Format(DateFormatISO)
 }
 
 type TopMilkProducerResponse struct {
@@ -277,17 +267,91 @@ type TopMilkProducerResponse struct {
 	DaysInLactation        int     `json:"days_in_lactation"`
 }
 
-func (h *MilkCollectionHandler) GetTopMilkProducers(w http.ResponseWriter, r *http.Request) {
+type animalStats struct {
+	AnimalID           uint
+	AnimalName         string
+	EarTagNumberLocal  int
+	Photo              string
+	TotalProduction    float64
+	CollectionCount    int
+	FatContent         float64
+	LastCollectionDate time.Time
+	DaysInLactation    int
+}
+
+func calculateAnimalStats(milkCollections []models.MilkCollection) map[uint]*animalStats {
+	stats := make(map[uint]*animalStats)
+
+	for _, mc := range milkCollections {
+		if existing, exists := stats[mc.AnimalID]; exists {
+			existing.TotalProduction += mc.Liters
+			existing.CollectionCount++
+			if mc.Date.After(existing.LastCollectionDate) {
+				existing.LastCollectionDate = mc.Date
+			}
+		} else {
+			daysInLactation := int(time.Since(mc.Date).Hours()/24) + 60
+			if daysInLactation < 0 {
+				daysInLactation = 0
+			}
+
+			stats[mc.AnimalID] = &animalStats{
+				AnimalID:           mc.AnimalID,
+				AnimalName:         mc.Animal.AnimalName,
+				EarTagNumberLocal:  mc.Animal.EarTagNumberLocal,
+				Photo:              mc.Animal.Photo,
+				TotalProduction:    mc.Liters,
+				CollectionCount:    1,
+				FatContent:         3.5,
+				LastCollectionDate: mc.Date,
+				DaysInLactation:    daysInLactation,
+			}
+		}
+	}
+
+	return stats
+}
+
+func buildTopMilkProducerResponses(stats map[uint]*animalStats) []TopMilkProducerResponse {
+	responses := make([]TopMilkProducerResponse, 0, len(stats))
+
+	for _, s := range stats {
+		averageDailyProduction := s.TotalProduction / float64(s.CollectionCount)
+		responses = append(responses, TopMilkProducerResponse{
+			ID:                     s.AnimalID,
+			AnimalName:             s.AnimalName,
+			EarTagNumberLocal:      s.EarTagNumberLocal,
+			Photo:                  s.Photo,
+			TotalProduction:        s.TotalProduction,
+			AverageDailyProduction: averageDailyProduction,
+			FatContent:             s.FatContent,
+			LastCollectionDate:     s.LastCollectionDate.Format(DateFormatISO),
+			DaysInLactation:        s.DaysInLactation,
+		})
+	}
+
+	return responses
+}
+
+func sortByTotalProduction(responses []TopMilkProducerResponse) {
+	for i := 0; i < len(responses); i++ {
+		for j := i + 1; j < len(responses); j++ {
+			if responses[i].TotalProduction < responses[j].TotalProduction {
+				responses[i], responses[j] = responses[j], responses[i]
+			}
+		}
+	}
+}
+
+func parseTopMilkProducersParams(r *http.Request) (uint, int, int, error) {
 	farmID := r.URL.Query().Get("farmId")
 	if farmID == "" {
-		SendErrorResponse(w, "ID da fazenda é obrigatório", http.StatusBadRequest)
-		return
+		return 0, 0, 0, fmt.Errorf("ID da fazenda é obrigatório")
 	}
 
 	id, err := strconv.ParseUint(farmID, 10, 32)
 	if err != nil {
-		SendErrorResponse(w, "ID da fazenda inválido", http.StatusBadRequest)
-		return
+		return 0, 0, 0, fmt.Errorf("ID da fazenda inválido")
 	}
 
 	limit := 10
@@ -304,88 +368,27 @@ func (h *MilkCollectionHandler) GetTopMilkProducers(w http.ResponseWriter, r *ht
 		}
 	}
 
+	return uint(id), limit, periodDays, nil
+}
+
+func (h *MilkCollectionHandler) GetTopMilkProducers(w http.ResponseWriter, r *http.Request) {
+	farmID, limit, periodDays, err := parseTopMilkProducersParams(r)
+	if err != nil {
+		SendErrorResponse(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	startDate := time.Now().AddDate(0, 0, -periodDays)
 	endDate := time.Now()
-	milkCollections, err := h.service.GetMilkCollectionsByFarmIDWithDateRange(uint(id), &startDate, &endDate)
+	milkCollections, err := h.service.GetMilkCollectionsByFarmIDWithDateRange(farmID, &startDate, &endDate)
 	if err != nil {
 		SendErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	animalStats := make(map[uint]*struct {
-		AnimalID           uint
-		AnimalName         string
-		EarTagNumberLocal  int
-		Photo              string
-		TotalProduction    float64
-		CollectionCount    int
-		FatContent         float64
-		LastCollectionDate time.Time
-		DaysInLactation    int
-	})
-
-	for _, mc := range milkCollections {
-		if stats, exists := animalStats[mc.AnimalID]; exists {
-			stats.TotalProduction += mc.Liters
-			stats.CollectionCount++
-			if mc.Date.After(stats.LastCollectionDate) {
-				stats.LastCollectionDate = mc.Date
-			}
-		} else {
-			daysInLactation := int(time.Since(mc.Date).Hours()/24) + 60
-			if daysInLactation < 0 {
-				daysInLactation = 0
-			}
-
-			animalStats[mc.AnimalID] = &struct {
-				AnimalID           uint
-				AnimalName         string
-				EarTagNumberLocal  int
-				Photo              string
-				TotalProduction    float64
-				CollectionCount    int
-				FatContent         float64
-				LastCollectionDate time.Time
-				DaysInLactation    int
-			}{
-				AnimalID:           mc.AnimalID,
-				AnimalName:         mc.Animal.AnimalName,
-				EarTagNumberLocal:  mc.Animal.EarTagNumberLocal,
-				Photo:              mc.Animal.Photo,
-				TotalProduction:    mc.Liters,
-				CollectionCount:    1,
-				FatContent:         3.5,
-				LastCollectionDate: mc.Date,
-				DaysInLactation:    daysInLactation,
-			}
-		}
-	}
-
-	var responses []TopMilkProducerResponse
-	for _, stats := range animalStats {
-		averageDailyProduction := stats.TotalProduction / float64(stats.CollectionCount)
-
-		response := TopMilkProducerResponse{
-			ID:                     stats.AnimalID,
-			AnimalName:             stats.AnimalName,
-			EarTagNumberLocal:      stats.EarTagNumberLocal,
-			Photo:                  stats.Photo,
-			TotalProduction:        stats.TotalProduction,
-			AverageDailyProduction: averageDailyProduction,
-			FatContent:             stats.FatContent,
-			LastCollectionDate:     stats.LastCollectionDate.Format("2006-01-02"),
-			DaysInLactation:        stats.DaysInLactation,
-		}
-		responses = append(responses, response)
-	}
-
-	for i := 0; i < len(responses); i++ {
-		for j := i + 1; j < len(responses); j++ {
-			if responses[i].TotalProduction < responses[j].TotalProduction {
-				responses[i], responses[j] = responses[j], responses[i]
-			}
-		}
-	}
+	stats := calculateAnimalStats(milkCollections)
+	responses := buildTopMilkProducerResponses(stats)
+	sortByTotalProduction(responses)
 
 	if len(responses) > limit {
 		responses = responses[:limit]

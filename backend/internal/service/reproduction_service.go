@@ -92,51 +92,7 @@ func (s *ReproductionService) UpdateReproductionPhase(animalID uint, newPhase mo
 	reproduction.CurrentPhase = newPhase
 	now := time.Now()
 
-	switch newPhase {
-	case models.PhasePrenhas:
-		if pregnancyDate, ok := additionalData["pregnancy_date"].(time.Time); ok {
-			reproduction.PregnancyDate = &pregnancyDate
-			expectedBirth := pregnancyDate.AddDate(0, 0, 283)
-			reproduction.ExpectedBirthDate = &expectedBirth
-		}
-		if inseminationDate, ok := additionalData["insemination_date"].(time.Time); ok {
-			reproduction.InseminationDate = &inseminationDate
-		}
-		if inseminationType, ok := additionalData["insemination_type"].(string); ok {
-			reproduction.InseminationType = inseminationType
-		}
-		if veterinaryConfirmation, ok := additionalData["veterinary_confirmation"].(bool); ok {
-			reproduction.VeterinaryConfirmation = veterinaryConfirmation
-		}
-
-	case models.PhaseLactacao:
-		if lactationStartDate, ok := additionalData["lactation_start_date"].(time.Time); ok {
-			reproduction.LactationStartDate = &lactationStartDate
-		} else {
-			reproduction.LactationStartDate = &now
-		}
-		if actualBirthDate, ok := additionalData["actual_birth_date"].(time.Time); ok {
-			reproduction.ActualBirthDate = &actualBirthDate
-		}
-
-	case models.PhaseSecando:
-		if dryPeriodStartDate, ok := additionalData["dry_period_start_date"].(time.Time); ok {
-			reproduction.DryPeriodStartDate = &dryPeriodStartDate
-		} else {
-			reproduction.DryPeriodStartDate = &now
-		}
-		if lactationEndDate, ok := additionalData["lactation_end_date"].(time.Time); ok {
-			reproduction.LactationEndDate = &lactationEndDate
-		}
-
-	case models.PhaseVazias:
-		reproduction.PregnancyDate = nil
-		reproduction.ExpectedBirthDate = nil
-		reproduction.ActualBirthDate = nil
-		reproduction.LactationStartDate = nil
-		reproduction.LactationEndDate = nil
-		reproduction.DryPeriodStartDate = nil
-	}
+	s.applyPhaseData(reproduction, newPhase, additionalData, now)
 
 	if observations, ok := additionalData["observations"].(string); ok {
 		reproduction.Observations = observations
@@ -145,6 +101,67 @@ func (s *ReproductionService) UpdateReproductionPhase(animalID uint, newPhase mo
 	reproduction.UpdatedAt = now
 
 	return s.repository.Update(reproduction)
+}
+
+func (s *ReproductionService) applyPhaseData(reproduction *models.Reproduction, phase models.ReproductionPhase, additionalData map[string]interface{}, now time.Time) {
+	switch phase {
+	case models.PhasePrenhas:
+		s.applyPrenhasPhase(reproduction, additionalData)
+	case models.PhaseLactacao:
+		s.applyLactacaoPhase(reproduction, additionalData, now)
+	case models.PhaseSecando:
+		s.applySecandoPhase(reproduction, additionalData, now)
+	case models.PhaseVazias:
+		s.applyVaziasPhase(reproduction)
+	}
+}
+
+func (s *ReproductionService) applyPrenhasPhase(reproduction *models.Reproduction, additionalData map[string]interface{}) {
+	if pregnancyDate, ok := additionalData["pregnancy_date"].(time.Time); ok {
+		reproduction.PregnancyDate = &pregnancyDate
+		expectedBirth := pregnancyDate.AddDate(0, 0, 283)
+		reproduction.ExpectedBirthDate = &expectedBirth
+	}
+	if inseminationDate, ok := additionalData["insemination_date"].(time.Time); ok {
+		reproduction.InseminationDate = &inseminationDate
+	}
+	if inseminationType, ok := additionalData["insemination_type"].(string); ok {
+		reproduction.InseminationType = inseminationType
+	}
+	if veterinaryConfirmation, ok := additionalData["veterinary_confirmation"].(bool); ok {
+		reproduction.VeterinaryConfirmation = veterinaryConfirmation
+	}
+}
+
+func (s *ReproductionService) applyLactacaoPhase(reproduction *models.Reproduction, additionalData map[string]interface{}, now time.Time) {
+	if lactationStartDate, ok := additionalData["lactation_start_date"].(time.Time); ok {
+		reproduction.LactationStartDate = &lactationStartDate
+	} else {
+		reproduction.LactationStartDate = &now
+	}
+	if actualBirthDate, ok := additionalData["actual_birth_date"].(time.Time); ok {
+		reproduction.ActualBirthDate = &actualBirthDate
+	}
+}
+
+func (s *ReproductionService) applySecandoPhase(reproduction *models.Reproduction, additionalData map[string]interface{}, now time.Time) {
+	if dryPeriodStartDate, ok := additionalData["dry_period_start_date"].(time.Time); ok {
+		reproduction.DryPeriodStartDate = &dryPeriodStartDate
+	} else {
+		reproduction.DryPeriodStartDate = &now
+	}
+	if lactationEndDate, ok := additionalData["lactation_end_date"].(time.Time); ok {
+		reproduction.LactationEndDate = &lactationEndDate
+	}
+}
+
+func (s *ReproductionService) applyVaziasPhase(reproduction *models.Reproduction) {
+	reproduction.PregnancyDate = nil
+	reproduction.ExpectedBirthDate = nil
+	reproduction.ActualBirthDate = nil
+	reproduction.LactationStartDate = nil
+	reproduction.LactationEndDate = nil
+	reproduction.DryPeriodStartDate = nil
 }
 
 func (s *ReproductionService) DeleteReproduction(id uint) error {

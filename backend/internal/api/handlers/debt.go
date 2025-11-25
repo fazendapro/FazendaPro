@@ -41,7 +41,7 @@ type DebtListResponse struct {
 func (h *DebtHandler) CreateDebt(w http.ResponseWriter, r *http.Request) {
 	var req CreateDebtRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Erro ao decodificar JSON: "+err.Error(), http.StatusBadRequest)
+		http.Error(w, ErrDecodeJSON+err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -59,50 +59,64 @@ func (h *DebtHandler) CreateDebt(w http.ResponseWriter, r *http.Request) {
 		ID:        debt.ID,
 		Person:    debt.Person,
 		Value:     debt.Value,
-		CreatedAt: debt.CreatedAt.Format("2006-01-02T15:04:05.000Z"),
-		UpdatedAt: debt.UpdatedAt.Format("2006-01-02T15:04:05.000Z"),
+		CreatedAt: debt.CreatedAt.Format(DateFormatISO8601),
+		UpdatedAt: debt.UpdatedAt.Format(DateFormatISO8601),
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(response)
 }
 
-func (h *DebtHandler) GetDebts(w http.ResponseWriter, r *http.Request) {
+type queryParams struct {
+	page  int
+	limit int
+	year  *int
+	month *int
+}
+
+func parseQueryParams(r *http.Request) queryParams {
 	pageStr := r.URL.Query().Get("page")
 	limitStr := r.URL.Query().Get("limit")
 	yearStr := r.URL.Query().Get("year")
 	monthStr := r.URL.Query().Get("month")
 
-	page := 1
-	limit := 10
-	var year, month *int
+	params := queryParams{
+		page:  1,
+		limit: 10,
+	}
 
 	if pageStr != "" {
 		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
-			page = p
+			params.page = p
 		}
 	}
 
 	if limitStr != "" {
 		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
-			limit = l
+			params.limit = l
 		}
 	}
 
 	if yearStr != "" {
 		if y, err := strconv.Atoi(yearStr); err == nil {
-			year = &y
+			params.year = &y
 		}
 	}
 
 	if monthStr != "" {
 		if m, err := strconv.Atoi(monthStr); err == nil && m >= 1 && m <= 12 {
-			month = &m
+			params.month = &m
 		}
 	}
 
-	debts, total, err := h.service.GetDebtsWithPagination(page, limit, year, month)
+	return params
+}
+
+func (h *DebtHandler) GetDebts(w http.ResponseWriter, r *http.Request) {
+	params := parseQueryParams(r)
+
+	debts, total, err := h.service.GetDebtsWithPagination(params.page, params.limit, params.year, params.month)
 	if err != nil {
 		http.Error(w, "Erro ao buscar dívidas: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -114,19 +128,19 @@ func (h *DebtHandler) GetDebts(w http.ResponseWriter, r *http.Request) {
 			ID:        debt.ID,
 			Person:    debt.Person,
 			Value:     debt.Value,
-			CreatedAt: debt.CreatedAt.Format("2006-01-02T15:04:05.000Z"),
-			UpdatedAt: debt.UpdatedAt.Format("2006-01-02T15:04:05.000Z"),
+			CreatedAt: debt.CreatedAt.Format(DateFormatISO8601),
+			UpdatedAt: debt.UpdatedAt.Format(DateFormatISO8601),
 		}
 	}
 
 	response := DebtListResponse{
 		Debts: debtResponses,
 		Total: total,
-		Page:  page,
-		Limit: limit,
+		Page:  params.page,
+		Limit: params.limit,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -148,7 +162,7 @@ func (h *DebtHandler) DeleteDebt(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Dívida deletada com sucesso"})
 }
@@ -186,6 +200,6 @@ func (h *DebtHandler) GetTotalByPerson(w http.ResponseWriter, r *http.Request) {
 		"totals": totals,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	json.NewEncoder(w).Encode(response)
 }

@@ -9,6 +9,11 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+const (
+	HeaderContentType = "Content-Type"
+	ContentTypeJSON   = "application/json"
+)
+
 type ErrorResponse struct {
 	Success bool   `json:"success"`
 	Error   string `json:"error"`
@@ -17,7 +22,7 @@ type ErrorResponse struct {
 }
 
 func SendErrorResponse(w http.ResponseWriter, message string, statusCode int) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	w.WriteHeader(statusCode)
 
 	response := ErrorResponse{
@@ -30,6 +35,32 @@ func SendErrorResponse(w http.ResponseWriter, message string, statusCode int) {
 	json.NewEncoder(w).Encode(response)
 }
 
+func validateToken(tokenString, jwtSecret string) (*jwt.Token, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return []byte(jwtSecret), nil
+	})
+	if err != nil || !token.Valid {
+		return nil, err
+	}
+	return token, nil
+}
+
+func extractFarmID(token *jwt.Token) (uint, bool) {
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return 0, false
+	}
+	farmID, exists := claims["farm_id"]
+	if !exists {
+		return 0, false
+	}
+	farmIDFloat, ok := farmID.(float64)
+	if !ok {
+		return 0, false
+	}
+	return uint(farmIDFloat), true
+}
+
 func Auth(jwtSecret string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -39,23 +70,15 @@ func Auth(jwtSecret string) func(http.Handler) http.Handler {
 				return
 			}
 
-			token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-				return []byte(jwtSecret), nil
-			})
-
-			if err != nil || !token.Valid {
+			token, err := validateToken(tokenString, jwtSecret)
+			if err != nil {
 				SendErrorResponse(w, "Token inválido", http.StatusUnauthorized)
 				return
 			}
 
-			if claims, ok := token.Claims.(jwt.MapClaims); ok {
-				if farmID, exists := claims["farm_id"]; exists {
-					if farmIDFloat, ok := farmID.(float64); ok {
-						ctx := r.Context()
-						ctx = context.WithValue(ctx, "farm_id", uint(farmIDFloat))
-						r = r.WithContext(ctx)
-					}
-				}
+			if farmID, ok := extractFarmID(token); ok {
+				ctx := context.WithValue(r.Context(), "farm_id", farmID)
+				r = r.WithContext(ctx)
 			}
 
 			next.ServeHTTP(w, r)
