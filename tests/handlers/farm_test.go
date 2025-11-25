@@ -11,6 +11,7 @@ import (
 	"github.com/fazendapro/FazendaPro-api/internal/api/handlers"
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
+	"github.com/fazendapro/FazendaPro-api/tests"
 	"github.com/fazendapro/FazendaPro-api/tests/services"
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
@@ -36,7 +37,7 @@ func TestFarmHandler_GetFarm_Success(t *testing.T) {
 		Logo:     "logo.png",
 	}
 
-	req, _ := http.NewRequest("GET", "/farm?id=1", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointFarmWithID, nil)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("FindByID", uint(1)).Return(expectedFarm, nil)
@@ -79,7 +80,7 @@ func TestFarmHandler_GetFarm_NotFound(t *testing.T) {
 	mockRepo := new(services.MockFarmRepository)
 	router, _ := setupFarmRouter(mockRepo)
 
-	req, _ := http.NewRequest("GET", "/farm?id=1", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointFarmWithID, nil)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("FindByID", uint(1)).Return(nil, nil)
@@ -94,7 +95,7 @@ func TestFarmHandler_GetFarm_ServiceError(t *testing.T) {
 	mockRepo := new(services.MockFarmRepository)
 	router, _ := setupFarmRouter(mockRepo)
 
-	req, _ := http.NewRequest("GET", "/farm?id=1", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointFarmWithID, nil)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("FindByID", uint(1)).Return(nil, errors.New("erro ao buscar"))
@@ -114,7 +115,7 @@ func TestFarmHandler_GetFarm_LoadCompanyDataError(t *testing.T) {
 		CompanyID: 1,
 	}
 
-	req, _ := http.NewRequest("GET", "/farm?id=1", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointFarmWithID, nil)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("FindByID", uint(1)).Return(expectedFarm, nil)
@@ -131,12 +132,12 @@ func TestFarmHandler_UpdateFarm_Success(t *testing.T) {
 	router, _ := setupFarmRouter(mockRepo)
 
 	farmData := map[string]interface{}{
-		"logo": "new-logo.png",
+		"logo": tests.TestFileNewLogoPNG,
 	}
 
 	jsonData, _ := json.Marshal(farmData)
 	req, _ := http.NewRequest("PUT", "/farm?id=1", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("Update", mock.AnythingOfType("*models.Farm")).Return(nil)
@@ -168,12 +169,12 @@ func TestFarmHandler_UpdateFarm_MissingID(t *testing.T) {
 	router, _ := setupFarmRouter(mockRepo)
 
 	farmData := map[string]interface{}{
-		"logo": "new-logo.png",
+		"logo": tests.TestFileNewLogoPNG,
 	}
 
 	jsonData, _ := json.Marshal(farmData)
 	req, _ := http.NewRequest("PUT", "/farm", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	router.ServeHTTP(w, req)
@@ -186,12 +187,12 @@ func TestFarmHandler_UpdateFarm_InvalidID(t *testing.T) {
 	router, _ := setupFarmRouter(mockRepo)
 
 	farmData := map[string]interface{}{
-		"logo": "new-logo.png",
+		"logo": tests.TestFileNewLogoPNG,
 	}
 
 	jsonData, _ := json.Marshal(farmData)
 	req, _ := http.NewRequest("PUT", "/farm?id=invalid", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	router.ServeHTTP(w, req)
@@ -204,7 +205,7 @@ func TestFarmHandler_UpdateFarm_InvalidJSON(t *testing.T) {
 	router, _ := setupFarmRouter(mockRepo)
 
 	req, _ := http.NewRequest("PUT", "/farm?id=1", bytes.NewBuffer([]byte("invalid json")))
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	router.ServeHTTP(w, req)
@@ -217,12 +218,12 @@ func TestFarmHandler_UpdateFarm_ServiceError(t *testing.T) {
 	router, _ := setupFarmRouter(mockRepo)
 
 	farmData := map[string]interface{}{
-		"logo": "new-logo.png",
+		"logo": tests.TestFileNewLogoPNG,
 	}
 
 	jsonData, _ := json.Marshal(farmData)
 	req, _ := http.NewRequest("PUT", "/farm?id=1", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("Update", mock.AnythingOfType("*models.Farm")).Return(errors.New("erro ao atualizar"))

@@ -61,19 +61,19 @@ type LoginResponse struct {
 
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		SendErrorResponse(w, "Método não permitido", http.StatusMethodNotAllowed)
+		SendErrorResponse(w, ErrMethodNotAllowed, http.StatusMethodNotAllowed)
 		return
 	}
 
 	var req LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		SendErrorResponse(w, "Erro ao decodificar JSON: "+err.Error(), http.StatusBadRequest)
+		SendErrorResponse(w, ErrDecodeJSON+err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	user, err := h.service.GetUserByEmail(req.Email)
 	if err != nil {
-		SendErrorResponse(w, "Erro interno do servidor", http.StatusInternalServerError)
+		SendErrorResponse(w, ErrInternalServer, http.StatusInternalServerError)
 		return
 	}
 
@@ -84,7 +84,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	valid, err := h.service.ValidatePasswordByEmail(req.Email, req.Password)
 	if err != nil {
-		SendErrorResponse(w, "Erro interno do servidor", http.StatusInternalServerError)
+		SendErrorResponse(w, ErrInternalServer, http.StatusInternalServerError)
 		return
 	}
 	if !valid {
@@ -94,7 +94,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	accessToken, err := h.generateJWT(user)
 	if err != nil {
-		SendErrorResponse(w, "Erro ao gerar token", http.StatusInternalServerError)
+		SendErrorResponse(w, ErrGenerateToken, http.StatusInternalServerError)
 		return
 	}
 
@@ -127,13 +127,13 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		SendErrorResponse(w, "Método não permitido", http.StatusMethodNotAllowed)
+		SendErrorResponse(w, ErrMethodNotAllowed, http.StatusMethodNotAllowed)
 		return
 	}
 
 	var req RegisterRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		SendErrorResponse(w, "Erro ao decodificar JSON: "+err.Error(), http.StatusBadRequest)
+		SendErrorResponse(w, ErrDecodeJSON+err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -155,7 +155,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 	accessToken, err := h.generateJWT(user)
 	if err != nil {
-		SendErrorResponse(w, "Erro ao gerar token", http.StatusInternalServerError)
+		SendErrorResponse(w, ErrGenerateToken, http.StatusInternalServerError)
 		return
 	}
 
@@ -181,7 +181,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(response)
 }
@@ -211,19 +211,19 @@ type RefreshTokenResponse struct {
 
 func (h *AuthHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		SendErrorResponse(w, "Método não permitido", http.StatusMethodNotAllowed)
+		SendErrorResponse(w, ErrMethodNotAllowed, http.StatusMethodNotAllowed)
 		return
 	}
 
 	var req RefreshTokenRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		SendErrorResponse(w, "Erro ao decodificar JSON: "+err.Error(), http.StatusBadRequest)
+		SendErrorResponse(w, ErrDecodeJSON+err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	refreshToken, err := h.refreshTokenRepo.FindByToken(req.RefreshToken)
 	if err != nil {
-		SendErrorResponse(w, "Erro interno do servidor", http.StatusInternalServerError)
+		SendErrorResponse(w, ErrInternalServer, http.StatusInternalServerError)
 		return
 	}
 
@@ -234,7 +234,7 @@ func (h *AuthHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 
 	accessToken, err := h.generateJWT(&refreshToken.User)
 	if err != nil {
-		SendErrorResponse(w, "Erro ao gerar token", http.StatusInternalServerError)
+		SendErrorResponse(w, ErrGenerateToken, http.StatusInternalServerError)
 		return
 	}
 
@@ -244,25 +244,25 @@ func (h *AuthHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 		AccessToken: accessToken,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
 }
 
 func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		SendErrorResponse(w, "Método não permitido", http.StatusMethodNotAllowed)
+		SendErrorResponse(w, ErrMethodNotAllowed, http.StatusMethodNotAllowed)
 		return
 	}
 
 	var req RefreshTokenRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		SendErrorResponse(w, "Erro ao decodificar JSON: "+err.Error(), http.StatusBadRequest)
+		SendErrorResponse(w, ErrDecodeJSON+err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	if err := h.refreshTokenRepo.DeleteByToken(req.RefreshToken); err != nil {
-		SendErrorResponse(w, "Erro interno do servidor", http.StatusInternalServerError)
+		SendErrorResponse(w, ErrInternalServer, http.StatusInternalServerError)
 		return
 	}
 
@@ -271,7 +271,7 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 		"message": "Logout realizado com sucesso",
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
 }

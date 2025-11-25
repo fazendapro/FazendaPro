@@ -10,6 +10,7 @@ import (
 	"github.com/fazendapro/FazendaPro-api/internal/api/handlers"
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
+	"github.com/fazendapro/FazendaPro-api/tests"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -84,9 +85,9 @@ func TestGetNextToCalve(t *testing.T) {
 			Animal: models.Animal{
 				ID:                1,
 				FarmID:            farmID,
-				AnimalName:        "Tata Salt",
+				AnimalName:        tests.TestNameTataSalt,
 				EarTagNumberLocal: 123,
-				Photo:             "src/assets/images/mocked/cows/tata.png",
+				Photo:             tests.TestPathTataPNG,
 			},
 		},
 		{
@@ -99,14 +100,14 @@ func TestGetNextToCalve(t *testing.T) {
 				FarmID:            farmID,
 				AnimalName:        "Lays",
 				EarTagNumberLocal: 124,
-				Photo:             "src/assets/images/mocked/cows/lays.png",
+				Photo:             tests.TestPathLaysPNG,
 			},
 		},
 	}
 
 	mockRepo.On("FindByPhase", models.PhasePrenhas).Return(mockReproductions, nil)
 
-	req, err := http.NewRequest("GET", "/api/v1/reproductions/next-to-calve?farmId=1", nil)
+	req, err := http.NewRequest("GET", tests.EndpointAPIv1ReproductionsNextToCalve, nil)
 	assert.NoError(t, err)
 
 	rr := httptest.NewRecorder()
@@ -201,7 +202,7 @@ func TestGetNextToCalve_ServiceError(t *testing.T) {
 
 	mockRepo.On("FindByPhase", models.PhasePrenhas).Return(nil, assert.AnError)
 
-	req, err := http.NewRequest("GET", "/api/v1/reproductions/next-to-calve?farmId=1", nil)
+	req, err := http.NewRequest("GET", tests.EndpointAPIv1ReproductionsNextToCalve, nil)
 	assert.NoError(t, err)
 
 	rr := httptest.NewRecorder()
@@ -227,7 +228,7 @@ func TestGetNextToCalve_EmptyResults(t *testing.T) {
 
 	mockRepo.On("FindByPhase", models.PhasePrenhas).Return([]models.Reproduction{}, nil)
 
-	req, err := http.NewRequest("GET", "/api/v1/reproductions/next-to-calve?farmId=1", nil)
+	req, err := http.NewRequest("GET", tests.EndpointAPIv1ReproductionsNextToCalve, nil)
 	assert.NoError(t, err)
 
 	rr := httptest.NewRecorder()
@@ -269,9 +270,9 @@ func TestGetNextToCalve_FiltersByFarm(t *testing.T) {
 			Animal: models.Animal{
 				ID:                1,
 				FarmID:            1,
-				AnimalName:        "Tata Salt",
+				AnimalName:        tests.TestNameTataSalt,
 				EarTagNumberLocal: 123,
-				Photo:             "src/assets/images/mocked/cows/tata.png",
+				Photo:             tests.TestPathTataPNG,
 			},
 		},
 		{
@@ -284,14 +285,14 @@ func TestGetNextToCalve_FiltersByFarm(t *testing.T) {
 				FarmID:            2,
 				AnimalName:        "Lays",
 				EarTagNumberLocal: 124,
-				Photo:             "src/assets/images/mocked/cows/lays.png",
+				Photo:             tests.TestPathLaysPNG,
 			},
 		},
 	}
 
 	mockRepo.On("FindByPhase", models.PhasePrenhas).Return(mockReproductions, nil)
 
-	req, err := http.NewRequest("GET", "/api/v1/reproductions/next-to-calve?farmId=1", nil)
+	req, err := http.NewRequest("GET", tests.EndpointAPIv1ReproductionsNextToCalve, nil)
 	assert.NoError(t, err)
 
 	rr := httptest.NewRecorder()
@@ -347,9 +348,9 @@ func TestGetNextToCalve_SortsByDaysUntilBirth(t *testing.T) {
 			Animal: models.Animal{
 				ID:                1,
 				FarmID:            1,
-				AnimalName:        "Tata Salt",
+				AnimalName:        tests.TestNameTataSalt,
 				EarTagNumberLocal: 123,
-				Photo:             "src/assets/images/mocked/cows/tata.png",
+				Photo:             tests.TestPathTataPNG,
 			},
 		},
 		{
@@ -362,14 +363,14 @@ func TestGetNextToCalve_SortsByDaysUntilBirth(t *testing.T) {
 				FarmID:            1,
 				AnimalName:        "Lays",
 				EarTagNumberLocal: 124,
-				Photo:             "src/assets/images/mocked/cows/lays.png",
+				Photo:             tests.TestPathLaysPNG,
 			},
 		},
 	}
 
 	mockRepo.On("FindByPhase", models.PhasePrenhas).Return(mockReproductions, nil)
 
-	req, err := http.NewRequest("GET", "/api/v1/reproductions/next-to-calve?farmId=1", nil)
+	req, err := http.NewRequest("GET", tests.EndpointAPIv1ReproductionsNextToCalve, nil)
 	assert.NoError(t, err)
 
 	rr := httptest.NewRecorder()

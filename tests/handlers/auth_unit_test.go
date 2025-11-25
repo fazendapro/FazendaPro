@@ -11,6 +11,7 @@ import (
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
 	"github.com/fazendapro/FazendaPro-api/internal/utils"
+	"github.com/fazendapro/FazendaPro-api/tests"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -25,19 +26,19 @@ func TestAuthHandler_Login(t *testing.T) {
 			ID:     1,
 			FarmID: 1,
 			Person: &models.Person{
-				Email:    "test@example.com",
+				Email:    tests.TestEmailExample,
 				Password: hashedPassword,
 			},
 		}
 
-		mockUserRepo.On("FindByPersonEmail", "test@example.com").Return(expectedUser, nil)
+		mockUserRepo.On("FindByPersonEmail", tests.TestEmailExample).Return(expectedUser, nil)
 		mockRefreshTokenRepo.On("Create", uint(1), mock.AnythingOfType("time.Time")).Return(&models.RefreshToken{Token: "refresh_token_123"}, nil)
 
 		userService := service.NewUserService(mockUserRepo)
 		authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, "secret")
 
 		loginData := map[string]string{
-			"email":    "test@example.com",
+			"email":    tests.TestEmailExample,
 			"password": "password123",
 		}
 		jsonData, _ := json.Marshal(loginData)
@@ -62,7 +63,7 @@ func TestAuthHandler_Login(t *testing.T) {
 		authHandler := handlers.NewAuthHandler(userService, mockRefreshTokenRepo, "secret")
 
 		loginData := map[string]string{
-			"email":    "test@example.com",
+			"email":    tests.TestEmailExample,
 			"password": "wrongpassword",
 		}
 		jsonData, _ := json.Marshal(loginData)

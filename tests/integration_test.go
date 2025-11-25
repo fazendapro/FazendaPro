@@ -28,7 +28,7 @@ func setupTestDB(t *testing.T) *repository.Database {
 	require.NoError(t, err)
 
 	company := &models.Company{
-		CompanyName: "Test Company",
+		CompanyName: TestCompanyName,
 		FarmCNPJ:    "12345678901234",
 	}
 	err = db.Create(company).Error
@@ -52,11 +52,11 @@ func setupTestApp(t *testing.T) (*app.Application, *repository.Database, *config
 
 	cfg := &config.Config{
 		Port:      "8080",
-		JWTSecret: "test-secret-key",
+		JWTSecret: TestSecret + "-key",
 		CORS: config.CORSConfig{
 			AllowedOrigins:   []string{"*"},
 			AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-			AllowedHeaders:   []string{"Content-Type", "Authorization"},
+			AllowedHeaders:   []string{HeaderContentType, HeaderAuthorization},
 			ExposedHeaders:   []string{},
 			AllowCredentials: true,
 			MaxAge:           86400,
@@ -73,7 +73,7 @@ func TestIntegration(t *testing.T) {
 	router := routes.SetupRoutes(app, db, cfg)
 
 	t.Run("Health_Check", func(t *testing.T) {
-		req, err := http.NewRequest("GET", "/health", nil)
+		req, err := http.NewRequest("GET", EndpointHealth, nil)
 		require.NoError(t, err)
 
 		rr := httptest.NewRecorder()
@@ -95,9 +95,9 @@ func TestIntegration(t *testing.T) {
 	})
 
 	t.Run("CORS_Headers", func(t *testing.T) {
-		req, err := http.NewRequest("OPTIONS", "/api/v1/auth/register", nil)
+		req, err := http.NewRequest("OPTIONS", EndpointAPIv1AuthRegister, nil)
 		require.NoError(t, err)
-		req.Header.Set("Origin", "http://localhost:3000")
+		req.Header.Set("Origin", TestOriginLocalhost)
 
 		rr := httptest.NewRecorder()
 		router.ServeHTTP(rr, req)
@@ -131,9 +131,9 @@ func TestAuthIntegration(t *testing.T) {
 		jsonData, err := json.Marshal(userData)
 		require.NoError(t, err)
 
-		req, err := http.NewRequest("POST", "/api/v1/auth/register", bytes.NewBuffer(jsonData))
+		req, err := http.NewRequest("POST", EndpointAPIv1AuthRegister, bytes.NewBuffer(jsonData))
 		require.NoError(t, err)
-		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set(HeaderContentType, ContentTypeJSON)
 
 		rr := httptest.NewRecorder()
 		router.ServeHTTP(rr, req)
@@ -167,9 +167,9 @@ func TestAuthIntegration(t *testing.T) {
 		jsonData, err := json.Marshal(userData)
 		require.NoError(t, err)
 
-		req, err := http.NewRequest("POST", "/api/v1/auth/register", bytes.NewBuffer(jsonData))
+		req, err := http.NewRequest("POST", EndpointAPIv1AuthRegister, bytes.NewBuffer(jsonData))
 		require.NoError(t, err)
-		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set(HeaderContentType, ContentTypeJSON)
 
 		rr := httptest.NewRecorder()
 		router.ServeHTTP(rr, req)
@@ -201,9 +201,9 @@ func TestAuthIntegration(t *testing.T) {
 		jsonData, err := json.Marshal(userData)
 		require.NoError(t, err)
 
-		req, err := http.NewRequest("POST", "/api/v1/auth/register", bytes.NewBuffer(jsonData))
+		req, err := http.NewRequest("POST", EndpointAPIv1AuthRegister, bytes.NewBuffer(jsonData))
 		require.NoError(t, err)
-		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set(HeaderContentType, ContentTypeJSON)
 
 		rr := httptest.NewRecorder()
 		router.ServeHTTP(rr, req)
@@ -418,7 +418,7 @@ func TestPerformance(t *testing.T) {
 	t.Run("Health_Check_Performance", func(t *testing.T) {
 		start := time.Now()
 
-		req, err := http.NewRequest("GET", "/health", nil)
+		req, err := http.NewRequest("GET", EndpointHealth, nil)
 		require.NoError(t, err)
 
 		rr := httptest.NewRecorder()
@@ -436,7 +436,7 @@ func TestPerformance(t *testing.T) {
 
 		for i := 0; i < concurrency; i++ {
 			go func() {
-				req, err := http.NewRequest("GET", "/health", nil)
+				req, err := http.NewRequest("GET", EndpointHealth, nil)
 				require.NoError(t, err)
 
 				rr := httptest.NewRecorder()

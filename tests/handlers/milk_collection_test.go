@@ -12,6 +12,7 @@ import (
 	"github.com/fazendapro/FazendaPro-api/internal/api/handlers"
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
+	"github.com/fazendapro/FazendaPro-api/tests"
 	"github.com/fazendapro/FazendaPro-api/tests/mocks"
 	"github.com/fazendapro/FazendaPro-api/tests/services"
 	"github.com/go-chi/chi/v5"
@@ -24,11 +25,11 @@ func setupMilkCollectionRouter(mockMilkRepo *mocks.MockMilkCollectionRepository,
 	milkService := service.NewMilkCollectionService(mockMilkRepo, batchService)
 	milkHandler := handlers.NewMilkCollectionHandler(milkService)
 	r := chi.NewRouter()
-	r.Post("/milk-collections", milkHandler.CreateMilkCollection)
-	r.Put("/milk-collections/{id}", milkHandler.UpdateMilkCollection)
-	r.Get("/milk-collections/farm/{farmId}", milkHandler.GetMilkCollectionsByFarmID)
-	r.Get("/milk-collections/animal/{animalId}", milkHandler.GetMilkCollectionsByAnimalID)
-	r.Get("/milk-collections/top-producers", milkHandler.GetTopMilkProducers)
+	r.Post(tests.EndpointMilkCollections, milkHandler.CreateMilkCollection)
+	r.Put(tests.EndpointMilkCollections+"/{id}", milkHandler.UpdateMilkCollection)
+	r.Get(tests.EndpointMilkCollections+"/farm/{farmId}", milkHandler.GetMilkCollectionsByFarmID)
+	r.Get(tests.EndpointMilkCollections+"/animal/{animalId}", milkHandler.GetMilkCollectionsByAnimalID)
+	r.Get(tests.EndpointMilkCollections+"/top-producers", milkHandler.GetTopMilkProducers)
 	return r, mockMilkRepo
 }
 
@@ -40,12 +41,12 @@ func TestMilkCollectionHandler_CreateMilkCollection_Success(t *testing.T) {
 	milkData := map[string]interface{}{
 		"animal_id": 1,
 		"liters":    35.5,
-		"date":      "2024-01-15",
+		"date":      tests.TestDate20240115,
 	}
 
 	jsonData, _ := json.Marshal(milkData)
-	req, _ := http.NewRequest("POST", "/milk-collections", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("POST", tests.EndpointMilkCollections, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	createdMilkCollection := &models.MilkCollection{
@@ -58,7 +59,7 @@ func TestMilkCollectionHandler_CreateMilkCollection_Success(t *testing.T) {
 	animal := &models.Animal{ID: 1, CurrentBatch: models.Batch1, FarmID: 1}
 	milkCollections := []models.MilkCollection{*createdMilkCollection}
 
-	mockMilkRepo.On("Create", mock.AnythingOfType("*models.MilkCollection")).Return(nil).Run(func(args mock.Arguments) {
+	mockMilkRepo.On("Create", mock.AnythingOfType(tests.TypeModelsMilkCollection)).Return(nil).Run(func(args mock.Arguments) {
 		mc := args.Get(0).(*models.MilkCollection)
 		mc.ID = 1
 	})
@@ -103,8 +104,8 @@ func TestMilkCollectionHandler_CreateMilkCollection_InvalidDate(t *testing.T) {
 	}
 
 	jsonData, _ := json.Marshal(milkData)
-	req, _ := http.NewRequest("POST", "/milk-collections", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("POST", tests.EndpointMilkCollections, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	router.ServeHTTP(w, req)
@@ -120,12 +121,12 @@ func TestMilkCollectionHandler_CreateMilkCollection_ServiceError(t *testing.T) {
 	milkData := map[string]interface{}{
 		"animal_id": 1,
 		"liters":    35.5,
-		"date":      "2024-01-15",
+		"date":      tests.TestDate20240115,
 	}
 
 	jsonData, _ := json.Marshal(milkData)
-	req, _ := http.NewRequest("POST", "/milk-collections", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("POST", tests.EndpointMilkCollections, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	mockMilkRepo.On("Create", mock.AnythingOfType("*models.MilkCollection")).Return(errors.New("erro ao criar"))
@@ -144,7 +145,7 @@ func TestMilkCollectionHandler_UpdateMilkCollection_Success(t *testing.T) {
 	milkData := map[string]interface{}{
 		"animal_id": 1,
 		"liters":    40.0,
-		"date":      "2024-01-15",
+		"date":      tests.TestDate20240115,
 	}
 
 	jsonData, _ := json.Marshal(milkData)
@@ -179,7 +180,7 @@ func TestMilkCollectionHandler_UpdateMilkCollection_InvalidID(t *testing.T) {
 	milkData := map[string]interface{}{
 		"animal_id": 1,
 		"liters":    40.0,
-		"date":      "2024-01-15",
+		"date":      tests.TestDate20240115,
 	}
 
 	jsonData, _ := json.Marshal(milkData)
@@ -202,7 +203,7 @@ func TestMilkCollectionHandler_GetMilkCollectionsByFarmID_Success(t *testing.T) 
 		{ID: 2, AnimalID: 2, Liters: 40.0, Date: time.Now()},
 	}
 
-	req, _ := http.NewRequest("GET", "/milk-collections/farm/1", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointMilkCollectionsFarm, nil)
 	w := httptest.NewRecorder()
 
 	mockMilkRepo.On("FindByFarmID", uint(1)).Return(expectedCollections, nil)
@@ -357,7 +358,7 @@ func TestMilkCollectionHandler_GetMilkCollectionsByFarmID_WithAnimalData(t *test
 		},
 	}
 
-	req, _ := http.NewRequest("GET", "/milk-collections/farm/1", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointMilkCollectionsFarm, nil)
 	w := httptest.NewRecorder()
 
 	mockMilkRepo.On("FindByFarmID", uint(1)).Return(expectedCollections, nil)
@@ -394,7 +395,7 @@ func TestMilkCollectionHandler_GetMilkCollectionsByFarmID_WithNilBirthDate(t *te
 		},
 	}
 
-	req, _ := http.NewRequest("GET", "/milk-collections/farm/1", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointMilkCollectionsFarm, nil)
 	w := httptest.NewRecorder()
 
 	mockMilkRepo.On("FindByFarmID", uint(1)).Return(expectedCollections, nil)

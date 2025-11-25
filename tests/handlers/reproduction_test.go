@@ -12,6 +12,7 @@ import (
 	"github.com/fazendapro/FazendaPro-api/internal/api/handlers"
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
+	"github.com/fazendapro/FazendaPro-api/tests"
 	"github.com/fazendapro/FazendaPro-api/tests/services"
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
@@ -22,14 +23,14 @@ func setupReproductionRouter(mockRepo *services.MockReproductionRepository) (*ch
 	reproductionService := service.NewReproductionService(mockRepo)
 	reproductionHandler := handlers.NewReproductionHandler(reproductionService)
 	r := chi.NewRouter()
-	r.Post("/reproductions", reproductionHandler.CreateReproduction)
-	r.Get("/reproductions", reproductionHandler.GetReproduction)
-	r.Get("/reproductions/animal", reproductionHandler.GetReproductionByAnimal)
-	r.Get("/reproductions/farm", reproductionHandler.GetReproductionsByFarm)
-	r.Get("/reproductions/phase", reproductionHandler.GetReproductionsByPhase)
-	r.Put("/reproductions", reproductionHandler.UpdateReproduction)
-	r.Put("/reproductions/phase", reproductionHandler.UpdateReproductionPhase)
-	r.Delete("/reproductions", reproductionHandler.DeleteReproduction)
+	r.Post(tests.EndpointReproductions, reproductionHandler.CreateReproduction)
+	r.Get(tests.EndpointReproductions, reproductionHandler.GetReproduction)
+	r.Get(tests.EndpointReproductions+"/animal", reproductionHandler.GetReproductionByAnimal)
+	r.Get(tests.EndpointReproductions+"/farm", reproductionHandler.GetReproductionsByFarm)
+	r.Get(tests.EndpointReproductionsPhase, reproductionHandler.GetReproductionsByPhase)
+	r.Put(tests.EndpointReproductions, reproductionHandler.UpdateReproduction)
+	r.Put(tests.EndpointReproductionsPhase, reproductionHandler.UpdateReproductionPhase)
+	r.Delete(tests.EndpointReproductions, reproductionHandler.DeleteReproduction)
 	return r, mockRepo
 }
 
@@ -43,12 +44,12 @@ func TestReproductionHandler_CreateReproduction_Success(t *testing.T) {
 	}
 
 	jsonData, _ := json.Marshal(reproductionData)
-	req, _ := http.NewRequest("POST", "/reproductions", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("POST", tests.EndpointReproductions, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("FindByAnimalID", uint(1)).Return(nil, nil)
-	mockRepo.On("Create", mock.AnythingOfType("*models.Reproduction")).Return(nil).Run(func(args mock.Arguments) {
+	mockRepo.On("Create", mock.AnythingOfType(tests.TypeModelsReproduction)).Return(nil).Run(func(args mock.Arguments) {
 		rep := args.Get(0).(*models.Reproduction)
 		rep.ID = 1
 	})
@@ -67,7 +68,7 @@ func TestReproductionHandler_CreateReproduction_InvalidMethod(t *testing.T) {
 	reproductionService := service.NewReproductionService(mockRepo)
 	reproductionHandler := handlers.NewReproductionHandler(reproductionService)
 
-	req, _ := http.NewRequest("GET", "/reproductions", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointReproductions, nil)
 	w := httptest.NewRecorder()
 
 	reproductionHandler.CreateReproduction(w, req)
@@ -97,8 +98,8 @@ func TestReproductionHandler_CreateReproduction_ServiceError(t *testing.T) {
 	}
 
 	jsonData, _ := json.Marshal(reproductionData)
-	req, _ := http.NewRequest("POST", "/reproductions", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("POST", tests.EndpointReproductions, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("FindByAnimalID", uint(1)).Return(nil, errors.New("erro ao buscar"))
@@ -121,7 +122,7 @@ func TestReproductionHandler_GetReproduction_Success(t *testing.T) {
 		PregnancyDate: &pregnancyDate,
 	}
 
-	req, _ := http.NewRequest("GET", "/reproductions?id=1", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointReproductionsWithID, nil)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("FindByID", uint(1)).Return(expectedReproduction, nil)
@@ -139,7 +140,7 @@ func TestReproductionHandler_GetReproduction_MissingID(t *testing.T) {
 	mockRepo := new(services.MockReproductionRepository)
 	router, _ := setupReproductionRouter(mockRepo)
 
-	req, _ := http.NewRequest("GET", "/reproductions", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointReproductions, nil)
 	w := httptest.NewRecorder()
 
 	router.ServeHTTP(w, req)
@@ -151,7 +152,7 @@ func TestReproductionHandler_GetReproduction_NotFound(t *testing.T) {
 	mockRepo := new(services.MockReproductionRepository)
 	router, _ := setupReproductionRouter(mockRepo)
 
-	req, _ := http.NewRequest("GET", "/reproductions?id=1", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointReproductionsWithID, nil)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("FindByID", uint(1)).Return(nil, nil)
@@ -356,12 +357,12 @@ func TestReproductionHandler_CreateReproduction_WithAllDates(t *testing.T) {
 	}
 
 	jsonData, _ := json.Marshal(reproductionData)
-	req, _ := http.NewRequest("POST", "/reproductions", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("POST", tests.EndpointReproductions, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("FindByAnimalID", uint(1)).Return(nil, nil)
-	mockRepo.On("Create", mock.AnythingOfType("*models.Reproduction")).Return(nil).Run(func(args mock.Arguments) {
+	mockRepo.On("Create", mock.AnythingOfType(tests.TypeModelsReproduction)).Return(nil).Run(func(args mock.Arguments) {
 		rep := args.Get(0).(*models.Reproduction)
 		rep.ID = 1
 	})
@@ -384,12 +385,12 @@ func TestReproductionHandler_CreateReproduction_WithInvalidDates(t *testing.T) {
 	}
 
 	jsonData, _ := json.Marshal(reproductionData)
-	req, _ := http.NewRequest("POST", "/reproductions", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("POST", tests.EndpointReproductions, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("FindByAnimalID", uint(1)).Return(nil, nil)
-	mockRepo.On("Create", mock.AnythingOfType("*models.Reproduction")).Return(nil).Run(func(args mock.Arguments) {
+	mockRepo.On("Create", mock.AnythingOfType(tests.TypeModelsReproduction)).Return(nil).Run(func(args mock.Arguments) {
 		rep := args.Get(0).(*models.Reproduction)
 		rep.ID = 1
 	})
@@ -485,7 +486,7 @@ func TestReproductionHandler_GetReproduction_WithAllDates(t *testing.T) {
 		UpdatedAt: now,
 	}
 
-	req, _ := http.NewRequest("GET", "/reproductions?id=1", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointReproductionsWithID, nil)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("FindByID", uint(1)).Return(reproduction, nil)

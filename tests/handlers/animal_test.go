@@ -14,6 +14,7 @@ import (
 	"github.com/fazendapro/FazendaPro-api/internal/cache"
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
+	"github.com/fazendapro/FazendaPro-api/tests"
 	"github.com/fazendapro/FazendaPro-api/tests/services"
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
@@ -24,13 +25,13 @@ func setupAnimalRouter(mockRepo *services.MockAnimalRepository, mockCache *MockC
 	animalService := service.NewAnimalService(mockRepo, mockCache)
 	animalHandler := handlers.NewAnimalHandler(animalService)
 	r := chi.NewRouter()
-	r.Post("/animals", animalHandler.CreateAnimal)
-	r.Get("/animals", animalHandler.GetAnimal)
-	r.Get("/animals/farm", animalHandler.GetAnimalsByFarm)
-	r.Put("/animals", animalHandler.UpdateAnimal)
-	r.Delete("/animals", animalHandler.DeleteAnimal)
-	r.Get("/animals/sex", animalHandler.GetAnimalsBySex)
-	r.Post("/animals/photo", animalHandler.UploadAnimalPhoto)
+	r.Post(tests.EndpointAnimals, animalHandler.CreateAnimal)
+	r.Get(tests.EndpointAnimals, animalHandler.GetAnimal)
+	r.Get(tests.EndpointAnimals+"/farm", animalHandler.GetAnimalsByFarm)
+	r.Put(tests.EndpointAnimals, animalHandler.UpdateAnimal)
+	r.Delete(tests.EndpointAnimals, animalHandler.DeleteAnimal)
+	r.Get(tests.EndpointAnimals+"/sex", animalHandler.GetAnimalsBySex)
+	r.Post(tests.EndpointAnimalsPhoto, animalHandler.UploadAnimalPhoto)
 	return r, mockRepo, mockCache
 }
 
@@ -44,7 +45,7 @@ func TestAnimalHandler_CreateAnimal_Success(t *testing.T) {
 		"farm_id":                 1,
 		"ear_tag_number_local":    123,
 		"ear_tag_number_register": 456,
-		"animal_name":             "Boi Teste",
+		"animal_name":             tests.TestNameBoiTeste,
 		"sex":                     1,
 		"breed":                   "Nelore",
 		"type":                    "Bovino",
@@ -56,13 +57,13 @@ func TestAnimalHandler_CreateAnimal_Success(t *testing.T) {
 	}
 
 	jsonData, _ := json.Marshal(animalData)
-	req, _ := http.NewRequest("POST", "/animals", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("POST", tests.EndpointAnimals, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 
 	w := httptest.NewRecorder()
 
 	mockRepo.On("FindByEarTagNumber", uint(1), 123).Return((*models.Animal)(nil), nil)
-	mockRepo.On("Create", mock.AnythingOfType("*models.Animal")).Return(nil).Run(func(args mock.Arguments) {
+	mockRepo.On("Create", mock.AnythingOfType(tests.TypeModelsAnimal)).Return(nil).Run(func(args mock.Arguments) {
 		animal := args.Get(0).(*models.Animal)
 		animal.ID = 1
 	})
@@ -83,7 +84,7 @@ func TestAnimalHandler_CreateAnimal_InvalidMethod(t *testing.T) {
 	animalService := service.NewAnimalService(mockRepo, new(MockCache))
 	animalHandler := handlers.NewAnimalHandler(animalService)
 
-	req, _ := http.NewRequest("GET", "/animals", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointAnimals, nil)
 	w := httptest.NewRecorder()
 
 	animalHandler.CreateAnimal(w, req)
@@ -96,8 +97,8 @@ func TestAnimalHandler_CreateAnimal_InvalidJSON(t *testing.T) {
 	mockCache := new(MockCache)
 	router, _, _ := setupAnimalRouter(mockRepo, mockCache)
 
-	req, _ := http.NewRequest("POST", "/animals", bytes.NewBuffer([]byte("invalid json")))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("POST", tests.EndpointAnimals, bytes.NewBuffer([]byte(tests.TestErrorInvalidJSON)))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	router.ServeHTTP(w, req)
@@ -119,11 +120,11 @@ func TestAnimalHandler_CreateAnimal_ServiceError(t *testing.T) {
 	}
 
 	jsonData, _ := json.Marshal(animalData)
-	req, _ := http.NewRequest("POST", "/animals", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("POST", tests.EndpointAnimals, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
-	mockRepo.On("FindByEarTagNumber", uint(1), 123).Return((*models.Animal)(nil), errors.New("erro ao buscar"))
+	mockRepo.On("FindByEarTagNumber", uint(1), 123).Return((*models.Animal)(nil), errors.New(tests.TestErrorErroAoBuscar))
 
 	router.ServeHTTP(w, req)
 
@@ -150,7 +151,7 @@ func TestAnimalHandler_GetAnimal_Success(t *testing.T) {
 		UpdatedAt:         time.Now(),
 	}
 
-	req, _ := http.NewRequest("GET", "/animals?id=1", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointAnimalsWithID, nil)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("FindByID", uint(1)).Return(expectedAnimal, nil)
@@ -169,7 +170,7 @@ func TestAnimalHandler_GetAnimal_MissingID(t *testing.T) {
 	mockCache := new(MockCache)
 	router, _, _ := setupAnimalRouter(mockRepo, mockCache)
 
-	req, _ := http.NewRequest("GET", "/animals", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointAnimals, nil)
 	w := httptest.NewRecorder()
 
 	router.ServeHTTP(w, req)
@@ -195,7 +196,7 @@ func TestAnimalHandler_GetAnimal_NotFound(t *testing.T) {
 	mockCache := new(MockCache)
 	router, _, _ := setupAnimalRouter(mockRepo, mockCache)
 
-	req, _ := http.NewRequest("GET", "/animals?id=1", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointAnimalsWithID, nil)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("FindByID", uint(1)).Return(nil, nil)
@@ -211,7 +212,7 @@ func TestAnimalHandler_GetAnimal_ServiceError(t *testing.T) {
 	mockCache := new(MockCache)
 	router, _, _ := setupAnimalRouter(mockRepo, mockCache)
 
-	req, _ := http.NewRequest("GET", "/animals?id=1", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointAnimalsWithID, nil)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("FindByID", uint(1)).Return(nil, errors.New("erro ao buscar animal"))
@@ -283,7 +284,7 @@ func TestAnimalHandler_UpdateAnimal_Success(t *testing.T) {
 		"id":                   1,
 		"farm_id":              1,
 		"ear_tag_number_local": 123,
-		"animal_name":          "Animal Atualizado",
+		"animal_name":          tests.TestNameAnimalAtualizado,
 		"breed":                "Nelore",
 		"type":                 "Bovino",
 	}
@@ -297,14 +298,14 @@ func TestAnimalHandler_UpdateAnimal_Success(t *testing.T) {
 		ID:                1,
 		FarmID:            1,
 		EarTagNumberLocal: 123,
-		AnimalName:        "Animal Atualizado",
+		AnimalName:        tests.TestNameAnimalAtualizado,
 		CreatedAt:         time.Now(),
 		UpdatedAt:         time.Now(),
 	}
 
 	existingAnimal := &models.Animal{ID: 1, FarmID: 1}
 	mockRepo.On("FindByID", uint(1)).Return(existingAnimal, nil).Once()
-	mockRepo.On("Update", mock.AnythingOfType("*models.Animal")).Return(nil)
+	mockRepo.On("Update", mock.AnythingOfType(tests.TypeModelsAnimal)).Return(nil)
 	mockRepo.On("FindByID", uint(1)).Return(updatedAnimal, nil).Once()
 	mockCache.On("Delete", "animals:farm:1").Return(nil)
 
@@ -319,7 +320,7 @@ func TestAnimalHandler_UpdateAnimal_InvalidMethod(t *testing.T) {
 	animalService := service.NewAnimalService(mockRepo, new(MockCache))
 	animalHandler := handlers.NewAnimalHandler(animalService)
 
-	req, _ := http.NewRequest("GET", "/animals", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointAnimals, nil)
 	w := httptest.NewRecorder()
 
 	animalHandler.UpdateAnimal(w, req)
@@ -332,7 +333,7 @@ func TestAnimalHandler_DeleteAnimal_Success(t *testing.T) {
 	mockCache := new(MockCache)
 	router, _, _ := setupAnimalRouter(mockRepo, mockCache)
 
-	req, _ := http.NewRequest("DELETE", "/animals?id=1", nil)
+	req, _ := http.NewRequest("DELETE", tests.EndpointAnimalsWithID, nil)
 	w := httptest.NewRecorder()
 
 	existingAnimal := &models.Animal{ID: 1, FarmID: 1}
@@ -377,7 +378,7 @@ func TestAnimalHandler_DeleteAnimal_ServiceError(t *testing.T) {
 	mockCache := new(MockCache)
 	router, _, _ := setupAnimalRouter(mockRepo, mockCache)
 
-	req, _ := http.NewRequest("DELETE", "/animals?id=1", nil)
+	req, _ := http.NewRequest("DELETE", tests.EndpointAnimalsWithID, nil)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("FindByID", uint(1)).Return(nil, errors.New("animal not found"))
@@ -397,7 +398,7 @@ func TestAnimalHandler_UpdateAnimal_ServiceError(t *testing.T) {
 		"id":                   1,
 		"farm_id":              1,
 		"ear_tag_number_local": 123,
-		"animal_name":          "Animal Atualizado",
+		"animal_name":          tests.TestNameAnimalAtualizado,
 	}
 
 	jsonData, _ := json.Marshal(animalData)
@@ -424,7 +425,7 @@ func TestAnimalHandler_UpdateAnimal_GetAnimalError(t *testing.T) {
 		"id":                   1,
 		"farm_id":              1,
 		"ear_tag_number_local": 123,
-		"animal_name":          "Animal Atualizado",
+		"animal_name":          tests.TestNameAnimalAtualizado,
 	}
 
 	jsonData, _ := json.Marshal(animalData)
@@ -434,8 +435,8 @@ func TestAnimalHandler_UpdateAnimal_GetAnimalError(t *testing.T) {
 
 	existingAnimal := &models.Animal{ID: 1, FarmID: 1}
 	mockRepo.On("FindByID", uint(1)).Return(existingAnimal, nil).Once()
-	mockRepo.On("Update", mock.AnythingOfType("*models.Animal")).Return(nil)
-	mockRepo.On("FindByID", uint(1)).Return(nil, errors.New("erro ao buscar"))
+	mockRepo.On("Update", mock.AnythingOfType(tests.TypeModelsAnimal)).Return(nil)
+	mockRepo.On("FindByID", uint(1)).Return(nil, errors.New(tests.TestErrorErroAoBuscar))
 	mockCache.On("Delete", "animals:farm:1").Return(nil)
 
 	router.ServeHTTP(w, req)
@@ -548,18 +549,18 @@ func TestAnimalHandler_UploadAnimalPhoto_Success(t *testing.T) {
 	var b bytes.Buffer
 	writer := multipart.NewWriter(&b)
 	writer.WriteField("animal_id", "1")
-	part, _ := writer.CreateFormFile("photo", "test.jpg")
+	part, _ := writer.CreateFormFile("photo", tests.TestFileTestJPG)
 	part.Write([]byte("fake image content"))
 	writer.Close()
 
-	req, _ := http.NewRequest("POST", "/animals/photo", &b)
+	req, _ := http.NewRequest("POST", tests.EndpointAnimalsPhoto, &b)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	w := httptest.NewRecorder()
 
 	existingAnimal := &models.Animal{
 		ID:         1,
 		FarmID:     1,
-		AnimalName: "Test Animal",
+		AnimalName: tests.TestNameTestAnimal,
 		CreatedAt:  time.Now(),
 		UpdatedAt:  time.Now(),
 	}
@@ -567,7 +568,7 @@ func TestAnimalHandler_UploadAnimalPhoto_Success(t *testing.T) {
 	updatedAnimal := &models.Animal{
 		ID:         1,
 		FarmID:     1,
-		AnimalName: "Test Animal",
+		AnimalName: tests.TestNameTestAnimal,
 		Photo:      "data:image/jpeg;base64,ZmFrZSBpbWFnZSBjb250ZW50",
 		CreatedAt:  time.Now(),
 		UpdatedAt:  time.Now(),
@@ -575,7 +576,7 @@ func TestAnimalHandler_UploadAnimalPhoto_Success(t *testing.T) {
 
 	mockRepo.On("FindByID", uint(1)).Return(existingAnimal, nil).Once()
 	mockRepo.On("FindByID", uint(1)).Return(existingAnimal, nil).Once()
-	mockRepo.On("Update", mock.AnythingOfType("*models.Animal")).Return(nil)
+	mockRepo.On("Update", mock.AnythingOfType(tests.TypeModelsAnimal)).Return(nil)
 	mockRepo.On("FindByID", uint(1)).Return(updatedAnimal, nil).Once()
 	mockCache.On("Delete", "animals:farm:1").Return(nil)
 
@@ -608,7 +609,7 @@ func TestAnimalHandler_UploadAnimalPhoto_MissingAnimalID(t *testing.T) {
 	writer.CreateFormFile("photo", "test.jpg")
 	writer.Close()
 
-	req, _ := http.NewRequest("POST", "/animals/photo", &b)
+	req, _ := http.NewRequest("POST", tests.EndpointAnimalsPhoto, &b)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	w := httptest.NewRecorder()
 
@@ -627,7 +628,7 @@ func TestAnimalHandler_UploadAnimalPhoto_InvalidAnimalID(t *testing.T) {
 	writer.WriteField("animal_id", "invalid")
 	writer.Close()
 
-	req, _ := http.NewRequest("POST", "/animals/photo", &b)
+	req, _ := http.NewRequest("POST", tests.EndpointAnimalsPhoto, &b)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	w := httptest.NewRecorder()
 
@@ -645,10 +646,10 @@ func TestAnimalHandler_UploadAnimalPhoto_AnimalNotFound(t *testing.T) {
 	writer := multipart.NewWriter(&b)
 	writer.WriteField("animal_id", "1")
 	fileWriter, _ := writer.CreateFormFile("photo", "test.jpg")
-	fileWriter.Write([]byte("fake image data"))
+	fileWriter.Write([]byte(tests.TestFileFakeImageData))
 	writer.Close()
 
-	req, _ := http.NewRequest("POST", "/animals/photo", &b)
+	req, _ := http.NewRequest("POST", tests.EndpointAnimalsPhoto, &b)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	w := httptest.NewRecorder()
 
@@ -669,10 +670,10 @@ func TestAnimalHandler_UploadAnimalPhoto_UpdateError(t *testing.T) {
 	writer := multipart.NewWriter(&b)
 	writer.WriteField("animal_id", "1")
 	fileWriter, _ := writer.CreateFormFile("photo", "test.jpg")
-	fileWriter.Write([]byte("fake image data"))
+	fileWriter.Write([]byte(tests.TestFileFakeImageData))
 	writer.Close()
 
-	req, _ := http.NewRequest("POST", "/animals/photo", &b)
+	req, _ := http.NewRequest("POST", tests.EndpointAnimalsPhoto, &b)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	w := httptest.NewRecorder()
 
@@ -696,18 +697,18 @@ func TestAnimalHandler_UploadAnimalPhoto_GetUpdatedAnimalError(t *testing.T) {
 	writer := multipart.NewWriter(&b)
 	writer.WriteField("animal_id", "1")
 	fileWriter, _ := writer.CreateFormFile("photo", "test.jpg")
-	fileWriter.Write([]byte("fake image data"))
+	fileWriter.Write([]byte(tests.TestFileFakeImageData))
 	writer.Close()
 
-	req, _ := http.NewRequest("POST", "/animals/photo", &b)
+	req, _ := http.NewRequest("POST", tests.EndpointAnimalsPhoto, &b)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	w := httptest.NewRecorder()
 
 	existingAnimal := &models.Animal{ID: 1, FarmID: 1}
 	mockRepo.On("FindByID", uint(1)).Return(existingAnimal, nil).Once()
 	mockRepo.On("FindByID", uint(1)).Return(existingAnimal, nil).Once()
-	mockRepo.On("Update", mock.AnythingOfType("*models.Animal")).Return(nil)
-	mockRepo.On("FindByID", uint(1)).Return(nil, errors.New("erro ao buscar"))
+	mockRepo.On("Update", mock.AnythingOfType(tests.TypeModelsAnimal)).Return(nil)
+	mockRepo.On("FindByID", uint(1)).Return(nil, errors.New(tests.TestErrorErroAoBuscar))
 	mockCache.On("Delete", "animals:farm:1").Return(nil)
 
 	router.ServeHTTP(w, req)
@@ -738,12 +739,12 @@ func TestAnimalHandler_CreateAnimal_WithFatherAndMother(t *testing.T) {
 	}
 
 	jsonData, _ := json.Marshal(animalData)
-	req, _ := http.NewRequest("POST", "/animals", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("POST", tests.EndpointAnimals, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("FindByEarTagNumber", uint(1), 123).Return(nil, nil)
-	mockRepo.On("Create", mock.AnythingOfType("*models.Animal")).Return(nil).Run(func(args mock.Arguments) {
+	mockRepo.On("Create", mock.AnythingOfType(tests.TypeModelsAnimal)).Return(nil).Run(func(args mock.Arguments) {
 		animal := args.Get(0).(*models.Animal)
 		animal.ID = 1
 	})
@@ -774,12 +775,12 @@ func TestAnimalHandler_CreateAnimal_InvalidBirthDate(t *testing.T) {
 	}
 
 	jsonData, _ := json.Marshal(animalData)
-	req, _ := http.NewRequest("POST", "/animals", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("POST", tests.EndpointAnimals, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("FindByEarTagNumber", uint(1), 123).Return(nil, nil)
-	mockRepo.On("Create", mock.AnythingOfType("*models.Animal")).Return(nil).Run(func(args mock.Arguments) {
+	mockRepo.On("Create", mock.AnythingOfType(tests.TypeModelsAnimal)).Return(nil).Run(func(args mock.Arguments) {
 		animal := args.Get(0).(*models.Animal)
 		animal.ID = 1
 	})
@@ -817,7 +818,7 @@ func TestAnimalHandler_GetAnimal_WithFatherAndMother(t *testing.T) {
 		UpdatedAt: time.Now(),
 	}
 
-	req, _ := http.NewRequest("GET", "/animals?id=1", nil)
+	req, _ := http.NewRequest("GET", tests.EndpointAnimalsWithID, nil)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("FindByID", uint(1)).Return(animal, nil)

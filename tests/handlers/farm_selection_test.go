@@ -11,6 +11,7 @@ import (
 	"github.com/fazendapro/FazendaPro-api/internal/api/handlers"
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
+	"github.com/fazendapro/FazendaPro-api/tests"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/sqlite"
@@ -30,26 +31,26 @@ func generateTestToken(userID uint) string {
 		"iat": now.Unix(),
 		"exp": now.Add(24 * time.Hour).Unix(),
 	})
-	tokenString, _ := token.SignedString([]byte("test-secret"))
+	tokenString, _ := token.SignedString([]byte(tests.TestSecret))
 	return tokenString
 }
 
 func TestGetUserFarms_SingleFarm(t *testing.T) {
 	mockRepo := new(MockUserRepository)
 	userService := service.NewUserService(mockRepo)
-	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+	farmHandler := handlers.NewFarmSelectionHandler(userService, tests.TestSecret)
 
 	userID := uint(1)
 	farm := models.Farm{
 		ID:   1,
-		Logo: "logo1.png",
+		Logo: tests.TestFileLogo1PNG,
 	}
 
 	mockRepo.On("GetUserFarms", userID).Return([]models.Farm{farm}, nil)
 	mockRepo.On("GetUserFarmCount", userID).Return(int64(1), nil)
 
-	req := httptest.NewRequest("GET", "/api/v1/farms/user", nil)
-	req.Header.Set("Authorization", "Bearer "+generateTestToken(userID))
+	req := httptest.NewRequest("GET", tests.EndpointAPIv1FarmsUser, nil)
+	req.Header.Set(tests.HeaderAuthorization, tests.BearerPrefix+generateTestToken(userID))
 	w := httptest.NewRecorder()
 
 	farmHandler.GetUserFarms(w, req)
@@ -68,7 +69,7 @@ func TestGetUserFarms_SingleFarm(t *testing.T) {
 func TestGetUserFarms_MultipleFarms(t *testing.T) {
 	mockRepo := new(MockUserRepository)
 	userService := service.NewUserService(mockRepo)
-	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+	farmHandler := handlers.NewFarmSelectionHandler(userService, tests.TestSecret)
 
 	userID := uint(1)
 	farms := []models.Farm{
@@ -79,8 +80,8 @@ func TestGetUserFarms_MultipleFarms(t *testing.T) {
 	mockRepo.On("GetUserFarms", userID).Return(farms, nil)
 	mockRepo.On("GetUserFarmCount", userID).Return(int64(2), nil)
 
-	req := httptest.NewRequest("GET", "/api/v1/farms/user", nil)
-	req.Header.Set("Authorization", "Bearer "+generateTestToken(userID))
+	req := httptest.NewRequest("GET", tests.EndpointAPIv1FarmsUser, nil)
+	req.Header.Set(tests.HeaderAuthorization, tests.BearerPrefix+generateTestToken(userID))
 	w := httptest.NewRecorder()
 
 	farmHandler.GetUserFarms(w, req)
@@ -99,15 +100,15 @@ func TestGetUserFarms_MultipleFarms(t *testing.T) {
 func TestGetUserFarms_NoFarms(t *testing.T) {
 	mockRepo := new(MockUserRepository)
 	userService := service.NewUserService(mockRepo)
-	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+	farmHandler := handlers.NewFarmSelectionHandler(userService, tests.TestSecret)
 
 	userID := uint(1)
 
 	mockRepo.On("GetUserFarms", userID).Return([]models.Farm{}, nil)
 	mockRepo.On("GetUserFarmCount", userID).Return(int64(0), nil)
 
-	req := httptest.NewRequest("GET", "/api/v1/farms/user", nil)
-	req.Header.Set("Authorization", "Bearer "+generateTestToken(userID))
+	req := httptest.NewRequest("GET", tests.EndpointAPIv1FarmsUser, nil)
+	req.Header.Set(tests.HeaderAuthorization, tests.BearerPrefix+generateTestToken(userID))
 	w := httptest.NewRecorder()
 
 	farmHandler.GetUserFarms(w, req)
@@ -125,7 +126,7 @@ func TestGetUserFarms_NoFarms(t *testing.T) {
 func TestSelectFarm(t *testing.T) {
 	mockRepo := new(MockUserRepository)
 	userService := service.NewUserService(mockRepo)
-	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+	farmHandler := handlers.NewFarmSelectionHandler(userService, tests.TestSecret)
 
 	userID := uint(1)
 	farmID := uint(2)
@@ -141,9 +142,9 @@ func TestSelectFarm(t *testing.T) {
 	}
 	jsonBody, _ := json.Marshal(requestBody)
 
-	req := httptest.NewRequest("POST", "/api/v1/farms/select", bytes.NewBuffer(jsonBody))
-	req.Header.Set("Authorization", "Bearer "+generateTestToken(userID))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest("POST", tests.EndpointAPIv1FarmsSelect, bytes.NewBuffer(jsonBody))
+	req.Header.Set(tests.HeaderAuthorization, tests.BearerPrefix+generateTestToken(userID))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	farmHandler.SelectFarm(w, req)
@@ -160,7 +161,7 @@ func TestSelectFarm(t *testing.T) {
 func TestSelectFarm_InvalidFarm(t *testing.T) {
 	mockRepo := new(MockUserRepository)
 	userService := service.NewUserService(mockRepo)
-	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+	farmHandler := handlers.NewFarmSelectionHandler(userService, tests.TestSecret)
 
 	userID := uint(1)
 	farmID := uint(999)
@@ -172,9 +173,9 @@ func TestSelectFarm_InvalidFarm(t *testing.T) {
 	}
 	jsonBody, _ := json.Marshal(requestBody)
 
-	req := httptest.NewRequest("POST", "/api/v1/farms/select", bytes.NewBuffer(jsonBody))
-	req.Header.Set("Authorization", "Bearer "+generateTestToken(userID))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest("POST", tests.EndpointAPIv1FarmsSelect, bytes.NewBuffer(jsonBody))
+	req.Header.Set(tests.HeaderAuthorization, tests.BearerPrefix+generateTestToken(userID))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	farmHandler.SelectFarm(w, req)
@@ -191,7 +192,7 @@ func TestSelectFarm_InvalidFarm(t *testing.T) {
 func TestGetUserFarms_InvalidMethod(t *testing.T) {
 	mockRepo := new(MockUserRepository)
 	userService := service.NewUserService(mockRepo)
-	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+	farmHandler := handlers.NewFarmSelectionHandler(userService, tests.TestSecret)
 
 	req := httptest.NewRequest("POST", "/api/v1/farms/user", nil)
 	req.Header.Set("Authorization", "Bearer "+generateTestToken(1))
@@ -205,7 +206,7 @@ func TestGetUserFarms_InvalidMethod(t *testing.T) {
 func TestGetUserFarms_InvalidToken(t *testing.T) {
 	mockRepo := new(MockUserRepository)
 	userService := service.NewUserService(mockRepo)
-	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+	farmHandler := handlers.NewFarmSelectionHandler(userService, tests.TestSecret)
 
 	req := httptest.NewRequest("GET", "/api/v1/farms/user", nil)
 	req.Header.Set("Authorization", "Bearer invalid-token")
@@ -219,7 +220,7 @@ func TestGetUserFarms_InvalidToken(t *testing.T) {
 func TestGetUserFarms_MissingToken(t *testing.T) {
 	mockRepo := new(MockUserRepository)
 	userService := service.NewUserService(mockRepo)
-	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+	farmHandler := handlers.NewFarmSelectionHandler(userService, tests.TestSecret)
 
 	req := httptest.NewRequest("GET", "/api/v1/farms/user", nil)
 	w := httptest.NewRecorder()
@@ -232,13 +233,13 @@ func TestGetUserFarms_MissingToken(t *testing.T) {
 func TestGetUserFarms_ServiceError(t *testing.T) {
 	mockRepo := new(MockUserRepository)
 	userService := service.NewUserService(mockRepo)
-	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+	farmHandler := handlers.NewFarmSelectionHandler(userService, tests.TestSecret)
 
 	userID := uint(1)
 	mockRepo.On("GetUserFarms", userID).Return(nil, gorm.ErrRecordNotFound)
 
-	req := httptest.NewRequest("GET", "/api/v1/farms/user", nil)
-	req.Header.Set("Authorization", "Bearer "+generateTestToken(userID))
+	req := httptest.NewRequest("GET", tests.EndpointAPIv1FarmsUser, nil)
+	req.Header.Set(tests.HeaderAuthorization, tests.BearerPrefix+generateTestToken(userID))
 	w := httptest.NewRecorder()
 
 	farmHandler.GetUserFarms(w, req)
@@ -250,7 +251,7 @@ func TestGetUserFarms_ServiceError(t *testing.T) {
 func TestSelectFarm_InvalidMethod(t *testing.T) {
 	mockRepo := new(MockUserRepository)
 	userService := service.NewUserService(mockRepo)
-	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+	farmHandler := handlers.NewFarmSelectionHandler(userService, tests.TestSecret)
 
 	req := httptest.NewRequest("GET", "/api/v1/farms/select", nil)
 	req.Header.Set("Authorization", "Bearer "+generateTestToken(1))
@@ -264,7 +265,7 @@ func TestSelectFarm_InvalidMethod(t *testing.T) {
 func TestSelectFarm_InvalidToken(t *testing.T) {
 	mockRepo := new(MockUserRepository)
 	userService := service.NewUserService(mockRepo)
-	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+	farmHandler := handlers.NewFarmSelectionHandler(userService, tests.TestSecret)
 
 	requestBody := map[string]interface{}{
 		"farm_id": 1,
@@ -284,7 +285,7 @@ func TestSelectFarm_InvalidToken(t *testing.T) {
 func TestSelectFarm_InvalidJSON(t *testing.T) {
 	mockRepo := new(MockUserRepository)
 	userService := service.NewUserService(mockRepo)
-	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+	farmHandler := handlers.NewFarmSelectionHandler(userService, tests.TestSecret)
 
 	req := httptest.NewRequest("POST", "/api/v1/farms/select", bytes.NewBuffer([]byte("invalid json")))
 	req.Header.Set("Authorization", "Bearer "+generateTestToken(1))
@@ -299,7 +300,7 @@ func TestSelectFarm_InvalidJSON(t *testing.T) {
 func TestSelectFarm_ServiceError(t *testing.T) {
 	mockRepo := new(MockUserRepository)
 	userService := service.NewUserService(mockRepo)
-	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+	farmHandler := handlers.NewFarmSelectionHandler(userService, tests.TestSecret)
 
 	userID := uint(1)
 	farmID := uint(2)
@@ -311,9 +312,9 @@ func TestSelectFarm_ServiceError(t *testing.T) {
 	}
 	jsonBody, _ := json.Marshal(requestBody)
 
-	req := httptest.NewRequest("POST", "/api/v1/farms/select", bytes.NewBuffer(jsonBody))
-	req.Header.Set("Authorization", "Bearer "+generateTestToken(userID))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest("POST", tests.EndpointAPIv1FarmsSelect, bytes.NewBuffer(jsonBody))
+	req.Header.Set(tests.HeaderAuthorization, tests.BearerPrefix+generateTestToken(userID))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	farmHandler.SelectFarm(w, req)
@@ -325,7 +326,7 @@ func TestSelectFarm_ServiceError(t *testing.T) {
 func TestGetUserFarms_ShouldAutoSelectFarmError(t *testing.T) {
 	mockRepo := new(MockUserRepository)
 	userService := service.NewUserService(mockRepo)
-	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+	farmHandler := handlers.NewFarmSelectionHandler(userService, tests.TestSecret)
 
 	userID := uint(1)
 	farms := []models.Farm{
@@ -336,7 +337,7 @@ func TestGetUserFarms_ShouldAutoSelectFarmError(t *testing.T) {
 	mockRepo.On("GetUserFarms", userID).Return(farms, nil)
 	mockRepo.On("GetUserFarmCount", userID).Return(int64(0), gorm.ErrRecordNotFound)
 
-	req := httptest.NewRequest("GET", "/api/v1/farms", nil)
+	req := httptest.NewRequest("GET", tests.EndpointAPIv1Farms, nil)
 	req.Header.Set("Authorization", "Bearer "+generateTestToken(userID))
 	w := httptest.NewRecorder()
 
@@ -349,14 +350,14 @@ func TestGetUserFarms_ShouldAutoSelectFarmError(t *testing.T) {
 func TestGetUserFarms_EmptyFarmsList(t *testing.T) {
 	mockRepo := new(MockUserRepository)
 	userService := service.NewUserService(mockRepo)
-	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+	farmHandler := handlers.NewFarmSelectionHandler(userService, tests.TestSecret)
 
 	userID := uint(1)
 
 	mockRepo.On("GetUserFarms", userID).Return([]models.Farm{}, nil)
 	mockRepo.On("GetUserFarmCount", userID).Return(int64(0), nil)
 
-	req := httptest.NewRequest("GET", "/api/v1/farms", nil)
+	req := httptest.NewRequest("GET", tests.EndpointAPIv1Farms, nil)
 	req.Header.Set("Authorization", "Bearer "+generateTestToken(userID))
 	w := httptest.NewRecorder()
 
@@ -375,16 +376,16 @@ func TestGetUserFarms_EmptyFarmsList(t *testing.T) {
 func TestExtractUserIDFromToken_InvalidClaims(t *testing.T) {
 	mockRepo := new(MockUserRepository)
 	userService := service.NewUserService(mockRepo)
-	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+	farmHandler := handlers.NewFarmSelectionHandler(userService, tests.TestSecret)
 
 	now := time.Now()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"iat": now.Unix(),
 		"exp": now.Add(24 * time.Hour).Unix(),
 	})
-	tokenString, _ := token.SignedString([]byte("test-secret"))
+	tokenString, _ := token.SignedString([]byte(tests.TestSecret))
 
-	req := httptest.NewRequest("GET", "/api/v1/farms", nil)
+	req := httptest.NewRequest("GET", tests.EndpointAPIv1Farms, nil)
 	req.Header.Set("Authorization", "Bearer "+tokenString)
 	w := httptest.NewRecorder()
 
@@ -396,7 +397,7 @@ func TestExtractUserIDFromToken_InvalidClaims(t *testing.T) {
 func TestExtractUserIDFromToken_InvalidTokenType(t *testing.T) {
 	mockRepo := new(MockUserRepository)
 	userService := service.NewUserService(mockRepo)
-	farmHandler := handlers.NewFarmSelectionHandler(userService, "test-secret")
+	farmHandler := handlers.NewFarmSelectionHandler(userService, tests.TestSecret)
 
 	now := time.Now()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -404,9 +405,9 @@ func TestExtractUserIDFromToken_InvalidTokenType(t *testing.T) {
 		"iat": now.Unix(),
 		"exp": now.Add(24 * time.Hour).Unix(),
 	})
-	tokenString, _ := token.SignedString([]byte("test-secret"))
+	tokenString, _ := token.SignedString([]byte(tests.TestSecret))
 
-	req := httptest.NewRequest("GET", "/api/v1/farms", nil)
+	req := httptest.NewRequest("GET", tests.EndpointAPIv1Farms, nil)
 	req.Header.Set("Authorization", "Bearer "+tokenString)
 	w := httptest.NewRecorder()
 

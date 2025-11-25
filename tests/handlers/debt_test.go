@@ -14,6 +14,7 @@ import (
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/repository"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
+	"github.com/fazendapro/FazendaPro-api/tests"
 	"github.com/fazendapro/FazendaPro-api/tests/services"
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
@@ -24,10 +25,10 @@ func setupDebtRouter(mockRepo *services.MockDebtRepository) (*chi.Mux, *services
 	debtService := service.NewDebtService(mockRepo)
 	debtHandler := handlers.NewDebtHandler(debtService)
 	r := chi.NewRouter()
-	r.Post("/debts", debtHandler.CreateDebt)
-	r.Get("/debts", debtHandler.GetDebts)
-	r.Delete("/debts/{id}", debtHandler.DeleteDebt)
-	r.Get("/debts/total-by-person", debtHandler.GetTotalByPerson)
+	r.Post(tests.EndpointDebts, debtHandler.CreateDebt)
+	r.Get(tests.EndpointDebts, debtHandler.GetDebts)
+	r.Delete(tests.EndpointDebts+"/{id}", debtHandler.DeleteDebt)
+	r.Get(tests.EndpointDebts+"/total-by-person", debtHandler.GetTotalByPerson)
 	return r, mockRepo
 }
 
@@ -36,13 +37,13 @@ func TestDebtHandler_CreateDebt_Success(t *testing.T) {
 	router, _ := setupDebtRouter(mockRepo)
 
 	debtData := map[string]interface{}{
-		"person": "João Silva",
+		"person": tests.TestNameJoaoSilva,
 		"value":  1500.50,
 	}
 
 	jsonData, _ := json.Marshal(debtData)
-	req, _ := http.NewRequest("POST", "/debts", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("POST", tests.EndpointDebts, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	mockRepo.On("Create", mock.AnythingOfType("*models.Debt")).Return(nil).Run(func(args mock.Arguments) {
@@ -58,7 +59,7 @@ func TestDebtHandler_CreateDebt_Success(t *testing.T) {
 	var response handlers.DebtResponse
 	json.Unmarshal(w.Body.Bytes(), &response)
 	assert.Equal(t, uint(1), response.ID)
-	assert.Equal(t, "João Silva", response.Person)
+	assert.Equal(t, tests.TestNameJoaoSilva, response.Person)
 	assert.Equal(t, 1500.50, response.Value)
 	mockRepo.AssertExpectations(t)
 }
@@ -67,8 +68,8 @@ func TestDebtHandler_CreateDebt_InvalidJSON(t *testing.T) {
 	mockRepo := new(services.MockDebtRepository)
 	router, _ := setupDebtRouter(mockRepo)
 
-	req, _ := http.NewRequest("POST", "/debts", bytes.NewBuffer([]byte("invalid json")))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("POST", tests.EndpointDebts, bytes.NewBuffer([]byte(tests.TestErrorInvalidJSON)))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	router.ServeHTTP(w, req)
@@ -86,8 +87,8 @@ func TestDebtHandler_CreateDebt_ServiceError(t *testing.T) {
 	}
 
 	jsonData, _ := json.Marshal(debtData)
-	req, _ := http.NewRequest("POST", "/debts", bytes.NewBuffer(jsonData))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("POST", tests.EndpointDebts, bytes.NewBuffer(jsonData))
+	req.Header.Set(tests.HeaderContentType, tests.ContentTypeJSON)
 	w := httptest.NewRecorder()
 
 	router.ServeHTTP(w, req)

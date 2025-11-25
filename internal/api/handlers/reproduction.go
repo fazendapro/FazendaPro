@@ -53,6 +53,17 @@ type ReproductionResponse struct {
 	UpdatedAt string `json:"updatedAt"`
 }
 
+func parseOptionalDate(dateStr *string) *time.Time {
+	if dateStr == nil || *dateStr == "" {
+		return nil
+	}
+	parsedDate, err := time.Parse(DateFormatISO, *dateStr)
+	if err != nil {
+		return nil
+	}
+	return &parsedDate
+}
+
 func reproductionDataToModel(data ReproductionData) models.Reproduction {
 	reproduction := models.Reproduction{
 		ID:                     data.ID,
@@ -61,48 +72,13 @@ func reproductionDataToModel(data ReproductionData) models.Reproduction {
 		InseminationType:       data.InseminationType,
 		VeterinaryConfirmation: data.VeterinaryConfirmation,
 		Observations:           data.Observations,
-	}
-
-	if data.InseminationDate != nil && *data.InseminationDate != "" {
-		if parsedDate, err := time.Parse("2006-01-02", *data.InseminationDate); err == nil {
-			reproduction.InseminationDate = &parsedDate
-		}
-	}
-
-	if data.PregnancyDate != nil && *data.PregnancyDate != "" {
-		if parsedDate, err := time.Parse("2006-01-02", *data.PregnancyDate); err == nil {
-			reproduction.PregnancyDate = &parsedDate
-		}
-	}
-
-	if data.ExpectedBirthDate != nil && *data.ExpectedBirthDate != "" {
-		if parsedDate, err := time.Parse("2006-01-02", *data.ExpectedBirthDate); err == nil {
-			reproduction.ExpectedBirthDate = &parsedDate
-		}
-	}
-
-	if data.ActualBirthDate != nil && *data.ActualBirthDate != "" {
-		if parsedDate, err := time.Parse("2006-01-02", *data.ActualBirthDate); err == nil {
-			reproduction.ActualBirthDate = &parsedDate
-		}
-	}
-
-	if data.LactationStartDate != nil && *data.LactationStartDate != "" {
-		if parsedDate, err := time.Parse("2006-01-02", *data.LactationStartDate); err == nil {
-			reproduction.LactationStartDate = &parsedDate
-		}
-	}
-
-	if data.LactationEndDate != nil && *data.LactationEndDate != "" {
-		if parsedDate, err := time.Parse("2006-01-02", *data.LactationEndDate); err == nil {
-			reproduction.LactationEndDate = &parsedDate
-		}
-	}
-
-	if data.DryPeriodStartDate != nil && *data.DryPeriodStartDate != "" {
-		if parsedDate, err := time.Parse("2006-01-02", *data.DryPeriodStartDate); err == nil {
-			reproduction.DryPeriodStartDate = &parsedDate
-		}
+		InseminationDate:       parseOptionalDate(data.InseminationDate),
+		PregnancyDate:          parseOptionalDate(data.PregnancyDate),
+		ExpectedBirthDate:      parseOptionalDate(data.ExpectedBirthDate),
+		ActualBirthDate:        parseOptionalDate(data.ActualBirthDate),
+		LactationStartDate:     parseOptionalDate(data.LactationStartDate),
+		LactationEndDate:       parseOptionalDate(data.LactationEndDate),
+		DryPeriodStartDate:     parseOptionalDate(data.DryPeriodStartDate),
 	}
 
 	return reproduction
@@ -120,42 +96,42 @@ func modelToReproductionResponse(reproduction *models.Reproduction) Reproduction
 			VeterinaryConfirmation: reproduction.VeterinaryConfirmation,
 			Observations:           reproduction.Observations,
 		},
-		CreatedAt: reproduction.CreatedAt.Format("2006-01-02 15:04:05"),
-		UpdatedAt: reproduction.UpdatedAt.Format("2006-01-02 15:04:05"),
+		CreatedAt: reproduction.CreatedAt.Format(DateFormatDateTime),
+		UpdatedAt: reproduction.UpdatedAt.Format(DateFormatDateTime),
 	}
 
 	if reproduction.InseminationDate != nil {
-		dateStr := reproduction.InseminationDate.Format("2006-01-02")
+		dateStr := reproduction.InseminationDate.Format(DateFormatISO)
 		response.InseminationDate = &dateStr
 	}
 
 	if reproduction.PregnancyDate != nil {
-		dateStr := reproduction.PregnancyDate.Format("2006-01-02")
+		dateStr := reproduction.PregnancyDate.Format(DateFormatISO)
 		response.PregnancyDate = &dateStr
 	}
 
 	if reproduction.ExpectedBirthDate != nil {
-		dateStr := reproduction.ExpectedBirthDate.Format("2006-01-02")
+		dateStr := reproduction.ExpectedBirthDate.Format(DateFormatISO)
 		response.ExpectedBirthDate = &dateStr
 	}
 
 	if reproduction.ActualBirthDate != nil {
-		dateStr := reproduction.ActualBirthDate.Format("2006-01-02")
+		dateStr := reproduction.ActualBirthDate.Format(DateFormatISO)
 		response.ActualBirthDate = &dateStr
 	}
 
 	if reproduction.LactationStartDate != nil {
-		dateStr := reproduction.LactationStartDate.Format("2006-01-02")
+		dateStr := reproduction.LactationStartDate.Format(DateFormatISO)
 		response.LactationStartDate = &dateStr
 	}
 
 	if reproduction.LactationEndDate != nil {
-		dateStr := reproduction.LactationEndDate.Format("2006-01-02")
+		dateStr := reproduction.LactationEndDate.Format(DateFormatISO)
 		response.LactationEndDate = &dateStr
 	}
 
 	if reproduction.DryPeriodStartDate != nil {
-		dateStr := reproduction.DryPeriodStartDate.Format("2006-01-02")
+		dateStr := reproduction.DryPeriodStartDate.Format(DateFormatISO)
 		response.DryPeriodStartDate = &dateStr
 	}
 
@@ -164,13 +140,13 @@ func modelToReproductionResponse(reproduction *models.Reproduction) Reproduction
 
 func (h *ReproductionHandler) CreateReproduction(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		SendErrorResponse(w, "Método não permitido", http.StatusMethodNotAllowed)
+		SendErrorResponse(w, ErrMethodNotAllowed, http.StatusMethodNotAllowed)
 		return
 	}
 
 	var req CreateReproductionRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		SendErrorResponse(w, "Erro ao decodificar JSON: "+err.Error(), http.StatusBadRequest)
+		SendErrorResponse(w, ErrDecodeJSON+err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -299,13 +275,13 @@ func (h *ReproductionHandler) GetReproductionsByPhase(w http.ResponseWriter, r *
 
 func (h *ReproductionHandler) UpdateReproduction(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPut {
-		SendErrorResponse(w, "Método não permitido", http.StatusMethodNotAllowed)
+		SendErrorResponse(w, ErrMethodNotAllowed, http.StatusMethodNotAllowed)
 		return
 	}
 
 	var req CreateReproductionRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		SendErrorResponse(w, "Erro ao decodificar JSON: "+err.Error(), http.StatusBadRequest)
+		SendErrorResponse(w, ErrDecodeJSON+err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -321,13 +297,13 @@ func (h *ReproductionHandler) UpdateReproduction(w http.ResponseWriter, r *http.
 
 func (h *ReproductionHandler) UpdateReproductionPhase(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPut {
-		SendErrorResponse(w, "Método não permitido", http.StatusMethodNotAllowed)
+		SendErrorResponse(w, ErrMethodNotAllowed, http.StatusMethodNotAllowed)
 		return
 	}
 
 	var req UpdateReproductionPhaseRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		SendErrorResponse(w, "Erro ao decodificar JSON: "+err.Error(), http.StatusBadRequest)
+		SendErrorResponse(w, ErrDecodeJSON+err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -346,7 +322,7 @@ func (h *ReproductionHandler) UpdateReproductionPhase(w http.ResponseWriter, r *
 
 func (h *ReproductionHandler) DeleteReproduction(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodDelete {
-		SendErrorResponse(w, "Método não permitido", http.StatusMethodNotAllowed)
+		SendErrorResponse(w, ErrMethodNotAllowed, http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -381,6 +357,54 @@ type NextToCalveResponse struct {
 	Status            string `json:"status"`
 }
 
+func calculateBirthStatus(daysUntilBirth int) string {
+	if daysUntilBirth <= 30 {
+		return "Alto"
+	}
+	if daysUntilBirth <= 60 {
+		return "Médio"
+	}
+	return "Baixo"
+}
+
+func sortByDaysUntilBirth(responses []NextToCalveResponse) {
+	for i := 0; i < len(responses); i++ {
+		for j := i + 1; j < len(responses); j++ {
+			if responses[i].DaysUntilBirth > responses[j].DaysUntilBirth {
+				responses[i], responses[j] = responses[j], responses[i]
+			}
+		}
+	}
+}
+
+func buildNextToCalveResponses(reproductions []models.Reproduction, farmID uint, now time.Time) []NextToCalveResponse {
+	var responses []NextToCalveResponse
+
+	for _, reproduction := range reproductions {
+		if reproduction.Animal.FarmID != farmID || reproduction.PregnancyDate == nil {
+			continue
+		}
+
+		expectedBirth := reproduction.PregnancyDate.AddDate(0, 0, 283)
+		daysUntilBirth := int(expectedBirth.Sub(now).Hours() / 24)
+
+		response := NextToCalveResponse{
+			ID:                reproduction.Animal.ID,
+			AnimalName:        reproduction.Animal.AnimalName,
+			EarTagNumberLocal: reproduction.Animal.EarTagNumberLocal,
+			Photo:             reproduction.Animal.Photo,
+			PregnancyDate:     reproduction.PregnancyDate.Format(DateFormatISO),
+			ExpectedBirthDate: expectedBirth.Format(DateFormatISO),
+			DaysUntilBirth:    daysUntilBirth,
+			Status:            calculateBirthStatus(daysUntilBirth),
+		}
+
+		responses = append(responses, response)
+	}
+
+	return responses
+}
+
 func (h *ReproductionHandler) GetNextToCalve(w http.ResponseWriter, r *http.Request) {
 	farmID := r.URL.Query().Get("farmId")
 	if farmID == "" {
@@ -400,52 +424,8 @@ func (h *ReproductionHandler) GetNextToCalve(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	var responses []NextToCalveResponse
-	now := time.Now()
-
-	for _, reproduction := range reproductions {
-		if reproduction.Animal.FarmID != uint(id) {
-			continue
-		}
-
-		if reproduction.PregnancyDate == nil {
-			continue
-		}
-
-		expectedBirth := reproduction.PregnancyDate.AddDate(0, 0, 283)
-
-		daysUntilBirth := int(expectedBirth.Sub(now).Hours() / 24)
-
-		var status string
-		if daysUntilBirth <= 30 {
-			status = "Alto"
-		} else if daysUntilBirth <= 60 {
-			status = "Médio"
-		} else {
-			status = "Baixo"
-		}
-
-		response := NextToCalveResponse{
-			ID:                reproduction.Animal.ID,
-			AnimalName:        reproduction.Animal.AnimalName,
-			EarTagNumberLocal: reproduction.Animal.EarTagNumberLocal,
-			Photo:             reproduction.Animal.Photo,
-			PregnancyDate:     reproduction.PregnancyDate.Format("2006-01-02"),
-			ExpectedBirthDate: expectedBirth.Format("2006-01-02"),
-			DaysUntilBirth:    daysUntilBirth,
-			Status:            status,
-		}
-
-		responses = append(responses, response)
-	}
-
-	for i := 0; i < len(responses); i++ {
-		for j := i + 1; j < len(responses); j++ {
-			if responses[i].DaysUntilBirth > responses[j].DaysUntilBirth {
-				responses[i], responses[j] = responses[j], responses[i]
-			}
-		}
-	}
+	responses := buildNextToCalveResponses(reproductions, uint(id), time.Now())
+	sortByDaysUntilBirth(responses)
 
 	SendSuccessResponse(w, responses, fmt.Sprintf("Próximas vacas a parir encontradas com sucesso (%d registros)", len(responses)), http.StatusOK)
 }
