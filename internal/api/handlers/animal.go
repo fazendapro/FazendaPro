@@ -63,7 +63,7 @@ type AnimalParent struct {
 func animalDataToModel(data AnimalData) models.Animal {
 	var birthDate *time.Time
 	if data.BirthDate != "" {
-		if parsedDate, err := time.Parse("2006-01-02", data.BirthDate); err == nil {
+		if parsedDate, err := time.Parse(DateFormatISO, data.BirthDate); err == nil {
 			birthDate = &parsedDate
 		} else {
 			fmt.Printf("Erro ao fazer parse da data: %v\n", err)
@@ -98,7 +98,7 @@ func animalDataToModel(data AnimalData) models.Animal {
 func modelToAnimalResponse(animal *models.Animal) AnimalResponse {
 	var birthDate string
 	if animal.BirthDate != nil {
-		birthDate = animal.BirthDate.Format("2006-01-02")
+		birthDate = animal.BirthDate.Format(DateFormatISO)
 	}
 
 	var father *AnimalParent
@@ -143,20 +143,20 @@ func modelToAnimalResponse(animal *models.Animal) AnimalResponse {
 		},
 		Father:    father,
 		Mother:    mother,
-		CreatedAt: animal.CreatedAt.Format("2006-01-02 15:04:05"),
-		UpdatedAt: animal.UpdatedAt.Format("2006-01-02 15:04:05"),
+		CreatedAt: animal.CreatedAt.Format(DateFormatDateTime),
+		UpdatedAt: animal.UpdatedAt.Format(DateFormatDateTime),
 	}
 }
 
 func (h *AnimalHandler) CreateAnimal(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		SendErrorResponse(w, "Método não permitido", http.StatusMethodNotAllowed)
+		SendErrorResponse(w, ErrMethodNotAllowed, http.StatusMethodNotAllowed)
 		return
 	}
 
 	var req CreateAnimalRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		SendErrorResponse(w, "Erro ao decodificar JSON: "+err.Error(), http.StatusBadRequest)
+		SendErrorResponse(w, ErrDecodeJSON+err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -176,7 +176,7 @@ func (h *AnimalHandler) CreateAnimal(w http.ResponseWriter, r *http.Request) {
 func (h *AnimalHandler) GetAnimal(w http.ResponseWriter, r *http.Request) {
 	animalID := r.URL.Query().Get("id")
 	if animalID == "" {
-		SendErrorResponse(w, "ID do animal é obrigatório", http.StatusBadRequest)
+		SendErrorResponse(w, ErrAnimalIDRequired, http.StatusBadRequest)
 		return
 	}
 
@@ -238,13 +238,13 @@ func (h *AnimalHandler) GetAnimalsByFarm(w http.ResponseWriter, r *http.Request)
 
 func (h *AnimalHandler) UpdateAnimal(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPut {
-		SendErrorResponse(w, "Método não permitido", http.StatusMethodNotAllowed)
+		SendErrorResponse(w, ErrMethodNotAllowed, http.StatusMethodNotAllowed)
 		return
 	}
 
 	var req CreateAnimalRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		SendErrorResponse(w, "Erro ao decodificar JSON: "+err.Error(), http.StatusBadRequest)
+		SendErrorResponse(w, ErrDecodeJSON+err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -267,13 +267,13 @@ func (h *AnimalHandler) UpdateAnimal(w http.ResponseWriter, r *http.Request) {
 
 func (h *AnimalHandler) DeleteAnimal(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodDelete {
-		SendErrorResponse(w, "Método não permitido", http.StatusMethodNotAllowed)
+		SendErrorResponse(w, ErrMethodNotAllowed, http.StatusMethodNotAllowed)
 		return
 	}
 
 	animalID := r.URL.Query().Get("id")
 	if animalID == "" {
-		SendErrorResponse(w, "ID do animal é obrigatório", http.StatusBadRequest)
+		SendErrorResponse(w, ErrAnimalIDRequired, http.StatusBadRequest)
 		return
 	}
 
@@ -333,7 +333,7 @@ func (h *AnimalHandler) GetAnimalsBySex(w http.ResponseWriter, r *http.Request) 
 
 func (h *AnimalHandler) UploadAnimalPhoto(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		SendErrorResponse(w, "Método não permitido", http.StatusMethodNotAllowed)
+		SendErrorResponse(w, ErrMethodNotAllowed, http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -345,7 +345,7 @@ func (h *AnimalHandler) UploadAnimalPhoto(w http.ResponseWriter, r *http.Request
 
 	animalID := r.FormValue("animal_id")
 	if animalID == "" {
-		SendErrorResponse(w, "ID do animal é obrigatório", http.StatusBadRequest)
+		SendErrorResponse(w, ErrAnimalIDRequired, http.StatusBadRequest)
 		return
 	}
 

@@ -1,6 +1,6 @@
 FROM golang:1.24.2-alpine AS builder
 
-RUN apk add --no-cache git ca-certificates tzdata
+RUN apk add --no-cache ca-certificates git tzdata
 
 WORKDIR /app
 
@@ -12,11 +12,10 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main ./main.go
 
-FROM alpine:latest
+FROM alpine:3.19
 
-RUN apk --no-cache add ca-certificates tzdata
-
-RUN addgroup -g 1001 -S appgroup && \
+RUN apk --no-cache add ca-certificates tzdata && \
+    addgroup -g 1001 -S appgroup && \
     adduser -u 1001 -S appuser -G appgroup
 
 WORKDIR /app
