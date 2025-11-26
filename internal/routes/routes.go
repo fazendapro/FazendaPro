@@ -46,9 +46,21 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 		w.Write([]byte("FazendaPro API is running!"))
 	})
 
-	r.Get("/swagger/*", httpSwagger.Handler(
-		httpSwagger.URL("http://localhost:8080/swagger/doc.json"),
-	))
+	r.Get("/swagger/*", func(w http.ResponseWriter, r *http.Request) {
+		scheme := "http"
+		if r.TLS != nil || r.Header.Get("X-Forwarded-Proto") == "https" {
+			scheme = "https"
+		}
+
+		host := r.Host
+		if host == "" {
+			host = "localhost:8080"
+		}
+
+		docURL := fmt.Sprintf("%s://%s/swagger/doc.json", scheme, host)
+
+		httpSwagger.Handler(httpSwagger.URL(docURL)).ServeHTTP(w, r)
+	})
 
 	r.Get("/test-error", func(w http.ResponseWriter, r *http.Request) {
 		err := errors.New("erro de teste do Sentry - Rota /test-error")
