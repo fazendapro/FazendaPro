@@ -3,10 +3,12 @@ package handlers
 const (
 	ErrMethodNotAllowed       = "Método não permitido"
 	ErrAnimalIDRequired       = "ID do animal é obrigatório"
+	ErrInvalidAnimalID        = "ID do animal inválido"
 	ErrDecodeJSON             = "Erro ao decodificar JSON: "
 	ErrInternalServer         = "Erro interno do servidor"
 	ErrGenerateToken          = "Erro ao gerar token"
 	ErrFarmIDNotFound         = "Farm ID not found in context"
+	ErrInvalidFarmID          = "ID da fazenda inválido"
 	ErrInvalidSaleID          = "Invalid sale ID"
 	ErrSaleNotFound           = "Sale not found"
 	ErrSaleNotBelongsToFarm   = "Sale does not belong to the specified farm"

@@ -182,7 +182,7 @@ func (h *AnimalHandler) GetAnimal(w http.ResponseWriter, r *http.Request) {
 
 	id, err := strconv.ParseUint(animalID, 10, 32)
 	if err != nil {
-		SendErrorResponse(w, "ID do animal inválido", http.StatusBadRequest)
+		SendErrorResponse(w, ErrInvalidAnimalID, http.StatusBadRequest)
 		return
 	}
 
@@ -279,7 +279,7 @@ func (h *AnimalHandler) DeleteAnimal(w http.ResponseWriter, r *http.Request) {
 
 	id, err := strconv.ParseUint(animalID, 10, 32)
 	if err != nil {
-		SendErrorResponse(w, "ID do animal inválido", http.StatusBadRequest)
+		SendErrorResponse(w, ErrInvalidAnimalID, http.StatusBadRequest)
 		return
 	}
 
@@ -351,7 +351,7 @@ func (h *AnimalHandler) UploadAnimalPhoto(w http.ResponseWriter, r *http.Request
 
 	id, err := strconv.ParseUint(animalID, 10, 32)
 	if err != nil {
-		SendErrorResponse(w, "ID do animal inválido", http.StatusBadRequest)
+		SendErrorResponse(w, ErrInvalidAnimalID, http.StatusBadRequest)
 		return
 	}
 

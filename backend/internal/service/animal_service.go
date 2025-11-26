@@ -79,9 +79,9 @@ func (s *AnimalService) CreateAnimal(animal *models.Animal) error {
 		return err
 	}
 
-	cacheKey := fmt.Sprintf("animals:farm:%d", animal.FarmID)
+	cacheKey := fmt.Sprintf(CacheKeyAnimalsFarm, animal.FarmID)
 	if err := s.cache.Delete(cacheKey); err != nil {
-		log.Printf("Erro ao invalidar cache (não crítico): %v", err)
+		log.Printf(ErrInvalidateCache, err)
 	}
 
 	return nil
@@ -92,7 +92,7 @@ func (s *AnimalService) GetAnimalByID(id uint) (*models.Animal, error) {
 }
 
 func (s *AnimalService) GetAnimalsByFarmID(farmID uint) ([]models.Animal, error) {
-	cacheKey := fmt.Sprintf("animals:farm:%d", farmID)
+	cacheKey := fmt.Sprintf(CacheKeyAnimalsFarm, farmID)
 	var cachedAnimals []models.Animal
 
 	err := s.cache.Get(cacheKey, &cachedAnimals)
@@ -150,9 +150,9 @@ func (s *AnimalService) UpdateAnimal(animal *models.Animal) error {
 		return err
 	}
 
-	cacheKey := fmt.Sprintf("animals:farm:%d", animal.FarmID)
+	cacheKey := fmt.Sprintf(CacheKeyAnimalsFarm, animal.FarmID)
 	if err := s.cache.Delete(cacheKey); err != nil {
-		log.Printf("Erro ao invalidar cache (não crítico): %v", err)
+		log.Printf(ErrInvalidateCache, err)
 	}
 
 	return nil
@@ -178,9 +178,9 @@ func (s *AnimalService) DeleteAnimal(id uint) error {
 		return err
 	}
 
-	cacheKey := fmt.Sprintf("animals:farm:%d", farmID)
+	cacheKey := fmt.Sprintf(CacheKeyAnimalsFarm, farmID)
 	if err := s.cache.Delete(cacheKey); err != nil {
-		log.Printf("Erro ao invalidar cache (não crítico): %v", err)
+		log.Printf(ErrInvalidateCache, err)
 	}
 
 	return nil

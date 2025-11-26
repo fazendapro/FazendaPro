@@ -78,7 +78,7 @@ func (r *saleRepository) GetByAnimalID(ctx context.Context, animalID uint, farmI
 
 func (r *saleRepository) GetByDateRange(ctx context.Context, farmID uint, startDate, endDate time.Time) ([]*models.Sale, error) {
 	var sales []*models.Sale
-	err := r.db.WithContext(ctx).Preload("Animal").Where("farm_id = ? AND sale_date BETWEEN ? AND ?", farmID, startDate, endDate).Order(SQLOrderSaleDateDESC).Find(&sales).Error
+	err := r.db.WithContext(ctx).Preload("Animal").Where(SQLWhereFarmID+" AND sale_date BETWEEN ? AND ?", farmID, startDate, endDate).Order(SQLOrderSaleDateDESC).Find(&sales).Error
 	if err != nil {
 		return nil, err
 	}
@@ -159,7 +159,17 @@ func (r *saleRepository) GetMonthlySalesData(ctx context.Context, farmID uint, m
 }
 
 func (r *saleRepository) Update(ctx context.Context, sale *models.Sale) error {
-	return r.db.WithContext(ctx).Save(sale).Error
+	result := r.db.WithContext(ctx).
+		Where(SQLWhereID+" AND "+SQLWhereFarmID, sale.ID, sale.FarmID).
+		Updates(sale)
+
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("%s", ErrSaleNotFoundOrNotBelongsToFarm)
+	}
+	return nil
 }
 
 func (r *saleRepository) Delete(ctx context.Context, id uint, farmID uint) error {
@@ -168,7 +178,7 @@ func (r *saleRepository) Delete(ctx context.Context, id uint, farmID uint) error
 		return result.Error
 	}
 	if result.RowsAffected == 0 {
-		return fmt.Errorf("sale not found or does not belong to farm")
+		return fmt.Errorf("%s", ErrSaleNotFoundOrNotBelongsToFarm)
 	}
 	return nil
 }
