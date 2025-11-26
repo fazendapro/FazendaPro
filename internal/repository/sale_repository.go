@@ -167,7 +167,7 @@ func (r *saleRepository) Update(ctx context.Context, sale *models.Sale) error {
 		return result.Error
 	}
 	if result.RowsAffected == 0 {
-		return fmt.Errorf("sale not found or does not belong to farm")
+		return fmt.Errorf("%s", ErrSaleNotFoundOrNotBelongsToFarm)
 	}
 	return nil
 }
@@ -178,7 +178,7 @@ func (r *saleRepository) Delete(ctx context.Context, id uint, farmID uint) error
 		return result.Error
 	}
 	if result.RowsAffected == 0 {
-		return fmt.Errorf("sale not found or does not belong to farm")
+		return fmt.Errorf("%s", ErrSaleNotFoundOrNotBelongsToFarm)
 	}
 	return nil
 }

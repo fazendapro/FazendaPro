@@ -3,6 +3,7 @@ package handlers
 const (
 	ErrMethodNotAllowed       = "Método não permitido"
 	ErrAnimalIDRequired       = "ID do animal é obrigatório"
+	ErrInvalidAnimalID        = "ID do animal inválido"
 	ErrDecodeJSON             = "Erro ao decodificar JSON: "
 	ErrInternalServer         = "Erro interno do servidor"
 	ErrGenerateToken          = "Erro ao gerar token"

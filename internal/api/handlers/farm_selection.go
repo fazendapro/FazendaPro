@@ -79,7 +79,7 @@ func (h *FarmSelectionHandler) GetUserFarms(w http.ResponseWriter, r *http.Reque
 		fmt.Printf("DEBUG: Farm %d - ID: %d, CompanyID: %d, Logo: %s\n", i, farm.ID, farm.CompanyID, farm.Logo)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
 }
@@ -114,7 +114,7 @@ func (h *FarmSelectionHandler) SelectFarm(w http.ResponseWriter, r *http.Request
 		FarmID:  farm.ID,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(HeaderContentType, ContentTypeJSON)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
 }

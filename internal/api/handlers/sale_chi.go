@@ -330,7 +330,7 @@ func (h *SaleChiHandler) UpdateSale(w http.ResponseWriter, r *http.Request) {
 
 	err = h.service.UpdateSale(r.Context(), sale, farmID)
 	if err != nil {
-		if err.Error() == "sale not found or does not belong to farm" {
+		if err.Error() == service.ErrSaleNotFoundOrNotBelongsToFarm {
 			SendErrorResponse(w, ErrSaleNotBelongsToFarm, http.StatusForbidden)
 		} else {
 			SendErrorResponse(w, err.Error(), http.StatusBadRequest)
@@ -377,7 +377,7 @@ func (h *SaleChiHandler) DeleteSale(w http.ResponseWriter, r *http.Request) {
 
 	err = h.service.DeleteSale(r.Context(), uint(id), farmID)
 	if err != nil {
-		if err.Error() == "sale not found or does not belong to farm" {
+		if err.Error() == service.ErrSaleNotFoundOrNotBelongsToFarm {
 			SendErrorResponse(w, ErrSaleNotBelongsToFarm, http.StatusForbidden)
 		} else {
 			SendErrorResponse(w, err.Error(), http.StatusNotFound)

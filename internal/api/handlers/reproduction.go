@@ -200,7 +200,7 @@ func (h *ReproductionHandler) GetReproductionByAnimal(w http.ResponseWriter, r *
 
 	id, err := strconv.ParseUint(animalID, 10, 32)
 	if err != nil {
-		SendErrorResponse(w, "ID do animal inválido", http.StatusBadRequest)
+		SendErrorResponse(w, ErrInvalidAnimalID, http.StatusBadRequest)
 		return
 	}
 

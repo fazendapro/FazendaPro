@@ -50,7 +50,7 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 		sentry.CaptureException(err)
 		sentry.Flush(2)
 
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set(handlers.HeaderContentType, handlers.ContentTypeJSON)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"error": "Erro de teste enviado para o Sentry", "message": "Verifique o dashboard do Sentry para ver este erro"}`))
 	})
@@ -90,7 +90,7 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 		db.DB.Model(&models.Company{}).Count(&companyCount)
 
 		if companyCount > 0 {
-			w.Header().Set("Content-Type", "application/json")
+			w.Header().Set(handlers.HeaderContentType, handlers.ContentTypeJSON)
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`{"success": true, "message": "Dados já existem"}`))
 			return
@@ -113,7 +113,7 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set(handlers.HeaderContentType, handlers.ContentTypeJSON)
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"success": true, "message": "Dados iniciais criados", "company_id": ` + fmt.Sprintf("%d", company.ID) + `, "farm_id": ` + fmt.Sprintf("%d", farm.ID) + `}`))
 	})

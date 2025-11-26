@@ -59,7 +59,7 @@ func (s *saleService) CreateSale(ctx context.Context, sale *models.Sale) error {
 
 	animal, err := s.animalRepo.FindByID(sale.AnimalID)
 	if err != nil {
-		return errors.New("animal not found")
+		return errors.New(ErrAnimalNotFound)
 	}
 	if animal.FarmID != sale.FarmID {
 		return errors.New("animal does not belong to the specified farm")
@@ -95,18 +95,17 @@ func (s *saleService) GetSalesByFarmID(ctx context.Context, farmID uint) ([]*mod
 }
 
 func (s *saleService) GetSalesByAnimalID(ctx context.Context, animalID uint, farmID uint) ([]*models.Sale, error) {
-	// Validar que o animal pertence à fazenda
 	animal, err := s.animalRepo.FindByID(animalID)
 	if err != nil {
-		return nil, errors.New("animal not found")
+		return nil, errors.New(ErrAnimalNotFound)
 	}
 	if animal == nil {
-		return nil, errors.New("animal not found")
+		return nil, errors.New(ErrAnimalNotFound)
 	}
 	if animal.FarmID != farmID {
 		return nil, errors.New("animal does not belong to the specified farm")
 	}
-	
+
 	return s.saleRepo.GetByAnimalID(ctx, animalID, farmID)
 }
 
@@ -191,16 +190,14 @@ func (s *saleService) UpdateSale(ctx context.Context, sale *models.Sale, farmID 
 		return errors.New("sale date is required")
 	}
 
-	// Validar que a venda pertence à fazenda
 	existingSale, err := s.saleRepo.GetByID(ctx, sale.ID, farmID)
 	if err != nil {
-		return errors.New("sale not found or does not belong to farm")
+		return errors.New(ErrSaleNotFoundOrNotBelongsToFarm)
 	}
 	if existingSale == nil {
-		return errors.New("sale not found or does not belong to farm")
+		return errors.New(ErrSaleNotFoundOrNotBelongsToFarm)
 	}
 
-	// Garantir que o FarmID não pode ser alterado
 	sale.FarmID = farmID
 	sale.AnimalID = existingSale.AnimalID
 
@@ -215,13 +212,12 @@ func (s *saleService) UpdateSale(ctx context.Context, sale *models.Sale, farmID 
 }
 
 func (s *saleService) DeleteSale(ctx context.Context, id uint, farmID uint) error {
-	// Validar que a venda pertence à fazenda
 	sale, err := s.saleRepo.GetByID(ctx, id, farmID)
 	if err != nil {
-		return errors.New("sale not found or does not belong to farm")
+		return errors.New(ErrSaleNotFoundOrNotBelongsToFarm)
 	}
 	if sale == nil {
-		return errors.New("sale not found or does not belong to farm")
+		return errors.New(ErrSaleNotFoundOrNotBelongsToFarm)
 	}
 
 	err = s.saleRepo.Delete(ctx, id, farmID)
@@ -247,13 +243,13 @@ func (s *saleService) GetSalesHistory(ctx context.Context, farmID uint) ([]*mode
 func (s *saleService) invalidateDashboardCache(farmID uint) {
 	overviewKey := fmt.Sprintf("dashboard:overview:%d", farmID)
 	if err := s.cache.Delete(overviewKey); err != nil {
-		log.Printf("Erro ao invalidar cache de overview (não crítico): %v", err)
+		log.Printf(ErrInvalidateCache, err)
 	}
 
 	for months := 6; months <= 24; months += 6 {
 		monthlyKey := fmt.Sprintf("dashboard:monthly:%d:%d", farmID, months)
 		if err := s.cache.Delete(monthlyKey); err != nil {
-			log.Printf("Erro ao invalidar cache mensal (não crítico): %v", err)
+			log.Printf(ErrInvalidateCache, err)
 		}
 	}
 }
