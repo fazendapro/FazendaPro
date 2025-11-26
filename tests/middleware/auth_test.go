@@ -142,3 +142,48 @@ func TestAuthMiddleware_NoBearerPrefix(t *testing.T) {
 
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
 }
+
+func TestAuthMiddleware_MissingFarmID(t *testing.T) {
+	jwtSecret := tests.TestSecret
+	authMiddleware := middleware.Auth(jwtSecret)
+
+	handler := authMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+
+	claims := jwt.MapClaims{
+		"sub":   1,
+		"email": tests.TestEmailExample,
+		"iat":   time.Now().Unix(),
+		"exp":   time.Now().Add(time.Hour * 24).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, _ := token.SignedString([]byte(jwtSecret))
+
+	req := httptest.NewRequest("GET", "/test", nil)
+	req.Header.Set("Authorization", "Bearer "+tokenString)
+	w := httptest.NewRecorder()
+
+	handler.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusUnauthorized, w.Code)
+}
+
+func TestAuthMiddleware_ZeroFarmID(t *testing.T) {
+	jwtSecret := tests.TestSecret
+	authMiddleware := middleware.Auth(jwtSecret)
+
+	handler := authMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+
+	token := generateValidToken(jwtSecret, 0)
+	req := httptest.NewRequest("GET", "/test", nil)
+	req.Header.Set(tests.HeaderAuthorization, tests.BearerPrefix+token)
+	w := httptest.NewRecorder()
+
+	handler.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusUnauthorized, w.Code)
+}

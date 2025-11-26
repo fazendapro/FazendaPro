@@ -135,7 +135,19 @@ func TestSelectFarm(t *testing.T) {
 		Logo: "logo2.png",
 	}
 
+	personID := uint(1)
+	user := &models.User{
+		ID:       userID,
+		PersonID: &personID,
+		FarmID:   1,
+		Person: &models.Person{
+			ID:    personID,
+			Email: "test@example.com",
+		},
+	}
+
 	mockRepo.On("GetUserFarmByID", userID, farmID).Return(&farm, nil)
+	mockRepo.On("FindByIDWithPerson", userID).Return(user, nil)
 
 	requestBody := map[string]interface{}{
 		"farm_id": farmID,
@@ -156,6 +168,8 @@ func TestSelectFarm(t *testing.T) {
 
 	assert.True(t, response["success"].(bool))
 	assert.Equal(t, float64(farmID), response["farm_id"])
+	assert.NotEmpty(t, response["access_token"])
+	mockRepo.AssertExpectations(t)
 }
 
 func TestSelectFarm_InvalidFarm(t *testing.T) {

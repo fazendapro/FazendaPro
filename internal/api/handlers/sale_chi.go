@@ -62,15 +62,15 @@ func (h *SaleChiHandler) CreateSale(w http.ResponseWriter, r *http.Request) {
 	}
 
 	farmIDFromContext, ok := r.Context().Value("farm_id").(uint)
-	if !ok {
-		http.Error(w, ErrFarmIDNotFound, http.StatusUnauthorized)
+	if !ok || farmIDFromContext == 0 {
+		SendErrorResponse(w, ErrFarmIDNotFound, http.StatusUnauthorized)
 		return
 	}
 
 	var farmID uint
 	if req.FarmID != nil {
 		if *req.FarmID != farmIDFromContext {
-			http.Error(w, "farm_id do body não corresponde ao farm_id do token", http.StatusForbidden)
+			SendErrorResponse(w, "farm_id do body não corresponde ao farm_id do token", http.StatusForbidden)
 			return
 		}
 		farmID = *req.FarmID

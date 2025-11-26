@@ -76,10 +76,14 @@ func Auth(jwtSecret string) func(http.Handler) http.Handler {
 				return
 			}
 
-			if farmID, ok := extractFarmID(token); ok {
-				ctx := context.WithValue(r.Context(), "farm_id", farmID)
-				r = r.WithContext(ctx)
+			farmID, ok := extractFarmID(token)
+			if !ok || farmID == 0 {
+				SendErrorResponse(w, "Token não contém farm_id válido", http.StatusUnauthorized)
+				return
 			}
+
+			ctx := context.WithValue(r.Context(), "farm_id", farmID)
+			r = r.WithContext(ctx)
 
 			next.ServeHTTP(w, r)
 		})

@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
+	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -34,9 +36,10 @@ type SelectFarmRequest struct {
 }
 
 type SelectFarmResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-	FarmID  uint   `json:"farm_id"`
+	Success     bool   `json:"success"`
+	Message     string `json:"message"`
+	FarmID      uint   `json:"farm_id"`
+	AccessToken string `json:"access_token"`
 }
 
 func (h *FarmSelectionHandler) GetUserFarms(w http.ResponseWriter, r *http.Request) {
@@ -108,10 +111,30 @@ func (h *FarmSelectionHandler) SelectFarm(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	user, err := h.service.GetUserWithPerson(userID)
+	if err != nil {
+		SendErrorResponse(w, "Erro ao buscar usuário: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if user == nil {
+		SendErrorResponse(w, "Usuário não encontrado", http.StatusNotFound)
+		return
+	}
+
+	userForToken := *user
+	userForToken.FarmID = farm.ID
+
+	accessToken, err := h.generateJWT(&userForToken)
+	if err != nil {
+		SendErrorResponse(w, "Erro ao gerar token: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	response := SelectFarmResponse{
-		Success: true,
-		Message: "Fazenda selecionada com sucesso",
-		FarmID:  farm.ID,
+		Success:     true,
+		Message:     "Fazenda selecionada com sucesso",
+		FarmID:      farm.ID,
+		AccessToken: accessToken,
 	}
 
 	w.Header().Set(HeaderContentType, ContentTypeJSON)
@@ -146,4 +169,21 @@ func (h *FarmSelectionHandler) extractUserIDFromToken(r *http.Request) (uint, er
 	}
 
 	return uint(userIDFloat), nil
+}
+
+func (h *FarmSelectionHandler) generateJWT(user *models.User) (string, error) {
+	if user.Person == nil {
+		return "", fmt.Errorf("user person is nil")
+	}
+
+	claims := jwt.MapClaims{
+		"sub":     user.ID,
+		"email":   user.Person.Email,
+		"farm_id": user.FarmID,
+		"iat":     time.Now().Unix(),
+		"exp":     time.Now().Add(time.Hour * 24).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(h.jwtSecret))
 }
