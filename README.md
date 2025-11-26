@@ -16,6 +16,10 @@
 >
 > [Onde está o roadmap do projeto?](https://github.com/orgs/fazendapro/projects/1)
 >
+> [Onde encontro a análise do código pelo sonar?](https://sonarcloud.io/summary/new_code?id=fazendapro_FazendaPro&branch=main)
+>
+> [Onde encontro uma visão atual do monitoramento de erros?](https://sonarcloud.io/summary/new_code?id=fazendapro_FazendaPro&branch=main)
+>
 > [Onde vejo o design da interface?](<http://figma.com/proto/ZoKjm0cUGoA5tQncXZeGtb/Inventory-Management-Dashboard-(Community)?node-id=459-576>)
 
 Feito com muito, muito amor por [Gugu](https://www.instagram.com/gvstavu/) 🐮❤️
