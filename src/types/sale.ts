@@ -21,6 +21,7 @@ export interface Sale {
 
 export interface CreateSaleRequest {
   animal_id: number;
+  farm_id?: number;
   buyer_name: string;
   price: number;
   sale_date: string;
