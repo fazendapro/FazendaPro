@@ -59,7 +59,6 @@ export const SaleModal: React.FC<SaleModalProps> = ({
         }
         const saleData: CreateSaleRequest = {
           animal_id: values.animal_id,
-          farm_id: farm.id,
           buyer_name: values.buyer_name,
           price: values.price,
           sale_date: values.sale_date.format('YYYY-MM-DD'),
