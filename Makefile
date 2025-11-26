@@ -1,6 +1,6 @@
 # Makefile para FazendaPro API
 
-.PHONY: help test test-coverage test-unit test-handlers clean install-deps run build migrate-docker db-reset
+.PHONY: help test test-coverage test-unit test-handlers clean install-deps run build migrate-docker db-reset swagger
 
 # Variáveis
 GO_VERSION := 1.24.2
@@ -13,6 +13,9 @@ help:
 	@echo ""
 	@echo "📦 Dependências:"
 	@echo "  install-deps    - Instalar dependências do Go"
+	@echo ""
+	@echo "📚 Documentação:"
+	@echo "  swagger         - Gerar documentação Swagger"
 	@echo ""
 	@echo "🧪 Testes:"
 	@echo "  test            - Executar todos os testes"
@@ -295,3 +298,26 @@ test-rich: ## Executar testes com richgo
 coverage-pipeline: generate-tests coverage-100 test-generated ## Pipeline completo para 100% coverage
 	@echo "✅ Pipeline de coverage executado com sucesso!"
 	@echo "📊 Verifique os relatórios em: coverage/"
+
+# =============================================================================
+# COMANDOS DE DOCUMENTAÇÃO SWAGGER
+# =============================================================================
+
+# Gerar documentação Swagger
+swagger: ## Gerar documentação Swagger
+	@echo "📚 Gerando documentação Swagger..."
+	@if command -v swag >/dev/null 2>&1; then \
+		swag init -g main.go -o docs --parseDependency --parseInternal; \
+		echo "✅ Documentação Swagger gerada com sucesso!"; \
+		echo "📖 Acesse: http://localhost:8080/swagger/index.html"; \
+	elif [ -f "$(HOME)/go/bin/swag" ]; then \
+		$(HOME)/go/bin/swag init -g main.go -o docs --parseDependency --parseInternal; \
+		echo "✅ Documentação Swagger gerada com sucesso!"; \
+		echo "📖 Acesse: http://localhost:8080/swagger/index.html"; \
+	else \
+		echo "⚠️  swag não encontrado. Instalando..."; \
+		go install github.com/swaggo/swag/cmd/swag@latest; \
+		$(HOME)/go/bin/swag init -g main.go -o docs --parseDependency --parseInternal; \
+		echo "✅ Documentação Swagger gerada com sucesso!"; \
+		echo "📖 Acesse: http://localhost:8080/swagger/index.html"; \
+	fi

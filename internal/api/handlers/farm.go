@@ -17,10 +17,25 @@ func NewFarmHandler(service *service.FarmService) *FarmHandler {
 	return &FarmHandler{service: service}
 }
 
+// UpdateFarmRequest representa a requisição de atualização de fazenda
+// @Description Dados para atualizar uma fazenda
 type UpdateFarmRequest struct {
-	Logo string `json:"logo"`
+	Logo string `json:"logo" example:"data:image/png;base64,..."` // Logo da fazenda em base64
 }
 
+// GetFarm obtém uma fazenda por ID
+// @Summary      Obter fazenda por ID
+// @Description  Retorna os dados de uma fazenda específica pelo ID
+// @Tags         farm
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id query int true "ID da fazenda"
+// @Success      200  {object}  map[string]interface{}
+// @Failure      400  {object}  ErrorResponse
+// @Failure      404  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /api/v1/farm [get]
 func (h *FarmHandler) GetFarm(w http.ResponseWriter, r *http.Request) {
 	farmIDStr := r.URL.Query().Get("id")
 	if farmIDStr == "" {
@@ -53,6 +68,19 @@ func (h *FarmHandler) GetFarm(w http.ResponseWriter, r *http.Request) {
 	SendSuccessResponse(w, farm, "Fazenda encontrada com sucesso", http.StatusOK)
 }
 
+// UpdateFarm atualiza os dados de uma fazenda
+// @Summary      Atualizar fazenda
+// @Description  Atualiza os dados de uma fazenda existente
+// @Tags         farm
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id query int true "ID da fazenda"
+// @Param        request body UpdateFarmRequest true "Dados atualizados da fazenda"
+// @Success      200  {object}  map[string]interface{}
+// @Failure      400  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /api/v1/farm [put]
 func (h *FarmHandler) UpdateFarm(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPut {
 		SendErrorResponse(w, "Método não permitido", http.StatusMethodNotAllowed)

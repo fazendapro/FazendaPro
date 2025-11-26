@@ -16,11 +16,25 @@ func NewUserHandler(service *service.UserService) *UserHandler {
 	return &UserHandler{service: service}
 }
 
+// CreateUserRequest representa a requisição de criação de usuário
+// @Description Dados necessários para criar um novo usuário
 type CreateUserRequest struct {
-	User   models.User   `json:"user"`
-	Person models.Person `json:"person"`
+	User   models.User   `json:"user"`   // Dados do usuário
+	Person models.Person `json:"person"` // Dados da pessoa
 }
 
+// GetUser obtém um usuário por email
+// @Summary      Obter usuário por email
+// @Description  Retorna os dados de um usuário específico pelo email
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        email query string true "Email do usuário"
+// @Success      200  {object}  map[string]interface{}
+// @Failure      404  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /api/v1/users [get]
 func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 	email := r.URL.Query().Get("email")
 	user, err := h.service.GetUserByEmail(email)
@@ -37,6 +51,18 @@ func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 	SendSuccessResponse(w, user, "Usuário encontrado com sucesso", http.StatusOK)
 }
 
+// CreateUser cria um novo usuário
+// @Summary      Criar usuário
+// @Description  Cria um novo usuário no sistema
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request body CreateUserRequest true "Dados do novo usuário"
+// @Success      201  {object}  map[string]interface{}
+// @Failure      400  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /api/v1/users [post]
 func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		SendErrorResponse(w, "Método não permitido", http.StatusMethodNotAllowed)

@@ -16,6 +16,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/go-chi/chi/v5"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Config) *chi.Mux {
@@ -44,6 +45,10 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("FazendaPro API is running!"))
 	})
+
+	r.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:8080/swagger/doc.json"),
+	))
 
 	r.Get("/test-error", func(w http.ResponseWriter, r *http.Request) {
 		err := errors.New("erro de teste do Sentry - Rota /test-error")

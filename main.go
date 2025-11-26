@@ -10,11 +10,31 @@ import (
 
 	"github.com/fazendapro/FazendaPro-api/cmd/app"
 	"github.com/fazendapro/FazendaPro-api/config"
+	_ "github.com/fazendapro/FazendaPro-api/docs" // swagger docs
 	"github.com/fazendapro/FazendaPro-api/internal/migrations"
 	"github.com/fazendapro/FazendaPro-api/internal/repository"
 	"github.com/fazendapro/FazendaPro-api/internal/routes"
 	"github.com/getsentry/sentry-go"
 )
+
+// @title           FazendaPro API
+// @version         1.0
+// @description     API REST para gerenciamento de fazendas leiteiras
+// @description     Sistema completo para gestão de animais, coletas de leite, reproduções, vendas e dívidas
+
+// @contact.name   Suporte FazendaPro
+// @contact.email  suporte@fazendapro.com
+
+// @license.name  MIT
+// @license.url   https://opensource.org/licenses/MIT
+
+// @host      localhost:8080
+// @BasePath  /
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Digite "Bearer" seguido de um espaço e depois o token JWT. Exemplo: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 
 func main() {
 	if len(os.Args) > 1 && os.Args[1] == "migrate" {

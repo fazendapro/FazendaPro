@@ -1,0 +1,1509 @@
+basePath: /
+definitions:
+  handlers.AnimalData:
+    description: Dados principais de um animal na fazenda
+    properties:
+      animal_name:
+        description: Nome do animal
+        example: Branquinha
+        type: string
+      animal_type:
+        description: Tipo de animal (enum)
+        example: 1
+        type: integer
+      birth_date:
+        description: Data de nascimento (ISO format)
+        example: "2020-01-15"
+        type: string
+      breed:
+        description: Raça
+        example: Holandesa
+        type: string
+      castrated:
+        description: Se está castrado
+        example: false
+        type: boolean
+      confinement:
+        description: Se está em confinamento
+        example: false
+        type: boolean
+      current_batch:
+        description: Lote atual
+        example: 1
+        type: integer
+      ear_tag_number_local:
+        description: Número da brinco local
+        example: 123
+        type: integer
+      ear_tag_number_register:
+        description: Número de registro
+        example: 456
+        type: integer
+      farm_id:
+        description: ID da fazenda
+        example: 1
+        type: integer
+      father_id:
+        description: ID do pai (opcional)
+        example: 10
+        type: integer
+      fertilization:
+        description: Se está fertilizada
+        example: true
+        type: boolean
+      id:
+        description: ID único do animal
+        example: 1
+        type: integer
+      mother_id:
+        description: ID da mãe (opcional)
+        example: 20
+        type: integer
+      photo:
+        description: Foto em base64
+        example: data:image/jpeg;base64,...
+        type: string
+      purpose:
+        description: Propósito do animal (enum)
+        example: 1
+        type: integer
+      sex:
+        description: Sexo (1=Fêmea, 2=Macho)
+        example: 1
+        type: integer
+      status:
+        description: Status do animal (enum)
+        example: 1
+        type: integer
+      type:
+        description: Tipo de animal
+        example: Bovino
+        type: string
+    type: object
+  handlers.AnimalParent:
+    description: Informações resumidas do animal pai ou mãe
+    properties:
+      animal_name:
+        description: Nome do animal
+        example: Touro Bravo
+        type: string
+      ear_tag_number_local:
+        description: Número da brinco
+        example: 100
+        type: integer
+      id:
+        description: ID do animal pai/mãe
+        example: 10
+        type: integer
+    type: object
+  handlers.AnimalResponse:
+    description: Resposta com dados do animal incluindo informações dos pais
+    properties:
+      animal_name:
+        description: Nome do animal
+        example: Branquinha
+        type: string
+      animal_type:
+        description: Tipo de animal (enum)
+        example: 1
+        type: integer
+      birth_date:
+        description: Data de nascimento (ISO format)
+        example: "2020-01-15"
+        type: string
+      breed:
+        description: Raça
+        example: Holandesa
+        type: string
+      castrated:
+        description: Se está castrado
+        example: false
+        type: boolean
+      confinement:
+        description: Se está em confinamento
+        example: false
+        type: boolean
+      createdAt:
+        description: Data de criação
+        example: "2024-01-15T10:30:00Z"
+        type: string
+      current_batch:
+        description: Lote atual
+        example: 1
+        type: integer
+      ear_tag_number_local:
+        description: Número da brinco local
+        example: 123
+        type: integer
+      ear_tag_number_register:
+        description: Número de registro
+        example: 456
+        type: integer
+      farm_id:
+        description: ID da fazenda
+        example: 1
+        type: integer
+      father:
+        allOf:
+        - $ref: '#/definitions/handlers.AnimalParent'
+        description: Informações do pai (se disponível)
+      father_id:
+        description: ID do pai (opcional)
+        example: 10
+        type: integer
+      fertilization:
+        description: Se está fertilizada
+        example: true
+        type: boolean
+      id:
+        description: ID único do animal
+        example: 1
+        type: integer
+      mother:
+        allOf:
+        - $ref: '#/definitions/handlers.AnimalParent'
+        description: Informações da mãe (se disponível)
+      mother_id:
+        description: ID da mãe (opcional)
+        example: 20
+        type: integer
+      photo:
+        description: Foto em base64
+        example: data:image/jpeg;base64,...
+        type: string
+      purpose:
+        description: Propósito do animal (enum)
+        example: 1
+        type: integer
+      sex:
+        description: Sexo (1=Fêmea, 2=Macho)
+        example: 1
+        type: integer
+      status:
+        description: Status do animal (enum)
+        example: 1
+        type: integer
+      type:
+        description: Tipo de animal
+        example: Bovino
+        type: string
+      updatedAt:
+        description: Data de atualização
+        example: "2024-01-15T10:30:00Z"
+        type: string
+    type: object
+  handlers.CreateAnimalRequest:
+    description: Dados necessários para criar um novo animal
+    properties:
+      animal_name:
+        description: Nome do animal
+        example: Branquinha
+        type: string
+      animal_type:
+        description: Tipo de animal (enum)
+        example: 1
+        type: integer
+      birth_date:
+        description: Data de nascimento (ISO format)
+        example: "2020-01-15"
+        type: string
+      breed:
+        description: Raça
+        example: Holandesa
+        type: string
+      castrated:
+        description: Se está castrado
+        example: false
+        type: boolean
+      confinement:
+        description: Se está em confinamento
+        example: false
+        type: boolean
+      current_batch:
+        description: Lote atual
+        example: 1
+        type: integer
+      ear_tag_number_local:
+        description: Número da brinco local
+        example: 123
+        type: integer
+      ear_tag_number_register:
+        description: Número de registro
+        example: 456
+        type: integer
+      farm_id:
+        description: ID da fazenda
+        example: 1
+        type: integer
+      father_id:
+        description: ID do pai (opcional)
+        example: 10
+        type: integer
+      fertilization:
+        description: Se está fertilizada
+        example: true
+        type: boolean
+      id:
+        description: ID único do animal
+        example: 1
+        type: integer
+      mother_id:
+        description: ID da mãe (opcional)
+        example: 20
+        type: integer
+      photo:
+        description: Foto em base64
+        example: data:image/jpeg;base64,...
+        type: string
+      purpose:
+        description: Propósito do animal (enum)
+        example: 1
+        type: integer
+      sex:
+        description: Sexo (1=Fêmea, 2=Macho)
+        example: 1
+        type: integer
+      status:
+        description: Status do animal (enum)
+        example: 1
+        type: integer
+      type:
+        description: Tipo de animal
+        example: Bovino
+        type: string
+    type: object
+  handlers.CreateDebtRequest:
+    description: Dados necessários para criar uma nova dívida
+    properties:
+      person:
+        description: Nome da pessoa
+        example: João Silva
+        type: string
+      value:
+        description: Valor da dívida
+        example: 1500.5
+        type: number
+    type: object
+  handlers.CreateMilkCollectionRequest:
+    description: Dados necessários para criar uma nova coleta de leite
+    properties:
+      animal_id:
+        description: ID do animal
+        example: 1
+        type: integer
+      date:
+        description: Data da coleta (YYYY-MM-DD)
+        example: "2024-01-15"
+        type: string
+      liters:
+        description: Quantidade de litros
+        example: 25.5
+        minimum: 0
+        type: number
+    required:
+    - animal_id
+    - date
+    - liters
+    type: object
+  handlers.CreateReproductionRequest:
+    description: Dados necessários para criar um novo registro de reprodução
+    properties:
+      actual_birth_date:
+        type: string
+      animal_id:
+        type: integer
+      animal_name:
+        type: string
+      current_phase:
+        type: integer
+      dry_period_start_date:
+        type: string
+      ear_tag:
+        type: integer
+      expected_birth_date:
+        type: string
+      id:
+        type: integer
+      insemination_date:
+        type: string
+      insemination_type:
+        type: string
+      lactation_end_date:
+        type: string
+      lactation_start_date:
+        type: string
+      observations:
+        type: string
+      pregnancy_date:
+        type: string
+      veterinary_confirmation:
+        type: boolean
+    type: object
+  handlers.CreateUserRequest:
+    description: Dados necessários para criar um novo usuário
+    properties:
+      person:
+        allOf:
+        - $ref: '#/definitions/models.Person'
+        description: Dados da pessoa
+      user:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        description: Dados do usuário
+    type: object
+  handlers.DebtListResponse:
+    description: Resposta com lista paginada de dívidas
+    properties:
+      debts:
+        description: Lista de dívidas
+        items:
+          $ref: '#/definitions/handlers.DebtResponse'
+        type: array
+      limit:
+        description: Limite por página
+        example: 10
+        type: integer
+      page:
+        description: Página atual
+        example: 1
+        type: integer
+      total:
+        description: Total de registros
+        example: 5
+        type: integer
+    type: object
+  handlers.DebtResponse:
+    description: Resposta com dados de uma dívida
+    properties:
+      created_at:
+        description: Data de criação
+        example: "2024-01-15T10:30:00Z"
+        type: string
+      id:
+        description: ID da dívida
+        example: 1
+        type: integer
+      person:
+        description: Nome da pessoa
+        example: João Silva
+        type: string
+      updated_at:
+        description: Data de atualização
+        example: "2024-01-15T10:30:00Z"
+        type: string
+      value:
+        description: Valor da dívida
+        example: 1500.5
+        type: number
+    type: object
+  handlers.ErrorResponse:
+    properties:
+      code:
+        type: integer
+      error:
+        type: string
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  handlers.LoginRequest:
+    description: Dados necessários para autenticação
+    properties:
+      email:
+        description: Email do usuário
+        example: usuario@example.com
+        type: string
+      password:
+        description: Senha do usuário
+        example: senha123
+        type: string
+    type: object
+  handlers.LoginResponse:
+    description: Resposta após autenticação bem-sucedida
+    properties:
+      access_token:
+        description: Token de acesso JWT
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+      message:
+        description: Mensagem de resposta
+        example: Login realizado com sucesso
+        type: string
+      refresh_token:
+        description: Token de refresh
+        example: abc123def456...
+        type: string
+      success:
+        description: Indica se a operação foi bem-sucedida
+        example: true
+        type: boolean
+      user:
+        description: Dados do usuário autenticado
+        properties:
+          email:
+            description: Email do usuário
+            type: string
+          id:
+            description: ID do usuário
+            type: integer
+          name:
+            description: Nome completo do usuário
+            type: string
+        type: object
+    type: object
+  handlers.MilkCollectionData:
+    properties:
+      animal:
+        $ref: '#/definitions/handlers.AnimalData'
+      animal_id:
+        type: integer
+      created_at:
+        type: string
+      date:
+        type: string
+      id:
+        type: integer
+      liters:
+        type: number
+      updated_at:
+        type: string
+    type: object
+  handlers.MilkCollectionResponse:
+    description: Resposta com dados de uma coleta de leite
+    properties:
+      data:
+        allOf:
+        - $ref: '#/definitions/handlers.MilkCollectionData'
+        description: Dados da coleta
+      message:
+        description: Mensagem de resposta
+        type: string
+      success:
+        description: Indica sucesso
+        example: true
+        type: boolean
+    type: object
+  handlers.RefreshTokenRequest:
+    description: Token de refresh para renovar o access token
+    properties:
+      refresh_token:
+        description: Token de refresh
+        example: abc123def456...
+        type: string
+    type: object
+  handlers.RefreshTokenResponse:
+    description: Novo access token gerado
+    properties:
+      access_token:
+        description: Novo token de acesso JWT
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+      message:
+        description: Mensagem de resposta
+        example: Token renovado com sucesso
+        type: string
+      success:
+        description: Indica se a operação foi bem-sucedida
+        example: true
+        type: boolean
+    type: object
+  handlers.RegisterRequest:
+    description: Dados necessários para criar um novo usuário
+    properties:
+      person:
+        allOf:
+        - $ref: '#/definitions/models.Person'
+        description: Dados da pessoa
+      user:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        description: Dados do usuário
+    type: object
+  handlers.RegisterResponse:
+    description: Resposta após criação de usuário com tokens de autenticação
+    properties:
+      access_token:
+        description: Token de acesso JWT
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+      message:
+        description: Mensagem de resposta
+        example: Usuário criado e logado com sucesso
+        type: string
+      refresh_token:
+        description: Token de refresh
+        example: abc123def456...
+        type: string
+      success:
+        description: Indica se a operação foi bem-sucedida
+        example: true
+        type: boolean
+      user:
+        description: Dados do usuário criado
+        properties:
+          email:
+            description: Email do usuário
+            type: string
+          id:
+            description: ID do usuário
+            type: integer
+          name:
+            description: Nome completo do usuário
+            type: string
+        type: object
+    type: object
+  handlers.ReproductionResponse:
+    description: Resposta com dados completos de uma reprodução
+    properties:
+      actual_birth_date:
+        type: string
+      animal_id:
+        type: integer
+      animal_name:
+        type: string
+      createdAt:
+        description: Data de criação
+        example: "2024-01-15T10:30:00Z"
+        type: string
+      current_phase:
+        type: integer
+      dry_period_start_date:
+        type: string
+      ear_tag:
+        type: integer
+      expected_birth_date:
+        type: string
+      id:
+        type: integer
+      insemination_date:
+        type: string
+      insemination_type:
+        type: string
+      lactation_end_date:
+        type: string
+      lactation_start_date:
+        type: string
+      observations:
+        type: string
+      pregnancy_date:
+        type: string
+      updatedAt:
+        description: Data de atualização
+        example: "2024-01-15T10:30:00Z"
+        type: string
+      veterinary_confirmation:
+        type: boolean
+    type: object
+  handlers.UpdateFarmRequest:
+    description: Dados para atualizar uma fazenda
+    properties:
+      logo:
+        description: Logo da fazenda em base64
+        example: data:image/png;base64,...
+        type: string
+    type: object
+  models.Animal:
+    properties:
+      animalName:
+        type: string
+      animalType:
+        type: integer
+      birthDate:
+        type: string
+      breed:
+        type: string
+      castrated:
+        type: boolean
+      confinement:
+        type: boolean
+      createdAt:
+        type: string
+      currentBatch:
+        type: integer
+      earTagNumberLocal:
+        type: integer
+      earTagNumberRegister:
+        type: integer
+      farm:
+        $ref: '#/definitions/models.Farm'
+      farmID:
+        type: integer
+      father:
+        $ref: '#/definitions/models.Animal'
+      fatherID:
+        type: integer
+      fertilization:
+        type: boolean
+      id:
+        type: integer
+      mother:
+        $ref: '#/definitions/models.Animal'
+      motherID:
+        type: integer
+      photo:
+        type: string
+      purpose:
+        type: integer
+      sex:
+        type: integer
+      status:
+        type: integer
+      type:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.Company:
+    properties:
+      companyName:
+        type: string
+      createdAt:
+        type: string
+      farmCNPJ:
+        type: string
+      id:
+        type: integer
+      location:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.Expense:
+    properties:
+      amount:
+        type: number
+      category:
+        type: string
+      createdAt:
+        type: string
+      date:
+        type: string
+      description:
+        type: string
+      farm:
+        $ref: '#/definitions/models.Farm'
+      farmID:
+        type: integer
+      id:
+        type: integer
+      notes:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.Farm:
+    properties:
+      animals:
+        items:
+          $ref: '#/definitions/models.Animal'
+        type: array
+      company:
+        $ref: '#/definitions/models.Company'
+      companyID:
+        type: integer
+      createdAt:
+        type: string
+      expenses:
+        items:
+          $ref: '#/definitions/models.Expense'
+        type: array
+      id:
+        type: integer
+      logo:
+        type: string
+      updatedAt:
+        type: string
+      users:
+        items:
+          $ref: '#/definitions/models.User'
+        type: array
+    type: object
+  models.Person:
+    properties:
+      cpf:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: integer
+      last_access:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.User:
+    properties:
+      farm:
+        $ref: '#/definitions/models.Farm'
+      farm_id:
+        type: integer
+      id:
+        type: integer
+      person:
+        $ref: '#/definitions/models.Person'
+      person_id:
+        type: integer
+      user_farms:
+        items:
+          $ref: '#/definitions/models.UserFarm'
+        type: array
+    type: object
+  models.UserFarm:
+    properties:
+      created_at:
+        type: string
+      farm:
+        $ref: '#/definitions/models.Farm'
+      farm_id:
+        type: integer
+      id:
+        type: integer
+      is_primary:
+        type: boolean
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+      user_id:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: suporte@fazendapro.com
+    name: Suporte FazendaPro
+  description: |-
+    API REST para gerenciamento de fazendas leiteiras
+    Sistema completo para gestão de animais, coletas de leite, reproduções, vendas e dívidas
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  title: FazendaPro API
+  version: "1.0"
+paths:
+  /api/v1/animals:
+    delete:
+      consumes:
+      - application/json
+      description: Remove um animal do sistema
+      parameters:
+      - description: ID do animal
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Deletar animal
+      tags:
+      - animals
+    get:
+      consumes:
+      - application/json
+      description: Retorna os dados de um animal específico pelo ID
+      parameters:
+      - description: ID do animal
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.AnimalResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Obter animal por ID
+      tags:
+      - animals
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo animal na fazenda
+      parameters:
+      - description: Dados do animal
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateAnimalRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Criar animal
+      tags:
+      - animals
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de um animal existente
+      parameters:
+      - description: Dados atualizados do animal
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateAnimalRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.AnimalResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Atualizar animal
+      tags:
+      - animals
+  /api/v1/animals/farm:
+    get:
+      consumes:
+      - application/json
+      description: Retorna lista de todos os animais de uma fazenda específica
+      parameters:
+      - description: ID da fazenda
+        in: query
+        name: farmId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handlers.AnimalResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Obter animais por fazenda
+      tags:
+      - animals
+  /api/v1/animals/photo:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Faz upload de uma foto para um animal específico
+      parameters:
+      - description: ID do animal
+        in: formData
+        name: animal_id
+        required: true
+        type: integer
+      - description: Arquivo de imagem
+        in: formData
+        name: photo
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.AnimalResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Upload foto do animal
+      tags:
+      - animals
+  /api/v1/animals/sex:
+    get:
+      consumes:
+      - application/json
+      description: Retorna lista de animais de uma fazenda filtrados por sexo
+      parameters:
+      - description: ID da fazenda
+        in: query
+        name: farmId
+        required: true
+        type: integer
+      - description: Sexo (1=Fêmea, 2=Macho)
+        in: query
+        name: sex
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handlers.AnimalResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Obter animais por sexo
+      tags:
+      - animals
+  /api/v1/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Autentica um usuário com email e senha, retornando tokens de acesso
+        e refresh
+      parameters:
+      - description: Credenciais de login
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Realizar login
+      tags:
+      - auth
+  /api/v1/auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Invalida o refresh token, efetivando o logout do usuário
+      parameters:
+      - description: Refresh token a ser invalidado
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Realizar logout
+      tags:
+      - auth
+  /api/v1/auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Gera um novo access token usando um refresh token válido
+      parameters:
+      - description: Refresh token
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.RefreshTokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Renovar token de acesso
+      tags:
+      - auth
+  /api/v1/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo usuário no sistema e retorna tokens de autenticação
+      parameters:
+      - description: Dados do novo usuário
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.RegisterResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Registrar novo usuário
+      tags:
+      - auth
+  /api/v1/farm:
+    get:
+      consumes:
+      - application/json
+      description: Retorna os dados de uma fazenda específica pelo ID
+      parameters:
+      - description: ID da fazenda
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Obter fazenda por ID
+      tags:
+      - farm
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de uma fazenda existente
+      parameters:
+      - description: ID da fazenda
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: Dados atualizados da fazenda
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateFarmRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Atualizar fazenda
+      tags:
+      - farm
+  /api/v1/milk-collections:
+    post:
+      consumes:
+      - application/json
+      description: Registra uma nova coleta de leite de um animal
+      parameters:
+      - description: Dados da coleta
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateMilkCollectionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.MilkCollectionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Criar coleta de leite
+      tags:
+      - milk-collections
+  /api/v1/milk-collections/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de uma coleta de leite existente
+      parameters:
+      - description: ID da coleta
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados atualizados
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateMilkCollectionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.MilkCollectionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Atualizar coleta de leite
+      tags:
+      - milk-collections
+  /api/v1/reproductions:
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo registro de reprodução para um animal
+      parameters:
+      - description: Dados da reprodução
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateReproductionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.ReproductionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Criar reprodução
+      tags:
+      - reproductions
+  /api/v1/users:
+    get:
+      consumes:
+      - application/json
+      description: Retorna os dados de um usuário específico pelo email
+      parameters:
+      - description: Email do usuário
+        in: query
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Obter usuário por email
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo usuário no sistema
+      parameters:
+      - description: Dados do novo usuário
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Criar usuário
+      tags:
+      - users
+  /debts:
+    get:
+      consumes:
+      - application/json
+      description: Retorna lista paginada de dívidas com filtros opcionais
+      parameters:
+      - default: 1
+        description: Número da página
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Itens por página
+        in: query
+        name: limit
+        type: integer
+      - description: Filtrar por ano
+        in: query
+        name: year
+        type: integer
+      - description: Filtrar por mês
+        in: query
+        name: month
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.DebtListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Obter dívidas
+      tags:
+      - debts
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo registro de dívida
+      parameters:
+      - description: Dados da dívida
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateDebtRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.DebtResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Criar dívida
+      tags:
+      - debts
+  /debts/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove uma dívida do sistema
+      parameters:
+      - description: ID da dívida
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Deletar dívida
+      tags:
+      - debts
+securityDefinitions:
+  BearerAuth:
+    description: 'Digite "Bearer" seguido de um espaço e depois o token JWT. Exemplo:
+      "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

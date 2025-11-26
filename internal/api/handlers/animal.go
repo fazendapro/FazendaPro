@@ -20,44 +20,52 @@ func NewAnimalHandler(service *service.AnimalService) *AnimalHandler {
 	return &AnimalHandler{service: service}
 }
 
+// AnimalData representa os dados básicos de um animal
+// @Description Dados principais de um animal na fazenda
 type AnimalData struct {
-	ID                   uint   `json:"id"`
-	FarmID               uint   `json:"farm_id"`
-	EarTagNumberLocal    int    `json:"ear_tag_number_local"`
-	EarTagNumberRegister int    `json:"ear_tag_number_register"`
-	AnimalName           string `json:"animal_name"`
-	Sex                  int    `json:"sex"`
-	Breed                string `json:"breed"`
-	Type                 string `json:"type"`
-	BirthDate            string `json:"birth_date,omitempty"`
-	Photo                string `json:"photo,omitempty"`
-	FatherID             *uint  `json:"father_id,omitempty"`
-	MotherID             *uint  `json:"mother_id,omitempty"`
-	Confinement          bool   `json:"confinement"`
-	AnimalType           int    `json:"animal_type"`
-	Status               int    `json:"status"`
-	Fertilization        bool   `json:"fertilization"`
-	Castrated            bool   `json:"castrated"`
-	Purpose              int    `json:"purpose"`
-	CurrentBatch         int    `json:"current_batch"`
+	ID                   uint   `json:"id" example:"1"`                                       // ID único do animal
+	FarmID               uint   `json:"farm_id" example:"1"`                                  // ID da fazenda
+	EarTagNumberLocal    int    `json:"ear_tag_number_local" example:"123"`                   // Número da brinco local
+	EarTagNumberRegister int    `json:"ear_tag_number_register" example:"456"`                // Número de registro
+	AnimalName           string `json:"animal_name" example:"Branquinha"`                     // Nome do animal
+	Sex                  int    `json:"sex" example:"1"`                                      // Sexo (1=Fêmea, 2=Macho)
+	Breed                string `json:"breed" example:"Holandesa"`                            // Raça
+	Type                 string `json:"type" example:"Bovino"`                                // Tipo de animal
+	BirthDate            string `json:"birth_date,omitempty" example:"2020-01-15"`            // Data de nascimento (ISO format)
+	Photo                string `json:"photo,omitempty" example:"data:image/jpeg;base64,..."` // Foto em base64
+	FatherID             *uint  `json:"father_id,omitempty" example:"10"`                     // ID do pai (opcional)
+	MotherID             *uint  `json:"mother_id,omitempty" example:"20"`                     // ID da mãe (opcional)
+	Confinement          bool   `json:"confinement" example:"false"`                          // Se está em confinamento
+	AnimalType           int    `json:"animal_type" example:"1"`                              // Tipo de animal (enum)
+	Status               int    `json:"status" example:"1"`                                   // Status do animal (enum)
+	Fertilization        bool   `json:"fertilization" example:"true"`                         // Se está fertilizada
+	Castrated            bool   `json:"castrated" example:"false"`                            // Se está castrado
+	Purpose              int    `json:"purpose" example:"1"`                                  // Propósito do animal (enum)
+	CurrentBatch         int    `json:"current_batch" example:"1"`                            // Lote atual
 }
 
+// CreateAnimalRequest representa a requisição de criação de animal
+// @Description Dados necessários para criar um novo animal
 type CreateAnimalRequest struct {
-	AnimalData
+	AnimalData // Dados do animal
 }
 
+// AnimalResponse representa a resposta com dados completos do animal
+// @Description Resposta com dados do animal incluindo informações dos pais
 type AnimalResponse struct {
-	AnimalData
-	Father    *AnimalParent `json:"father,omitempty"`
-	Mother    *AnimalParent `json:"mother,omitempty"`
-	CreatedAt string        `json:"createdAt"`
-	UpdatedAt string        `json:"updatedAt"`
+	AnimalData               // Dados básicos do animal
+	Father     *AnimalParent `json:"father,omitempty"`                         // Informações do pai (se disponível)
+	Mother     *AnimalParent `json:"mother,omitempty"`                         // Informações da mãe (se disponível)
+	CreatedAt  string        `json:"createdAt" example:"2024-01-15T10:30:00Z"` // Data de criação
+	UpdatedAt  string        `json:"updatedAt" example:"2024-01-15T10:30:00Z"` // Data de atualização
 }
 
+// AnimalParent representa informações básicas de um animal pai/mãe
+// @Description Informações resumidas do animal pai ou mãe
 type AnimalParent struct {
-	ID                uint   `json:"id"`
-	AnimalName        string `json:"animal_name"`
-	EarTagNumberLocal int    `json:"ear_tag_number_local"`
+	ID                uint   `json:"id" example:"10"`                    // ID do animal pai/mãe
+	AnimalName        string `json:"animal_name" example:"Touro Bravo"`  // Nome do animal
+	EarTagNumberLocal int    `json:"ear_tag_number_local" example:"100"` // Número da brinco
 }
 
 func animalDataToModel(data AnimalData) models.Animal {
@@ -148,6 +156,18 @@ func modelToAnimalResponse(animal *models.Animal) AnimalResponse {
 	}
 }
 
+// CreateAnimal cria um novo animal
+// @Summary      Criar animal
+// @Description  Cria um novo animal na fazenda
+// @Tags         animals
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request body CreateAnimalRequest true "Dados do animal"
+// @Success      201  {object}  map[string]interface{}
+// @Failure      400  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /api/v1/animals [post]
 func (h *AnimalHandler) CreateAnimal(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		SendErrorResponse(w, ErrMethodNotAllowed, http.StatusMethodNotAllowed)
@@ -173,6 +193,19 @@ func (h *AnimalHandler) CreateAnimal(w http.ResponseWriter, r *http.Request) {
 	SendSuccessResponse(w, data, "Animal criado com sucesso", http.StatusCreated)
 }
 
+// GetAnimal obtém um animal por ID
+// @Summary      Obter animal por ID
+// @Description  Retorna os dados de um animal específico pelo ID
+// @Tags         animals
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id query int true "ID do animal"
+// @Success      200  {object}  AnimalResponse
+// @Failure      400  {object}  ErrorResponse
+// @Failure      404  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /api/v1/animals [get]
 func (h *AnimalHandler) GetAnimal(w http.ResponseWriter, r *http.Request) {
 	animalID := r.URL.Query().Get("id")
 	if animalID == "" {
@@ -201,6 +234,18 @@ func (h *AnimalHandler) GetAnimal(w http.ResponseWriter, r *http.Request) {
 	SendSuccessResponse(w, response, "Animal encontrado com sucesso", http.StatusOK)
 }
 
+// GetAnimalsByFarm obtém todos os animais de uma fazenda
+// @Summary      Obter animais por fazenda
+// @Description  Retorna lista de todos os animais de uma fazenda específica
+// @Tags         animals
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        farmId query int true "ID da fazenda"
+// @Success      200  {array}   AnimalResponse
+// @Failure      400  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /api/v1/animals/farm [get]
 func (h *AnimalHandler) GetAnimalsByFarm(w http.ResponseWriter, r *http.Request) {
 	farmID := r.URL.Query().Get("farmId")
 	if farmID == "" {
@@ -236,6 +281,18 @@ func (h *AnimalHandler) GetAnimalsByFarm(w http.ResponseWriter, r *http.Request)
 	SendSuccessResponse(w, responses, fmt.Sprintf("Animais encontrados com sucesso (%d animais)", len(animals)), http.StatusOK)
 }
 
+// UpdateAnimal atualiza os dados de um animal
+// @Summary      Atualizar animal
+// @Description  Atualiza os dados de um animal existente
+// @Tags         animals
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request body CreateAnimalRequest true "Dados atualizados do animal"
+// @Success      200  {object}  AnimalResponse
+// @Failure      400  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /api/v1/animals [put]
 func (h *AnimalHandler) UpdateAnimal(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPut {
 		SendErrorResponse(w, ErrMethodNotAllowed, http.StatusMethodNotAllowed)
@@ -265,6 +322,18 @@ func (h *AnimalHandler) UpdateAnimal(w http.ResponseWriter, r *http.Request) {
 	SendSuccessResponse(w, response, "Animal atualizado com sucesso", http.StatusOK)
 }
 
+// DeleteAnimal remove um animal
+// @Summary      Deletar animal
+// @Description  Remove um animal do sistema
+// @Tags         animals
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id query int true "ID do animal"
+// @Success      200  {object}  map[string]interface{}
+// @Failure      400  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /api/v1/animals [delete]
 func (h *AnimalHandler) DeleteAnimal(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodDelete {
 		SendErrorResponse(w, ErrMethodNotAllowed, http.StatusMethodNotAllowed)
@@ -291,6 +360,19 @@ func (h *AnimalHandler) DeleteAnimal(w http.ResponseWriter, r *http.Request) {
 	SendSuccessResponse(w, nil, "Animal deletado com sucesso", http.StatusOK)
 }
 
+// GetAnimalsBySex obtém animais filtrados por sexo
+// @Summary      Obter animais por sexo
+// @Description  Retorna lista de animais de uma fazenda filtrados por sexo
+// @Tags         animals
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        farmId query int true "ID da fazenda"
+// @Param        sex query int true "Sexo (1=Fêmea, 2=Macho)"
+// @Success      200  {array}   AnimalResponse
+// @Failure      400  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /api/v1/animals/sex [get]
 func (h *AnimalHandler) GetAnimalsBySex(w http.ResponseWriter, r *http.Request) {
 	farmID := r.URL.Query().Get("farmId")
 	sex := r.URL.Query().Get("sex")
@@ -331,6 +413,20 @@ func (h *AnimalHandler) GetAnimalsBySex(w http.ResponseWriter, r *http.Request) 
 	SendSuccessResponse(w, responses, fmt.Sprintf("Animais encontrados com sucesso (%d animais)", len(animals)), http.StatusOK)
 }
 
+// UploadAnimalPhoto faz upload de foto de um animal
+// @Summary      Upload foto do animal
+// @Description  Faz upload de uma foto para um animal específico
+// @Tags         animals
+// @Accept       multipart/form-data
+// @Produce      json
+// @Security     BearerAuth
+// @Param        animal_id formData int true "ID do animal"
+// @Param        photo formData file true "Arquivo de imagem"
+// @Success      200  {object}  AnimalResponse
+// @Failure      400  {object}  ErrorResponse
+// @Failure      404  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /api/v1/animals/photo [post]
 func (h *AnimalHandler) UploadAnimalPhoto(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		SendErrorResponse(w, ErrMethodNotAllowed, http.StatusMethodNotAllowed)

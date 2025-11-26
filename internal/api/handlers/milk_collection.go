@@ -30,24 +30,42 @@ type MilkCollectionData struct {
 	UpdatedAt time.Time  `json:"updated_at"`
 }
 
+// CreateMilkCollectionRequest representa a requisição de criação de coleta de leite
+// @Description Dados necessários para criar uma nova coleta de leite
 type CreateMilkCollectionRequest struct {
-	AnimalID uint    `json:"animal_id" validate:"required"`
-	Liters   float64 `json:"liters" validate:"required,min=0"`
-	Date     string  `json:"date" validate:"required"`
+	AnimalID uint    `json:"animal_id" validate:"required" example:"1"`        // ID do animal
+	Liters   float64 `json:"liters" validate:"required,min=0" example:"25.5"`   // Quantidade de litros
+	Date     string  `json:"date" validate:"required" example:"2024-01-15"`     // Data da coleta (YYYY-MM-DD)
 }
 
+// MilkCollectionResponse representa a resposta de coleta de leite
+// @Description Resposta com dados de uma coleta de leite
 type MilkCollectionResponse struct {
-	Success bool               `json:"success"`
-	Data    MilkCollectionData `json:"data,omitempty"`
-	Message string             `json:"message,omitempty"`
+	Success bool               `json:"success" example:"true"` // Indica sucesso
+	Data    MilkCollectionData `json:"data,omitempty"`        // Dados da coleta
+	Message string             `json:"message,omitempty"`     // Mensagem de resposta
 }
 
+// MilkCollectionsResponse representa a resposta com múltiplas coletas
+// @Description Resposta com lista de coletas de leite
 type MilkCollectionsResponse struct {
-	Success bool                 `json:"success"`
-	Data    []MilkCollectionData `json:"data,omitempty"`
-	Message string               `json:"message,omitempty"`
+	Success bool                 `json:"success" example:"true"` // Indica sucesso
+	Data    []MilkCollectionData `json:"data,omitempty"`         // Lista de coletas
+	Message string               `json:"message,omitempty"`    // Mensagem de resposta
 }
 
+// CreateMilkCollection cria uma nova coleta de leite
+// @Summary      Criar coleta de leite
+// @Description  Registra uma nova coleta de leite de um animal
+// @Tags         milk-collections
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request body CreateMilkCollectionRequest true "Dados da coleta"
+// @Success      201  {object}  MilkCollectionResponse
+// @Failure      400  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /api/v1/milk-collections [post]
 func (h *MilkCollectionHandler) CreateMilkCollection(w http.ResponseWriter, r *http.Request) {
 	var req CreateMilkCollectionRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -89,6 +107,19 @@ func (h *MilkCollectionHandler) CreateMilkCollection(w http.ResponseWriter, r *h
 	json.NewEncoder(w).Encode(response)
 }
 
+// UpdateMilkCollection atualiza uma coleta de leite
+// @Summary      Atualizar coleta de leite
+// @Description  Atualiza os dados de uma coleta de leite existente
+// @Tags         milk-collections
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id path int true "ID da coleta"
+// @Param        request body CreateMilkCollectionRequest true "Dados atualizados"
+// @Success      200  {object}  MilkCollectionResponse
+// @Failure      400  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /api/v1/milk-collections/{id} [put]
 func (h *MilkCollectionHandler) UpdateMilkCollection(w http.ResponseWriter, r *http.Request) {
 	milkCollectionIDStr := chi.URLParam(r, "id")
 	milkCollectionID, err := strconv.ParseUint(milkCollectionIDStr, 10, 32)

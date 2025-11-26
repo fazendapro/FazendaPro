@@ -37,20 +37,26 @@ type ReproductionData struct {
 	Observations           string  `json:"observations,omitempty"`
 }
 
+// CreateReproductionRequest representa a requisição de criação de reprodução
+// @Description Dados necessários para criar um novo registro de reprodução
 type CreateReproductionRequest struct {
-	ReproductionData
+	ReproductionData // Dados da reprodução
 }
 
+// UpdateReproductionPhaseRequest representa a requisição de atualização de fase
+// @Description Dados para atualizar a fase de uma reprodução
 type UpdateReproductionPhaseRequest struct {
-	AnimalID       uint                   `json:"animal_id"`
-	NewPhase       int                    `json:"new_phase"`
-	AdditionalData map[string]interface{} `json:"additional_data,omitempty"`
+	AnimalID       uint                   `json:"animal_id" example:"1"`     // ID do animal
+	NewPhase       int                    `json:"new_phase" example:"2"`     // Nova fase
+	AdditionalData map[string]interface{} `json:"additional_data,omitempty"` // Dados adicionais
 }
 
+// ReproductionResponse representa a resposta de reprodução
+// @Description Resposta com dados completos de uma reprodução
 type ReproductionResponse struct {
-	ReproductionData
-	CreatedAt string `json:"createdAt"`
-	UpdatedAt string `json:"updatedAt"`
+	ReproductionData        // Dados da reprodução
+	CreatedAt        string `json:"createdAt" example:"2024-01-15T10:30:00Z"` // Data de criação
+	UpdatedAt        string `json:"updatedAt" example:"2024-01-15T10:30:00Z"` // Data de atualização
 }
 
 func parseOptionalDate(dateStr *string) *time.Time {
@@ -138,6 +144,18 @@ func modelToReproductionResponse(reproduction *models.Reproduction) Reproduction
 	return response
 }
 
+// CreateReproduction cria um novo registro de reprodução
+// @Summary      Criar reprodução
+// @Description  Cria um novo registro de reprodução para um animal
+// @Tags         reproductions
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request body CreateReproductionRequest true "Dados da reprodução"
+// @Success      201  {object}  ReproductionResponse
+// @Failure      400  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /api/v1/reproductions [post]
 func (h *ReproductionHandler) CreateReproduction(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		SendErrorResponse(w, ErrMethodNotAllowed, http.StatusMethodNotAllowed)

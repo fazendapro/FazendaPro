@@ -18,26 +18,43 @@ func NewDebtHandler(service *service.DebtService) *DebtHandler {
 	return &DebtHandler{service: service}
 }
 
+// CreateDebtRequest representa a requisição de criação de dívida
+// @Description Dados necessários para criar uma nova dívida
 type CreateDebtRequest struct {
-	Person string  `json:"person"`
-	Value  float64 `json:"value"`
+	Person string  `json:"person" example:"João Silva"`    // Nome da pessoa
+	Value  float64 `json:"value" example:"1500.50"`       // Valor da dívida
 }
 
+// DebtResponse representa a resposta de dívida
+// @Description Resposta com dados de uma dívida
 type DebtResponse struct {
-	ID        uint    `json:"id"`
-	Person    string  `json:"person"`
-	Value     float64 `json:"value"`
-	CreatedAt string  `json:"created_at"`
-	UpdatedAt string  `json:"updated_at"`
+	ID        uint    `json:"id" example:"1"`                        // ID da dívida
+	Person    string  `json:"person" example:"João Silva"`            // Nome da pessoa
+	Value     float64 `json:"value" example:"1500.50"`               // Valor da dívida
+	CreatedAt string  `json:"created_at" example:"2024-01-15T10:30:00Z"` // Data de criação
+	UpdatedAt string  `json:"updated_at" example:"2024-01-15T10:30:00Z"` // Data de atualização
 }
 
+// DebtListResponse representa a resposta com lista de dívidas
+// @Description Resposta com lista paginada de dívidas
 type DebtListResponse struct {
-	Debts []DebtResponse `json:"debts"`
-	Total int64          `json:"total"`
-	Page  int            `json:"page"`
-	Limit int            `json:"limit"`
+	Debts []DebtResponse `json:"debts"` // Lista de dívidas
+	Total int64          `json:"total" example:"5"` // Total de registros
+	Page  int            `json:"page" example:"1"` // Página atual
+	Limit int            `json:"limit" example:"10"` // Limite por página
 }
 
+// CreateDebt cria uma nova dívida
+// @Summary      Criar dívida
+// @Description  Cria um novo registro de dívida
+// @Tags         debts
+// @Accept       json
+// @Produce      json
+// @Param        request body CreateDebtRequest true "Dados da dívida"
+// @Success      201  {object}  DebtResponse
+// @Failure      400  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /debts [post]
 func (h *DebtHandler) CreateDebt(w http.ResponseWriter, r *http.Request) {
 	var req CreateDebtRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -113,6 +130,20 @@ func parseQueryParams(r *http.Request) queryParams {
 	return params
 }
 
+// GetDebts obtém lista de dívidas
+// @Summary      Obter dívidas
+// @Description  Retorna lista paginada de dívidas com filtros opcionais
+// @Tags         debts
+// @Accept       json
+// @Produce      json
+// @Param        page query int false "Número da página" default(1)
+// @Param        limit query int false "Itens por página" default(10)
+// @Param        year query int false "Filtrar por ano"
+// @Param        month query int false "Filtrar por mês"
+// @Success      200  {object}  DebtListResponse
+// @Failure      400  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /debts [get]
 func (h *DebtHandler) GetDebts(w http.ResponseWriter, r *http.Request) {
 	params := parseQueryParams(r)
 
@@ -144,6 +175,17 @@ func (h *DebtHandler) GetDebts(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
+// DeleteDebt remove uma dívida
+// @Summary      Deletar dívida
+// @Description  Remove uma dívida do sistema
+// @Tags         debts
+// @Accept       json
+// @Produce      json
+// @Param        id path int true "ID da dívida"
+// @Success      200  {object}  map[string]interface{}
+// @Failure      400  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /debts/{id} [delete]
 func (h *DebtHandler) DeleteDebt(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	if idStr == "" {
