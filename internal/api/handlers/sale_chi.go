@@ -67,15 +67,11 @@ func (h *SaleChiHandler) CreateSale(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var farmID uint
-	if req.FarmID != nil {
-		if *req.FarmID != farmIDFromContext {
-			SendErrorResponse(w, "farm_id do body não corresponde ao farm_id do token", http.StatusForbidden)
-			return
-		}
-		farmID = *req.FarmID
-	} else {
-		farmID = farmIDFromContext
+	farmID := farmIDFromContext
+
+	if req.FarmID != nil && *req.FarmID != farmIDFromContext {
+		SendErrorResponse(w, "farm_id do body não corresponde ao farm_id do token. Use o farm_id do token ou não envie farm_id no body", http.StatusForbidden)
+		return
 	}
 
 	sale := &models.Sale{
