@@ -29,7 +29,7 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
   const [isUpdatePhaseModalVisible, setIsUpdatePhaseModalVisible] = useState(false);
   const [selectedReproduction, setSelectedReproduction] = useState<Reproduction | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(isMobile ? 5 : isTablet ? 8 : 10);
+  const [pageSize, setPageSize] = useState(10);
 
   const fetchReproductions = useCallback(async () => {
     if (!farm?.id) return;

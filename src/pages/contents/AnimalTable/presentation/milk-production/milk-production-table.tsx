@@ -26,7 +26,7 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
   const { isMobile, isTablet } = useResponsive()
   const [filters, setFilters] = useState<MilkProductionFilters>({ period: 'all' })
   const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize, setPageSize] = useState(isMobile ? 5 : isTablet ? 8 : 10)
+  const [pageSize, setPageSize] = useState(10)
   
   const { milkProductions, loading, error, refetch } = useMilkProduction(farm?.id || 0, filters)
 

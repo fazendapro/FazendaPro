@@ -22,7 +22,7 @@ const AnimalTable = forwardRef<AnimalTableRef, AnimalTableProps>((props, ref) =>
   const { buildTableColumns } = useAnimalColumnBuilder();
   const { isMobile, isTablet } = useResponsive();
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(isMobile ? 5 : isTablet ? 8 : 10);
+  const [pageSize, setPageSize] = useState(10);
 
   useImperativeHandle(ref, () => ({
     refetch
