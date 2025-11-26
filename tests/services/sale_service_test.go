@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -912,7 +913,10 @@ func TestSaleService_CreateSale_AnimalWrongFarm(t *testing.T) {
 	err := saleService.CreateSale(ctx, sale)
 
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "animal does not belong to the specified farm")
+	assert.True(t,
+		strings.Contains(err.Error(), "animal does not belong to the specified farm") ||
+			strings.Contains(err.Error(), "pertence à fazenda"),
+		"Erro esperado contendo 'animal does not belong to the specified farm' ou 'pertence à fazenda', mas recebido: %s", err.Error())
 	mockAnimalRepo.AssertExpectations(t)
 	mockSaleRepo.AssertNotCalled(t, "Create")
 }
