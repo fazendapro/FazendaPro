@@ -26,7 +26,7 @@ export const CustomPagination: React.FC<CustomPaginationProps> = ({
   style = {},
   ...props
 }) => {
-  const { isMobile, isTablet } = useResponsive();
+  const { isMobile } = useResponsive();
 
   const defaultPageSize = 10;
   const finalPageSize = pageSize || defaultPageSize;
