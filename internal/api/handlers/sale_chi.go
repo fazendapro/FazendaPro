@@ -21,6 +21,7 @@ func NewSaleChiHandler(service service.SaleService) *SaleChiHandler {
 
 type CreateSaleRequest struct {
 	AnimalID  uint    `json:"animal_id"`
+	FarmID    *uint   `json:"farm_id,omitempty"` // Opcional: se não vier, usa do contexto
 	BuyerName string  `json:"buyer_name"`
 	Price     float64 `json:"price"`
 	SaleDate  string  `json:"sale_date"`
@@ -60,10 +61,23 @@ func (h *SaleChiHandler) CreateSale(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	farmID, ok := r.Context().Value("farm_id").(uint)
+	farmIDFromContext, ok := r.Context().Value("farm_id").(uint)
 	if !ok {
 		http.Error(w, ErrFarmIDNotFound, http.StatusUnauthorized)
 		return
+	}
+
+	// Se farm_id vier no body, valida que corresponde ao do contexto (segurança)
+	// Se não vier, usa o do contexto
+	var farmID uint
+	if req.FarmID != nil {
+		if *req.FarmID != farmIDFromContext {
+			http.Error(w, "farm_id do body não corresponde ao farm_id do token", http.StatusForbidden)
+			return
+		}
+		farmID = *req.FarmID
+	} else {
+		farmID = farmIDFromContext
 	}
 
 	sale := &models.Sale{

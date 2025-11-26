@@ -59,10 +59,17 @@ func (s *saleService) CreateSale(ctx context.Context, sale *models.Sale) error {
 
 	animal, err := s.animalRepo.FindByID(sale.AnimalID)
 	if err != nil {
+		log.Printf("Erro ao buscar animal ID %d: %v", sale.AnimalID, err)
 		return errors.New(ErrAnimalNotFound)
 	}
+	if animal == nil {
+		log.Printf("Animal ID %d não encontrado", sale.AnimalID)
+		return errors.New(ErrAnimalNotFound)
+	}
+	log.Printf("Animal ID %d encontrado - FarmID do animal: %d, FarmID da venda: %d", sale.AnimalID, animal.FarmID, sale.FarmID)
 	if animal.FarmID != sale.FarmID {
-		return errors.New("animal does not belong to the specified farm")
+		log.Printf("Erro: Animal ID %d pertence à fazenda %d, mas a venda está sendo criada para a fazenda %d", sale.AnimalID, animal.FarmID, sale.FarmID)
+		return fmt.Errorf("animal ID %d pertence à fazenda %d, mas a venda está sendo criada para a fazenda %d", sale.AnimalID, animal.FarmID, sale.FarmID)
 	}
 
 	if animal.Status == models.AnimalStatusSold {
