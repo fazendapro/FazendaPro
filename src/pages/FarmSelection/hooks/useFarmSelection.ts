@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { farmSelectionService, Farm } from '../services/farm-selection-service';
 import { useFarm } from '../../../contexts/FarmContext';
+import { useAuth } from '../../../contexts/AuthContext';
 
 export interface UseFarmSelectionReturn {
   farms: Farm[];
@@ -21,6 +22,7 @@ export const useFarmSelection = (): UseFarmSelectionReturn => {
   
   const navigate = useNavigate();
   const { setSelectedFarm } = useFarm();
+  const { updateToken } = useAuth();
 
   useEffect(() => {
     const loadFarms = async () => {
@@ -56,17 +58,19 @@ export const useFarmSelection = (): UseFarmSelectionReturn => {
   const selectFarm = async (farmId: number) => {
     try {
       setError(null);
-      
+
       const response = await farmSelectionService.selectFarm(farmId);
-      
-      if (response.success) {
+
+      if (response.success && response.access_token) {
+        updateToken(response.access_token);
+
         setSelectedFarmId(farmId);
-        
-        const selectedFarm = farms.find(farm => farm.ID === farmId);
+
+        const selectedFarm = farms.find((farm: Farm) => farm.ID === farmId);
         if (selectedFarm) {
           setSelectedFarm(selectedFarm);
         }
-        
+
         navigate('/');
       } else {
         setError('Erro ao selecionar fazenda');

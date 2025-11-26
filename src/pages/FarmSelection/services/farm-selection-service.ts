@@ -28,6 +28,7 @@ export interface SelectFarmResponse {
   success: boolean;
   message: string;
   farm_id: number;
+  access_token: string;
 }
 
 export const farmSelectionService = {

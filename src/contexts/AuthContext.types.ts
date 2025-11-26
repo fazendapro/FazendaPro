@@ -11,5 +11,6 @@ export interface AuthContextType {
   user: DecodedToken | null;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
+  updateToken: (newToken: string) => void;
   token: string | null;
 }

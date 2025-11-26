@@ -166,6 +166,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     [navigate, validateToken, t, csrfToken, setSelectedFarm]
   );
 
+  const updateToken = useCallback((newToken: string) => {
+    const decoded = validateToken(newToken);
+    if (decoded) {
+      localStorage.setItem('token', newToken);
+      setToken(newToken);
+      setUser(decoded);
+    }
+  }, [validateToken]);
+
   const logout = useCallback(async () => {
     try {
       if (refreshToken) {
@@ -192,6 +201,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     login,
     logout,
+    updateToken,
     token,
   };
 
