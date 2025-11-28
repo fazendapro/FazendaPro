@@ -1,7 +1,8 @@
 > [!NOTE]
 >
 > ## FAQ - FazendaPro
->
+> ***Quais são as branches princais?*** Frontend: `front/release`; Backend: `back/release`.
+> 
 > [O que é o software e para que serve?](https://github.com/fazendapro/cowtech/wiki/Introduction-&-Description)
 >
 > [Onde está o código fonte?](https://github.com/fazendapro/cowtech/projects)
