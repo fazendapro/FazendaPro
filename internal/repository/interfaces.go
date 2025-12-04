@@ -38,7 +38,9 @@ type MilkCollectionRepositoryInterface interface {
 	Create(milkCollection *models.MilkCollection) error
 	FindByID(id uint) (*models.MilkCollection, error)
 	FindByFarmID(farmID uint) ([]models.MilkCollection, error)
+	FindByFarmIDWithPagination(farmID uint, page, limit int) ([]models.MilkCollection, int64, error)
 	FindByFarmIDWithDateRange(farmID uint, startDate, endDate *time.Time) ([]models.MilkCollection, error)
+	FindByFarmIDWithDateRangePaginated(farmID uint, startDate, endDate *time.Time, page, limit int) ([]models.MilkCollection, int64, error)
 	FindByAnimalID(animalID uint) ([]models.MilkCollection, error)
 	Update(milkCollection *models.MilkCollection) error
 	Delete(id uint) error

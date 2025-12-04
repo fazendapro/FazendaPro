@@ -45,6 +45,28 @@ func (r *MilkCollectionRepository) FindByFarmID(farmID uint) ([]models.MilkColle
 	return milkCollections, err
 }
 
+func (r *MilkCollectionRepository) FindByFarmIDWithPagination(farmID uint, page, limit int) ([]models.MilkCollection, int64, error) {
+	var milkCollections []models.MilkCollection
+	var total int64
+
+	query := r.db.Model(&models.MilkCollection{}).
+		Joins("JOIN animals ON milk_collections.animal_id = animals.id").
+		Where(SQLWhereAnimalsFarmID, farmID)
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	offset := (page - 1) * limit
+	err := query.Preload("Animal", SQLWhereFarmID, farmID).
+		Order("milk_collections.date DESC").
+		Offset(offset).
+		Limit(limit).
+		Find(&milkCollections).Error
+
+	return milkCollections, total, err
+}
+
 func (r *MilkCollectionRepository) FindByFarmIDWithDateRange(farmID uint, startDate, endDate *time.Time) ([]models.MilkCollection, error) {
 	var milkCollections []models.MilkCollection
 	query := r.db.Preload("Animal", SQLWhereFarmID, farmID).
@@ -60,6 +82,35 @@ func (r *MilkCollectionRepository) FindByFarmIDWithDateRange(farmID uint, startD
 
 	err := query.Order("milk_collections.date DESC").Find(&milkCollections).Error
 	return milkCollections, err
+}
+
+func (r *MilkCollectionRepository) FindByFarmIDWithDateRangePaginated(farmID uint, startDate, endDate *time.Time, page, limit int) ([]models.MilkCollection, int64, error) {
+	var milkCollections []models.MilkCollection
+	var total int64
+
+	query := r.db.Model(&models.MilkCollection{}).
+		Joins("JOIN animals ON milk_collections.animal_id = animals.id").
+		Where(SQLWhereAnimalsFarmID, farmID)
+
+	if startDate != nil {
+		query = query.Where("milk_collections.date >= ?", *startDate)
+	}
+	if endDate != nil {
+		query = query.Where("milk_collections.date <= ?", *endDate)
+	}
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	offset := (page - 1) * limit
+	err := query.Preload("Animal", SQLWhereFarmID, farmID).
+		Order("milk_collections.date DESC").
+		Offset(offset).
+		Limit(limit).
+		Find(&milkCollections).Error
+
+	return milkCollections, total, err
 }
 
 func (r *MilkCollectionRepository) FindByAnimalID(animalID uint) ([]models.MilkCollection, error) {
