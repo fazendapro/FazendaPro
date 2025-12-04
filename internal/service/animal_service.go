@@ -189,3 +189,14 @@ func (s *AnimalService) DeleteAnimal(id uint) error {
 func (s *AnimalService) GetAnimalsByFarmIDAndSex(farmID uint, sex int) ([]models.Animal, error) {
 	return s.repository.FindByFarmIDAndSex(farmID, sex)
 }
+
+func (s *AnimalService) GetAnimalsByFarmIDWithPagination(farmID uint, page, limit int) ([]models.Animal, int64, error) {
+	if page <= 0 {
+		page = 1
+	}
+	if limit <= 0 {
+		limit = 10
+	}
+
+	return s.repository.FindByFarmIDWithPagination(farmID, page, limit)
+}

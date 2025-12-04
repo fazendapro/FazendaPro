@@ -10,6 +10,7 @@ type AnimalRepositoryInterface interface {
 	Create(animal *models.Animal) error
 	FindByID(id uint) (*models.Animal, error)
 	FindByFarmID(farmID uint) ([]models.Animal, error)
+	FindByFarmIDWithPagination(farmID uint, page, limit int) ([]models.Animal, int64, error)
 	FindByEarTagNumber(farmID uint, earTagNumber int) (*models.Animal, error)
 	FindByFarmIDAndSex(farmID uint, sex int) ([]models.Animal, error)
 	CountBySex(farmID uint, sex int) (int64, error)
