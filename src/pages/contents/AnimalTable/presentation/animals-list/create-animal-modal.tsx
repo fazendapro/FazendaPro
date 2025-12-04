@@ -144,7 +144,7 @@ const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({ isOpen, onClose }
               <Select
                 value={methods.watch('type')}
                 placeholder={t('animalTable.selectAnimalType')}
-                onChange={(value) => methods.setValue('type', value)}
+                onChange={(value: string) => methods.setValue('type', value as 'vaca' | 'bezerro' | 'touro' | 'novilho')}
               >
                 <Option value="vaca">{t('animalTable.cow')}</Option>
                 <Option value="bezerro">{t('animalTable.calf')}</Option>
@@ -162,7 +162,7 @@ const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({ isOpen, onClose }
               <Select
                 value={methods.watch('sex')}
                 placeholder={t('animalTable.selectAnimalSex')}
-                onChange={(value) => methods.setValue('sex', value)}
+                onChange={(value: string) => methods.setValue('sex', Number(value) as AnimalSex)}
               >
                 <Option value={AnimalSex.MALE}>{t('animalTable.male')}</Option>
                 <Option value={AnimalSex.FEMALE}>{t('animalTable.female')}</Option>

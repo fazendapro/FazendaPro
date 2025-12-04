@@ -3,6 +3,7 @@ import { Card, List, Avatar, Spin, Tooltip } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useNextToCalve } from '../hooks/useNextToCalve';
+import { NextToCalveAnimal } from '../types/dashboard.types';
 
 const NextToCalve: React.FC = () => {
   const { t } = useTranslation();
@@ -71,7 +72,7 @@ const NextToCalve: React.FC = () => {
       <List
         itemLayout="horizontal"
         dataSource={nextToCalve}
-        renderItem={(item) => (
+        renderItem={(item: NextToCalveAnimal) => (
           <List.Item
             style={{
               padding: '12px 0',

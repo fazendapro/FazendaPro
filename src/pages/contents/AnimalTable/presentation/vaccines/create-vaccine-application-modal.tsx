@@ -155,7 +155,7 @@ export const CreateVaccineApplicationModal: React.FC<CreateVaccineApplicationMod
             loading={animalsLoading}
             showSearch
             optionFilterProp="children"
-            filterOption={(input, option) => {
+            filterOption={(input: string, option?: { children?: React.ReactNode }) => {
               const children = String(option?.children || '')
               return children.toLowerCase().includes(input.toLowerCase())
             }}
@@ -180,7 +180,7 @@ export const CreateVaccineApplicationModal: React.FC<CreateVaccineApplicationMod
             loading={vaccinesLoading}
             showSearch
             optionFilterProp="children"
-            filterOption={(input, option) => {
+            filterOption={(input: string, option?: { children?: React.ReactNode }) => {
               const children = String(option?.children || '')
               return children.toLowerCase().includes(input.toLowerCase())
             }}

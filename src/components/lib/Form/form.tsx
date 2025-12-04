@@ -28,7 +28,7 @@ const FieldRenderer: React.FC<{ fields: FieldType[] }> = ({ fields }) => {
                 name={field.name}
                 control={control}
                 render={({ field: { onChange, value } }) => (
-                  <Checkbox checked={value} onChange={e => onChange(e.target.checked)}>
+                  <Checkbox checked={value} onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.checked)}>
                     {t(field.label)}
                   </Checkbox>
                 )}

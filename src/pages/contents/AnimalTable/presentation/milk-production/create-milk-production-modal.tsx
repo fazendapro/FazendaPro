@@ -142,7 +142,7 @@ export const CreateMilkProductionModal: React.FC<MilkProductionModalProps> = ({
             loading={animalsLoading}
             showSearch
             optionFilterProp="children"
-            filterOption={(input, option) => {
+            filterOption={(input: string, option?: { children?: React.ReactNode }) => {
               const children = String(option?.children || '')
               return children.toLowerCase().includes(input.toLowerCase())
             }}

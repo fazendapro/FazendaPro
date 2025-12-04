@@ -96,7 +96,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
             <Checkbox
               key={column.key}
               checked={selectedColumns.includes(column.key)}
-              onChange={(e) => handleColumnToggle(column.key, e.target.checked)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleColumnToggle(column.key, e.target.checked)}
             >
               {column.label}
             </Checkbox>

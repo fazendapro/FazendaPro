@@ -45,7 +45,7 @@ export const Sidebar = () => {
     <Sider
       collapsible
       collapsed={collapsed}
-      onCollapse={(value) => setCollapsed(value)}
+      onCollapse={(value: boolean) => setCollapsed(value)}
       width={280}
       style={{
         background: 'white',
@@ -115,7 +115,7 @@ export const Sidebar = () => {
           borderRight: 0,
           padding: '0 16px'
         }}
-        onClick={({ key }) => handleMenuClick(key)}
+        onClick={({ key }: { key: string }) => handleMenuClick(key)}
       />
 
       {user && !collapsed && (

@@ -153,7 +153,7 @@ export const CreateReproductionModal = ({
           showSearch
           loading={animalsLoading}
           optionFilterProp="children"
-          filterOption={(input, option) =>
+          filterOption={(input: string, option?: { children?: React.ReactNode }) =>
             (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
           }
         >
