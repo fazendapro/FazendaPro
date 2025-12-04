@@ -20,14 +20,33 @@ vi.mock('react-router-dom', () => ({
   Navigate: () => null,
 }))
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-    i18n: {
-      changeLanguage: vi.fn(),
-      language: 'pt',
-    },
-  }),
+vi.mock('react-i18next', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('react-i18next')>()
+  const mockInitReactI18next = {
+    type: '3rdParty',
+    init: vi.fn(),
+  }
+  
+  return {
+    ...actual,
+    useTranslation: () => ({
+      t: (key: string) => key,
+      i18n: {
+        changeLanguage: vi.fn(),
+        language: 'pt',
+      },
+    }),
+    initReactI18next: mockInitReactI18next,
+  }
+})
+
+vi.mock('../locale/i18n', () => ({
+  default: {
+    changeLanguage: vi.fn(),
+    language: 'pt',
+    languages: ['pt', 'en', 'es'],
+    isInitialized: true,
+  },
 }))
 
 vi.mock('antd', async () => {
