@@ -10,6 +10,7 @@ export const translations = {
     notInseminated: "No inseminadas",
     createCow: "Crear Vaca",
     filter: "Filtro",
+    addWeight: "Agregar Peso",
     importCsv: "Importar csv",
     newCattle: "Nuevo Ganado",
     cancel: "Cancelar",
@@ -34,8 +35,8 @@ export const translations = {
     breedPlaceholder: "Ingrese la raza del animal",
     birthDate: "Fecha de Nacimiento",
     birthDatePlaceholder: "Ingrese la fecha de nacimiento",
-    weight: "Peso",
-    weightPlaceholder: "Ingrese el peso de nacimiento",
+    birthWeight: "Peso",
+    birthWeightPlaceholder: "Ingrese el peso de nacimiento",
     search: "Buscar",
     animalCreatedSuccessfully: "Animal creado con éxito",
     animalsRetrievedSuccessfully: "Animales cargados con éxito",
@@ -127,6 +128,21 @@ export const translations = {
         endDate: "Fecha final"
       },
       actions: "Acciones"
+    },
+    weight: {
+      addWeight: "Agregar Peso",
+      selectAnimal: "Seleccionar Animal",
+      selectAnimalPlaceholder: "Seleccione un animal",
+      animalRequired: "El animal es obligatorio",
+      weight: "Peso (kg)",
+      weightRequired: "El peso es obligatorio",
+      weightMin: "El peso debe ser mayor que cero",
+      weightPlaceholder: "Ingrese el peso en kg",
+      date: "Fecha",
+      dateRequired: "La fecha es obligatoria",
+      datePlaceholder: "Seleccione una fecha",
+      createdSuccessfully: "Peso registrado con éxito",
+      createError: "Error al registrar peso"
     }
   }
 }; 

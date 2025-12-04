@@ -5,6 +5,7 @@ import { useModal, useResponsive } from '../../../../../hooks';
 import { useTranslation } from 'react-i18next';
 import { CreateAnimalModal } from './create-animal-modal';
 import { FilterModal } from './filter-modal';
+import { CreateWeightModal } from './create-weight-modal';
 
 const { Search } = Input;
 
@@ -23,6 +24,7 @@ const AnimalDashboard: React.FC<AnimalDashboardProps> = ({
 }) => {
   const { isOpen, onOpen, onClose } = useModal();
   const { isOpen: isFilterOpen, onOpen: onFilterOpen, onClose: onFilterClose } = useModal();
+  const { isOpen: isWeightModalOpen, onOpen: onWeightModalOpen, onClose: onWeightModalClose } = useModal();
   const { t } = useTranslation();
   const { isMobile } = useResponsive();
   const [isDashboardExpanded, setIsDashboardExpanded] = useState(false);
@@ -41,6 +43,13 @@ const AnimalDashboard: React.FC<AnimalDashboardProps> = ({
 
   const handleAnimalCreated = () => {
     onClose();
+    if (onAnimalCreated) {
+      onAnimalCreated();
+    }
+  };
+
+  const handleWeightCreated = () => {
+    onWeightModalClose();
     if (onAnimalCreated) {
       onAnimalCreated();
     }
@@ -174,6 +183,13 @@ const AnimalDashboard: React.FC<AnimalDashboardProps> = ({
           >
             {t('animalTable.filter')}
           </Button>
+          <Button 
+            onClick={onWeightModalOpen}
+            size={'middle'}
+            block={isMobile}
+          >
+            {t('animalTable.addWeight') || 'Adicionar Peso'}
+          </Button>
           <Search 
             placeholder={t('animalTable.search')} 
             style={{ width: isMobile ? '100%' : 'auto' }}
@@ -190,6 +206,11 @@ const AnimalDashboard: React.FC<AnimalDashboardProps> = ({
         onClose={onFilterClose}
         onApplyFilters={handleApplyFilters}
         currentColumns={selectedColumns}
+      />
+      <CreateWeightModal
+        visible={isWeightModalOpen}
+        onCancel={onWeightModalClose}
+        onSuccess={handleWeightCreated}
       />
     </div>
   );
