@@ -28,7 +28,11 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   
-  const { milkProductions, loading, error, refetch } = useMilkProduction(farm?.id || 0, filters)
+  const { milkProductions, total, loading, error, refetch } = useMilkProduction(farm?.id || 0, {
+    filters,
+    page: currentPage,
+    limit: pageSize
+  })
 
   useImperativeHandle(ref, () => ({
     refetch
@@ -113,10 +117,6 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
     setPageSize(size)
   }
 
-  const startIndex = (currentPage - 1) * pageSize
-  const endIndex = startIndex + pageSize
-  const paginatedData = (milkProductions || []).slice(startIndex, endIndex)
-
   const rangePickerValue: [dayjs.Dayjs, dayjs.Dayjs] | null = filters.startDate && filters.endDate 
     ? [dayjs(filters.startDate), dayjs(filters.endDate)] 
     : null
@@ -191,7 +191,7 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
 
       <Table
         columns={columns}
-        dataSource={paginatedData}
+        dataSource={milkProductions}
         rowKey="id"
         pagination={false}
         scroll={{
@@ -206,7 +206,7 @@ const MilkProductionTable = forwardRef<MilkProductionTableRef, MilkProductionTab
 
       <CustomPagination
         current={currentPage}
-        total={(milkProductions || []).length}
+        total={total}
         pageSize={pageSize}
         onChange={handlePageChange}
         onShowSizeChange={handleShowSizeChange}
