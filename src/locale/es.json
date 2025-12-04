@@ -14,6 +14,13 @@
     "passwordPlaceholder": "Digite sua senha",
     "rememberPassword": "Lembrar da senha",
     "forgotPassword": "Esqueceu a senha?",
-    "access": "Acessar"
+    "access": "Acessar",
+    "navigation": {
+      "dashboard": "Panel de control",
+      "cattle": "Ganado",
+      "sales": "Ventas",
+      "settings": "Configuración",
+      "logout": "Salir"
+    }
   }
 }

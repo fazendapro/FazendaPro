@@ -14,5 +14,11 @@ export const settingsTranslations = {
   logoUpdatedSuccessfully: "Logo updated successfully!",
   errorUpdatingFarm: "Error updating farm",
   errorUpdatingLogo: "Error updating logo",
-  errorLoadingFarmData: "Error loading farm data"
+  errorLoadingFarmData: "Error loading farm data",
+  language: "Language",
+  languagePlaceholder: "Select language",
+  languageDescription: "Choose the preferred language for this farm",
+  languagePt: "Português",
+  languageEn: "English",
+  languageEs: "Español"
 };

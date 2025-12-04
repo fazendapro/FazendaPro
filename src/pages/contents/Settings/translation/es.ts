@@ -14,5 +14,11 @@ export const settingsTranslations = {
   logoUpdatedSuccessfully: "Logo actualizado con éxito!",
   errorUpdatingFarm: "Error al actualizar granja",
   errorUpdatingLogo: "Error al actualizar logo",
-  errorLoadingFarmData: "Error al cargar datos de la granja"
+  errorLoadingFarmData: "Error al cargar datos de la granja",
+  language: "Idioma",
+  languagePlaceholder: "Seleccione el idioma",
+  languageDescription: "Elija el idioma preferido para esta granja",
+  languagePt: "Português",
+  languageEn: "English",
+  languageEs: "Español"
 };

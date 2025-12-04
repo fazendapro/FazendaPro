@@ -10,8 +10,13 @@ const NextToCalve: React.FC = () => {
   const { nextToCalve, loading, error } = useNextToCalve();
 
   const getStatusStyles = (status: string) => {
+    const highStatus = t('dashboard.status.high');
+    const mediumStatus = t('dashboard.status.medium');
+    const lowStatus = t('dashboard.status.low');
+    
     switch (status) {
       case 'Alto':
+      case highStatus:
         return {
           color: 'red',
           border: '1px solid red',
@@ -19,6 +24,7 @@ const NextToCalve: React.FC = () => {
           fontSize: '12px'
         };
       case 'Médio':
+      case mediumStatus:
         return {
           color: '#ff8c00',
           border: '1px solid #ff8c00',
@@ -61,7 +67,7 @@ const NextToCalve: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {t('dashboard.nextToCalve')}
           <Tooltip 
-            title="Uma vaca fica grávida por aproximadamente 9 meses, ou cerca de 280 a 290 dias, a partir do dia em que a prenhez é confirmada. O período de gestação pode variar ligeiramente dependendo da raça, da saúde do animal e de outros fatores, mas a média é de 283 dias."
+            title={t('dashboard.nextToCalveTooltip')}
             placement="top"
           >
             <InfoCircleOutlined style={{ color: '#1890ff', cursor: 'help' }} />
@@ -129,7 +135,7 @@ const NextToCalve: React.FC = () => {
                       fontSize: '14px',
                       color: '#595959'
                     }}>
-                      Faltam: <strong>{item.days_until_birth} dias</strong>
+                      {t('dashboard.daysRemaining')}: <strong>{item.days_until_birth} {t('dashboard.days')}</strong>
                     </span>
                     <span style={{ 
                       ...getStatusStyles(item.status),
@@ -138,14 +144,24 @@ const NextToCalve: React.FC = () => {
                       fontSize: '12px',
                       fontWeight: 'bold'
                     }}>
-                      {item.status}
+                      {(() => {
+                        const statusMap: Record<string, string> = {
+                          'Alto': t('dashboard.status.high'),
+                          'Médio': t('dashboard.status.medium'),
+                          'Baixo': t('dashboard.status.low'),
+                          [t('dashboard.status.high')]: t('dashboard.status.high'),
+                          [t('dashboard.status.medium')]: t('dashboard.status.medium'),
+                          [t('dashboard.status.low')]: t('dashboard.status.low')
+                        };
+                        return statusMap[item.status] || item.status;
+                      })()}
                     </span>
                   </div>
                   <div style={{ 
                     fontSize: '12px',
                     color: '#8c8c8c'
                   }}>
-                    Data prevista: {item.expected_birth_date}
+                    {t('dashboard.expectedDate')}: {item.expected_birth_date}
                   </div>
                 </div>
               }

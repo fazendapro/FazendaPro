@@ -1,5 +1,6 @@
 import { Button } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { HomeOutlined, UserOutlined, LogoutOutlined, SettingOutlined, DollarOutlined } from "@ant-design/icons";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -10,6 +11,7 @@ interface MenuItem {
 }
 
 export const MobileSidebar = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const { logout, isAuthenticated } = useAuth();
@@ -23,11 +25,11 @@ export const MobileSidebar = () => {
   };
 
   const menuItems: MenuItem[] = [
-    { key: '/', icon: <HomeOutlined />, label: 'Dashboard' },
-    { key: '/vacas', icon: <UserOutlined />, label: 'Vacas' },
-    { key: '/vendas', icon: <DollarOutlined />, label: 'Vendas' },
-    { key: '/configuracoes', icon: <SettingOutlined />, label: 'Configurações' },
-    { key: '/sair', icon: <LogoutOutlined />, label: 'Sair' },
+    { key: '/', icon: <HomeOutlined />, label: t('navigation.dashboard') },
+    { key: '/vacas', icon: <UserOutlined />, label: t('navigation.cattle') },
+    { key: '/vendas', icon: <DollarOutlined />, label: t('navigation.sales') },
+    { key: '/configuracoes', icon: <SettingOutlined />, label: t('navigation.settings') },
+    { key: '/sair', icon: <LogoutOutlined />, label: t('navigation.logout') },
   ];
 
   if (!isAuthenticated) {

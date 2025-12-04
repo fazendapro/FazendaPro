@@ -3,7 +3,7 @@ import { Modal, Form, Select, DatePicker, Input, Switch, message } from 'antd';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { useReproduction } from '../../hooks/useReproduction';
-import { UpdateReproductionPhaseRequest, Reproduction, ReproductionPhaseLabels } from '../../domain/model/reproduction';
+import { UpdateReproductionPhaseRequest, Reproduction, ReproductionPhase } from '../../domain/model/reproduction';
 
 const { TextArea } = Input;
 
@@ -124,11 +124,18 @@ export const UpdateReproductionPhaseModal = ({
           rules={[{ required: true, message: t('animalTable.reproduction.phaseRequired') }]}
         >
           <Select>
-            {Object.entries(ReproductionPhaseLabels).map(([value, label]) => (
-              <Select.Option key={value} value={parseInt(value)}>
-                {label}
-              </Select.Option>
-            ))}
+            <Select.Option value={ReproductionPhase.LACTACAO}>
+              {t('animalTable.reproduction.phases.lactacao')}
+            </Select.Option>
+            <Select.Option value={ReproductionPhase.SECANDO}>
+              {t('animalTable.reproduction.phases.secando')}
+            </Select.Option>
+            <Select.Option value={ReproductionPhase.VAZIAS}>
+              {t('animalTable.reproduction.phases.vazias')}
+            </Select.Option>
+            <Select.Option value={ReproductionPhase.PRENHAS}>
+              {t('animalTable.reproduction.phases.prenhas')}
+            </Select.Option>
           </Select>
         </Form.Item>
 

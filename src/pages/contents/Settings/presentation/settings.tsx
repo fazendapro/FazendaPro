@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, Form, Input, Button, Upload, message, Row, Col, Avatar, Typography } from 'antd';
+import { Card, Form, Input, Button, Upload, message, Row, Col, Avatar, Typography, Select } from 'antd';
 import { UploadOutlined, UserOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import i18n from '../../../../locale/i18n';
+import dayjs from '../../../../config/dayjs';
 import { UpdateFarmFactory, GetFarmFactory } from '../factories';
 import { FarmData, BackendFarmData, UpdateFarmParams } from '../types/farm-types';
 import { useSelectedFarm } from '../../../../hooks/useSelectedFarm';
@@ -29,6 +31,7 @@ const Settings: React.FC = () => {
         const newFarmData = {
           id: backendData.ID,
           logo: farmLogo || backendData.Logo || '',
+          language: backendData.Language || 'pt',
           company_id: backendData.CompanyID,
           company: backendData.Company ? {
             id: backendData.Company.ID,
@@ -44,18 +47,35 @@ const Settings: React.FC = () => {
           created_at: backendData.CreatedAt,
           updated_at: backendData.UpdatedAt,
         };
-        
+
         setFarmData(newFarmData);
-        
+
+        const farmLanguage = backendData.Language || 'pt';
         form.setFieldsValue({
           name: backendData.Company?.CompanyName || farm?.name || 'Fazenda',
+          language: farmLanguage,
         });
+
+        // Aplicar idioma no i18n se for diferente do atual
+        if (i18n.language !== farmLanguage) {
+          i18n.changeLanguage(farmLanguage);
+        }
+
+        // Aplicar locale do dayjs
+        const dayjsLocaleMap: Record<string, string> = {
+          'pt': 'pt-br',
+          'en': 'en',
+          'es': 'es',
+        };
+        const dayjsLocale = dayjsLocaleMap[farmLanguage] || 'pt-br';
+        dayjs.locale(dayjsLocale);
       }
     } catch (error) {
       console.error('Error loading farm data:', error);
       setFarmData({
         id: farmId,
         logo: '',
+        language: 'pt',
         company_id: 1,
         company: {
           id: 1,
@@ -68,6 +88,7 @@ const Settings: React.FC = () => {
       });
       form.setFieldsValue({
           name: farm?.name || 'Fazenda',
+          language: 'pt',
       });
     }
   }, [farmId, farm, form, farmLogo]);
@@ -81,16 +102,65 @@ const Settings: React.FC = () => {
 
     try {
       const updateFarmUseCase = UpdateFarmFactory.create();
+      const formValues = form.getFieldsValue();
       const params: UpdateFarmParams = {
         logo: farmData?.logo || '',
+        language: formValues.language || farmData?.language || 'pt',
       };
 
       await updateFarmUseCase.update(farmId, params);
+
+      if (farmData) {
+        setFarmData({
+          ...farmData,
+          language: params.language || 'pt',
+        });
+      }
 
       message.success(t('farmUpdatedSuccessfully'));
     } catch (error) {
       message.error(t('errorUpdatingFarm'));
       console.error('Error updating farm:', error);
+    }
+  };
+
+  const handleLanguageChange = async (language: string) => {
+    if (!farmId) return;
+
+    try {
+      await i18n.changeLanguage(language);
+
+      const dayjsLocaleMap: Record<string, string> = {
+        'pt': 'pt-br',
+        'en': 'en',
+        'es': 'es',
+      };
+      const dayjsLocale = dayjsLocaleMap[language] || 'pt-br';
+      dayjs.locale(dayjsLocale);
+
+      form.setFieldsValue({ language });
+
+      const updateFarmUseCase = UpdateFarmFactory.create();
+      const params: UpdateFarmParams = {
+        logo: farmData?.logo || '',
+        language: language,
+      };
+
+      await updateFarmUseCase.update(farmId, params);
+
+      // Atualizar farmData localmente
+      if (farmData) {
+        setFarmData({
+          ...farmData,
+          language: language,
+        });
+      }
+
+      // Não recarregar os dados para evitar resetar o idioma
+      message.success(t('farmUpdatedSuccessfully'));
+    } catch (error) {
+      console.error('Error updating language:', error);
+      message.error(t('errorUpdatingFarm'));
     }
   };
 
@@ -158,6 +228,25 @@ const Settings: React.FC = () => {
               </Form.Item>
               <div style={{ color: '#666', fontSize: '12px', marginTop: '-8px', marginBottom: '16px' }}>
                 {t('farmNameDisabled')}
+              </div>
+              
+              <Form.Item
+                label={t('language')}
+                name="language"
+              >
+                <Select
+                  placeholder={t('languagePlaceholder')}
+                  onChange={handleLanguageChange}
+                  value={farmData?.language || 'pt'}
+                  options={[
+                    { label: t('languagePt'), value: 'pt' },
+                    { label: t('languageEn'), value: 'en' },
+                    { label: t('languageEs'), value: 'es' },
+                  ]}
+                />
+              </Form.Item>
+              <div style={{ color: '#666', fontSize: '12px', marginTop: '-8px', marginBottom: '16px' }}>
+                {t('languageDescription')}
               </div>
             </Form>
           </Card>
