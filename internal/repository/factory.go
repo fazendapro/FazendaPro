@@ -56,6 +56,10 @@ func (f *RepositoryFactory) CreateVaccineApplicationRepository() VaccineApplicat
 	return NewVaccineApplicationRepository(f.db.DB)
 }
 
+func (f *RepositoryFactory) CreateWeightRepository() WeightRepositoryInterface {
+	return NewWeightRepository(f.db.DB)
+}
+
 func (f *RepositoryFactory) GetCache() cache.CacheInterface {
 	return f.cache
 }

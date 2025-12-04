@@ -13,35 +13,44 @@ import (
 )
 
 type AnimalHandler struct {
-	service *service.AnimalService
+	service       *service.AnimalService
+	weightService *service.WeightService
 }
 
 func NewAnimalHandler(service *service.AnimalService) *AnimalHandler {
 	return &AnimalHandler{service: service}
 }
 
+func NewAnimalHandlerWithWeight(animalService *service.AnimalService, weightService *service.WeightService) *AnimalHandler {
+	return &AnimalHandler{
+		service:       animalService,
+		weightService: weightService,
+	}
+}
+
 // AnimalData representa os dados básicos de um animal
 // @Description Dados principais de um animal na fazenda
 type AnimalData struct {
-	ID                   uint   `json:"id" example:"1"`                                       // ID único do animal
-	FarmID               uint   `json:"farm_id" example:"1"`                                  // ID da fazenda
-	EarTagNumberLocal    int    `json:"ear_tag_number_local" example:"123"`                   // Número da brinco local
-	EarTagNumberRegister int    `json:"ear_tag_number_register" example:"456"`                // Número de registro
-	AnimalName           string `json:"animal_name" example:"Branquinha"`                     // Nome do animal
-	Sex                  int    `json:"sex" example:"1"`                                      // Sexo (1=Fêmea, 2=Macho)
-	Breed                string `json:"breed" example:"Holandesa"`                            // Raça
-	Type                 string `json:"type" example:"Bovino"`                                // Tipo de animal
-	BirthDate            string `json:"birth_date,omitempty" example:"2020-01-15"`            // Data de nascimento (ISO format)
-	Photo                string `json:"photo,omitempty" example:"data:image/jpeg;base64,..."` // Foto em base64
-	FatherID             *uint  `json:"father_id,omitempty" example:"10"`                     // ID do pai (opcional)
-	MotherID             *uint  `json:"mother_id,omitempty" example:"20"`                     // ID da mãe (opcional)
-	Confinement          bool   `json:"confinement" example:"false"`                          // Se está em confinamento
-	AnimalType           int    `json:"animal_type" example:"1"`                              // Tipo de animal (enum)
-	Status               int    `json:"status" example:"1"`                                   // Status do animal (enum)
-	Fertilization        bool   `json:"fertilization" example:"true"`                         // Se está fertilizada
-	Castrated            bool   `json:"castrated" example:"false"`                            // Se está castrado
-	Purpose              int    `json:"purpose" example:"1"`                                  // Propósito do animal (enum)
-	CurrentBatch         int    `json:"current_batch" example:"1"`                            // Lote atual
+	ID                   uint     `json:"id" example:"1"`                                       // ID único do animal
+	FarmID               uint     `json:"farm_id" example:"1"`                                  // ID da fazenda
+	EarTagNumberLocal    int      `json:"ear_tag_number_local" example:"123"`                   // Número da brinco local
+	EarTagNumberRegister int      `json:"ear_tag_number_register" example:"456"`                // Número de registro
+	AnimalName           string   `json:"animal_name" example:"Branquinha"`                     // Nome do animal
+	Sex                  int      `json:"sex" example:"1"`                                      // Sexo (1=Fêmea, 2=Macho)
+	Breed                string   `json:"breed" example:"Holandesa"`                            // Raça
+	Type                 string   `json:"type" example:"Bovino"`                                // Tipo de animal
+	BirthDate            string   `json:"birth_date,omitempty" example:"2020-01-15"`            // Data de nascimento (ISO format)
+	Photo                string   `json:"photo,omitempty" example:"data:image/jpeg;base64,..."` // Foto em base64
+	FatherID             *uint    `json:"father_id,omitempty" example:"10"`                     // ID do pai (opcional)
+	MotherID             *uint    `json:"mother_id,omitempty" example:"20"`                     // ID da mãe (opcional)
+	Confinement          bool     `json:"confinement" example:"false"`                          // Se está em confinamento
+	AnimalType           int      `json:"animal_type" example:"1"`                              // Tipo de animal (enum)
+	Status               int      `json:"status" example:"1"`                                   // Status do animal (enum)
+	Fertilization        bool     `json:"fertilization" example:"true"`                         // Se está fertilizada
+	Castrated            bool     `json:"castrated" example:"false"`                            // Se está castrado
+	Purpose              int      `json:"purpose" example:"1"`                                  // Propósito do animal (enum)
+	CurrentBatch         int      `json:"current_batch" example:"1"`                            // Lote atual
+	Weight               *float64 `json:"weight,omitempty" example:"450.5"`                     // Peso atual do animal (kg)
 }
 
 // CreateAnimalRequest representa a requisição de criação de animal
@@ -148,6 +157,7 @@ func modelToAnimalResponse(animal *models.Animal) AnimalResponse {
 			Castrated:            animal.Castrated,
 			Purpose:              animal.Purpose,
 			CurrentBatch:         animal.CurrentBatch,
+			Weight:               nil, // Será preenchido no handler se necessário
 		},
 		Father:    father,
 		Mother:    mother,
@@ -273,7 +283,24 @@ func (h *AnimalHandler) GetAnimalsByFarm(w http.ResponseWriter, r *http.Request)
 
 	var responses []AnimalResponse
 	for _, animal := range animals {
-		responses = append(responses, modelToAnimalResponse(&animal))
+		response := modelToAnimalResponse(&animal)
+
+		if h.weightService != nil {
+			weight, err := h.weightService.GetWeightByAnimalID(animal.ID)
+			if err != nil {
+				fmt.Printf("Erro ao buscar peso para animal ID %d: %v\n", animal.ID, err)
+			} else if weight != nil {
+				response.Weight = &weight.AnimalWeight
+				fmt.Printf("Peso encontrado para animal ID %d: %.2f kg\n", animal.ID, weight.AnimalWeight)
+			} else {
+				fmt.Printf("Peso não encontrado para animal ID %d (weight é nil)\n", animal.ID)
+			}
+		} else {
+			fmt.Printf("WeightService não disponível no AnimalHandler para animal ID %d\n", animal.ID)
+		}
+
+		fmt.Printf("Response antes de adicionar: Weight = %v\n", response.Weight)
+		responses = append(responses, response)
 	}
 
 	fmt.Printf("FarmID: %d, Animais encontrados: %d\n", id, len(animals))

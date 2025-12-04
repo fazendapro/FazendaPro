@@ -85,3 +85,12 @@ type VaccineApplicationRepositoryInterface interface {
 	Update(vaccineApplication *models.VaccineApplication) error
 	Delete(id uint) error
 }
+
+type WeightRepositoryInterface interface {
+	Create(weight *models.Weight) error
+	FindByID(id uint) (*models.Weight, error)
+	FindByAnimalID(animalID uint) (*models.Weight, error)
+	FindByFarmID(farmID uint) ([]models.Weight, error)
+	Update(weight *models.Weight) error
+	Delete(id uint) error
+}

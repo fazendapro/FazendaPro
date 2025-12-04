@@ -167,7 +167,8 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 			})
 
 			animalService := serviceFactory.CreateAnimalService()
-			animalHandler := handlers.NewAnimalHandler(animalService)
+			weightService := serviceFactory.CreateWeightService()
+			animalHandler := handlers.NewAnimalHandlerWithWeight(animalService, weightService)
 
 			r.Route("/animals", func(r chi.Router) {
 				r.Use(middleware.Auth(cfg.JWTSecret))
@@ -263,6 +264,16 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 				r.Put("/{id}", vaccineApplicationHandler.UpdateVaccineApplication)
 				r.Delete("/{id}", vaccineApplicationHandler.DeleteVaccineApplication)
 			})
+
+			weightHandler := handlers.NewWeightHandler(weightService)
+
+			r.Route("/weights", func(r chi.Router) {
+				r.Use(middleware.Auth(cfg.JWTSecret))
+				r.Post("/", weightHandler.CreateOrUpdateWeight)
+				r.Put("/", weightHandler.UpdateWeight)
+				r.Get("/farm/{farmId}", weightHandler.GetWeightsByFarm)
+				r.Get("/animal/{animalId}", weightHandler.GetWeightByAnimal)
+			})
 		})
 
 		app.Logger.Println("Rotas de animais configuradas: /api/v1/animals/farm")
@@ -270,6 +281,7 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 		app.Logger.Println("Rotas de reprodução configuradas: /api/v1/reproductions")
 		app.Logger.Println("Rotas de vacinas configuradas: /api/v1/vaccines")
 		app.Logger.Println("Rotas de aplicações de vacinas configuradas: /api/v1/vaccine-applications")
+		app.Logger.Println("Rotas de pesos configuradas: /api/v1/weights")
 	} else {
 		app.Logger.Println("Database não disponível - rotas de dados desabilitadas")
 	}

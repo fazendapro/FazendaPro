@@ -61,3 +61,8 @@ func (f *ServiceFactory) CreateVaccineApplicationService() *VaccineApplicationSe
 	vaccineApplicationRepo := f.repoFactory.CreateVaccineApplicationRepository()
 	return NewVaccineApplicationService(vaccineApplicationRepo)
 }
+
+func (f *ServiceFactory) CreateWeightService() *WeightService {
+	weightRepo := f.repoFactory.CreateWeightRepository()
+	return NewWeightService(weightRepo)
+}
