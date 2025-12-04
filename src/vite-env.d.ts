@@ -96,6 +96,8 @@ declare module 'antd' {
   export const App: any;
   export const Image: any;
   export const InputRef: any;
+  export const Flex: any;
+  export type Breakpoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
   export const theme: any;
   export const version: string;
   const antd: any;
@@ -109,4 +111,12 @@ declare module 'antd/es/table' {
   export type ColumnType<T = any> = any;
   const table: any;
   export default table;
+}
+
+declare module 'antd/es/input' {
+  export type InputRef = {
+    focus: () => void;
+    blur: () => void;
+    input: HTMLInputElement | null;
+  };
 }
