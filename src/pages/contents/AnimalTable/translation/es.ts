@@ -42,7 +42,8 @@ export const translations = {
     tabs: {
       animalsList: "Lista de Animales",
       milkProduction: "Producción de Leche",
-      reproduction: "Reproducción"
+      reproduction: "Reproducción",
+      vaccines: "Vacunas"
     },
     milkProductionContainer: {
       animalName: "Nombre del Animal",
@@ -79,6 +80,53 @@ export const translations = {
       edit: "Editar",
       addProductionForAnimal: "Agregar producción para este animal",
       editProduction: "Editar producción de leche"
+    },
+    vaccines: {
+      animalName: "Nombre del Animal",
+      earTag: "Número de Arete",
+      vaccineName: "Nombre de la Vacuna",
+      applicationDate: "Fecha de Aplicación",
+      batchNumber: "Número de Lote",
+      veterinarian: "Veterinario",
+      observations: "Observaciones",
+      addVaccine: "Agregar Vacuna",
+      addApplication: "Aplicar Vacuna",
+      createVaccineTitle: "Registrar Vacuna",
+      createApplicationTitle: "Aplicar Vacuna",
+      editApplicationTitle: "Editar Aplicación de Vacuna",
+      selectAnimal: "Seleccionar Animal",
+      selectAnimalPlaceholder: "Seleccione un animal",
+      selectVaccine: "Seleccionar Vacuna",
+      selectVaccinePlaceholder: "Seleccione una vacuna",
+      vaccineNameRequired: "El nombre de la vacuna es obligatorio",
+      animalRequired: "Por favor seleccione un animal",
+      vaccineRequired: "Por favor seleccione una vacuna",
+      applicationDateRequired: "Por favor seleccione la fecha de aplicación",
+      applicationDatePlaceholder: "Seleccione la fecha",
+      batchNumberPlaceholder: "Ej: LOTE123",
+      veterinarianPlaceholder: "Nombre del veterinario",
+      observationsPlaceholder: "Ingrese observaciones sobre la aplicación",
+      description: "Descripción",
+      descriptionPlaceholder: "Descripción de la vacuna",
+      manufacturer: "Fabricante",
+      manufacturerPlaceholder: "Nombre del fabricante",
+      vaccineNamePlaceholder: "Ej: Vacuna contra Fiebre Aftosa",
+      create: "Crear",
+      update: "Actualizar",
+      edit: "Editar",
+      editApplication: "Editar aplicación de vacuna",
+      vaccineCreatedSuccessfully: "Vacuna registrada con éxito",
+      applicationCreatedSuccessfully: "Aplicación de vacuna registrada con éxito",
+      applicationUpdatedSuccessfully: "Aplicación de vacuna actualizada con éxito",
+      createVaccineError: "Error al registrar vacuna",
+      createApplicationError: "Error al registrar aplicación de vacuna",
+      updateApplicationError: "Error al actualizar aplicación de vacuna",
+      clearFilters: "Limpiar Filtros",
+      filters: {
+        startDate: "Fecha inicial",
+        endDate: "Fecha final"
+      },
+      actions: "Acciones"
     }
   }
 }; 

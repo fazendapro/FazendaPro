@@ -42,7 +42,8 @@ export const translations = {
     tabs: {
       animalsList: "Animals List",
       milkProduction: "Milk Production",
-      reproduction: "Reproduction"
+      reproduction: "Reproduction",
+      vaccines: "Vaccines"
     },
     milkProductionContainer: {
       animalName: "Animal Name",
@@ -79,6 +80,53 @@ export const translations = {
       edit: "Edit",
       addProductionForAnimal: "Add production for this animal",
       editProduction: "Edit milk production"
+    },
+    vaccines: {
+      animalName: "Animal Name",
+      earTag: "Ear Tag",
+      vaccineName: "Vaccine Name",
+      applicationDate: "Application Date",
+      batchNumber: "Batch Number",
+      veterinarian: "Veterinarian",
+      observations: "Observations",
+      addVaccine: "Add Vaccine",
+      addApplication: "Apply Vaccine",
+      createVaccineTitle: "Register Vaccine",
+      createApplicationTitle: "Apply Vaccine",
+      editApplicationTitle: "Edit Vaccine Application",
+      selectAnimal: "Select Animal",
+      selectAnimalPlaceholder: "Select an animal",
+      selectVaccine: "Select Vaccine",
+      selectVaccinePlaceholder: "Select a vaccine",
+      vaccineNameRequired: "Vaccine name is required",
+      animalRequired: "Please select an animal",
+      vaccineRequired: "Please select a vaccine",
+      applicationDateRequired: "Please select the application date",
+      applicationDatePlaceholder: "Select the date",
+      batchNumberPlaceholder: "E.g.: BATCH123",
+      veterinarianPlaceholder: "Veterinarian name",
+      observationsPlaceholder: "Enter observations about the application",
+      description: "Description",
+      descriptionPlaceholder: "Vaccine description",
+      manufacturer: "Manufacturer",
+      manufacturerPlaceholder: "Manufacturer name",
+      vaccineNamePlaceholder: "E.g.: Foot and Mouth Disease Vaccine",
+      create: "Create",
+      update: "Update",
+      edit: "Edit",
+      editApplication: "Edit vaccine application",
+      vaccineCreatedSuccessfully: "Vaccine registered successfully",
+      applicationCreatedSuccessfully: "Vaccine application registered successfully",
+      applicationUpdatedSuccessfully: "Vaccine application updated successfully",
+      createVaccineError: "Error registering vaccine",
+      createApplicationError: "Error registering vaccine application",
+      updateApplicationError: "Error updating vaccine application",
+      clearFilters: "Clear Filters",
+      filters: {
+        startDate: "Start Date",
+        endDate: "End Date"
+      },
+      actions: "Actions"
     }
   }
 }; 
