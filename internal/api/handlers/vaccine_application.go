@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -20,44 +21,53 @@ func NewVaccineApplicationHandler(service *service.VaccineApplicationService) *V
 }
 
 type VaccineApplicationData struct {
-	ID              uint       `json:"id"`
-	AnimalID        uint       `json:"animal_id"`
-	Animal          AnimalData `json:"animal"`
-	VaccineID       uint       `json:"vaccine_id"`
+	ID              uint        `json:"id"`
+	AnimalID        uint        `json:"animal_id"`
+	Animal          AnimalData  `json:"animal"`
+	VaccineID       uint        `json:"vaccine_id"`
 	Vaccine         VaccineData `json:"vaccine"`
-	ApplicationDate string     `json:"application_date"`
-	BatchNumber     string     `json:"batch_number"`
-	Veterinarian    string     `json:"veterinarian"`
-	Observations    string     `json:"observations"`
-	CreatedAt       string     `json:"created_at"`
-	UpdatedAt       string     `json:"updated_at"`
+	ApplicationDate string      `json:"application_date"`
+	BatchNumber     string      `json:"batch_number"`
+	Veterinarian    string      `json:"veterinarian"`
+	Observations    string      `json:"observations"`
+	CreatedAt       string      `json:"created_at"`
+	UpdatedAt       string      `json:"updated_at"`
 }
 
 // CreateVaccineApplicationRequest representa a requisição de criação de aplicação de vacina
 // @Description Dados necessários para criar uma nova aplicação de vacina
 type CreateVaccineApplicationRequest struct {
-	AnimalID        uint   `json:"animal_id" validate:"required" example:"1"`              // ID do animal
-	VaccineID       uint   `json:"vaccine_id" validate:"required" example:"1"`               // ID da vacina
+	AnimalID        uint   `json:"animal_id" validate:"required" example:"1"`                 // ID do animal
+	VaccineID       uint   `json:"vaccine_id" validate:"required" example:"1"`                // ID da vacina
 	ApplicationDate string `json:"application_date" validate:"required" example:"2024-01-15"` // Data da aplicação (YYYY-MM-DD)
 	BatchNumber     string `json:"batch_number" example:"LOTE123"`                            // Número do lote
-	Veterinarian    string `json:"veterinarian" example:"Dr. João Silva"`                    // Nome do veterinário
-	Observations    string `json:"observations" example:"Aplicação realizada com sucesso"`     // Observações
+	Veterinarian    string `json:"veterinarian" example:"Dr. João Silva"`                     // Nome do veterinário
+	Observations    string `json:"observations" example:"Aplicação realizada com sucesso"`    // Observações
 }
 
 // VaccineApplicationResponse representa a resposta de aplicação de vacina
 // @Description Resposta com dados de uma aplicação de vacina
 type VaccineApplicationResponse struct {
 	Success bool                   `json:"success" example:"true"` // Indica sucesso
-	Data    VaccineApplicationData `json:"data,omitempty"`       // Dados da aplicação
-	Message string                 `json:"message,omitempty"`     // Mensagem de resposta
+	Data    VaccineApplicationData `json:"data,omitempty"`         // Dados da aplicação
+	Message string                 `json:"message,omitempty"`      // Mensagem de resposta
 }
 
 // VaccineApplicationsResponse representa a resposta com múltiplas aplicações
 // @Description Resposta com lista de aplicações de vacinas
 type VaccineApplicationsResponse struct {
 	Success bool                     `json:"success" example:"true"` // Indica sucesso
-	Data    []VaccineApplicationData `json:"data,omitempty"`        // Lista de aplicações
+	Data    []VaccineApplicationData `json:"data,omitempty"`         // Lista de aplicações
 	Message string                   `json:"message,omitempty"`      // Mensagem de resposta
+}
+
+// PaginatedVaccineApplicationsResponse representa a resposta paginada de aplicações
+// @Description Resposta com lista paginada de aplicações de vacinas e metadados
+type PaginatedVaccineApplicationsResponse struct {
+	VaccineApplications []VaccineApplicationData `json:"vaccine_applications"` // Lista de aplicações
+	Total               int64                    `json:"total"`                // Total de registros
+	Page                int                      `json:"page"`                 // Página atual
+	Limit               int                      `json:"limit"`                // Limite por página
 }
 
 // CreateVaccineApplication cria uma nova aplicação de vacina
@@ -118,7 +128,7 @@ func (h *VaccineApplicationHandler) CreateVaccineApplication(w http.ResponseWrit
 
 // GetVaccineApplicationsByFarmID obtém lista de aplicações de vacinas da fazenda
 // @Summary      Obter aplicações de vacinas da fazenda
-// @Description  Retorna lista de aplicações de vacinas com filtros opcionais de data
+// @Description  Retorna lista de aplicações de vacinas com filtros opcionais de data e paginação
 // @Tags         vaccine-applications
 // @Accept       json
 // @Produce      json
@@ -126,6 +136,8 @@ func (h *VaccineApplicationHandler) CreateVaccineApplication(w http.ResponseWrit
 // @Param        farmId path int true "ID da fazenda"
 // @Param        start_date query string false "Data inicial (YYYY-MM-DD)"
 // @Param        end_date query string false "Data final (YYYY-MM-DD)"
+// @Param        page query int false "Número da página" default(1)
+// @Param        limit query int false "Itens por página" default(10)
 // @Success      200  {object}  VaccineApplicationsResponse
 // @Failure      400  {object}  ErrorResponse
 // @Failure      500  {object}  ErrorResponse
@@ -140,6 +152,8 @@ func (h *VaccineApplicationHandler) GetVaccineApplicationsByFarmID(w http.Respon
 
 	startDateStr := r.URL.Query().Get("start_date")
 	endDateStr := r.URL.Query().Get("end_date")
+	pageStr := r.URL.Query().Get("page")
+	limitStr := r.URL.Query().Get("limit")
 
 	var startDate, endDate *time.Time
 
@@ -155,11 +169,43 @@ func (h *VaccineApplicationHandler) GetVaccineApplicationsByFarmID(w http.Respon
 		}
 	}
 
+	// Parse pagination parameters
+	page := 1
+	limit := 10
+
+	if pageStr != "" {
+		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
+			page = p
+		}
+	}
+
+	if limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
+			limit = l
+		}
+	}
+
 	var vaccineApplications []models.VaccineApplication
-	if startDate != nil || endDate != nil {
-		vaccineApplications, err = h.service.GetApplicationsByFarmIDWithDateRange(uint(farmID), startDate, endDate)
+	var total int64
+
+	if pageStr != "" || limitStr != "" {
+		if startDate != nil || endDate != nil {
+			vaccineApplications, total, err = h.service.GetApplicationsByFarmIDWithDateRangePaginated(uint(farmID), startDate, endDate, page, limit)
+		} else {
+			vaccineApplications, total, err = h.service.GetApplicationsByFarmIDWithPagination(uint(farmID), page, limit)
+		}
 	} else {
-		vaccineApplications, err = h.service.GetApplicationsByFarmID(uint(farmID))
+		if startDate != nil || endDate != nil {
+			vaccineApplications, err = h.service.GetApplicationsByFarmIDWithDateRange(uint(farmID), startDate, endDate)
+			if err == nil {
+				total = int64(len(vaccineApplications))
+			}
+		} else {
+			vaccineApplications, err = h.service.GetApplicationsByFarmID(uint(farmID))
+			if err == nil {
+				total = int64(len(vaccineApplications))
+			}
+		}
 	}
 
 	if err != nil {
@@ -170,6 +216,29 @@ func (h *VaccineApplicationHandler) GetVaccineApplicationsByFarmID(w http.Respon
 	vaccineApplicationData := make([]VaccineApplicationData, len(vaccineApplications))
 	for i, va := range vaccineApplications {
 		vaccineApplicationData[i] = h.mapToVaccineApplicationData(&va)
+	}
+
+	if pageStr != "" || limitStr != "" {
+		paginatedData := PaginatedVaccineApplicationsResponse{
+			VaccineApplications: vaccineApplicationData,
+			Total:               total,
+			Page:                page,
+			Limit:               limit,
+		}
+
+		response := struct {
+			Success bool                                 `json:"success"`
+			Data    PaginatedVaccineApplicationsResponse `json:"data"`
+			Message string                               `json:"message"`
+		}{
+			Success: true,
+			Data:    paginatedData,
+			Message: fmt.Sprintf("Aplicações de vacinas recuperadas com sucesso (%d de %d)", len(vaccineApplications), total),
+		}
+
+		w.Header().Set(HeaderContentType, ContentTypeJSON)
+		json.NewEncoder(w).Encode(response)
+		return
 	}
 
 	response := VaccineApplicationsResponse{
@@ -361,7 +430,7 @@ func (h *VaccineApplicationHandler) DeleteVaccineApplication(w http.ResponseWrit
 func (h *VaccineApplicationHandler) mapToVaccineApplicationData(va *models.VaccineApplication) VaccineApplicationData {
 	vaccineData := VaccineData{
 		ID:           va.Vaccine.ID,
-		FarmID:      va.Vaccine.FarmID,
+		FarmID:       va.Vaccine.FarmID,
 		Name:         va.Vaccine.Name,
 		Description:  va.Vaccine.Description,
 		Manufacturer: va.Vaccine.Manufacturer,
@@ -370,8 +439,8 @@ func (h *VaccineApplicationHandler) mapToVaccineApplicationData(va *models.Vacci
 	}
 
 	return VaccineApplicationData{
-		ID:              va.ID,
-		AnimalID:        va.AnimalID,
+		ID:       va.ID,
+		AnimalID: va.AnimalID,
 		Animal: AnimalData{
 			ID:                   va.Animal.ID,
 			FarmID:               va.Animal.FarmID,
@@ -400,4 +469,3 @@ func (h *VaccineApplicationHandler) mapToVaccineApplicationData(va *models.Vacci
 		UpdatedAt:       va.UpdatedAt.Format(DateFormatISO8601),
 	}
 }
-

@@ -54,6 +54,15 @@ type MilkCollectionsResponse struct {
 	Message string               `json:"message,omitempty"`    // Mensagem de resposta
 }
 
+// PaginatedMilkCollectionsResponse representa a resposta paginada de coletas
+// @Description Resposta com lista paginada de coletas de leite e metadados
+type PaginatedMilkCollectionsResponse struct {
+	MilkCollections []MilkCollectionData `json:"milk_collections"` // Lista de coletas
+	Total            int64                `json:"total"`            // Total de registros
+	Page             int                  `json:"page"`             // Página atual
+	Limit            int                  `json:"limit"`            // Limite por página
+}
+
 // CreateMilkCollection cria uma nova coleta de leite
 // @Summary      Criar coleta de leite
 // @Description  Registra uma nova coleta de leite de um animal
@@ -179,6 +188,8 @@ func (h *MilkCollectionHandler) GetMilkCollectionsByFarmID(w http.ResponseWriter
 
 	startDateStr := r.URL.Query().Get("start_date")
 	endDateStr := r.URL.Query().Get("end_date")
+	pageStr := r.URL.Query().Get("page")
+	limitStr := r.URL.Query().Get("limit")
 
 	var startDate, endDate *time.Time
 
@@ -194,11 +205,45 @@ func (h *MilkCollectionHandler) GetMilkCollectionsByFarmID(w http.ResponseWriter
 		}
 	}
 
+	// Parse pagination parameters
+	page := 1
+	limit := 10
+
+	if pageStr != "" {
+		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
+			page = p
+		}
+	}
+
+	if limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
+			limit = l
+		}
+	}
+
 	var milkCollections []models.MilkCollection
-	if startDate != nil || endDate != nil {
-		milkCollections, err = h.service.GetMilkCollectionsByFarmIDWithDateRange(uint(farmID), startDate, endDate)
+	var total int64
+
+	// Use paginated methods if page/limit are provided, otherwise use non-paginated
+	if pageStr != "" || limitStr != "" {
+		if startDate != nil || endDate != nil {
+			milkCollections, total, err = h.service.GetMilkCollectionsByFarmIDWithDateRangePaginated(uint(farmID), startDate, endDate, page, limit)
+		} else {
+			milkCollections, total, err = h.service.GetMilkCollectionsByFarmIDWithPagination(uint(farmID), page, limit)
+		}
 	} else {
-		milkCollections, err = h.service.GetMilkCollectionsByFarmID(uint(farmID))
+		// Backward compatibility: if no pagination params, return all
+		if startDate != nil || endDate != nil {
+			milkCollections, err = h.service.GetMilkCollectionsByFarmIDWithDateRange(uint(farmID), startDate, endDate)
+			if err == nil {
+				total = int64(len(milkCollections))
+			}
+		} else {
+			milkCollections, err = h.service.GetMilkCollectionsByFarmID(uint(farmID))
+			if err == nil {
+				total = int64(len(milkCollections))
+			}
+		}
 	}
 
 	if err != nil {
@@ -211,6 +256,31 @@ func (h *MilkCollectionHandler) GetMilkCollectionsByFarmID(w http.ResponseWriter
 		milkCollectionData[i] = h.mapToMilkCollectionData(&mc)
 	}
 
+	// If pagination was used, return paginated response
+	if pageStr != "" || limitStr != "" {
+		paginatedData := PaginatedMilkCollectionsResponse{
+			MilkCollections: milkCollectionData,
+			Total:            total,
+			Page:             page,
+			Limit:            limit,
+		}
+
+		response := struct {
+			Success bool                            `json:"success"`
+			Data    PaginatedMilkCollectionsResponse `json:"data"`
+			Message string                          `json:"message"`
+		}{
+			Success: true,
+			Data:    paginatedData,
+			Message: fmt.Sprintf("Milk collections retrieved successfully (%d of %d)", len(milkCollections), total),
+		}
+
+		w.Header().Set(HeaderContentType, ContentTypeJSON)
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	// Backward compatibility: return non-paginated response
 	response := MilkCollectionsResponse{
 		Success: true,
 		Data:    milkCollectionData,

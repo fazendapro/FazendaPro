@@ -41,8 +41,16 @@ func (s *MilkCollectionService) GetMilkCollectionsByFarmID(farmID uint) ([]model
 	return s.repository.FindByFarmID(farmID)
 }
 
+func (s *MilkCollectionService) GetMilkCollectionsByFarmIDWithPagination(farmID uint, page, limit int) ([]models.MilkCollection, int64, error) {
+	return s.repository.FindByFarmIDWithPagination(farmID, page, limit)
+}
+
 func (s *MilkCollectionService) GetMilkCollectionsByFarmIDWithDateRange(farmID uint, startDate, endDate *time.Time) ([]models.MilkCollection, error) {
 	return s.repository.FindByFarmIDWithDateRange(farmID, startDate, endDate)
+}
+
+func (s *MilkCollectionService) GetMilkCollectionsByFarmIDWithDateRangePaginated(farmID uint, startDate, endDate *time.Time, page, limit int) ([]models.MilkCollection, int64, error) {
+	return s.repository.FindByFarmIDWithDateRangePaginated(farmID, startDate, endDate, page, limit)
 }
 
 func (s *MilkCollectionService) GetMilkCollectionsByAnimalID(animalID uint) ([]models.MilkCollection, error) {

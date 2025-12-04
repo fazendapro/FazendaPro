@@ -218,6 +218,42 @@ func TestReproductionHandler_GetReproductionsByFarm_Success(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 }
 
+func TestReproductionHandler_GetReproductionsByFarm_WithPagination(t *testing.T) {
+	mockRepo := new(services.MockReproductionRepository)
+	router, _ := setupReproductionRouter(mockRepo)
+
+	expectedReproductions := []models.Reproduction{
+		{ID: 1, AnimalID: 1, CurrentPhase: models.PhasePrenhas},
+		{ID: 2, AnimalID: 2, CurrentPhase: models.PhaseLactacao},
+	}
+
+	req, _ := http.NewRequest("GET", "/reproductions/farm?farmId=1&page=1&limit=10", nil)
+	w := httptest.NewRecorder()
+
+	mockRepo.On("FindByFarmIDWithPagination", uint(1), 1, 10).Return(expectedReproductions, int64(2), nil)
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	var response struct {
+		Success bool `json:"success"`
+		Data    struct {
+			Reproductions []handlers.ReproductionResponse `json:"reproductions"`
+			Total         int64                           `json:"total"`
+			Page          int                             `json:"page"`
+			Limit         int                             `json:"limit"`
+		} `json:"data"`
+		Message string `json:"message"`
+	}
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.True(t, response.Success)
+	assert.Equal(t, int64(2), response.Data.Total)
+	assert.Equal(t, 1, response.Data.Page)
+	assert.Equal(t, 10, response.Data.Limit)
+	mockRepo.AssertExpectations(t)
+}
+
 func TestReproductionHandler_GetReproductionsByPhase_Success(t *testing.T) {
 	mockRepo := new(services.MockReproductionRepository)
 	router, _ := setupReproductionRouter(mockRepo)

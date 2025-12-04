@@ -52,6 +52,28 @@ func (r *ReproductionRepository) FindByFarmID(farmID uint) ([]models.Reproductio
 	return reproductions, err
 }
 
+func (r *ReproductionRepository) FindByFarmIDWithPagination(farmID uint, page, limit int) ([]models.Reproduction, int64, error) {
+	var reproductions []models.Reproduction
+	var total int64
+
+	query := r.db.Model(&models.Reproduction{}).
+		Joins("JOIN animals ON reproductions.animal_id = animals.id").
+		Where(SQLWhereAnimalsFarmID, farmID)
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	offset := (page - 1) * limit
+	err := query.Preload("Animal", SQLWhereFarmID, farmID).
+		Order("reproductions.created_at DESC").
+		Offset(offset).
+		Limit(limit).
+		Find(&reproductions).Error
+
+	return reproductions, total, err
+}
+
 func (r *ReproductionRepository) FindByPhase(phase models.ReproductionPhase) ([]models.Reproduction, error) {
 	var reproductions []models.Reproduction
 	err := r.db.Preload("Animal").Where("current_phase = ?", phase).Find(&reproductions).Error

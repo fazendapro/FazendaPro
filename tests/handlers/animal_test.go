@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/fazendapro/FazendaPro-api/internal/api/handlers"
-	"github.com/fazendapro/FazendaPro-api/internal/cache"
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/service"
 	"github.com/fazendapro/FazendaPro-api/tests"
@@ -233,12 +232,10 @@ func TestAnimalHandler_GetAnimalsByFarm_Success(t *testing.T) {
 		{ID: 2, FarmID: 1, AnimalName: "Animal 2"},
 	}
 
-	req, _ := http.NewRequest("GET", "/animals/farm?farmId=1", nil)
+	req, _ := http.NewRequest("GET", "/animals/farm?farmId=1&page=1&limit=10", nil)
 	w := httptest.NewRecorder()
 
-	mockCache.On("Get", "animals:farm:1", mock.Anything).Return(cache.ErrCacheMiss)
-	mockRepo.On("FindByFarmID", uint(1)).Return(expectedAnimals, nil)
-	mockCache.On("Set", "animals:farm:1", expectedAnimals, int32(300)).Return(nil)
+	mockRepo.On("FindByFarmIDWithPagination", uint(1), 1, 10).Return(expectedAnimals, int64(2), nil)
 
 	router.ServeHTTP(w, req)
 
@@ -246,6 +243,12 @@ func TestAnimalHandler_GetAnimalsByFarm_Success(t *testing.T) {
 	var response map[string]interface{}
 	json.Unmarshal(w.Body.Bytes(), &response)
 	assert.True(t, response["success"].(bool))
+	
+	data := response["data"].(map[string]interface{})
+	assert.Equal(t, float64(2), data["total"])
+	assert.Equal(t, float64(1), data["page"])
+	assert.Equal(t, float64(10), data["limit"])
+	
 	mockRepo.AssertExpectations(t)
 }
 
@@ -450,11 +453,10 @@ func TestAnimalHandler_GetAnimalsByFarm_ServiceError(t *testing.T) {
 	mockCache := new(MockCache)
 	router, _, _ := setupAnimalRouter(mockRepo, mockCache)
 
-	req, _ := http.NewRequest("GET", "/animals/farm?farmId=1", nil)
+	req, _ := http.NewRequest("GET", "/animals/farm?farmId=1&page=1&limit=10", nil)
 	w := httptest.NewRecorder()
 
-	mockCache.On("Get", "animals:farm:1", mock.Anything).Return(cache.ErrCacheMiss)
-	mockRepo.On("FindByFarmID", uint(1)).Return(nil, errors.New("erro ao buscar"))
+	mockRepo.On("FindByFarmIDWithPagination", uint(1), 1, 10).Return(nil, int64(0), errors.New("erro ao buscar"))
 
 	router.ServeHTTP(w, req)
 

@@ -386,3 +386,139 @@ func TestMilkCollectionRepository_Delete(t *testing.T) {
 	assert.Error(t, err)
 	assert.Nil(t, found)
 }
+
+func TestMilkCollectionRepository_FindByFarmIDWithPagination(t *testing.T) {
+	db := setupMilkCollectionTestDB(t)
+	repo := repository.NewMilkCollectionRepository(db)
+
+	farm := createTestFarmForMilkCollection(t, db)
+	animal := createTestAnimalForMilkCollection(t, db, farm.ID)
+
+	for i := 0; i < 10; i++ {
+		collection := &models.MilkCollection{
+			AnimalID: animal.ID,
+			Liters:   25.5 + float64(i),
+			Date:     time.Now().Add(-time.Duration(i) * 24 * time.Hour),
+		}
+		require.NoError(t, db.Create(collection).Error)
+	}
+
+	collections, total, err := repo.FindByFarmIDWithPagination(farm.ID, 1, 5)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(10), total)
+	assert.Len(t, collections, 5)
+
+	collections2, total2, err := repo.FindByFarmIDWithPagination(farm.ID, 2, 5)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(10), total2)
+	assert.Len(t, collections2, 5)
+
+	assert.NotEqual(t, collections[0].ID, collections2[0].ID)
+}
+
+func TestMilkCollectionRepository_FindByFarmIDWithPagination_EmptyResult(t *testing.T) {
+	db := setupMilkCollectionTestDB(t)
+	repo := repository.NewMilkCollectionRepository(db)
+
+	farm := createTestFarmForMilkCollection(t, db)
+
+	collections, total, err := repo.FindByFarmIDWithPagination(farm.ID, 1, 10)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(0), total)
+	assert.Len(t, collections, 0)
+}
+
+func TestMilkCollectionRepository_FindByFarmIDWithDateRangePaginated(t *testing.T) {
+	db := setupMilkCollectionTestDB(t)
+	repo := repository.NewMilkCollectionRepository(db)
+
+	farm := createTestFarmForMilkCollection(t, db)
+	animal := createTestAnimalForMilkCollection(t, db, farm.ID)
+
+	now := time.Now()
+	startDate := now.Add(-7 * 24 * time.Hour)
+	endDate := now.Add(24 * time.Hour)
+
+	for i := 0; i < 8; i++ {
+		collection := &models.MilkCollection{
+			AnimalID: animal.ID,
+			Liters:   25.5 + float64(i),
+			Date:     now.Add(-time.Duration(i) * 24 * time.Hour),
+		}
+		require.NoError(t, db.Create(collection).Error)
+	}
+
+	collectionOut1 := &models.MilkCollection{
+		AnimalID: animal.ID,
+		Liters:   20.0,
+		Date:     now.Add(-10 * 24 * time.Hour),
+	}
+	require.NoError(t, db.Create(collectionOut1).Error)
+
+	collectionOut2 := &models.MilkCollection{
+		AnimalID: animal.ID,
+		Liters:   20.0,
+		Date:     now.Add(3 * 24 * time.Hour),
+	}
+	require.NoError(t, db.Create(collectionOut2).Error)
+
+	collections, total, err := repo.FindByFarmIDWithDateRangePaginated(farm.ID, &startDate, &endDate, 1, 5)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(8), total)
+	assert.Len(t, collections, 5)
+
+	collections2, total2, err := repo.FindByFarmIDWithDateRangePaginated(farm.ID, &startDate, &endDate, 2, 5)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(8), total2)
+	assert.Len(t, collections2, 3)
+}
+
+func TestMilkCollectionRepository_FindByFarmIDWithDateRangePaginated_StartDateOnly(t *testing.T) {
+	db := setupMilkCollectionTestDB(t)
+	repo := repository.NewMilkCollectionRepository(db)
+
+	farm := createTestFarmForMilkCollection(t, db)
+	animal := createTestAnimalForMilkCollection(t, db, farm.ID)
+
+	now := time.Now()
+	startDate := now.Add(-7 * 24 * time.Hour)
+
+	for i := 0; i < 5; i++ {
+		collection := &models.MilkCollection{
+			AnimalID: animal.ID,
+			Liters:   25.5 + float64(i),
+			Date:     now.Add(-time.Duration(i) * 24 * time.Hour),
+		}
+		require.NoError(t, db.Create(collection).Error)
+	}
+
+	collections, total, err := repo.FindByFarmIDWithDateRangePaginated(farm.ID, &startDate, nil, 1, 10)
+	assert.NoError(t, err)
+	assert.Greater(t, total, int64(0))
+	assert.Greater(t, len(collections), 0)
+}
+
+func TestMilkCollectionRepository_FindByFarmIDWithDateRangePaginated_EndDateOnly(t *testing.T) {
+	db := setupMilkCollectionTestDB(t)
+	repo := repository.NewMilkCollectionRepository(db)
+
+	farm := createTestFarmForMilkCollection(t, db)
+	animal := createTestAnimalForMilkCollection(t, db, farm.ID)
+
+	now := time.Now()
+	endDate := now.Add(24 * time.Hour)
+
+	for i := 0; i < 5; i++ {
+		collection := &models.MilkCollection{
+			AnimalID: animal.ID,
+			Liters:   25.5 + float64(i),
+			Date:     now.Add(-time.Duration(i) * 24 * time.Hour),
+		}
+		require.NoError(t, db.Create(collection).Error)
+	}
+
+	collections, total, err := repo.FindByFarmIDWithDateRangePaginated(farm.ID, nil, &endDate, 1, 10)
+	assert.NoError(t, err)
+	assert.Greater(t, total, int64(0))
+	assert.Greater(t, len(collections), 0)
+}

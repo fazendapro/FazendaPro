@@ -63,6 +63,59 @@ func (r *VaccineApplicationRepository) FindByFarmIDWithDateRange(farmID uint, st
 	return vaccineApplications, err
 }
 
+func (r *VaccineApplicationRepository) FindByFarmIDWithPagination(farmID uint, page, limit int) ([]models.VaccineApplication, int64, error) {
+	var vaccineApplications []models.VaccineApplication
+	var total int64
+
+	query := r.db.Model(&models.VaccineApplication{}).
+		Joins("JOIN animals ON vaccine_applications.animal_id = animals.id").
+		Where(SQLWhereAnimalsFarmID, farmID)
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	offset := (page - 1) * limit
+	err := query.Preload("Animal", SQLWhereFarmID, farmID).
+		Preload("Vaccine", SQLWhereFarmID, farmID).
+		Order("vaccine_applications.application_date DESC").
+		Offset(offset).
+		Limit(limit).
+		Find(&vaccineApplications).Error
+
+	return vaccineApplications, total, err
+}
+
+func (r *VaccineApplicationRepository) FindByFarmIDWithDateRangePaginated(farmID uint, startDate, endDate *time.Time, page, limit int) ([]models.VaccineApplication, int64, error) {
+	var vaccineApplications []models.VaccineApplication
+	var total int64
+
+	query := r.db.Model(&models.VaccineApplication{}).
+		Joins("JOIN animals ON vaccine_applications.animal_id = animals.id").
+		Where(SQLWhereAnimalsFarmID, farmID)
+
+	if startDate != nil {
+		query = query.Where("vaccine_applications.application_date >= ?", *startDate)
+	}
+	if endDate != nil {
+		query = query.Where("vaccine_applications.application_date <= ?", *endDate)
+	}
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	offset := (page - 1) * limit
+	err := query.Preload("Animal", SQLWhereFarmID, farmID).
+		Preload("Vaccine", SQLWhereFarmID, farmID).
+		Order("vaccine_applications.application_date DESC").
+		Offset(offset).
+		Limit(limit).
+		Find(&vaccineApplications).Error
+
+	return vaccineApplications, total, err
+}
+
 func (r *VaccineApplicationRepository) FindByAnimalID(animalID uint) ([]models.VaccineApplication, error) {
 	var vaccineApplications []models.VaccineApplication
 	err := r.db.Preload("Animal").Preload("Vaccine").
@@ -88,4 +141,3 @@ func (r *VaccineApplicationRepository) Update(vaccineApplication *models.Vaccine
 func (r *VaccineApplicationRepository) Delete(id uint) error {
 	return r.db.Delete(&models.VaccineApplication{}, id).Error
 }
-

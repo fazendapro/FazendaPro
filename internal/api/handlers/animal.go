@@ -77,6 +77,15 @@ type AnimalParent struct {
 	EarTagNumberLocal int    `json:"ear_tag_number_local" example:"100"` // Número da brinco
 }
 
+// AnimalListResponse representa a resposta paginada de animais
+// @Description Resposta com lista paginada de animais e metadados
+type AnimalListResponse struct {
+	Animals []AnimalResponse `json:"animals"` // Lista de animais
+	Total   int64            `json:"total"`   // Total de registros
+	Page    int              `json:"page"`    // Página atual
+	Limit   int              `json:"limit"`   // Limite por página
+}
+
 func animalDataToModel(data AnimalData) models.Animal {
 	var birthDate *time.Time
 	if data.BirthDate != "" {
@@ -244,37 +253,72 @@ func (h *AnimalHandler) GetAnimal(w http.ResponseWriter, r *http.Request) {
 	SendSuccessResponse(w, response, "Animal encontrado com sucesso", http.StatusOK)
 }
 
+type animalQueryParams struct {
+	page   int
+	limit  int
+	farmID uint
+}
+
+func parseAnimalQueryParams(r *http.Request) (animalQueryParams, error) {
+	farmIDStr := r.URL.Query().Get("farmId")
+	if farmIDStr == "" {
+		return animalQueryParams{}, fmt.Errorf("ID da fazenda é obrigatório")
+	}
+
+	farmID, err := strconv.ParseUint(farmIDStr, 10, 32)
+	if err != nil {
+		return animalQueryParams{}, fmt.Errorf("ID da fazenda inválido")
+	}
+
+	pageStr := r.URL.Query().Get("page")
+	limitStr := r.URL.Query().Get("limit")
+
+	params := animalQueryParams{
+		page:   1,
+		limit:  10,
+		farmID: uint(farmID),
+	}
+
+	if pageStr != "" {
+		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
+			params.page = p
+		}
+	}
+
+	if limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
+			params.limit = l
+		}
+	}
+
+	return params, nil
+}
+
 // GetAnimalsByFarm obtém todos os animais de uma fazenda
 // @Summary      Obter animais por fazenda
-// @Description  Retorna lista de todos os animais de uma fazenda específica
+// @Description  Retorna lista paginada de animais de uma fazenda específica
 // @Tags         animals
 // @Accept       json
 // @Produce      json
 // @Security     BearerAuth
 // @Param        farmId query int true "ID da fazenda"
-// @Success      200  {array}   AnimalResponse
+// @Param        page query int false "Número da página" default(1)
+// @Param        limit query int false "Itens por página" default(10)
+// @Success      200  {object}  AnimalListResponse
 // @Failure      400  {object}  ErrorResponse
 // @Failure      500  {object}  ErrorResponse
 // @Router       /api/v1/animals/farm [get]
 func (h *AnimalHandler) GetAnimalsByFarm(w http.ResponseWriter, r *http.Request) {
-	farmID := r.URL.Query().Get("farmId")
-	if farmID == "" {
-		fmt.Printf("Erro: farmId não fornecido\n")
-
-		SendErrorResponse(w, "ID da fazenda é obrigatório", http.StatusBadRequest)
-		return
-	}
-
-	id, err := strconv.ParseUint(farmID, 10, 32)
+	params, err := parseAnimalQueryParams(r)
 	if err != nil {
-		fmt.Printf("Erro ao converter farmId: %v\n", err)
-		SendErrorResponse(w, "ID da fazenda inválido", http.StatusBadRequest)
+		fmt.Printf("Erro ao parsear parâmetros: %v\n", err)
+		SendErrorResponse(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	fmt.Printf("FarmID convertido: %d\n", id)
+	fmt.Printf("FarmID: %d, Page: %d, Limit: %d\n", params.farmID, params.page, params.limit)
 
-	animals, err := h.service.GetAnimalsByFarmID(uint(id))
+	animals, total, err := h.service.GetAnimalsByFarmIDWithPagination(params.farmID, params.page, params.limit)
 	if err != nil {
 		fmt.Printf("Erro ao buscar animais: %v\n", err)
 		SendErrorResponse(w, err.Error(), http.StatusInternalServerError)
@@ -303,9 +347,16 @@ func (h *AnimalHandler) GetAnimalsByFarm(w http.ResponseWriter, r *http.Request)
 		responses = append(responses, response)
 	}
 
-	fmt.Printf("FarmID: %d, Animais encontrados: %d\n", id, len(animals))
+	fmt.Printf("FarmID: %d, Animais encontrados: %d de %d total\n", params.farmID, len(animals), total)
 
-	SendSuccessResponse(w, responses, fmt.Sprintf("Animais encontrados com sucesso (%d animais)", len(animals)), http.StatusOK)
+	response := AnimalListResponse{
+		Animals: responses,
+		Total:   total,
+		Page:    params.page,
+		Limit:   params.limit,
+	}
+
+	SendSuccessResponse(w, response, fmt.Sprintf("Animais encontrados com sucesso (%d de %d animais)", len(animals), total), http.StatusOK)
 }
 
 // UpdateAnimal atualiza os dados de um animal

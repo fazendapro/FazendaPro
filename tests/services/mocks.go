@@ -33,6 +33,14 @@ func (m *MockAnimalRepository) FindByFarmID(farmID uint) ([]models.Animal, error
 	return args.Get(0).([]models.Animal), args.Error(1)
 }
 
+func (m *MockAnimalRepository) FindByFarmIDWithPagination(farmID uint, page, limit int) ([]models.Animal, int64, error) {
+	args := m.Called(farmID, page, limit)
+	if args.Get(0) == nil {
+		return nil, args.Get(1).(int64), args.Error(2)
+	}
+	return args.Get(0).([]models.Animal), args.Get(1).(int64), args.Error(2)
+}
+
 func (m *MockAnimalRepository) FindByEarTagNumber(farmID uint, earTagNumber int) (*models.Animal, error) {
 	args := m.Called(farmID, earTagNumber)
 	if args.Get(0) == nil {
@@ -179,6 +187,14 @@ func (m *MockReproductionRepository) FindByFarmID(farmID uint) ([]models.Reprodu
 		return nil, args.Error(1)
 	}
 	return args.Get(0).([]models.Reproduction), args.Error(1)
+}
+
+func (m *MockReproductionRepository) FindByFarmIDWithPagination(farmID uint, page, limit int) ([]models.Reproduction, int64, error) {
+	args := m.Called(farmID, page, limit)
+	if args.Get(0) == nil {
+		return nil, args.Get(1).(int64), args.Error(2)
+	}
+	return args.Get(0).([]models.Reproduction), args.Get(1).(int64), args.Error(2)
 }
 
 func (m *MockReproductionRepository) FindByPhase(phase models.ReproductionPhase) ([]models.Reproduction, error) {
@@ -343,12 +359,28 @@ func (m *MockVaccineApplicationRepository) FindByFarmID(farmID uint) ([]models.V
 	return args.Get(0).([]models.VaccineApplication), args.Error(1)
 }
 
+func (m *MockVaccineApplicationRepository) FindByFarmIDWithPagination(farmID uint, page, limit int) ([]models.VaccineApplication, int64, error) {
+	args := m.Called(farmID, page, limit)
+	if args.Get(0) == nil {
+		return nil, args.Get(1).(int64), args.Error(2)
+	}
+	return args.Get(0).([]models.VaccineApplication), args.Get(1).(int64), args.Error(2)
+}
+
 func (m *MockVaccineApplicationRepository) FindByFarmIDWithDateRange(farmID uint, startDate, endDate *time.Time) ([]models.VaccineApplication, error) {
 	args := m.Called(farmID, startDate, endDate)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
 	return args.Get(0).([]models.VaccineApplication), args.Error(1)
+}
+
+func (m *MockVaccineApplicationRepository) FindByFarmIDWithDateRangePaginated(farmID uint, startDate, endDate *time.Time, page, limit int) ([]models.VaccineApplication, int64, error) {
+	args := m.Called(farmID, startDate, endDate, page, limit)
+	if args.Get(0) == nil {
+		return nil, args.Get(1).(int64), args.Error(2)
+	}
+	return args.Get(0).([]models.VaccineApplication), args.Get(1).(int64), args.Error(2)
 }
 
 func (m *MockVaccineApplicationRepository) FindByAnimalID(animalID uint) ([]models.VaccineApplication, error) {

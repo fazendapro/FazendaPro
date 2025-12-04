@@ -81,3 +81,21 @@ func (r *AnimalRepository) CountBySex(farmID uint, sex int) (int64, error) {
 	}
 	return count, nil
 }
+
+func (r *AnimalRepository) FindByFarmIDWithPagination(farmID uint, page, limit int) ([]models.Animal, int64, error) {
+	var animals []models.Animal
+	var total int64
+
+	query := r.db.DB.Model(&models.Animal{}).Where(SQLWhereFarmID, farmID)
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, fmt.Errorf("erro ao contar animais da fazenda: %w", err)
+	}
+
+	offset := (page - 1) * limit
+	if err := query.Order("created_at DESC").Offset(offset).Limit(limit).Find(&animals).Error; err != nil {
+		return nil, 0, fmt.Errorf("erro ao buscar animais da fazenda: %w", err)
+	}
+
+	return animals, total, nil
+}

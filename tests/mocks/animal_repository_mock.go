@@ -24,6 +24,14 @@ func (m *MockAnimalRepository) FindByFarmID(farmID uint) ([]models.Animal, error
 	return args.Get(0).([]models.Animal), args.Error(1)
 }
 
+func (m *MockAnimalRepository) FindByFarmIDWithPagination(farmID uint, page, limit int) ([]models.Animal, int64, error) {
+	args := m.Called(farmID, page, limit)
+	if args.Get(0) == nil {
+		return nil, args.Get(1).(int64), args.Error(2)
+	}
+	return args.Get(0).([]models.Animal), args.Get(1).(int64), args.Error(2)
+}
+
 func (m *MockAnimalRepository) FindByEarTagNumber(farmID uint, earTagNumber int) (*models.Animal, error) {
 	args := m.Called(farmID, earTagNumber)
 	return args.Get(0).(*models.Animal), args.Error(1)
