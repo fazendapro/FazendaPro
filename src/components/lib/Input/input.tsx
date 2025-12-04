@@ -1,5 +1,6 @@
 import React, { forwardRef, ForwardRefRenderFunction, useEffect, useState } from 'react';
-import { Input as AntInput, Form, Typography, Space, Tooltip, InputRef } from 'antd';
+import { Input as AntInput, Form, Typography, Space, Tooltip } from 'antd';
+import type { InputRef } from 'antd/es/input';
 import { FieldError, FieldErrors, Merge, useFormContext } from 'react-hook-form';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 
