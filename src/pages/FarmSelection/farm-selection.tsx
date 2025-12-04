@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, Button, Spin, Alert, Typography, Row, Col, Image } from 'antd';
+import { toast } from 'react-toastify';
 import { useFarmSelection } from './hooks/useFarmSelection';
 import { useResponsive } from '../../hooks';
 
@@ -8,6 +9,17 @@ const { Title, Text } = Typography;
 export const FarmSelection: React.FC = () => {
   const { farms, loading, error, autoSelect, selectFarm } = useFarmSelection();
   const { isMobile } = useResponsive();
+
+  useEffect(() => {
+    if (error && !loading) {
+      if (farms.length > 0) {
+        toast.error(error, {
+          toastId: 'farm-selection-error-toast',
+          autoClose: 5000,
+        });
+      }
+    }
+  }, [error, loading, farms.length]);
 
   if (loading) {
     return (
@@ -126,7 +138,7 @@ export const FarmSelection: React.FC = () => {
                 </div>
                 
                 <Title level={4} style={{ marginBottom: '8px' }}>
-                  Fazenda {farm.ID}
+                  {farm.Company?.CompanyName}
                 </Title>
                 
                 <Button 

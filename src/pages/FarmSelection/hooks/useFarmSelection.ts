@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { farmSelectionService, Farm } from '../services/farm-selection-service';
 import { useFarm } from '../../../contexts/FarmContext';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -24,13 +25,47 @@ export const useFarmSelection = (): UseFarmSelectionReturn => {
   const { setSelectedFarm } = useFarm();
   const { updateToken } = useAuth();
 
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const isRequestInProgressRef = useRef(false);
+  const requestIdRef = useRef<string | null>(null);
+  const setSelectedFarmRef = useRef(setSelectedFarm);
+  const navigateRef = useRef(navigate);
+
   useEffect(() => {
+    setSelectedFarmRef.current = setSelectedFarm;
+    navigateRef.current = navigate;
+  }, [setSelectedFarm, navigate]);
+
+  useEffect(() => {
+    const currentRequestId = `farm-load-${Date.now()}-${Math.random()}`;
+
+    if (isRequestInProgressRef.current && abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    if (isRequestInProgressRef.current && requestIdRef.current === currentRequestId) {
+      return;
+    }
+
     const loadFarms = async () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+
+      const abortController = new AbortController();
+      abortControllerRef.current = abortController;
+      isRequestInProgressRef.current = true;
+      requestIdRef.current = currentRequestId;
+
       try {
         setLoading(true);
         setError(null);
-        
+
         const response = await farmSelectionService.getUserFarms();
+
+        if (abortController.signal.aborted || requestIdRef.current !== currentRequestId) {
+          return;
+        }
         
         if (response.success) {
           setFarms(response.farms);
@@ -39,21 +74,43 @@ export const useFarmSelection = (): UseFarmSelectionReturn => {
           if (response.auto_select && response.selected_farm_id) {
             setSelectedFarmId(response.selected_farm_id);
             setTimeout(() => {
-              navigate('/');
+              if (!abortController.signal.aborted && requestIdRef.current === currentRequestId) {
+                navigateRef.current('/');
+              }
             }, 2000);
           }
         } else {
           setError('Erro ao carregar fazendas');
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Erro desconhecido');
+        if (err instanceof Error && err.name === 'AbortError') {
+          return;
+        }
+        if (!abortController.signal.aborted && requestIdRef.current === currentRequestId) {
+          setError(err instanceof Error ? err.message : 'Erro desconhecido');
+        }
       } finally {
-        setLoading(false);
+        if (!abortController.signal.aborted && requestIdRef.current === currentRequestId) {
+          setLoading(false);
+        }
+        if (requestIdRef.current === currentRequestId) {
+          isRequestInProgressRef.current = false;
+        }
       }
     };
 
     loadFarms();
-  }, [navigate, setSelectedFarm]);
+
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
+      }
+      if (requestIdRef.current === currentRequestId) {
+        isRequestInProgressRef.current = false;
+      }
+    };
+  }, []);
 
   const selectFarm = async (farmId: number) => {
     try {
@@ -68,15 +125,25 @@ export const useFarmSelection = (): UseFarmSelectionReturn => {
 
         const selectedFarm = farms.find((farm: Farm) => farm.ID === farmId);
         if (selectedFarm) {
-          setSelectedFarm(selectedFarm);
+          setSelectedFarmRef.current(selectedFarm);
         }
 
         navigate('/');
       } else {
-        setError('Erro ao selecionar fazenda');
+        const errorMessage = 'Erro ao selecionar fazenda';
+        setError(errorMessage);
+        toast.error(errorMessage, {
+          toastId: 'farm-selection-select-error-toast',
+          autoClose: 5000,
+        });
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao selecionar fazenda');
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao selecionar fazenda';
+      setError(errorMessage);
+      toast.error(errorMessage, {
+        toastId: 'farm-selection-select-error-toast',
+        autoClose: 5000,
+      });
     }
   };
 

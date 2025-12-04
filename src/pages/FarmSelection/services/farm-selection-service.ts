@@ -35,9 +35,37 @@ export const farmSelectionService = {
   async getUserFarms(): Promise<GetUserFarmsResponse> {
     try {
       const response = await api().get<GetUserFarmsResponse>('/farms/user');
+
+      if (response.data && !response.data.success) {
+        const errorMessage = response.data.message || 'Erro ao buscar fazendas do usuário';
+        if (import.meta.env.DEV) {
+          console.error('Farm Selection Service Error:', {
+            status: response.status,
+            message: errorMessage,
+            data: response.data
+          });
+        }
+        throw new Error(errorMessage);
+      }
+      
       return response.data;
-    } catch {
-      throw new Error('Erro ao buscar fazendas do usuário');
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      
+      const axiosError = error as { response?: { data?: { message?: string }; status?: number } };
+      const errorMessage = axiosError?.response?.data?.message || 'Erro ao buscar fazendas do usuário';
+      
+      if (import.meta.env.DEV) {
+        console.error('Farm Selection Service Network Error:', {
+          status: axiosError?.response?.status,
+          message: errorMessage,
+          error
+        });
+      }
+      
+      throw new Error(errorMessage);
     }
   },
 
@@ -46,9 +74,37 @@ export const farmSelectionService = {
       const response = await api().post<SelectFarmResponse>('/farms/select', {
         farm_id: farmId,
       });
+      
+      if (response.data && !response.data.success) {
+        const errorMessage = response.data.message || 'Erro ao selecionar fazenda';
+        if (import.meta.env.DEV) {
+          console.error('Farm Selection Service Error:', {
+            status: response.status,
+            message: errorMessage,
+            data: response.data
+          });
+        }
+        throw new Error(errorMessage);
+      }
+      
       return response.data;
-    } catch {
-      throw new Error('Erro ao selecionar fazenda');
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+
+      const axiosError = error as { response?: { data?: { message?: string }; status?: number } };
+      const errorMessage = axiosError?.response?.data?.message || 'Erro ao selecionar fazenda';
+
+      if (import.meta.env.DEV) {
+        console.error('Farm Selection Service Network Error:', {
+          status: axiosError?.response?.status,
+          message: errorMessage,
+          error
+        });
+      }
+
+      throw new Error(errorMessage);
     }
   },
 };

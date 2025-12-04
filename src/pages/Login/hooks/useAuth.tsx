@@ -5,8 +5,6 @@ import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { LoginFactory, AuthFactory } from '../factories';
 import { useCsrfTokenContext } from '../../../contexts';
-import { farmSelectionService } from '../../FarmSelection/services/farm-selection-service';
-import { useFarm } from '../../../contexts/FarmContext';
 
 interface DecodedToken {
   exp: number;
@@ -18,7 +16,6 @@ export const useAuth = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { csrfToken } = useCsrfTokenContext();
-  const { setSelectedFarm } = useFarm();
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
   const [refreshToken, setRefreshToken] = useState<string | null>(() => localStorage.getItem('refreshToken'));
   const [user, setUser] = useState<DecodedToken | null>(null);
@@ -131,39 +128,16 @@ export const useAuth = () => {
         }
 
         toast.success(t('loginSuccess'));
-        
-        try {
-          const farmResponse = await farmSelectionService.getUserFarms();
-          
-          if (farmResponse.success) {
-            if (farmResponse.auto_select) {
-              if (farmResponse.farms && farmResponse.farms.length > 0) {
-                setSelectedFarm(farmResponse.farms[0]);
-              }
-              navigate('/', { replace: true });
-            } else {
-              navigate('/farm-selection', { replace: true });
-              
-              setTimeout(() => {
-                if (window.location.pathname === '/login') {
-                  window.location.href = '/farm-selection';
-                }
-              }, 100);
-            }
-          } else {
-            navigate('/', { replace: true });
-          }
-        } catch {
-          navigate('/', { replace: true });
-        }
-        
+
+        navigate('/farm-selection', { replace: true });
+
         return true;
       } catch (error) {
         toast.error(`Erro no login: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
         return false;
       }
     },
-    [navigate, validateToken, t, csrfToken, setSelectedFarm]
+    [navigate, validateToken, t, csrfToken]
   );
 
   const logout = useCallback(async () => {
@@ -181,10 +155,9 @@ export const useAuth = () => {
       setRefreshToken(null);
       setUser(null);
       setIsLoading(false);
-      setSelectedFarm(null);
       navigate('/login', { replace: true });
     }
-  }, [navigate, refreshToken, csrfToken, setSelectedFarm]);
+  }, [navigate, refreshToken, csrfToken]);
 
   return {
     isAuthenticated: !!token && !!user,
