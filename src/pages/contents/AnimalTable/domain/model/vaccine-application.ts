@@ -60,5 +60,7 @@ export interface VaccineApplicationFilters {
   endDate?: string
   animalId?: number
   vaccineId?: number
+  page?: number
+  limit?: number
 }
 

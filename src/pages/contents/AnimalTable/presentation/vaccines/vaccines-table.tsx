@@ -1,6 +1,6 @@
-import { forwardRef, useImperativeHandle, useState } from 'react'
+import { forwardRef, useImperativeHandle, useState, useMemo } from 'react'
 import { Table, Spin, Alert, Button, Space, DatePicker, Card } from 'antd'
-import { PlusOutlined, EditOutlined, ClearOutlined } from '@ant-design/icons'
+import { PlusOutlined, EditOutlined, ClearOutlined, UnorderedListOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { useVaccineApplication } from '../../hooks/useVaccineApplication'
 import { useFarm } from '../../../../../hooks/useFarm'
@@ -18,10 +18,11 @@ interface VaccinesTableProps {
   onAddVaccine?: () => void
   onAddApplication?: () => void
   onEditApplication?: (application: VaccineApplication) => void
+  onListVaccines?: () => void
 }
 
 const VaccinesTable = forwardRef<VaccinesTableRef, VaccinesTableProps>((props, ref) => {
-  const { onAddVaccine, onAddApplication, onEditApplication } = props
+  const { onAddVaccine, onAddApplication, onEditApplication, onListVaccines } = props
   const { t } = useTranslation()
   const { farm } = useFarm()
   const { isMobile, isTablet } = useResponsive()
@@ -29,7 +30,13 @@ const VaccinesTable = forwardRef<VaccinesTableRef, VaccinesTableProps>((props, r
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   
-  const { vaccineApplications, loading, error, refetch } = useVaccineApplication(farm?.id || 0, filters)
+  const paginationFilters = useMemo(() => ({
+    ...filters,
+    page: currentPage,
+    limit: pageSize
+  }), [filters, currentPage, pageSize])
+  
+  const { vaccineApplications, total, loading, error, refetch } = useVaccineApplication(farm?.id || 0, paginationFilters)
 
   useImperativeHandle(ref, () => ({
     refetch
@@ -102,12 +109,14 @@ const VaccinesTable = forwardRef<VaccinesTableRef, VaccinesTableProps>((props, r
         startDate: dates[0]!.format('YYYY-MM-DD'),
         endDate: dates[1]!.format('YYYY-MM-DD')
       }))
+      setCurrentPage(1)
     } else {
       setFilters(prev => ({
         ...prev,
         startDate: undefined,
         endDate: undefined
       }))
+      setCurrentPage(1)
     }
   }
 
@@ -125,10 +134,6 @@ const VaccinesTable = forwardRef<VaccinesTableRef, VaccinesTableProps>((props, r
     setCurrentPage(1)
     setPageSize(size)
   }
-
-  const startIndex = (currentPage - 1) * pageSize
-  const endIndex = startIndex + pageSize
-  const paginatedData = (vaccineApplications || []).slice(startIndex, endIndex)
 
   const rangePickerValue: [dayjs.Dayjs, dayjs.Dayjs] | null = filters.startDate && filters.endDate 
     ? [dayjs(filters.startDate), dayjs(filters.endDate)] 
@@ -180,6 +185,15 @@ const VaccinesTable = forwardRef<VaccinesTableRef, VaccinesTableProps>((props, r
           <Space direction={isMobile ? 'vertical' : 'horizontal'} style={{ width: isMobile ? '100%' : 'auto' }}>
             <Button
               type="default"
+              icon={<UnorderedListOutlined />}
+              onClick={onListVaccines}
+              size={'middle'}
+              block={isMobile}
+            >
+              {t('animalTable.vaccines.listVaccines') || 'Listar Vacinas'}
+            </Button>
+            <Button
+              type="default"
               icon={<PlusOutlined />}
               onClick={onAddVaccine}
               size={'middle'}
@@ -213,7 +227,7 @@ const VaccinesTable = forwardRef<VaccinesTableRef, VaccinesTableProps>((props, r
 
       <Table
         columns={columns}
-        dataSource={paginatedData}
+        dataSource={vaccineApplications}
         rowKey="id"
         pagination={false}
         scroll={{
@@ -228,7 +242,7 @@ const VaccinesTable = forwardRef<VaccinesTableRef, VaccinesTableProps>((props, r
 
       <CustomPagination
         current={currentPage}
-        total={(vaccineApplications || []).length}
+        total={total}
         pageSize={pageSize}
         onChange={handlePageChange}
         onShowSizeChange={handleShowSizeChange}

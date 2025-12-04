@@ -33,22 +33,26 @@ export const useReproduction = () => {
     }
   }, [farm?.id]);
 
-  const getReproductionsByFarm = useCallback(async (): Promise<Reproduction[]> => {
+  const getReproductionsByFarm = useCallback(async (options?: { page?: number; limit?: number }): Promise<{ reproductions: Reproduction[]; total: number; page: number; limit: number }> => {
     if (!farm?.id) {
       setError('Fazenda não encontrada');
-      return [];
+      return { reproductions: [], total: 0, page: 1, limit: 10 };
     }
 
     setLoading(true);
     setError(null);
 
     try {
-      const result = await remoteGetReproductionsByFarm(farm.id);
+      const result = await remoteGetReproductionsByFarm({
+        farm_id: farm.id,
+        page: options?.page,
+        limit: options?.limit
+      });
       return result;
     } catch (err: unknown) {
       const errorMessage = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Erro ao buscar registros de reprodução';
       setError(errorMessage);
-      return [];
+      return { reproductions: [], total: 0, page: 1, limit: 10 };
     } finally {
       setLoading(false);
     }

@@ -127,7 +127,15 @@ export const translations = {
         startDate: "Start Date",
         endDate: "End Date"
       },
-      actions: "Actions"
+      actions: "Actions",
+      listVaccines: "List Vaccines",
+      vaccinesList: "Vaccines List",
+      name: "Name",
+      createdAt: "Creation Date",
+      close: "Close",
+      error: "Error",
+      totalVaccines: "Total Vaccines",
+      total: "Total"
     },
     weight: {
       addWeight: "Add Weight",
