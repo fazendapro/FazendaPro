@@ -82,6 +82,39 @@ describe('farmSelectionService', () => {
       const mockError = new Error('Fazenda não encontrada');
       mockApiInstance.post.mockRejectedValue(mockError);
 
+      await expect(farmSelectionService.selectFarm(999)).rejects.toThrow('Fazenda não encontrada');
+    });
+
+    it('deve usar mensagem padrão quando erro não tem mensagem específica', async () => {
+      const mockError = { response: { status: 500 } };
+      mockApiInstance.post.mockRejectedValue(mockError);
+
+      await expect(farmSelectionService.selectFarm(999)).rejects.toThrow('Erro ao selecionar fazenda');
+    });
+
+    it('deve tratar erro quando a resposta tem success: false', async () => {
+      const mockResponse = {
+        success: false,
+        message: 'Fazenda não encontrada',
+        farm_id: 0,
+        access_token: '',
+      };
+
+      mockApiInstance.post.mockResolvedValue({ data: mockResponse });
+
+      await expect(farmSelectionService.selectFarm(999)).rejects.toThrow('Fazenda não encontrada');
+    });
+
+    it('deve usar mensagem padrão quando success: false sem mensagem', async () => {
+      const mockResponse = {
+        success: false,
+        message: '',
+        farm_id: 0,
+        access_token: '',
+      };
+
+      mockApiInstance.post.mockResolvedValue({ data: mockResponse });
+
       await expect(farmSelectionService.selectFarm(999)).rejects.toThrow('Erro ao selecionar fazenda');
     });
   });
