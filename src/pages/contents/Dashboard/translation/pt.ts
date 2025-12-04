@@ -30,6 +30,17 @@ export const translations = {
     monthly: "Vendas realizadas no mês",
     monthlySalesStatsRetrievedSuccessfully: "Estatísticas mensais de vendas recuperadas com sucesso",
     salesAndPurchasesTooltip: "Gráfico mostrando o valor total de vendas realizadas nos últimos 12 meses, baseado nas vendas de animais registradas no sistema.",
-    overviewStatsRetrievedSuccessfully: "Estatísticas gerais recuperadas com sucesso"
+    overviewStatsRetrievedSuccessfully: "Estatísticas gerais recuperadas com sucesso",
+    topMilkProducersTooltip: "Ranking das vacas com maior produção de leite nos últimos 30 dias, baseado na produção média diária.",
+    nextToCalveTooltip: "Uma vaca fica grávida por aproximadamente 9 meses, ou cerca de 280 a 290 dias, a partir do dia em que a prenhez é confirmada. O período de gestação pode variar ligeiramente dependendo da raça, da saúde do animal e de outros fatores, mas a média é de 283 dias.",
+    litersPerDay: "L/dia",
+    days: "dias",
+    daysRemaining: "Faltam",
+    expectedDate: "Data prevista",
+    status: {
+      high: "Alto",
+      medium: "Médio",
+      low: "Baixo"
+    }
   }
 };

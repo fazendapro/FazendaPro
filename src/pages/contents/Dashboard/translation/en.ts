@@ -30,6 +30,17 @@ export const translations = {
     monthly: "Sales made in the month",
     monthlySalesStatsRetrievedSuccessfully: "Monthly sales statistics retrieved successfully",
     salesAndPurchasesTooltip: "Chart showing the total value of sales made in the last 12 months, based on animal sales registered in the system.",
-    overviewStatsRetrievedSuccessfully: "Overview statistics retrieved successfully"
+    overviewStatsRetrievedSuccessfully: "Overview statistics retrieved successfully",
+    topMilkProducersTooltip: "Ranking of cows with the highest milk production in the last 30 days, based on average daily production.",
+    nextToCalveTooltip: "A cow is pregnant for approximately 9 months, or about 280 to 290 days, from the day pregnancy is confirmed. The gestation period may vary slightly depending on breed, animal health, and other factors, but the average is 283 days.",
+    litersPerDay: "L/day",
+    days: "days",
+    daysRemaining: "Remaining",
+    expectedDate: "Expected date",
+    status: {
+      high: "High",
+      medium: "Medium",
+      low: "Low"
+    }
   }
 }

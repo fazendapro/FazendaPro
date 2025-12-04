@@ -16,6 +16,13 @@
     "forgotPassword": "Esqueceu a senha?",
     "access": "Acessar",
     "loginSuccess": "Login realizado com sucesso",
-    "notInformed": "Não informado"
+    "notInformed": "Não informado",
+    "navigation": {
+      "dashboard": "Dashboard",
+      "cattle": "Vacas",
+      "sales": "Vendas",
+      "settings": "Configurações",
+      "logout": "Sair"
+    }
   }
 }

@@ -30,6 +30,17 @@ export const translations = {
     monthly: "Ventas realizadas en el mes",
     monthlySalesStatsRetrievedSuccessfully: "Estadísticas mensuales de ventas recuperadas con éxito",
     salesAndPurchasesTooltip: "Gráfico que muestra el valor total de ventas realizadas en los últimos 12 meses, basado en las ventas de animales registradas en el sistema.",
-    overviewStatsRetrievedSuccessfully: "Estadísticas generales recuperadas con éxito"
+    overviewStatsRetrievedSuccessfully: "Estadísticas generales recuperadas con éxito",
+    topMilkProducersTooltip: "Ranking de las vacas con mayor producción de leche en los últimos 30 días, basado en la producción media diaria.",
+    nextToCalveTooltip: "Una vaca está preñada durante aproximadamente 9 meses, o alrededor de 280 a 290 días, desde el día en que se confirma la preñez. El período de gestación puede variar ligeramente dependiendo de la raza, la salud del animal y otros factores, pero el promedio es de 283 días.",
+    litersPerDay: "L/día",
+    days: "días",
+    daysRemaining: "Faltan",
+    expectedDate: "Fecha prevista",
+    status: {
+      high: "Alto",
+      medium: "Medio",
+      low: "Bajo"
+    }
   }
 }

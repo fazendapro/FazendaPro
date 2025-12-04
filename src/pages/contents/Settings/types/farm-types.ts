@@ -1,6 +1,7 @@
 export interface FarmData {
   id: number;
   logo: string;
+  language: string;
   company_id: number;
   company?: {
     id: number;
@@ -15,6 +16,7 @@ export interface FarmData {
 export interface BackendFarmData {
   ID: number;
   Logo: string;
+  Language: string;
   CompanyID: number;
   Company?: {
     ID: number;
@@ -28,4 +30,5 @@ export interface BackendFarmData {
 
 export interface UpdateFarmParams {
   logo: string;
+  language?: string;
 }

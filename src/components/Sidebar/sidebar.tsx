@@ -1,6 +1,7 @@
 import { Menu, Layout, Grid, Button, Avatar, Card, Typography } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { HomeOutlined, UserOutlined, MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined, SettingOutlined, DollarOutlined } from "@ant-design/icons";
 import { useAuth } from "../../contexts/AuthContext";
 import { useSelectedFarm } from "../../hooks/useSelectedFarm";
@@ -10,6 +11,7 @@ const { useBreakpoint } = Grid;
 const { Text } = Typography;
 
 export const Sidebar = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const screens = useBreakpoint();
@@ -30,11 +32,11 @@ export const Sidebar = () => {
   };
 
   const menuItems = [
-    { key: '/', icon: <HomeOutlined />, label: 'Dashboard' },
-    { key: '/vacas', icon: <UserOutlined />, label: 'Vacas' },
-    { key: '/vendas', icon: <DollarOutlined />, label: 'Vendas' },
-    { key: '/configuracoes', icon: <SettingOutlined />, label: 'Configurações' },
-    { key: '/sair', icon: <LogoutOutlined />, label: 'Sair' },
+    { key: '/', icon: <HomeOutlined />, label: t('navigation.dashboard') },
+    { key: '/vacas', icon: <UserOutlined />, label: t('navigation.cattle') },
+    { key: '/vendas', icon: <DollarOutlined />, label: t('navigation.sales') },
+    { key: '/configuracoes', icon: <SettingOutlined />, label: t('navigation.settings') },
+    { key: '/sair', icon: <LogoutOutlined />, label: t('navigation.logout') },
   ];
 
   if (!isAuthenticated) {

@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import { useReproduction } from '../../hooks/useReproduction';
 import { useAnimals } from '../../hooks/useAnimals';
 import { useResponsive } from '../../../../../hooks';
-import { CreateReproductionRequest, Reproduction, ReproductionPhase, ReproductionPhaseLabels } from '../../domain/model/reproduction';
+import { CreateReproductionRequest, Reproduction, ReproductionPhase } from '../../domain/model/reproduction';
 
 const { TextArea } = Input;
 
@@ -171,11 +171,18 @@ export const CreateReproductionModal = ({
           rules={[{ required: true, message: t('animalTable.reproduction.phaseRequired') }]}
         >
           <Select>
-            {Object.entries(ReproductionPhaseLabels).map(([value, label]) => (
-              <Select.Option key={value} value={parseInt(value)}>
-                {label}
-              </Select.Option>
-            ))}
+            <Select.Option value={ReproductionPhase.LACTACAO}>
+              {t('animalTable.reproduction.phases.lactacao')}
+            </Select.Option>
+            <Select.Option value={ReproductionPhase.SECANDO}>
+              {t('animalTable.reproduction.phases.secando')}
+            </Select.Option>
+            <Select.Option value={ReproductionPhase.VAZIAS}>
+              {t('animalTable.reproduction.phases.vazias')}
+            </Select.Option>
+            <Select.Option value={ReproductionPhase.PRENHAS}>
+              {t('animalTable.reproduction.phases.prenhas')}
+            </Select.Option>
           </Select>
         </Form.Item>
 

@@ -14,6 +14,13 @@
     "passwordPlaceholder": "Enter your password",
     "rememberPassword": "Remember password",
     "forgotPassword": "Forgot password?",
-    "access": "Access"
+    "access": "Access",
+    "navigation": {
+      "dashboard": "Dashboard",
+      "cattle": "Cattle",
+      "sales": "Sales",
+      "settings": "Settings",
+      "logout": "Logout"
+    }
   }
 }

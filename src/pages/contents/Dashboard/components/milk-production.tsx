@@ -33,7 +33,7 @@ const DashboardMilkProduction: React.FC = () => {
       responsive: ['sm', 'md', 'lg', 'xl'] as Breakpoint[],
       render: (value: number) => (
         <span style={{ fontWeight: 'bold', color: '#1890ff' }}>
-          {value.toFixed(1)}L/dia
+          {value.toFixed(1)}{t('dashboard.litersPerDay')}
         </span>
       )
     },
@@ -57,7 +57,7 @@ const DashboardMilkProduction: React.FC = () => {
       responsive: ['lg', 'xl'] as Breakpoint[],
       render: (value: number) => (
         <span style={{ color: '#722ed1' }}>
-          {value} dias
+          {value} {t('dashboard.days')}
         </span>
       )
     },
@@ -94,7 +94,7 @@ const DashboardMilkProduction: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {t('dashboard.topMilkProducers')}
           <Tooltip 
-            title="Ranking das vacas com maior produção de leite nos últimos 30 dias, baseado na produção média diária."
+            title={t('dashboard.topMilkProducersTooltip')}
             placement="top"
           >
             <InfoCircleOutlined style={{ color: '#1890ff', cursor: 'help' }} />

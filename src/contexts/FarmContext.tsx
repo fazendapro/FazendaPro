@@ -4,6 +4,7 @@ interface Farm {
   ID: number;
   CompanyID: number;
   Logo: string;
+  Language?: string;
   Company?: {
     ID: number;
     CompanyName: string;

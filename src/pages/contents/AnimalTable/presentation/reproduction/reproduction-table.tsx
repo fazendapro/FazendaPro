@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useReproduction } from '../../hooks/useReproduction';
 import { useFarm } from '../../../../../hooks/useFarm';
 import { useResponsive } from '../../../../../hooks';
-import { Reproduction, ReproductionPhase, ReproductionPhaseLabels, ReproductionPhaseColors } from '../../domain/model/reproduction';
+import { Reproduction, ReproductionPhase, ReproductionPhaseColors } from '../../domain/model/reproduction';
 import { CreateReproductionModal } from './create-reproduction-modal';
 import { UpdateReproductionPhaseModal } from './update-reproduction-phase-modal';
 import { CustomPagination } from '../../../../../components/lib/Pagination/custom-pagination';
@@ -106,15 +106,25 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
       title: t('animalTable.reproduction.currentPhase'),
       dataIndex: 'current_phase',
       key: 'current_phase',
-      render: (phase: number) => (
-        <Tag color={ReproductionPhaseColors[phase as ReproductionPhase]}>
-          {ReproductionPhaseLabels[phase as ReproductionPhase]}
-        </Tag>
-      ),
-      filters: Object.entries(ReproductionPhaseLabels).map(([value, text]) => ({
-        text,
-        value: parseInt(value),
-      })),
+      render: (phase: number) => {
+        const phaseLabels: Record<number, string> = {
+          [ReproductionPhase.LACTACAO]: t('animalTable.reproduction.phases.lactacao'),
+          [ReproductionPhase.SECANDO]: t('animalTable.reproduction.phases.secando'),
+          [ReproductionPhase.VAZIAS]: t('animalTable.reproduction.phases.vazias'),
+          [ReproductionPhase.PRENHAS]: t('animalTable.reproduction.phases.prenhas')
+        };
+        return (
+          <Tag color={ReproductionPhaseColors[phase as ReproductionPhase]}>
+            {phaseLabels[phase] || '-'}
+          </Tag>
+        );
+      },
+      filters: [
+        { text: t('animalTable.reproduction.phases.lactacao'), value: ReproductionPhase.LACTACAO },
+        { text: t('animalTable.reproduction.phases.secando'), value: ReproductionPhase.SECANDO },
+        { text: t('animalTable.reproduction.phases.vazias'), value: ReproductionPhase.VAZIAS },
+        { text: t('animalTable.reproduction.phases.prenhas'), value: ReproductionPhase.PRENHAS }
+      ],
       onFilter: (value: boolean | React.Key, record: Reproduction) => record.current_phase === Number(value),
     },
     {
@@ -141,7 +151,7 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
       key: 'veterinary_confirmation',
       render: (confirmed: boolean) => (
         <Tag color={confirmed ? 'green' : 'red'}>
-          {confirmed ? 'Confirmado' : 'Não confirmado'}
+          {confirmed ? t('animalTable.reproduction.confirmed') : t('animalTable.reproduction.notConfirmed')}
         </Tag>
       ),
     },
