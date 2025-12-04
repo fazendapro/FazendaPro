@@ -43,7 +43,7 @@ export const AnimalDetailForm: React.FC<AnimalDetailFormProps> = ({ onSave, onCa
   }, [animal, form]);
 
   const handleSave = () => {
-    form.validateFields().then((values) => {
+    form.validateFields().then((values: Record<string, any>) => {
       const formData: AnimalDetailFormData = {
         animal_name: values.animal_name,
         ear_tag_number_local: values.ear_tag_number_local,
@@ -265,7 +265,7 @@ export const AnimalDetailForm: React.FC<AnimalDetailFormProps> = ({ onSave, onCa
             <Switch 
               key={`confinement-${animal?.id}-${animal?.confinement}`}
               checked={Boolean(animal?.confinement)}
-              onChange={(checked) => form.setFieldValue('confinement', checked)} 
+              onChange={(checked: boolean) => form.setFieldValue('confinement', checked)} 
             />
             <span style={{ marginLeft: '8px' }}>Confinamento</span>
           </div>
@@ -276,7 +276,7 @@ export const AnimalDetailForm: React.FC<AnimalDetailFormProps> = ({ onSave, onCa
             <Switch 
               key={`fertilization-${animal?.id}-${animal?.fertilization}`}
               checked={Boolean(animal?.fertilization)}
-              onChange={(checked) => form.setFieldValue('fertilization', checked)} 
+              onChange={(checked: boolean) => form.setFieldValue('fertilization', checked)} 
             />
             <span style={{ marginLeft: '8px' }}>Fertilização</span>
           </div>
@@ -287,7 +287,7 @@ export const AnimalDetailForm: React.FC<AnimalDetailFormProps> = ({ onSave, onCa
             <Switch 
               key={`castrated-${animal?.id}-${animal?.castrated}`}
               checked={Boolean(animal?.castrated)}
-              onChange={(checked) => form.setFieldValue('castrated', checked)} 
+              onChange={(checked: boolean) => form.setFieldValue('castrated', checked)} 
             />
             <span style={{ marginLeft: '8px' }}>Castrado</span>
           </div>

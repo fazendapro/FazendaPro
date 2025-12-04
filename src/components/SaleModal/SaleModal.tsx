@@ -126,7 +126,7 @@ export const SaleModal: React.FC<SaleModalProps> = ({
             disabled={mode === 'edit'}
             showSearch
             optionFilterProp="children"
-            filterOption={(input, option) =>
+            filterOption={(input: string, option?: { children?: React.ReactNode }) =>
               (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
             }
           >
@@ -162,8 +162,8 @@ export const SaleModal: React.FC<SaleModalProps> = ({
           <InputNumber
             placeholder={t('saleModal.placeholders.price')}
             style={{ width: '100%' }}
-            formatter={(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-            parser={(value) => value!.replace(/R\$\s?|(,*)/g, '')}
+            formatter={(value: string | number | undefined) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+            parser={(value: string | undefined) => value!.replace(/R\$\s?|(,*)/g, '')}
             precision={2}
           />
         </Form.Item>

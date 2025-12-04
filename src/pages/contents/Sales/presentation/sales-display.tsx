@@ -273,7 +273,7 @@ export const SalesDisplay: React.FC = () => {
                       dayjs(filters.start_date),
                       dayjs(filters.end_date)
                     ] : null}
-                    onChange={(dates) => {
+                    onChange={(dates: [dayjs.Dayjs, dayjs.Dayjs] | null) => {
                       if (dates && dates[0] && dates[1]) {
                         const newFilters = {
                           ...filters,
@@ -325,7 +325,7 @@ export const SalesDisplay: React.FC = () => {
                   pageSize: 10,
                   showSizeChanger: true,
                   showQuickJumper: true,
-                  showTotal: (total, range) => 
+                  showTotal: (total: number, range: [number, number]) => 
                     `${range[0]}-${range[1]} de ${total} ${t('sales.table.items')}`,
                 }}
               />
