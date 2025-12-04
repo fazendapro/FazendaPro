@@ -108,3 +108,5 @@ func TestFarmRepository_LoadCompanyData_NotFound(t *testing.T) {
 	err := repo.LoadCompanyData(farm)
 	assert.Error(t, err)
 }
+
+

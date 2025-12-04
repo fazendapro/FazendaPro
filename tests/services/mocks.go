@@ -1,6 +1,8 @@
 package services
 
 import (
+	"time"
+
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"github.com/fazendapro/FazendaPro-api/internal/repository"
 	"github.com/stretchr/testify/mock"
@@ -279,4 +281,141 @@ func (m *MockCache) Delete(key string) error {
 func (m *MockCache) Increment(key string, delta uint64) (uint64, error) {
 	args := m.Called(key, delta)
 	return args.Get(0).(uint64), args.Error(1)
+}
+
+type MockVaccineRepository struct {
+	mock.Mock
+}
+
+func (m *MockVaccineRepository) Create(vaccine *models.Vaccine) error {
+	args := m.Called(vaccine)
+	return args.Error(0)
+}
+
+func (m *MockVaccineRepository) FindByID(id uint) (*models.Vaccine, error) {
+	args := m.Called(id)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.Vaccine), args.Error(1)
+}
+
+func (m *MockVaccineRepository) FindByFarmID(farmID uint) ([]models.Vaccine, error) {
+	args := m.Called(farmID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]models.Vaccine), args.Error(1)
+}
+
+func (m *MockVaccineRepository) Update(vaccine *models.Vaccine) error {
+	args := m.Called(vaccine)
+	return args.Error(0)
+}
+
+func (m *MockVaccineRepository) Delete(id uint) error {
+	args := m.Called(id)
+	return args.Error(0)
+}
+
+type MockVaccineApplicationRepository struct {
+	mock.Mock
+}
+
+func (m *MockVaccineApplicationRepository) Create(vaccineApplication *models.VaccineApplication) error {
+	args := m.Called(vaccineApplication)
+	return args.Error(0)
+}
+
+func (m *MockVaccineApplicationRepository) FindByID(id uint) (*models.VaccineApplication, error) {
+	args := m.Called(id)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.VaccineApplication), args.Error(1)
+}
+
+func (m *MockVaccineApplicationRepository) FindByFarmID(farmID uint) ([]models.VaccineApplication, error) {
+	args := m.Called(farmID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]models.VaccineApplication), args.Error(1)
+}
+
+func (m *MockVaccineApplicationRepository) FindByFarmIDWithDateRange(farmID uint, startDate, endDate *time.Time) ([]models.VaccineApplication, error) {
+	args := m.Called(farmID, startDate, endDate)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]models.VaccineApplication), args.Error(1)
+}
+
+func (m *MockVaccineApplicationRepository) FindByAnimalID(animalID uint) ([]models.VaccineApplication, error) {
+	args := m.Called(animalID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]models.VaccineApplication), args.Error(1)
+}
+
+func (m *MockVaccineApplicationRepository) FindByVaccineID(vaccineID uint) ([]models.VaccineApplication, error) {
+	args := m.Called(vaccineID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]models.VaccineApplication), args.Error(1)
+}
+
+func (m *MockVaccineApplicationRepository) Update(vaccineApplication *models.VaccineApplication) error {
+	args := m.Called(vaccineApplication)
+	return args.Error(0)
+}
+
+func (m *MockVaccineApplicationRepository) Delete(id uint) error {
+	args := m.Called(id)
+	return args.Error(0)
+}
+
+type MockWeightRepository struct {
+	mock.Mock
+}
+
+func (m *MockWeightRepository) Create(weight *models.Weight) error {
+	args := m.Called(weight)
+	return args.Error(0)
+}
+
+func (m *MockWeightRepository) FindByID(id uint) (*models.Weight, error) {
+	args := m.Called(id)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.Weight), args.Error(1)
+}
+
+func (m *MockWeightRepository) FindByAnimalID(animalID uint) (*models.Weight, error) {
+	args := m.Called(animalID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.Weight), args.Error(1)
+}
+
+func (m *MockWeightRepository) FindByFarmID(farmID uint) ([]models.Weight, error) {
+	args := m.Called(farmID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]models.Weight), args.Error(1)
+}
+
+func (m *MockWeightRepository) Update(weight *models.Weight) error {
+	args := m.Called(weight)
+	return args.Error(0)
+}
+
+func (m *MockWeightRepository) Delete(id uint) error {
+	args := m.Called(id)
+	return args.Error(0)
 }

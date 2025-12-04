@@ -490,3 +490,27 @@ func TestAnimalRepository_CountBySex(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, int64(0), emptyCount)
 }
+
+func TestAnimalRepository_FindByFarmID_EmptyResult(t *testing.T) {
+	database, db := setupAnimalTestDB(t)
+	repo := repository.NewAnimalRepository(database)
+
+	farm := createTestFarmForAnimal(t, db)
+
+	animals, err := repo.FindByFarmID(farm.ID)
+	assert.NoError(t, err)
+	assert.NotNil(t, animals)
+	assert.Len(t, animals, 0)
+}
+
+func TestAnimalRepository_FindByFarmIDAndSex_EmptyResult(t *testing.T) {
+	database, db := setupAnimalTestDB(t)
+	repo := repository.NewAnimalRepository(database)
+
+	farm := createTestFarmForAnimal(t, db)
+
+	animals, err := repo.FindByFarmIDAndSex(farm.ID, 1)
+	assert.NoError(t, err)
+	assert.NotNil(t, animals)
+	assert.Len(t, animals, 0)
+}

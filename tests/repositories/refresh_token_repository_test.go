@@ -248,3 +248,39 @@ func TestRefreshTokenRepository_DeleteExpired_Multiple(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, found)
 }
+
+func TestRefreshTokenRepository_DeleteByToken_NonExistent(t *testing.T) {
+	database, _ := setupRefreshTokenTestDB(t)
+	repo := repository.NewRefreshTokenRepository(database)
+
+	err := repo.DeleteByToken("non-existent-token")
+	assert.NoError(t, err)
+}
+
+func TestRefreshTokenRepository_DeleteByUserID_NoTokens(t *testing.T) {
+	database, db := setupRefreshTokenTestDB(t)
+	repo := repository.NewRefreshTokenRepository(database)
+
+	user := createTestUserForRefreshToken(t, db)
+
+	err := repo.DeleteByUserID(user.ID)
+	assert.NoError(t, err)
+}
+
+func TestRefreshTokenRepository_DeleteExpired_NoExpiredTokens(t *testing.T) {
+	database, db := setupRefreshTokenTestDB(t)
+	repo := repository.NewRefreshTokenRepository(database)
+
+	user := createTestUserForRefreshToken(t, db)
+
+	validAt := time.Now().Add(24 * time.Hour)
+	_, err := repo.Create(user.ID, validAt)
+	require.NoError(t, err)
+
+	err = repo.DeleteExpired()
+	assert.NoError(t, err)
+
+	var count int64
+	db.Model(&models.RefreshToken{}).Count(&count)
+	assert.Equal(t, int64(1), count)
+}

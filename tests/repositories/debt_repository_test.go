@@ -274,6 +274,16 @@ func TestDebtRepository_GetTotalByPersonInMonth_December(t *testing.T) {
 	assert.Equal(t, 100.0, results[0].Total)
 }
 
+func TestDebtRepository_FindAllWithPagination_EmptyResult(t *testing.T) {
+	db := setupDebtTestDB(t)
+	repo := repository.NewDebtRepository(db)
+
+	debts, total, err := repo.FindAllWithPagination(1, 10, nil, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(0), total)
+	assert.Len(t, debts, 0)
+}
+
 func TestDebtRepository_GetTotalByPersonInMonth_Empty(t *testing.T) {
 	db := setupDebtTestDB(t)
 	repo := repository.NewDebtRepository(db)

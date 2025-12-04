@@ -48,6 +48,18 @@ func (f *RepositoryFactory) CreateDebtRepository() DebtRepositoryInterface {
 	return NewDebtRepository(f.db.DB)
 }
 
+func (f *RepositoryFactory) CreateVaccineRepository() VaccineRepositoryInterface {
+	return NewVaccineRepository(f.db.DB)
+}
+
+func (f *RepositoryFactory) CreateVaccineApplicationRepository() VaccineApplicationRepositoryInterface {
+	return NewVaccineApplicationRepository(f.db.DB)
+}
+
+func (f *RepositoryFactory) CreateWeightRepository() WeightRepositoryInterface {
+	return NewWeightRepository(f.db.DB)
+}
+
 func (f *RepositoryFactory) GetCache() cache.CacheInterface {
 	return f.cache
 }

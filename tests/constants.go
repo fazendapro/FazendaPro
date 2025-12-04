@@ -39,6 +39,9 @@ const (
 	EndpointUsersPersonWithID    = "/users/person?id=1"
 	EndpointHealth               = "/health"
 	EndpointAPIv1AuthRegister    = "/api/v1/auth/register"
+	EndpointAPIv1Weights         = "/api/v1/weights"
+	EndpointAPIv1WeightsAnimal  = "/api/v1/weights/animal/1"
+	EndpointAPIv1WeightsFarm    = "/api/v1/weights/farm/1"
 )
 
 // Test Data - Emails
@@ -118,6 +121,7 @@ const (
 	TypeModelsMilkCollection = "*models.MilkCollection"
 	TypeModelsReproduction  = "*models.Reproduction"
 	TypeModelsSale          = "*models.Sale"
+	TypeModelsWeight        = "*models.Weight"
 	TypeTimeTime            = "time.Time"
 	TypeTimeTimePtr         = "*time.Time"
 )
