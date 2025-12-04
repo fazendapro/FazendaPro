@@ -5,8 +5,8 @@ export const remoteGetWeightByAnimal = async (animalId: number): Promise<Weight 
   try {
     const response = await api().get(`/weights/animal/${animalId}`);
     return response.data.data;
-  } catch (error: any) {
-    if (error.response?.status === 404) {
+  } catch (error: unknown) {
+    if ((error as { response?: { status?: number } })?.response?.status === 404) {
       return null;
     }
     throw error;
