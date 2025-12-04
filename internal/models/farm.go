@@ -9,6 +9,7 @@ type Farm struct {
 	CompanyID uint    `gorm:"not null"`
 	Company   Company `gorm:"foreignKey:CompanyID"`
 	Logo      string
+	Language  string    `gorm:"default:'pt'"`
 	Users     []User    `gorm:"foreignKey:FarmID"`
 	Animals   []Animal  `gorm:"foreignKey:FarmID"`
 	Expenses  []Expense `gorm:"foreignKey:FarmID"`

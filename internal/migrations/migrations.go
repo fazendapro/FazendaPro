@@ -74,6 +74,7 @@ func RunMigrations(db *gorm.DB) error {
 		{"021_create_debts_table", createDebtsTable},
 		{"022_create_vaccines_table", createVaccinesTable},
 		{"023_create_vaccine_applications_table", createVaccineApplicationsTable},
+		{"024_add_farm_language", addFarmLanguage},
 	}
 
 	for _, migration := range migrations {
@@ -422,5 +423,20 @@ func createVaccineApplicationsTable(db *gorm.DB) error {
 	}
 
 	log.Printf("Vaccine applications table created successfully")
+	return nil
+}
+
+func addFarmLanguage(db *gorm.DB) error {
+	log.Printf("Adding language column to farms table...")
+
+	if err := db.AutoMigrate(&models.Farm{}); err != nil {
+		return fmt.Errorf("error adding language column to farms table: %w", err)
+	}
+
+	if err := db.Model(&models.Farm{}).Where("language = '' OR language IS NULL").Update("language", "pt").Error; err != nil {
+		log.Printf("Warning: Could not update existing farms with default language: %v", err)
+	}
+
+	log.Printf("Language column added to farms table successfully")
 	return nil
 }
