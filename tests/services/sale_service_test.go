@@ -319,9 +319,98 @@ func TestSaleService_GetSalesByAnimalID(t *testing.T) {
 	sales, err := saleService.GetSalesByAnimalID(ctx, animalID, farmID)
 
 	assert.NoError(t, err)
+	assert.NotNil(t, sales)
 	assert.Len(t, sales, 1)
 	assert.Equal(t, expectedSales[0].ID, sales[0].ID)
 	mockSaleRepo.AssertExpectations(t)
+	mockAnimalRepo.AssertExpectations(t)
+}
+
+func TestSaleService_GetSalesByAnimalID_AnimalNotFound(t *testing.T) {
+	mockSaleRepo := new(MockSaleRepository)
+	mockAnimalRepo := new(MockAnimalRepository)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, new(MockCache))
+
+	ctx := context.Background()
+	animalID := uint(1)
+	farmID := uint(1)
+
+	mockAnimalRepo.On("FindByID", animalID).Return(nil, nil)
+
+	sales, err := saleService.GetSalesByAnimalID(ctx, animalID, farmID)
+
+	assert.Error(t, err)
+	assert.Nil(t, sales)
+	assert.Contains(t, err.Error(), "animal not found")
+	mockAnimalRepo.AssertExpectations(t)
+}
+
+func TestSaleService_GetSalesByAnimalID_AnimalRepositoryError(t *testing.T) {
+	mockSaleRepo := new(MockSaleRepository)
+	mockAnimalRepo := new(MockAnimalRepository)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, new(MockCache))
+
+	ctx := context.Background()
+	animalID := uint(1)
+	farmID := uint(1)
+
+	mockAnimalRepo.On("FindByID", animalID).Return(nil, errors.New("database error"))
+
+	sales, err := saleService.GetSalesByAnimalID(ctx, animalID, farmID)
+
+	assert.Error(t, err)
+	assert.Nil(t, sales)
+	assert.Contains(t, err.Error(), "animal not found")
+	mockAnimalRepo.AssertExpectations(t)
+}
+
+func TestSaleService_GetSalesByAnimalID_WrongFarm(t *testing.T) {
+	mockSaleRepo := new(MockSaleRepository)
+	mockAnimalRepo := new(MockAnimalRepository)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, new(MockCache))
+
+	ctx := context.Background()
+	animalID := uint(1)
+	farmID := uint(1)
+	wrongFarmID := uint(2)
+
+	animal := &models.Animal{
+		ID:     animalID,
+		FarmID: wrongFarmID,
+	}
+	mockAnimalRepo.On("FindByID", animalID).Return(animal, nil)
+
+	sales, err := saleService.GetSalesByAnimalID(ctx, animalID, farmID)
+
+	assert.Error(t, err)
+	assert.Nil(t, sales)
+	assert.Contains(t, err.Error(), "does not belong to the specified farm")
+	mockAnimalRepo.AssertExpectations(t)
+}
+
+func TestSaleService_GetSalesByAnimalID_EmptyResult(t *testing.T) {
+	mockSaleRepo := new(MockSaleRepository)
+	mockAnimalRepo := new(MockAnimalRepository)
+	saleService := service.NewSaleService(mockSaleRepo, mockAnimalRepo, new(MockCache))
+
+	ctx := context.Background()
+	animalID := uint(1)
+	farmID := uint(1)
+
+	animal := &models.Animal{
+		ID:     animalID,
+		FarmID: farmID,
+	}
+	mockAnimalRepo.On("FindByID", animalID).Return(animal, nil)
+	mockSaleRepo.On("GetByAnimalID", ctx, animalID, farmID).Return([]*models.Sale{}, nil)
+
+	sales, err := saleService.GetSalesByAnimalID(ctx, animalID, farmID)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, sales)
+	assert.Len(t, sales, 0)
+	mockSaleRepo.AssertExpectations(t)
+	mockAnimalRepo.AssertExpectations(t)
 }
 
 func TestSaleService_GetSalesByDateRange(t *testing.T) {

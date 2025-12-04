@@ -140,6 +140,38 @@ func TestDebtService_GetDebtsWithPagination_DefaultValues(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 }
 
+func TestDebtService_GetDebtsWithPagination_NegativePage(t *testing.T) {
+	mockRepo := new(MockDebtRepository)
+	debtService := service.NewDebtService(mockRepo)
+
+	expectedDebts := []models.Debt{}
+
+	mockRepo.On("FindAllWithPagination", 1, 10, (*int)(nil), (*int)(nil)).Return(expectedDebts, int64(0), nil)
+
+	debts, total, err := debtService.GetDebtsWithPagination(-1, 10, nil, nil)
+
+	assert.NoError(t, err)
+	assert.Len(t, debts, 0)
+	assert.Equal(t, int64(0), total)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestDebtService_GetDebtsWithPagination_NegativeLimit(t *testing.T) {
+	mockRepo := new(MockDebtRepository)
+	debtService := service.NewDebtService(mockRepo)
+
+	expectedDebts := []models.Debt{}
+
+	mockRepo.On("FindAllWithPagination", 1, 10, (*int)(nil), (*int)(nil)).Return(expectedDebts, int64(0), nil)
+
+	debts, total, err := debtService.GetDebtsWithPagination(1, -5, nil, nil)
+
+	assert.NoError(t, err)
+	assert.Len(t, debts, 0)
+	assert.Equal(t, int64(0), total)
+	mockRepo.AssertExpectations(t)
+}
+
 func TestDebtService_GetDebtsWithPagination_WithFilters(t *testing.T) {
 	mockRepo := new(MockDebtRepository)
 	debtService := service.NewDebtService(mockRepo)
@@ -195,6 +227,19 @@ func TestDebtService_DeleteDebt_NotFound(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "dívida não encontrada")
+	mockRepo.AssertExpectations(t)
+}
+
+func TestDebtService_DeleteDebt_NotFoundNil(t *testing.T) {
+	mockRepo := new(MockDebtRepository)
+	debtService := service.NewDebtService(mockRepo)
+
+	mockRepo.On("FindByID", uint(1)).Return(nil, nil)
+	mockRepo.On("Delete", uint(1)).Return(nil)
+
+	err := debtService.DeleteDebt(1)
+
+	assert.NoError(t, err)
 	mockRepo.AssertExpectations(t)
 }
 
@@ -260,6 +305,66 @@ func TestDebtService_GetTotalByPersonInMonth_YearTooHigh(t *testing.T) {
 	assert.Contains(t, err.Error(), "ano deve estar entre 2000 e 3000")
 }
 
+func TestDebtService_GetTotalByPersonInMonth_YearBoundary2000(t *testing.T) {
+	mockRepo := new(MockDebtRepository)
+	debtService := service.NewDebtService(mockRepo)
+
+	expectedTotals := []repository.PersonTotal{}
+
+	mockRepo.On("GetTotalByPersonInMonth", 2000, 1).Return(expectedTotals, nil)
+
+	totals, err := debtService.GetTotalByPersonInMonth(2000, 1)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, totals)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestDebtService_GetTotalByPersonInMonth_YearBoundary3000(t *testing.T) {
+	mockRepo := new(MockDebtRepository)
+	debtService := service.NewDebtService(mockRepo)
+
+	expectedTotals := []repository.PersonTotal{}
+
+	mockRepo.On("GetTotalByPersonInMonth", 3000, 12).Return(expectedTotals, nil)
+
+	totals, err := debtService.GetTotalByPersonInMonth(3000, 12)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, totals)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestDebtService_GetTotalByPersonInMonth_MonthBoundary1(t *testing.T) {
+	mockRepo := new(MockDebtRepository)
+	debtService := service.NewDebtService(mockRepo)
+
+	expectedTotals := []repository.PersonTotal{}
+
+	mockRepo.On("GetTotalByPersonInMonth", 2024, 1).Return(expectedTotals, nil)
+
+	totals, err := debtService.GetTotalByPersonInMonth(2024, 1)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, totals)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestDebtService_GetTotalByPersonInMonth_MonthBoundary12(t *testing.T) {
+	mockRepo := new(MockDebtRepository)
+	debtService := service.NewDebtService(mockRepo)
+
+	expectedTotals := []repository.PersonTotal{}
+
+	mockRepo.On("GetTotalByPersonInMonth", 2024, 12).Return(expectedTotals, nil)
+
+	totals, err := debtService.GetTotalByPersonInMonth(2024, 12)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, totals)
+	mockRepo.AssertExpectations(t)
+}
+
 func TestDebtService_GetTotalByPersonInMonth_RepositoryError(t *testing.T) {
 	mockRepo := new(MockDebtRepository)
 	debtService := service.NewDebtService(mockRepo)
@@ -316,4 +421,3 @@ func TestDebtService_CreateDebt_RepositoryError(t *testing.T) {
 	assert.Error(t, err)
 	mockRepo.AssertExpectations(t)
 }
-
