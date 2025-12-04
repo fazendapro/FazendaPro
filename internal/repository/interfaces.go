@@ -66,3 +66,22 @@ type DebtRepositoryInterface interface {
 	Delete(id uint) error
 	GetTotalByPersonInMonth(year, month int) ([]PersonTotal, error)
 }
+
+type VaccineRepositoryInterface interface {
+	Create(vaccine *models.Vaccine) error
+	FindByID(id uint) (*models.Vaccine, error)
+	FindByFarmID(farmID uint) ([]models.Vaccine, error)
+	Update(vaccine *models.Vaccine) error
+	Delete(id uint) error
+}
+
+type VaccineApplicationRepositoryInterface interface {
+	Create(vaccineApplication *models.VaccineApplication) error
+	FindByID(id uint) (*models.VaccineApplication, error)
+	FindByFarmID(farmID uint) ([]models.VaccineApplication, error)
+	FindByFarmIDWithDateRange(farmID uint, startDate, endDate *time.Time) ([]models.VaccineApplication, error)
+	FindByAnimalID(animalID uint) ([]models.VaccineApplication, error)
+	FindByVaccineID(vaccineID uint) ([]models.VaccineApplication, error)
+	Update(vaccineApplication *models.VaccineApplication) error
+	Delete(id uint) error
+}

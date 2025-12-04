@@ -72,6 +72,8 @@ func RunMigrations(db *gorm.DB) error {
 		{"019_migrate_users_to_user_farms", migrateUsersToUserFarms},
 		{"020_create_sales_table", createSalesTable},
 		{"021_create_debts_table", createDebtsTable},
+		{"022_create_vaccines_table", createVaccinesTable},
+		{"023_create_vaccine_applications_table", createVaccineApplicationsTable},
 	}
 
 	for _, migration := range migrations {
@@ -398,5 +400,27 @@ func createDebtsTable(db *gorm.DB) error {
 	}
 
 	log.Printf("Debts table created successfully")
+	return nil
+}
+
+func createVaccinesTable(db *gorm.DB) error {
+	log.Printf("Creating vaccines table...")
+
+	if err := db.AutoMigrate(&models.Vaccine{}); err != nil {
+		return fmt.Errorf("error creating vaccines table: %w", err)
+	}
+
+	log.Printf("Vaccines table created successfully")
+	return nil
+}
+
+func createVaccineApplicationsTable(db *gorm.DB) error {
+	log.Printf("Creating vaccine_applications table...")
+
+	if err := db.AutoMigrate(&models.VaccineApplication{}); err != nil {
+		return fmt.Errorf("error creating vaccine_applications table: %w", err)
+	}
+
+	log.Printf("Vaccine applications table created successfully")
 	return nil
 }

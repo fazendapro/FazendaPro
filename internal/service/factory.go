@@ -51,3 +51,13 @@ func (f *ServiceFactory) CreateDebtService() *DebtService {
 	debtRepo := f.repoFactory.CreateDebtRepository()
 	return NewDebtService(debtRepo)
 }
+
+func (f *ServiceFactory) CreateVaccineService() *VaccineService {
+	vaccineRepo := f.repoFactory.CreateVaccineRepository()
+	return NewVaccineService(vaccineRepo)
+}
+
+func (f *ServiceFactory) CreateVaccineApplicationService() *VaccineApplicationService {
+	vaccineApplicationRepo := f.repoFactory.CreateVaccineApplicationRepository()
+	return NewVaccineApplicationService(vaccineApplicationRepo)
+}
