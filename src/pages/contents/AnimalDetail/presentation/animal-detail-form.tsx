@@ -5,6 +5,25 @@ import { useAnimalDetailContext } from '../hooks';
 import { AnimalDetailFormData, SEX_OPTIONS, ANIMAL_TYPE_OPTIONS, STATUS_OPTIONS, PURPOSE_OPTIONS } from '../types';
 import dayjs from 'dayjs';
 
+interface AnimalFormValues {
+  animal_name: string;
+  ear_tag_number_local: number;
+  ear_tag_number_register: number;
+  type: string;
+  sex: number;
+  breed: string;
+  birth_date?: dayjs.Dayjs | null;
+  animal_type: number;
+  status: number;
+  confinement: boolean;
+  fertilization: boolean;
+  castrated: boolean;
+  purpose: number;
+  current_batch: number;
+  father_id?: number;
+  mother_id?: number;
+}
+
 const { Option } = Select;
 
 interface AnimalDetailFormProps {
@@ -43,7 +62,7 @@ export const AnimalDetailForm: React.FC<AnimalDetailFormProps> = ({ onSave, onCa
   }, [animal, form]);
 
   const handleSave = () => {
-    form.validateFields().then((values: Record<string, any>) => {
+    form.validateFields().then((values: AnimalFormValues) => {
       const formData: AnimalDetailFormData = {
         animal_name: values.animal_name,
         ear_tag_number_local: values.ear_tag_number_local,
