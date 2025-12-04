@@ -100,7 +100,6 @@ func modelToWeightResponse(weight *models.Weight) WeightResponse {
 // @Failure      500  {object}  ErrorResponse
 // @Router       /api/v1/weights [post]
 func (h *WeightHandler) CreateOrUpdateWeight(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("CreateOrUpdateWeight handler chamado")
 	if r.Method != http.MethodPost {
 		SendErrorResponse(w, ErrMethodNotAllowed, http.StatusMethodNotAllowed)
 		return

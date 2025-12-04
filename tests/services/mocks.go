@@ -376,3 +376,46 @@ func (m *MockVaccineApplicationRepository) Delete(id uint) error {
 	args := m.Called(id)
 	return args.Error(0)
 }
+
+type MockWeightRepository struct {
+	mock.Mock
+}
+
+func (m *MockWeightRepository) Create(weight *models.Weight) error {
+	args := m.Called(weight)
+	return args.Error(0)
+}
+
+func (m *MockWeightRepository) FindByID(id uint) (*models.Weight, error) {
+	args := m.Called(id)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.Weight), args.Error(1)
+}
+
+func (m *MockWeightRepository) FindByAnimalID(animalID uint) (*models.Weight, error) {
+	args := m.Called(animalID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.Weight), args.Error(1)
+}
+
+func (m *MockWeightRepository) FindByFarmID(farmID uint) ([]models.Weight, error) {
+	args := m.Called(farmID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]models.Weight), args.Error(1)
+}
+
+func (m *MockWeightRepository) Update(weight *models.Weight) error {
+	args := m.Called(weight)
+	return args.Error(0)
+}
+
+func (m *MockWeightRepository) Delete(id uint) error {
+	args := m.Called(id)
+	return args.Error(0)
+}
