@@ -40,5 +40,13 @@ export interface Animal extends AnimalForm {
 
 export interface GetAnimalsByFarmParams {
   farm_id: number;
+  page?: number;
+  limit?: number;
 }
 
+export interface GetAnimalsByFarmPaginatedResponse {
+  animals: Animal[];
+  total: number;
+  page: number;
+  limit: number;
+}
