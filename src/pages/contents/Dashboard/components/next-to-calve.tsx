@@ -31,6 +31,8 @@ const NextToCalve: React.FC = () => {
           backgroundColor: '#ffe4b5',
           fontSize: '12px'
         };
+      case 'Baixo':
+      case lowStatus:
       default:
         return {
            color: 'green',
