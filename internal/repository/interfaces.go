@@ -51,6 +51,7 @@ type ReproductionRepositoryInterface interface {
 	FindByID(id uint) (*models.Reproduction, error)
 	FindByAnimalID(animalID uint) (*models.Reproduction, error)
 	FindByFarmID(farmID uint) ([]models.Reproduction, error)
+	FindByFarmIDWithPagination(farmID uint, page, limit int) ([]models.Reproduction, int64, error)
 	FindByPhase(phase models.ReproductionPhase) ([]models.Reproduction, error)
 	Update(reproduction *models.Reproduction) error
 	Delete(id uint) error
@@ -82,7 +83,9 @@ type VaccineApplicationRepositoryInterface interface {
 	Create(vaccineApplication *models.VaccineApplication) error
 	FindByID(id uint) (*models.VaccineApplication, error)
 	FindByFarmID(farmID uint) ([]models.VaccineApplication, error)
+	FindByFarmIDWithPagination(farmID uint, page, limit int) ([]models.VaccineApplication, int64, error)
 	FindByFarmIDWithDateRange(farmID uint, startDate, endDate *time.Time) ([]models.VaccineApplication, error)
+	FindByFarmIDWithDateRangePaginated(farmID uint, startDate, endDate *time.Time, page, limit int) ([]models.VaccineApplication, int64, error)
 	FindByAnimalID(animalID uint) ([]models.VaccineApplication, error)
 	FindByVaccineID(vaccineID uint) ([]models.VaccineApplication, error)
 	Update(vaccineApplication *models.VaccineApplication) error

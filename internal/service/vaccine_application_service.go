@@ -57,6 +57,32 @@ func (s *VaccineApplicationService) GetApplicationsByFarmIDWithDateRange(farmID 
 	return s.repository.FindByFarmIDWithDateRange(farmID, startDate, endDate)
 }
 
+func (s *VaccineApplicationService) GetApplicationsByFarmIDWithPagination(farmID uint, page, limit int) ([]models.VaccineApplication, int64, error) {
+	if farmID == 0 {
+		return nil, 0, errors.New("ID da fazenda é obrigatório")
+	}
+	if page <= 0 {
+		page = 1
+	}
+	if limit <= 0 {
+		limit = 10
+	}
+	return s.repository.FindByFarmIDWithPagination(farmID, page, limit)
+}
+
+func (s *VaccineApplicationService) GetApplicationsByFarmIDWithDateRangePaginated(farmID uint, startDate, endDate *time.Time, page, limit int) ([]models.VaccineApplication, int64, error) {
+	if farmID == 0 {
+		return nil, 0, errors.New("ID da fazenda é obrigatório")
+	}
+	if page <= 0 {
+		page = 1
+	}
+	if limit <= 0 {
+		limit = 10
+	}
+	return s.repository.FindByFarmIDWithDateRangePaginated(farmID, startDate, endDate, page, limit)
+}
+
 func (s *VaccineApplicationService) GetApplicationsByAnimalID(animalID uint) ([]models.VaccineApplication, error) {
 	if animalID == 0 {
 		return nil, errors.New("ID do animal é obrigatório")
@@ -118,4 +144,3 @@ func (s *VaccineApplicationService) DeleteApplication(id uint) error {
 
 	return s.repository.Delete(id)
 }
-

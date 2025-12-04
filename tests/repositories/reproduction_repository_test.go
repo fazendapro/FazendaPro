@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -552,6 +553,58 @@ func TestReproductionRepository_FindByFarmID(t *testing.T) {
 		assert.Equal(t, farm1.ID, reproduction.Animal.FarmID)
 		assert.NotNil(t, reproduction.Animal)
 	}
+}
+
+func TestReproductionRepository_FindByFarmIDWithPagination(t *testing.T) {
+	db := setupReproductionTestDB(t)
+	reproductionRepo := repository.NewReproductionRepository(db)
+
+	farm := createTestFarmForReproduction(t, db)
+
+	for i := 0; i < 10; i++ {
+		animal := &models.Animal{
+			FarmID:            farm.ID,
+			AnimalName:        fmt.Sprintf("Animal %d", i),
+			EarTagNumberLocal: 100 + i,
+			Sex:               0,
+			Breed:             "Holandesa",
+			Type:              "Bovino",
+			AnimalType:        0,
+			Status:            0,
+			Purpose:           0,
+		}
+		require.NoError(t, db.Create(animal).Error)
+
+		reproduction := &models.Reproduction{
+			AnimalID:     animal.ID,
+			CurrentPhase: models.PhaseVazias,
+		}
+		require.NoError(t, db.Create(reproduction).Error)
+	}
+
+	reproductions, total, err := reproductionRepo.FindByFarmIDWithPagination(farm.ID, 1, 5)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(10), total)
+	assert.Len(t, reproductions, 5)
+
+	reproductions2, total2, err := reproductionRepo.FindByFarmIDWithPagination(farm.ID, 2, 5)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(10), total2)
+	assert.Len(t, reproductions2, 5)
+
+	assert.NotEqual(t, reproductions[0].ID, reproductions2[0].ID)
+}
+
+func TestReproductionRepository_FindByFarmIDWithPagination_EmptyResult(t *testing.T) {
+	db := setupReproductionTestDB(t)
+	reproductionRepo := repository.NewReproductionRepository(db)
+
+	farm := createTestFarmForReproduction(t, db)
+
+	reproductions, total, err := reproductionRepo.FindByFarmIDWithPagination(farm.ID, 1, 10)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(0), total)
+	assert.Len(t, reproductions, 0)
 }
 
 func TestReproductionRepository_Update(t *testing.T) {

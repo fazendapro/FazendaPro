@@ -56,6 +56,17 @@ func (s *ReproductionService) GetReproductionsByFarmID(farmID uint) ([]models.Re
 	return s.repository.FindByFarmID(farmID)
 }
 
+func (s *ReproductionService) GetReproductionsByFarmIDWithPagination(farmID uint, page, limit int) ([]models.Reproduction, int64, error) {
+	if page <= 0 {
+		page = 1
+	}
+	if limit <= 0 {
+		limit = 10
+	}
+
+	return s.repository.FindByFarmIDWithPagination(farmID, page, limit)
+}
+
 func (s *ReproductionService) GetReproductionsByPhase(phase models.ReproductionPhase) ([]models.Reproduction, error) {
 	return s.repository.FindByPhase(phase)
 }

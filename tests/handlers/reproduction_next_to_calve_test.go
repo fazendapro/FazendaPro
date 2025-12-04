@@ -48,6 +48,14 @@ func (m *MockReproductionRepository) FindByFarmID(farmID uint) ([]models.Reprodu
 	return args.Get(0).([]models.Reproduction), args.Error(1)
 }
 
+func (m *MockReproductionRepository) FindByFarmIDWithPagination(farmID uint, page, limit int) ([]models.Reproduction, int64, error) {
+	args := m.Called(farmID, page, limit)
+	if args.Get(0) == nil {
+		return nil, args.Get(1).(int64), args.Error(2)
+	}
+	return args.Get(0).([]models.Reproduction), args.Get(1).(int64), args.Error(2)
+}
+
 func (m *MockReproductionRepository) FindByPhase(phase models.ReproductionPhase) ([]models.Reproduction, error) {
 	args := m.Called(phase)
 	if args.Get(0) == nil {

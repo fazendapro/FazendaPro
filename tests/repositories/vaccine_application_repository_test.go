@@ -438,6 +438,89 @@ func TestVaccineApplicationRepository_FindByAnimalID_Empty(t *testing.T) {
 	assert.Len(t, applications, 0)
 }
 
+func TestVaccineApplicationRepository_FindByFarmIDWithPagination(t *testing.T) {
+	db := setupVaccineApplicationTestDB(t)
+	repo := repository.NewVaccineApplicationRepository(db)
+
+	farm := createTestFarmForVaccineApplication(t, db)
+	vaccine := createTestVaccineForVaccineApplication(t, db, farm.ID)
+
+	for i := 0; i < 10; i++ {
+		animal := createTestAnimalForVaccineApplication(t, db, farm.ID)
+		applicationDate := time.Now().Add(-time.Duration(i) * 24 * time.Hour)
+		vaccineApplication := &models.VaccineApplication{
+			AnimalID:        animal.ID,
+			VaccineID:       vaccine.ID,
+			ApplicationDate: applicationDate,
+		}
+		require.NoError(t, db.Create(vaccineApplication).Error)
+	}
+
+	applications, total, err := repo.FindByFarmIDWithPagination(farm.ID, 1, 5)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(10), total)
+	assert.Len(t, applications, 5)
+
+	applications2, total2, err := repo.FindByFarmIDWithPagination(farm.ID, 2, 5)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(10), total2)
+	assert.Len(t, applications2, 5)
+
+	assert.NotEqual(t, applications[0].ID, applications2[0].ID)
+}
+
+func TestVaccineApplicationRepository_FindByFarmIDWithPagination_EmptyResult(t *testing.T) {
+	db := setupVaccineApplicationTestDB(t)
+	repo := repository.NewVaccineApplicationRepository(db)
+
+	farm := createTestFarmForVaccineApplication(t, db)
+
+	applications, total, err := repo.FindByFarmIDWithPagination(farm.ID, 1, 10)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(0), total)
+	assert.Len(t, applications, 0)
+}
+
+func TestVaccineApplicationRepository_FindByFarmIDWithDateRangePaginated(t *testing.T) {
+	db := setupVaccineApplicationTestDB(t)
+	repo := repository.NewVaccineApplicationRepository(db)
+
+	farm := createTestFarmForVaccineApplication(t, db)
+	animal := createTestAnimalForVaccineApplication(t, db, farm.ID)
+	vaccine := createTestVaccineForVaccineApplication(t, db, farm.ID)
+
+	now := time.Now()
+	startDate := now.AddDate(0, 0, -30)
+	endDate := now
+
+	// Criar 10 aplicações, 5 dentro do range e 5 fora
+	for i := 0; i < 10; i++ {
+		var applicationDate time.Time
+		if i < 5 {
+			applicationDate = now.AddDate(0, 0, -10-i) // Dentro do range
+		} else {
+			applicationDate = now.AddDate(0, 0, -40-i) // Fora do range
+		}
+
+		vaccineApplication := &models.VaccineApplication{
+			AnimalID:        animal.ID,
+			VaccineID:       vaccine.ID,
+			ApplicationDate: applicationDate,
+		}
+		require.NoError(t, db.Create(vaccineApplication).Error)
+	}
+
+	applications, total, err := repo.FindByFarmIDWithDateRangePaginated(farm.ID, &startDate, &endDate, 1, 3)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(5), total)
+	assert.Len(t, applications, 3)
+
+	applications2, total2, err := repo.FindByFarmIDWithDateRangePaginated(farm.ID, &startDate, &endDate, 2, 3)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(5), total2)
+	assert.Len(t, applications2, 2)
+}
+
 func TestVaccineApplicationRepository_FindByVaccineID_Empty(t *testing.T) {
 	db := setupVaccineApplicationTestDB(t)
 	repo := repository.NewVaccineApplicationRepository(db)

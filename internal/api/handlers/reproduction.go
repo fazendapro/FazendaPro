@@ -59,6 +59,15 @@ type ReproductionResponse struct {
 	UpdatedAt        string `json:"updatedAt" example:"2024-01-15T10:30:00Z"` // Data de atualização
 }
 
+// PaginatedReproductionsResponse representa a resposta paginada de reproduções
+// @Description Resposta com lista paginada de reproduções e metadados
+type PaginatedReproductionsResponse struct {
+	Reproductions []ReproductionResponse `json:"reproductions"` // Lista de reproduções
+	Total         int64                  `json:"total"`         // Total de registros
+	Page          int                    `json:"page"`          // Página atual
+	Limit         int                    `json:"limit"`         // Limite por página
+}
+
 func parseOptionalDate(dateStr *string) *time.Time {
 	if dateStr == nil || *dateStr == "" {
 		return nil
@@ -250,7 +259,39 @@ func (h *ReproductionHandler) GetReproductionsByFarm(w http.ResponseWriter, r *h
 		return
 	}
 
-	reproductions, err := h.service.GetReproductionsByFarmID(uint(id))
+	pageStr := r.URL.Query().Get("page")
+	limitStr := r.URL.Query().Get("limit")
+
+	// Parse pagination parameters
+	page := 1
+	limit := 10
+
+	if pageStr != "" {
+		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
+			page = p
+		}
+	}
+
+	if limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
+			limit = l
+		}
+	}
+
+	var reproductions []models.Reproduction
+	var total int64
+
+	// Use paginated methods if page/limit are provided, otherwise use non-paginated
+	if pageStr != "" || limitStr != "" {
+		reproductions, total, err = h.service.GetReproductionsByFarmIDWithPagination(uint(id), page, limit)
+	} else {
+		// Backward compatibility: if no pagination params, return all
+		reproductions, err = h.service.GetReproductionsByFarmID(uint(id))
+		if err == nil {
+			total = int64(len(reproductions))
+		}
+	}
+
 	if err != nil {
 		SendErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -261,6 +302,31 @@ func (h *ReproductionHandler) GetReproductionsByFarm(w http.ResponseWriter, r *h
 		responses = append(responses, modelToReproductionResponse(&reproduction))
 	}
 
+	// If pagination was used, return paginated response
+	if pageStr != "" || limitStr != "" {
+		paginatedData := PaginatedReproductionsResponse{
+			Reproductions: responses,
+			Total:         total,
+			Page:          page,
+			Limit:         limit,
+		}
+
+		response := struct {
+			Success bool                           `json:"success"`
+			Data    PaginatedReproductionsResponse `json:"data"`
+			Message string                         `json:"message"`
+		}{
+			Success: true,
+			Data:    paginatedData,
+			Message: fmt.Sprintf("Registros de reprodução encontrados com sucesso (%d de %d)", len(reproductions), total),
+		}
+
+		w.Header().Set(HeaderContentType, ContentTypeJSON)
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	// Backward compatibility: return non-paginated response
 	SendSuccessResponse(w, responses, fmt.Sprintf("Registros de reprodução encontrados com sucesso (%d registros)", len(reproductions)), http.StatusOK)
 }
 

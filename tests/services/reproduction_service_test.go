@@ -407,6 +407,61 @@ func TestReproductionService_GetReproductionByAnimalID_Success(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 }
 
+func TestReproductionService_GetReproductionsByFarmIDWithPagination_Success(t *testing.T) {
+	mockRepo := &MockReproductionRepository{}
+	reproductionService := service.NewReproductionService(mockRepo)
+
+	expectedReproductions := []models.Reproduction{
+		{ID: 1, AnimalID: 1, CurrentPhase: models.PhasePrenhas},
+		{ID: 2, AnimalID: 2, CurrentPhase: models.PhaseLactacao},
+	}
+
+	mockRepo.On("FindByFarmIDWithPagination", uint(1), 1, 10).Return(expectedReproductions, int64(2), nil)
+
+	reproductions, total, err := reproductionService.GetReproductionsByFarmIDWithPagination(1, 1, 10)
+
+	assert.NoError(t, err)
+	assert.Len(t, reproductions, 2)
+	assert.Equal(t, int64(2), total)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestReproductionService_GetReproductionsByFarmIDWithPagination_InvalidPage(t *testing.T) {
+	mockRepo := &MockReproductionRepository{}
+	reproductionService := service.NewReproductionService(mockRepo)
+
+	expectedReproductions := []models.Reproduction{
+		{ID: 1, AnimalID: 1, CurrentPhase: models.PhasePrenhas},
+	}
+
+	mockRepo.On("FindByFarmIDWithPagination", uint(1), 1, 10).Return(expectedReproductions, int64(1), nil)
+
+	reproductions, total, err := reproductionService.GetReproductionsByFarmIDWithPagination(1, 0, 10)
+
+	assert.NoError(t, err)
+	assert.Len(t, reproductions, 1)
+	assert.Equal(t, int64(1), total)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestReproductionService_GetReproductionsByFarmIDWithPagination_InvalidLimit(t *testing.T) {
+	mockRepo := &MockReproductionRepository{}
+	reproductionService := service.NewReproductionService(mockRepo)
+
+	expectedReproductions := []models.Reproduction{
+		{ID: 1, AnimalID: 1, CurrentPhase: models.PhasePrenhas},
+	}
+
+	mockRepo.On("FindByFarmIDWithPagination", uint(1), 1, 10).Return(expectedReproductions, int64(1), nil)
+
+	reproductions, total, err := reproductionService.GetReproductionsByFarmIDWithPagination(1, 1, 0)
+
+	assert.NoError(t, err)
+	assert.Len(t, reproductions, 1)
+	assert.Equal(t, int64(1), total)
+	mockRepo.AssertExpectations(t)
+}
+
 func TestReproductionService_GetReproductionsByFarmID_Success(t *testing.T) {
 	mockRepo := &MockReproductionRepository{}
 	reproductionService := service.NewReproductionService(mockRepo)
@@ -600,7 +655,7 @@ func TestReproductionService_UpdateReproductionPhase_PhaseSecando(t *testing.T) 
 
 	additionalData := map[string]interface{}{
 		"dry_period_start_date": dryPeriodStartDate,
-		"lactation_end_date":     lactationEndDate,
+		"lactation_end_date":    lactationEndDate,
 	}
 
 	mockRepo.On("FindByAnimalID", uint(1)).Return(existingReproduction, nil)

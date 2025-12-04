@@ -277,6 +277,76 @@ func TestVaccineApplicationService_GetApplicationsByVaccineID_RepositoryError(t 
 	mockRepo.AssertExpectations(t)
 }
 
+func TestVaccineApplicationService_GetApplicationsByFarmIDWithPagination_Success(t *testing.T) {
+	mockRepo := new(MockVaccineApplicationRepository)
+	vaccineApplicationService := service.NewVaccineApplicationService(mockRepo)
+
+	expectedApplications := []models.VaccineApplication{
+		{ID: 1, AnimalID: 1, VaccineID: 1, ApplicationDate: time.Now()},
+		{ID: 2, AnimalID: 2, VaccineID: 1, ApplicationDate: time.Now()},
+	}
+
+	mockRepo.On("FindByFarmIDWithPagination", uint(1), 1, 10).Return(expectedApplications, int64(2), nil)
+
+	applications, total, err := vaccineApplicationService.GetApplicationsByFarmIDWithPagination(1, 1, 10)
+
+	assert.NoError(t, err)
+	assert.Len(t, applications, 2)
+	assert.Equal(t, int64(2), total)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestVaccineApplicationService_GetApplicationsByFarmIDWithPagination_InvalidFarmID(t *testing.T) {
+	mockRepo := new(MockVaccineApplicationRepository)
+	vaccineApplicationService := service.NewVaccineApplicationService(mockRepo)
+
+	applications, total, err := vaccineApplicationService.GetApplicationsByFarmIDWithPagination(0, 1, 10)
+
+	assert.Error(t, err)
+	assert.Nil(t, applications)
+	assert.Equal(t, int64(0), total)
+	assert.Contains(t, err.Error(), "ID da fazenda é obrigatório")
+}
+
+func TestVaccineApplicationService_GetApplicationsByFarmIDWithPagination_InvalidPage(t *testing.T) {
+	mockRepo := new(MockVaccineApplicationRepository)
+	vaccineApplicationService := service.NewVaccineApplicationService(mockRepo)
+
+	expectedApplications := []models.VaccineApplication{
+		{ID: 1, AnimalID: 1, VaccineID: 1, ApplicationDate: time.Now()},
+	}
+
+	mockRepo.On("FindByFarmIDWithPagination", uint(1), 1, 10).Return(expectedApplications, int64(1), nil)
+
+	applications, total, err := vaccineApplicationService.GetApplicationsByFarmIDWithPagination(1, 0, 10)
+
+	assert.NoError(t, err)
+	assert.Len(t, applications, 1)
+	assert.Equal(t, int64(1), total)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestVaccineApplicationService_GetApplicationsByFarmIDWithDateRangePaginated_Success(t *testing.T) {
+	mockRepo := new(MockVaccineApplicationRepository)
+	vaccineApplicationService := service.NewVaccineApplicationService(mockRepo)
+
+	startDate := time.Now().AddDate(0, 0, -30)
+	endDate := time.Now()
+
+	expectedApplications := []models.VaccineApplication{
+		{ID: 1, AnimalID: 1, VaccineID: 1, ApplicationDate: time.Now()},
+	}
+
+	mockRepo.On("FindByFarmIDWithDateRangePaginated", uint(1), &startDate, &endDate, 1, 10).Return(expectedApplications, int64(1), nil)
+
+	applications, total, err := vaccineApplicationService.GetApplicationsByFarmIDWithDateRangePaginated(1, &startDate, &endDate, 1, 10)
+
+	assert.NoError(t, err)
+	assert.Len(t, applications, 1)
+	assert.Equal(t, int64(1), total)
+	mockRepo.AssertExpectations(t)
+}
+
 func TestVaccineApplicationService_UpdateApplication_Success(t *testing.T) {
 	mockRepo := new(MockVaccineApplicationRepository)
 	vaccineApplicationService := service.NewVaccineApplicationService(mockRepo)
