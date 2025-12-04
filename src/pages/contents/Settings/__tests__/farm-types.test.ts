@@ -7,6 +7,7 @@ describe('Farm Types', () => {
       const farmData: FarmData = {
         id: 1,
         logo: 'data:image/jpeg;base64,test',
+        language: 'pt',
         company_id: 1,
         company: {
           id: 1,
@@ -31,6 +32,7 @@ describe('Farm Types', () => {
       const farmData: FarmData = {
         id: 1,
         logo: '',
+        language: 'pt',
         company_id: 1,
         created_at: '2021-01-01T00:00:00Z',
         updated_at: '2021-01-01T00:00:00Z'
@@ -45,6 +47,7 @@ describe('Farm Types', () => {
       const backendFarmData: BackendFarmData = {
         ID: 1,
         Logo: 'data:image/jpeg;base64,test',
+        Language: 'pt',
         CompanyID: 1,
         Company: {
           ID: 1,
@@ -69,6 +72,7 @@ describe('Farm Types', () => {
       const backendFarmData: BackendFarmData = {
         ID: 1,
         Logo: '',
+        Language: 'pt',
         CompanyID: 1,
         CreatedAt: '2021-01-01T00:00:00Z',
         UpdatedAt: '2021-01-01T00:00:00Z'
