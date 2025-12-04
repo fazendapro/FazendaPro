@@ -94,8 +94,10 @@ export class AnimalColumnBuilder {
         dataIndex: 'weight',
         defaultVisible: false,
         render: (weight: unknown) => {
+          if (weight === null || weight === undefined) return '-';
           if (typeof weight !== 'number') return '-';
-          return weight ? `${weight} kg` : '-';
+          if (weight === 0) return '-';
+          return `${weight.toFixed(2)} kg`;
         }
       },
       {
@@ -268,11 +270,25 @@ export class AnimalColumnBuilder {
   public buildTableColumns(selectedKeys: string[]): ColumnType<Animal>[] {
     const selectedColumns = this.getColumnsByKeys(selectedKeys);
     
+    // Define larguras específicas para colunas que precisam de controle
+    const columnWidths: Record<string, number> = {
+      'ear_tag_number_local': 140,
+      'ear_tag_number_register': 180,
+      'animal_name': 180,
+      'type': 100,
+      'breed': 120,
+      'sex': 80,
+      'birth_date': 140,
+      'actions': 100
+    };
+    
     return selectedColumns.map(col => ({
       title: col.title,
       dataIndex: col.dataIndex,
       key: col.key,
-      render: col.render
+      render: col.render,
+      width: columnWidths[col.key] || undefined,
+      ellipsis: col.key === 'ear_tag_number_local' || col.key === 'ear_tag_number_register' ? true : undefined
     }));
   }
 }
