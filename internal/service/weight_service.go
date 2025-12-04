@@ -28,7 +28,6 @@ func (s *WeightService) CreateOrUpdateWeight(weight *models.Weight) error {
 		return errors.New("peso do animal deve ser maior que zero")
 	}
 
-	// Busca peso existente para o animal
 	existingWeight, err := s.repository.FindByAnimalID(weight.AnimalID)
 	if err != nil {
 		return err
@@ -37,14 +36,12 @@ func (s *WeightService) CreateOrUpdateWeight(weight *models.Weight) error {
 	now := time.Now()
 
 	if existingWeight != nil {
-		// Atualiza o peso existente
 		existingWeight.AnimalWeight = weight.AnimalWeight
 		existingWeight.Date = weight.Date
 		existingWeight.UpdatedAt = now
 		return s.repository.Update(existingWeight)
 	}
 
-	// Cria novo registro de peso
 	weight.CreatedAt = now
 	weight.UpdatedAt = now
 	return s.repository.Create(weight)
