@@ -22,7 +22,17 @@ func (r *FarmRepository) FindByID(id uint) (*models.Farm, error) {
 }
 
 func (r *FarmRepository) Update(farm *models.Farm) error {
-	return r.db.DB.Model(farm).Update("logo", farm.Logo).Error
+	updates := make(map[string]interface{})
+	if farm.Logo != "" {
+		updates["logo"] = farm.Logo
+	}
+	if farm.Language != "" {
+		updates["language"] = farm.Language
+	}
+	if len(updates) > 0 {
+		return r.db.DB.Model(farm).Updates(updates).Error
+	}
+	return nil
 }
 
 func (r *FarmRepository) LoadCompanyData(farm *models.Farm) error {

@@ -20,7 +20,8 @@ func NewFarmHandler(service *service.FarmService) *FarmHandler {
 // UpdateFarmRequest representa a requisição de atualização de fazenda
 // @Description Dados para atualizar uma fazenda
 type UpdateFarmRequest struct {
-	Logo string `json:"logo" example:"data:image/png;base64,..."` // Logo da fazenda em base64
+	Logo     string `json:"logo" example:"data:image/png;base64,..."` // Logo da fazenda em base64
+	Language string `json:"language" example:"pt"`                    // Idioma da fazenda (pt, en, es)
 }
 
 // GetFarm obtém uma fazenda por ID
@@ -106,8 +107,9 @@ func (h *FarmHandler) UpdateFarm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	farm := &models.Farm{
-		ID:   uint(farmID),
-		Logo: req.Logo,
+		ID:       uint(farmID),
+		Logo:     req.Logo,
+		Language: req.Language,
 	}
 
 	if err := h.service.UpdateFarm(farm); err != nil {
