@@ -334,3 +334,101 @@ func TestMilkCollectionService_DeleteMilkCollection_Error(t *testing.T) {
 	assert.Error(t, err)
 	mockMilkRepo.AssertExpectations(t)
 }
+
+func TestMilkCollectionService_GetMilkCollectionsByFarmIDWithPagination_Success(t *testing.T) {
+	mockMilkRepo := new(mocks.MockMilkCollectionRepository)
+	mockAnimalRepo := new(mocks.MockAnimalRepository)
+
+	batchService := service.NewBatchService(mockAnimalRepo, mockMilkRepo)
+	milkService := service.NewMilkCollectionService(mockMilkRepo, batchService)
+
+	expectedCollections := []models.MilkCollection{
+		{
+			ID:       1,
+			AnimalID: 1,
+			Liters:   35.0,
+			Date:     time.Now(),
+		},
+		{
+			ID:       2,
+			AnimalID: 2,
+			Liters:   30.0,
+			Date:     time.Now(),
+		},
+	}
+
+	mockMilkRepo.On("FindByFarmIDWithPagination", uint(1), 1, 10).Return(expectedCollections, int64(2), nil)
+
+	result, total, err := milkService.GetMilkCollectionsByFarmIDWithPagination(1, 1, 10)
+
+	assert.NoError(t, err)
+	assert.Equal(t, int64(2), total)
+	assert.Len(t, result, 2)
+	mockMilkRepo.AssertExpectations(t)
+}
+
+func TestMilkCollectionService_GetMilkCollectionsByFarmIDWithPagination_Error(t *testing.T) {
+	mockMilkRepo := new(mocks.MockMilkCollectionRepository)
+	mockAnimalRepo := new(mocks.MockAnimalRepository)
+
+	batchService := service.NewBatchService(mockAnimalRepo, mockMilkRepo)
+	milkService := service.NewMilkCollectionService(mockMilkRepo, batchService)
+
+	mockMilkRepo.On("FindByFarmIDWithPagination", uint(1), 1, 10).Return(nil, int64(0), errors.New("database error"))
+
+	result, total, err := milkService.GetMilkCollectionsByFarmIDWithPagination(1, 1, 10)
+
+	assert.Error(t, err)
+	assert.Equal(t, int64(0), total)
+	assert.Nil(t, result)
+	mockMilkRepo.AssertExpectations(t)
+}
+
+func TestMilkCollectionService_GetMilkCollectionsByFarmIDWithDateRangePaginated_Success(t *testing.T) {
+	mockMilkRepo := new(mocks.MockMilkCollectionRepository)
+	mockAnimalRepo := new(mocks.MockAnimalRepository)
+
+	batchService := service.NewBatchService(mockAnimalRepo, mockMilkRepo)
+	milkService := service.NewMilkCollectionService(mockMilkRepo, batchService)
+
+	startDate := time.Now().AddDate(0, 0, -30)
+	endDate := time.Now()
+
+	expectedCollections := []models.MilkCollection{
+		{
+			ID:       1,
+			AnimalID: 1,
+			Liters:   35.0,
+			Date:     time.Now(),
+		},
+	}
+
+	mockMilkRepo.On("FindByFarmIDWithDateRangePaginated", uint(1), &startDate, &endDate, 1, 10).Return(expectedCollections, int64(1), nil)
+
+	result, total, err := milkService.GetMilkCollectionsByFarmIDWithDateRangePaginated(1, &startDate, &endDate, 1, 10)
+
+	assert.NoError(t, err)
+	assert.Equal(t, int64(1), total)
+	assert.Len(t, result, 1)
+	mockMilkRepo.AssertExpectations(t)
+}
+
+func TestMilkCollectionService_GetMilkCollectionsByFarmIDWithDateRangePaginated_Error(t *testing.T) {
+	mockMilkRepo := new(mocks.MockMilkCollectionRepository)
+	mockAnimalRepo := new(mocks.MockAnimalRepository)
+
+	batchService := service.NewBatchService(mockAnimalRepo, mockMilkRepo)
+	milkService := service.NewMilkCollectionService(mockMilkRepo, batchService)
+
+	startDate := time.Now().AddDate(0, 0, -30)
+	endDate := time.Now()
+
+	mockMilkRepo.On("FindByFarmIDWithDateRangePaginated", uint(1), &startDate, &endDate, 1, 10).Return(nil, int64(0), errors.New("database error"))
+
+	result, total, err := milkService.GetMilkCollectionsByFarmIDWithDateRangePaginated(1, &startDate, &endDate, 1, 10)
+
+	assert.Error(t, err)
+	assert.Equal(t, int64(0), total)
+	assert.Nil(t, result)
+	mockMilkRepo.AssertExpectations(t)
+}

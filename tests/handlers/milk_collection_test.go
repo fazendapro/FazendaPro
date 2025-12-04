@@ -410,3 +410,113 @@ func TestMilkCollectionHandler_GetMilkCollectionsByFarmID_WithNilBirthDate(t *te
 	assert.Empty(t, response.Data[0].Animal.BirthDate)
 	mockMilkRepo.AssertExpectations(t)
 }
+
+func TestMilkCollectionHandler_GetMilkCollectionsByFarmID_WithPagination(t *testing.T) {
+	mockMilkRepo := new(mocks.MockMilkCollectionRepository)
+	mockAnimalRepo := new(services.MockAnimalRepository)
+	router, _ := setupMilkCollectionRouter(mockMilkRepo, mockAnimalRepo)
+
+	birthDate := time.Date(2020, 1, 15, 0, 0, 0, 0, time.UTC)
+	expectedCollections := []models.MilkCollection{
+		{
+			ID:       1,
+			AnimalID: 1,
+			Liters:   35.5,
+			Date:     time.Now(),
+			Animal: models.Animal{
+				ID:                1,
+				FarmID:            1,
+				AnimalName:        "Vaca Teste 1",
+				EarTagNumberLocal: 123,
+				BirthDate:         &birthDate,
+			},
+		},
+		{
+			ID:       2,
+			AnimalID: 2,
+			Liters:   40.0,
+			Date:     time.Now(),
+			Animal: models.Animal{
+				ID:                2,
+				FarmID:            1,
+				AnimalName:        "Vaca Teste 2",
+				EarTagNumberLocal: 124,
+				BirthDate:         &birthDate,
+			},
+		},
+	}
+
+	req, _ := http.NewRequest("GET", "/milk-collections/farm/1?page=1&limit=10", nil)
+	w := httptest.NewRecorder()
+
+	mockMilkRepo.On("FindByFarmIDWithPagination", uint(1), 1, 10).Return(expectedCollections, int64(2), nil)
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	var response struct {
+		Success bool `json:"success"`
+		Data    struct {
+			MilkCollections []handlers.MilkCollectionData `json:"milk_collections"`
+			Total           int64                         `json:"total"`
+			Page            int                           `json:"page"`
+			Limit           int                           `json:"limit"`
+		} `json:"data"`
+		Message string `json:"message"`
+	}
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.True(t, response.Success)
+	assert.Equal(t, int64(2), response.Data.Total)
+	assert.Equal(t, 1, response.Data.Page)
+	assert.Equal(t, 10, response.Data.Limit)
+	assert.Len(t, response.Data.MilkCollections, 2)
+	mockMilkRepo.AssertExpectations(t)
+}
+
+func TestMilkCollectionHandler_GetMilkCollectionsByFarmID_WithPaginationAndDateRange(t *testing.T) {
+	mockMilkRepo := new(mocks.MockMilkCollectionRepository)
+	mockAnimalRepo := new(services.MockAnimalRepository)
+	router, _ := setupMilkCollectionRouter(mockMilkRepo, mockAnimalRepo)
+
+	birthDate := time.Date(2020, 1, 15, 0, 0, 0, 0, time.UTC)
+	expectedCollections := []models.MilkCollection{
+		{
+			ID:       1,
+			AnimalID: 1,
+			Liters:   35.5,
+			Date:     time.Now(),
+			Animal: models.Animal{
+				ID:                1,
+				FarmID:            1,
+				AnimalName:        "Vaca Teste",
+				EarTagNumberLocal: 123,
+				BirthDate:         &birthDate,
+			},
+		},
+	}
+
+	req, _ := http.NewRequest("GET", "/milk-collections/farm/1?page=1&limit=10&start_date=2024-01-01&end_date=2024-01-31", nil)
+	w := httptest.NewRecorder()
+
+	mockMilkRepo.On("FindByFarmIDWithDateRangePaginated", uint(1), mock.AnythingOfType("*time.Time"), mock.AnythingOfType("*time.Time"), 1, 10).Return(expectedCollections, int64(1), nil)
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	var response struct {
+		Success bool `json:"success"`
+		Data    struct {
+			MilkCollections []handlers.MilkCollectionData `json:"milk_collections"`
+			Total           int64                         `json:"total"`
+			Page            int                           `json:"page"`
+			Limit           int                           `json:"limit"`
+		} `json:"data"`
+		Message string `json:"message"`
+	}
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.True(t, response.Success)
+	assert.Equal(t, int64(1), response.Data.Total)
+	mockMilkRepo.AssertExpectations(t)
+}

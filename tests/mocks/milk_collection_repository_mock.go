@@ -29,9 +29,25 @@ func (m *MockMilkCollectionRepository) FindByFarmID(farmID uint) ([]models.MilkC
 	return args.Get(0).([]models.MilkCollection), args.Error(1)
 }
 
+func (m *MockMilkCollectionRepository) FindByFarmIDWithPagination(farmID uint, page, limit int) ([]models.MilkCollection, int64, error) {
+	args := m.Called(farmID, page, limit)
+	if args.Get(0) == nil {
+		return nil, args.Get(1).(int64), args.Error(2)
+	}
+	return args.Get(0).([]models.MilkCollection), args.Get(1).(int64), args.Error(2)
+}
+
 func (m *MockMilkCollectionRepository) FindByFarmIDWithDateRange(farmID uint, startDate, endDate *time.Time) ([]models.MilkCollection, error) {
 	args := m.Called(farmID, startDate, endDate)
 	return args.Get(0).([]models.MilkCollection), args.Error(1)
+}
+
+func (m *MockMilkCollectionRepository) FindByFarmIDWithDateRangePaginated(farmID uint, startDate, endDate *time.Time, page, limit int) ([]models.MilkCollection, int64, error) {
+	args := m.Called(farmID, startDate, endDate, page, limit)
+	if args.Get(0) == nil {
+		return nil, args.Get(1).(int64), args.Error(2)
+	}
+	return args.Get(0).([]models.MilkCollection), args.Get(1).(int64), args.Error(2)
 }
 
 func (m *MockMilkCollectionRepository) FindByAnimalID(animalID uint) ([]models.MilkCollection, error) {
