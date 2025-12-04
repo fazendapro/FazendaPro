@@ -34,11 +34,10 @@ export const remoteGetReproductionsByFarm = async (params: GetReproductionsByFar
     }
   });
 
-  const { message, data: responseData } = data;
+  const { data: responseData } = data;
 
   let paginatedData;
   if (Array.isArray(responseData)) {
-    // Backward compatibility: if response is array, wrap it
     paginatedData = {
       reproductions: responseData,
       total: responseData.length,
@@ -46,7 +45,6 @@ export const remoteGetReproductionsByFarm = async (params: GetReproductionsByFar
       limit: responseData.length
     };
   } else {
-    // Paginated response
     paginatedData = responseData || {
       reproductions: [],
       total: 0,

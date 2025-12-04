@@ -24,6 +24,7 @@ export const useVaccineApplication = (farmId: number, filters?: VaccineApplicati
       page: filters.page,
       limit: filters.limit
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters?.startDate, filters?.endDate, filters?.animalId, filters?.vaccineId, filters?.page, filters?.limit])
 
   const fetchVaccineApplications = useCallback(async () => {
@@ -57,7 +58,7 @@ export const useVaccineApplication = (farmId: number, filters?: VaccineApplicati
     } finally {
       setLoading(false)
     }
-  }, [farmId, filterKey])
+  }, [farmId])
 
   const createVaccineApplication = async (data: CreateVaccineApplicationRequest) => {
     try {
