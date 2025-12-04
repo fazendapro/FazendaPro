@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { VaccinesTable } from './vaccines-table'
 import { CreateVaccineModal } from './create-vaccine-modal'
 import { CreateVaccineApplicationModal } from './create-vaccine-application-modal'
+import { VaccinesListModal } from './vaccines-list-modal'
 import { VaccineApplication as VaccineApplicationType } from '../../domain/model/vaccine-application'
 
 interface VaccinesRef {
@@ -12,6 +13,7 @@ const Vaccines = () => {
   const tableRef = useRef<VaccinesRef>(null)
   const [isVaccineModalVisible, setIsVaccineModalVisible] = useState(false)
   const [isApplicationModalVisible, setIsApplicationModalVisible] = useState(false)
+  const [isVaccinesListModalVisible, setIsVaccinesListModalVisible] = useState(false)
   const [preselectedAnimalId, setPreselectedAnimalId] = useState<number | undefined>()
   const [editingApplication, setEditingApplication] = useState<VaccineApplicationType | undefined>()
 
@@ -31,12 +33,20 @@ const Vaccines = () => {
     setIsApplicationModalVisible(true)
   }
 
+  const handleListVaccines = () => {
+    setIsVaccinesListModalVisible(true)
+  }
+
   const handleVaccineModalCancel = () => {
     setIsVaccineModalVisible(false)
   }
 
   const handleVaccineModalSuccess = () => {
     setIsVaccineModalVisible(false)
+  }
+
+  const handleVaccinesListModalCancel = () => {
+    setIsVaccinesListModalVisible(false)
   }
 
   const handleApplicationModalCancel = () => {
@@ -61,6 +71,7 @@ const Vaccines = () => {
         onAddVaccine={handleAddVaccine}
         onAddApplication={handleAddApplication}
         onEditApplication={handleEditApplication}
+        onListVaccines={handleListVaccines}
       />
       
       <CreateVaccineModal
@@ -75,6 +86,11 @@ const Vaccines = () => {
         onSuccess={handleApplicationModalSuccess}
         preselectedAnimalId={preselectedAnimalId}
         editingApplication={editingApplication}
+      />
+
+      <VaccinesListModal
+        visible={isVaccinesListModalVisible}
+        onCancel={handleVaccinesListModalCancel}
       />
     </div>
   )

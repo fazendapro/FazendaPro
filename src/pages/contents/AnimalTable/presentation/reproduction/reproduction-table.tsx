@@ -25,6 +25,7 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
   const { getReproductionsByFarm, deleteReproduction, loading, error } = useReproduction();
   const { isMobile, isTablet } = useResponsive();
   const [reproductions, setReproductions] = useState<Reproduction[]>([]);
+  const [total, setTotal] = useState(0);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [isUpdatePhaseModalVisible, setIsUpdatePhaseModalVisible] = useState(false);
   const [selectedReproduction, setSelectedReproduction] = useState<Reproduction | null>(null);
@@ -34,9 +35,10 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
   const fetchReproductions = useCallback(async () => {
     if (!farm?.id) return;
     
-    const data = await getReproductionsByFarm();
-    setReproductions(data || []);
-  }, [farm?.id, getReproductionsByFarm]);
+    const data = await getReproductionsByFarm({ page: currentPage, limit: pageSize });
+    setReproductions(data.reproductions || []);
+    setTotal(data.total || 0);
+  }, [farm?.id, getReproductionsByFarm, currentPage, pageSize]);
 
   useImperativeHandle(ref, () => ({
     refetch: fetchReproductions
@@ -87,10 +89,6 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
     setCurrentPage(1);
     setPageSize(size);
   };
-
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const paginatedData = (reproductions || []).slice(startIndex, endIndex);
 
   const columns = [
     {
@@ -200,7 +198,7 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
 
       <Table
         columns={columns}
-        dataSource={paginatedData}
+        dataSource={reproductions}
         rowKey="id"
         loading={loading}
         pagination={false}
@@ -216,7 +214,7 @@ export const ReproductionTable = forwardRef<ReproductionTableRef, ReproductionTa
 
       <CustomPagination
         current={currentPage}
-        total={(reproductions || []).length}
+        total={total}
         pageSize={pageSize}
         onChange={handlePageChange}
         onShowSizeChange={handleShowSizeChange}

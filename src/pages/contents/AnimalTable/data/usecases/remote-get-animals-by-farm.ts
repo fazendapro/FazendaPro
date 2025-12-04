@@ -8,21 +8,49 @@ export class RemoteGetAnimalsByFarm implements GetAnimalsByFarmDomain {
 
   async getAnimalsByFarm(params: GetAnimalsByFarmParams): Promise<GetAnimalsByFarmResponse> {
     try {
+      const requestParams: Record<string, string | number> = {
+        farmId: params.farm_id
+      };
+
+      if (params.page !== undefined) {
+        requestParams.page = params.page;
+      }
+
+      if (params.limit !== undefined) {
+        requestParams.limit = params.limit;
+      }
+
       const { data, status } = await api().get(
         '/animals/farm',
         {
-          params: {
-            farmId: params.farm_id
-          },
+          params: requestParams,
           headers: {
             'Content-Type': 'application/json'
           }
         }
       );
 
-      const { message, data: animalsData } = data;
+      const { message, data: responseData } = data;
+
+      let paginatedData;
+      if (Array.isArray(responseData)) {
+        paginatedData = {
+          animals: responseData,
+          total: responseData.length,
+          page: 1,
+          limit: responseData.length
+        };
+      } else {
+        paginatedData = responseData || {
+          animals: [],
+          total: 0,
+          page: 1,
+          limit: 10
+        };
+      }
+
       return {
-        data: animalsData || [],
+        data: paginatedData,
         status,
         message: message || t('animalTable.animalsRetrievedSuccessfully'), 
         success: true

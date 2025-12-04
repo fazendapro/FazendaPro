@@ -3,10 +3,21 @@ import { MilkProduction, CreateMilkProductionRequest, MilkProductionFilters } fr
 import { UpdateMilkProductionRequest } from '../domain/usecases/update-milk-production-use-case'
 import { getMilkProductionsFactory, createMilkProductionFactory, updateMilkProductionFactory } from '../factories'
 
-export const useMilkProduction = (farmId: number, filters?: MilkProductionFilters) => {
+interface UseMilkProductionOptions {
+  filters?: MilkProductionFilters
+  page?: number
+  limit?: number
+}
+
+export const useMilkProduction = (farmId: number, options?: UseMilkProductionOptions) => {
   const [milkProductions, setMilkProductions] = useState<MilkProduction[]>([])
+  const [total, setTotal] = useState<number>(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const filters = options?.filters
+  const page = options?.page ?? 1
+  const limit = options?.limit ?? 10
 
   const fetchMilkProductions = useCallback(async () => {
     setLoading(true)
@@ -14,15 +25,21 @@ export const useMilkProduction = (farmId: number, filters?: MilkProductionFilter
     
     try {
       const getMilkProductionsUseCase = getMilkProductionsFactory()
-      const data = await getMilkProductionsUseCase.getMilkProductions(farmId, filters)
-      setMilkProductions(data)
+      const result = await getMilkProductionsUseCase.getMilkProductions({
+        farmId,
+        filters,
+        page,
+        limit
+      })
+      setMilkProductions(result.milk_collections)
+      setTotal(result.total)
     } catch (err: unknown) {
       const error = err as Error
       setError(error.message || 'Erro ao carregar dados de produção de leite')
     } finally {
       setLoading(false)
     }
-  }, [farmId, filters])
+  }, [farmId, filters, page, limit])
 
   const createMilkProduction = async (data: CreateMilkProductionRequest) => {
     try {
@@ -57,11 +74,13 @@ export const useMilkProduction = (farmId: number, filters?: MilkProductionFilter
       fetchMilkProductions()
     } else {
       setMilkProductions([])
+      setTotal(0)
     }
-  }, [farmId, filters, fetchMilkProductions])
+  }, [farmId, filters, page, limit, fetchMilkProductions])
 
   return {
     milkProductions,
+    total,
     loading,
     error,
     refetch: fetchMilkProductions,

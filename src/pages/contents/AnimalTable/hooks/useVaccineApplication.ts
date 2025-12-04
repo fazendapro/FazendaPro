@@ -1,15 +1,35 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { VaccineApplication, CreateVaccineApplicationRequest, VaccineApplicationFilters, UpdateVaccineApplicationRequest } from '../domain/model/vaccine-application'
 import { getVaccineApplicationsFactory, createVaccineApplicationFactory, updateVaccineApplicationFactory, deleteVaccineApplicationFactory } from '../factories'
+import { GetVaccineApplicationsResponse } from '../data/usecases/remote-get-vaccine-applications'
 
 export const useVaccineApplication = (farmId: number, filters?: VaccineApplicationFilters) => {
   const [vaccineApplications, setVaccineApplications] = useState<VaccineApplication[]>([])
+  const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const filtersRef = useRef(filters)
+
+  useEffect(() => {
+    filtersRef.current = filters
+  }, [filters])
+
+  const filterKey = useMemo(() => {
+    if (!filters) return ''
+    return JSON.stringify({
+      startDate: filters.startDate,
+      endDate: filters.endDate,
+      animalId: filters.animalId,
+      vaccineId: filters.vaccineId,
+      page: filters.page,
+      limit: filters.limit
+    })
+  }, [filters?.startDate, filters?.endDate, filters?.animalId, filters?.vaccineId, filters?.page, filters?.limit])
 
   const fetchVaccineApplications = useCallback(async () => {
     if (!farmId || farmId <= 0) {
       setVaccineApplications([])
+      setTotal(0)
       return
     }
 
@@ -18,15 +38,26 @@ export const useVaccineApplication = (farmId: number, filters?: VaccineApplicati
     
     try {
       const getVaccineApplicationsUseCase = getVaccineApplicationsFactory()
-      const data = await getVaccineApplicationsUseCase.getVaccineApplications(farmId, filters)
-      setVaccineApplications(Array.isArray(data) ? data : [])
+      const data = await getVaccineApplicationsUseCase.getVaccineApplications(farmId, filtersRef.current)
+      
+      if (data && typeof data === 'object' && 'vaccine_applications' in data) {
+        const paginatedData = data as GetVaccineApplicationsResponse
+        setVaccineApplications(paginatedData.vaccine_applications || [])
+        setTotal(paginatedData.total || 0)
+      } else {
+        const applications = Array.isArray(data) ? data : []
+        setVaccineApplications(applications)
+        setTotal(applications.length)
+      }
     } catch (err: unknown) {
       const error = err as Error
       setError(error.message || 'Erro ao carregar aplicações de vacinas')
+      setVaccineApplications([])
+      setTotal(0)
     } finally {
       setLoading(false)
     }
-  }, [farmId, filters])
+  }, [farmId, filterKey])
 
   const createVaccineApplication = async (data: CreateVaccineApplicationRequest) => {
     try {
@@ -76,10 +107,11 @@ export const useVaccineApplication = (farmId: number, filters?: VaccineApplicati
 
   useEffect(() => {
     fetchVaccineApplications()
-  }, [fetchVaccineApplications])
+  }, [farmId, filterKey, fetchVaccineApplications])
 
   return {
     vaccineApplications,
+    total,
     loading,
     error,
     refetch: fetchVaccineApplications,

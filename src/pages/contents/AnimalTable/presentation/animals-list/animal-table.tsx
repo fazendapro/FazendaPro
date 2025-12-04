@@ -18,11 +18,16 @@ interface AnimalTableProps {
 const AnimalTable = forwardRef<AnimalTableRef, AnimalTableProps>((props, ref) => {
   const { selectedColumns = [], searchTerm = '' } = props;
   const { farm } = useFarm();
-  const { animals, loading, error, refetch } = useAnimals(farm?.id);
   const { buildTableColumns } = useAnimalColumnBuilder();
   const { isMobile, isTablet } = useResponsive();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  
+  const { animals, total, loading, error, refetch } = useAnimals(farm?.id, {
+    
+    page: currentPage,
+    limit: pageSize
+  });
 
   useImperativeHandle(ref, () => ({
     refetch
@@ -53,10 +58,6 @@ const AnimalTable = forwardRef<AnimalTableRef, AnimalTableProps>((props, ref) =>
     setPageSize(size);
   };
 
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const paginatedData = filteredAnimals.slice(startIndex, endIndex);
-
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '50px' }}>
@@ -81,7 +82,7 @@ const AnimalTable = forwardRef<AnimalTableRef, AnimalTableProps>((props, ref) =>
     <>
       <Table 
         columns={filteredColumns} 
-        dataSource={paginatedData} 
+        dataSource={filteredAnimals} 
         pagination={false}
         rowKey="id"
         scroll={{ 
@@ -96,7 +97,7 @@ const AnimalTable = forwardRef<AnimalTableRef, AnimalTableProps>((props, ref) =>
       
       <CustomPagination
         current={currentPage}
-        total={filteredAnimals.length}
+        total={total}
         pageSize={pageSize}
         onChange={handlePageChange}
         onShowSizeChange={handleShowSizeChange}
