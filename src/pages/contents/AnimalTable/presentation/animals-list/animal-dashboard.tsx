@@ -139,7 +139,7 @@ const AnimalDashboard: React.FC<AnimalDashboardProps> = ({
       {isMobile ? (
         <Collapse
           activeKey={isDashboardExpanded ? ['dashboard'] : []}
-          onChange={(keys) => setIsDashboardExpanded(keys.includes('dashboard'))}
+          onChange={(keys: string | string[]) => setIsDashboardExpanded(Array.isArray(keys) && keys.includes('dashboard'))}
           style={{ marginBottom: '16px' }}
           items={[
             {
