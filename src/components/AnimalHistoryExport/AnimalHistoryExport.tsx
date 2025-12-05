@@ -91,7 +91,15 @@ export const AnimalHistoryExport: React.FC<AnimalHistoryExportProps> = ({
             footer: {
               page: t('animalHistoryExport.footer.page'),
               of: t('animalHistoryExport.footer.of')
-            }
+            },
+            units: {
+              kg: t('animalHistoryExport.units.kg'),
+              liters: t('animalHistoryExport.units.liters'),
+              litersPerDay: t('animalHistoryExport.units.litersPerDay'),
+              currency: t('animalHistoryExport.units.currency')
+            },
+            dateFormat: t('animalHistoryExport.dateFormat'),
+            fileName: t('animalHistoryExport.fileName')
           },
           common: {
             notInformed: t('common.notInformed'),

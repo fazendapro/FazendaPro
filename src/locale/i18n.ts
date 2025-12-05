@@ -12,35 +12,55 @@ import { translations as animalTableTranslationsEs } from "../pages/contents/Ani
 import { settingsTranslations as settingsTranslationsPt } from "../pages/contents/Settings/translation/pt";
 import { settingsTranslations as settingsTranslationsEn } from "../pages/contents/Settings/translation/en";
 import { settingsTranslations as settingsTranslationsEs } from "../pages/contents/Settings/translation/es";
-import { translations as salesTranslations } from "./sales/pt";
+import { translations as salesTranslationsPt } from "./sales/pt";
+import { translations as salesTranslationsEn } from "./sales/en";
+import { translations as salesTranslationsEs } from "./sales/es";
+
+const mergeTranslations = (base: any, ...overrides: any[]) => {
+  const merged = { ...base };
+  overrides.forEach(override => {
+    Object.keys(override).forEach(key => {
+      if (key === 'common' && typeof override[key] === 'object' && override[key] !== null && 
+          typeof merged[key] === 'object' && merged[key] !== null) {
+        merged[key] = { ...override[key], ...merged[key] };
+      } else if (typeof override[key] === 'object' && override[key] !== null && !Array.isArray(override[key]) && 
+          typeof merged[key] === 'object' && merged[key] !== null && !Array.isArray(merged[key])) {
+        merged[key] = mergeTranslations(merged[key], override[key]);
+      } else {
+        merged[key] = override[key];
+      }
+    });
+  });
+  return merged;
+};
 
 const resources = {
   pt: {
-    translation: {
-      ...pt.translation,
-      ...dashboardTranslationsPt,
-      ...animalTableTranslationsPt,
-      ...settingsTranslationsPt,
-      ...salesTranslations
-    }
+    translation: mergeTranslations(
+      pt.translation,
+      dashboardTranslationsPt,
+      animalTableTranslationsPt,
+      settingsTranslationsPt,
+      salesTranslationsPt
+    )
   },
   es: {
-    translation: {
-      ...es.translation,
-      ...dashboardTranslationsEs,
-      ...animalTableTranslationsEs,
-      ...settingsTranslationsEs,
-      ...salesTranslations
-    }
+    translation: mergeTranslations(
+      es.translation,
+      dashboardTranslationsEs,
+      animalTableTranslationsEs,
+      settingsTranslationsEs,
+      salesTranslationsEs
+    )
   },
   en: {
-    translation: {
-      ...en.translation,
-      ...dashboardTranslationsEn,
-      ...animalTableTranslationsEn,
-      ...settingsTranslationsEn,
-      ...salesTranslations
-    }
+    translation: mergeTranslations(
+      en.translation,
+      dashboardTranslationsEn,
+      animalTableTranslationsEn,
+      settingsTranslationsEn,
+      salesTranslationsEn
+    )
   }
 };
 

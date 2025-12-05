@@ -254,5 +254,9 @@ export const translations = {
       reproduction: "Reproduction",
       mixed: "Mixed"
     }
+  },
+  common: {
+    edit: "Edit",
+    notInformed: "Not informed"
   }
 }; 

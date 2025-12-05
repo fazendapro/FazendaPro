@@ -1,34 +1,11 @@
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import { Animal } from '../../pages/contents/AnimalTable/types/type';
 import { Sale } from '../../types/sale';
 import { MilkCollection } from '../../types/milk-collection';
 import { Reproduction } from '../../types/reproduction';
 
-interface AutoTableOptions {
-  startY: number;
-  head: string[][];
-  body: string[][];
-  styles: {
-    fontSize: number;
-    cellPadding: number;
-  };
-  headStyles: {
-    fillColor: number[];
-    textColor: number[];
-    fontStyle: string;
-  };
-  alternateRowStyles: {
-    fillColor: number[];
-  };
-  margin: {
-    left: number;
-    right: number;
-  };
-}
-
 interface JSPDFWithAutoTable extends jsPDF {
-  autoTable: (options: AutoTableOptions) => void;
   lastAutoTable: {
     finalY: number;
   };
@@ -51,6 +28,14 @@ interface Translations {
       page: string;
       of: string;
     };
+    units?: {
+      kg?: string;
+      liters?: string;
+      litersPerDay?: string;
+      currency?: string;
+    };
+    dateFormat?: string;
+    fileName?: string;
     sex?: {
       male?: string;
       female?: string;
@@ -98,13 +83,18 @@ export class AnimalHistoryPDFGenerator {
   private generatePDF(options: PDFGeneratorOptions) {
     const { animal, sales, milkCollections, reproductions, animalImage } = options;
     
+    const animalId = typeof animal.id === 'string' ? parseInt(animal.id, 10) : Number(animal.id);
+    const filteredSales = sales.filter(sale => Number(sale.animal_id) === animalId);
+    const filteredMilkCollections = milkCollections.filter(collection => Number(collection.animal_id) === animalId);
+    const filteredReproductions = reproductions.filter(reproduction => Number(reproduction.animal_id) === animalId);
+    
     this.addHeader();
     this.addAnimalImage(animalImage);
     this.addAnimalInfo(animal);
-    this.addStatistics(sales, milkCollections, reproductions);
-    this.addSalesHistory(sales);
-    this.addMilkHistory(milkCollections);
-    this.addReproductionHistory(reproductions);
+    this.addStatistics(filteredSales, filteredMilkCollections, filteredReproductions);
+    this.addSalesHistory(filteredSales);
+    this.addMilkHistory(filteredMilkCollections);
+    this.addReproductionHistory(filteredReproductions);
     this.addFooter();
     
     this.savePDF(animal);
@@ -161,7 +151,7 @@ export class AnimalHistoryPDFGenerator {
       [this.translations.animalHistoryExport.fields.earTag, animal.ear_tag_number_local.toString()],
       [this.translations.animalHistoryExport.fields.breed, animal.breed],
       [this.translations.animalHistoryExport.fields.type, animal.type],
-      [this.translations.animalHistoryExport.fields.birthDate, animal.birth_date ? new Date(animal.birth_date).toLocaleDateString('pt-BR') : (this.translations.common?.notInformed || 'Não informado')],
+      [this.translations.animalHistoryExport.fields.birthDate, animal.birth_date ? new Date(animal.birth_date).toLocaleDateString(this.translations.animalHistoryExport.dateFormat || 'pt-BR') : (this.translations.common?.notInformed || 'Não informado')],
     ];
 
     this.doc.setFont('helvetica', 'normal');
@@ -186,13 +176,13 @@ export class AnimalHistoryPDFGenerator {
     ];
 
     if (animal.current_weight) {
-      additionalInfo.push([this.translations.animalHistoryExport.fields.currentWeight, `${animal.current_weight} kg`]);
+      additionalInfo.push([this.translations.animalHistoryExport.fields.currentWeight, `${animal.current_weight} ${this.translations.animalHistoryExport.units?.kg || 'kg'}`]);
     }
     if (animal.ideal_weight) {
-      additionalInfo.push([this.translations.animalHistoryExport.fields.idealWeight, `${animal.ideal_weight} kg`]);
+      additionalInfo.push([this.translations.animalHistoryExport.fields.idealWeight, `${animal.ideal_weight} ${this.translations.animalHistoryExport.units?.kg || 'kg'}`]);
     }
     if (animal.milk_production) {
-      additionalInfo.push([this.translations.animalHistoryExport.fields.milkProduction, `${animal.milk_production} L/dia`]);
+      additionalInfo.push([this.translations.animalHistoryExport.fields.milkProduction, `${animal.milk_production} ${this.translations.animalHistoryExport.units?.litersPerDay || 'L/dia'}`]);
     }
 
     additionalInfo.forEach(([label, value]) => {
@@ -210,21 +200,27 @@ export class AnimalHistoryPDFGenerator {
     this.doc.setFontSize(14);
     this.doc.setFont('helvetica', 'bold');
     this.doc.setTextColor(66, 139, 202);
-    this.doc.text(this.translations.animalHistoryExport.statistics, this.margin, this.currentY);
+    const statisticsTitle = this.translations.animalHistoryExport.statistics || 'Estatísticas';
+    this.doc.text(statisticsTitle, this.margin, this.currentY);
     this.currentY += 10;
 
     const totalSales = sales.length;
-    const totalSalesValue = sales.reduce((sum, sale) => sum + sale.price, 0);
+    const totalSalesValue = sales.reduce((sum, sale) => sum + (sale.price || 0), 0);
     const totalMilkCollections = milkCollections.length;
-    const totalMilkQuantity = milkCollections.reduce((sum, collection) => sum + collection.quantity, 0);
+    const totalMilkQuantity = milkCollections.reduce((sum, collection) => sum + (collection.quantity || 0), 0);
     const totalReproductions = reproductions.length;
 
+    const getStatLabel = (key: string, fallback: string): string => {
+      const label = this.translations.animalHistoryExport.stats?.[key];
+      return label && label.trim() !== '' ? label : fallback;
+    };
+
     const stats = [
-      [this.translations.animalHistoryExport.stats.totalSales, totalSales.toString()],
-      [this.translations.animalHistoryExport.stats.totalSalesValue, `R$ ${totalSalesValue.toFixed(2)}`],
-      [this.translations.animalHistoryExport.stats.totalMilkCollections, totalMilkCollections.toString()],
-      [this.translations.animalHistoryExport.stats.totalMilkQuantity, `${totalMilkQuantity.toFixed(2)} L`],
-      [this.translations.animalHistoryExport.stats.totalReproductions, totalReproductions.toString()],
+      [getStatLabel('totalSales', 'Total de Vendas'), totalSales.toString()],
+      [getStatLabel('totalSalesValue', 'Valor Total das Vendas'), `${this.translations.animalHistoryExport.units?.currency || 'R$'} ${totalSalesValue.toFixed(2)}`],
+      [getStatLabel('totalMilkCollections', 'Total de Ordenhas'), totalMilkCollections.toString()],
+      [getStatLabel('totalMilkQuantity', 'Quantidade Total de Leite'), `${totalMilkQuantity.toFixed(2)} ${this.translations.animalHistoryExport.units?.liters || 'L'}`],
+      [getStatLabel('totalReproductions', 'Total de Reproduções'), totalReproductions.toString()],
     ];
 
     this.doc.setFont('helvetica', 'normal');
@@ -232,11 +228,13 @@ export class AnimalHistoryPDFGenerator {
     this.doc.setTextColor(0, 0, 0);
 
     stats.forEach(([label, value]) => {
-      this.doc.setFont('helvetica', 'bold');
-      this.doc.text(`${label}:`, this.margin, this.currentY);
-      this.doc.setFont('helvetica', 'normal');
-      this.doc.text(value, this.margin + 80, this.currentY);
-      this.currentY += 7;
+      if (label && label.trim() !== '') {
+        this.doc.setFont('helvetica', 'bold');
+        this.doc.text(`${label}:`, this.margin, this.currentY);
+        this.doc.setFont('helvetica', 'normal');
+        this.doc.text(value, this.margin + 80, this.currentY);
+        this.currentY += 7;
+      }
     });
 
     this.currentY += 15;
@@ -253,14 +251,16 @@ export class AnimalHistoryPDFGenerator {
     this.doc.text(this.translations.animalHistoryExport.salesHistory, this.margin, this.currentY);
     this.currentY += 10;
 
+    const dateFormat = this.translations.animalHistoryExport.dateFormat || 'pt-BR';
+    const currency = this.translations.animalHistoryExport.units?.currency || 'R$';
     const salesData = sales.map(sale => [
-      new Date(sale.sale_date).toLocaleDateString('pt-BR'),
+      new Date(sale.sale_date).toLocaleDateString(dateFormat),
       sale.buyer_name,
-      `R$ ${sale.price.toFixed(2)}`,
+      `${currency} ${sale.price.toFixed(2)}`,
       sale.notes || '-'
     ]);
 
-    this.doc.autoTable({
+    autoTable(this.doc, {
       startY: this.currentY,
       head: [[
         this.translations.animalHistoryExport.salesTable.date,
@@ -284,7 +284,7 @@ export class AnimalHistoryPDFGenerator {
       margin: { left: this.margin, right: this.margin }
     });
 
-    this.currentY = this.doc.lastAutoTable.finalY + 15;
+    this.currentY = (this.doc as any).lastAutoTable.finalY + 15;
   }
 
   private addMilkHistory(milkCollections: MilkCollection[]) {
@@ -298,14 +298,16 @@ export class AnimalHistoryPDFGenerator {
     this.doc.text(this.translations.animalHistoryExport.milkHistory, this.margin, this.currentY);
     this.currentY += 10;
 
+    const dateFormat = this.translations.animalHistoryExport.dateFormat || 'pt-BR';
+    const liters = this.translations.animalHistoryExport.units?.liters || 'L';
     const milkData = milkCollections.map((collection: MilkCollection) => [
-      new Date(collection.collection_date).toLocaleDateString('pt-BR'),
-      `${collection.quantity}L`,
+      new Date(collection.collection_date).toLocaleDateString(dateFormat),
+      `${collection.quantity}${liters}`,
       collection.quality || '-',
       collection.notes || '-'
     ]);
 
-    this.doc.autoTable({
+    autoTable(this.doc, {
       startY: this.currentY,
       head: [[
         this.translations.animalHistoryExport.milkTable.date,
@@ -329,7 +331,7 @@ export class AnimalHistoryPDFGenerator {
       margin: { left: this.margin, right: this.margin }
     });
 
-    this.currentY = this.doc.lastAutoTable.finalY + 15;
+    this.currentY = (this.doc as any).lastAutoTable.finalY + 15;
   }
 
   private addReproductionHistory(reproductions: Reproduction[]) {
@@ -343,13 +345,14 @@ export class AnimalHistoryPDFGenerator {
     this.doc.text(this.translations.animalHistoryExport.reproductionHistory, this.margin, this.currentY);
     this.currentY += 10;
 
+    const dateFormat = this.translations.animalHistoryExport.dateFormat || 'pt-BR';
     const reproductionData = reproductions.map((reproduction: Reproduction) => [
-      new Date(reproduction.date).toLocaleDateString('pt-BR'),
+      new Date(reproduction.date).toLocaleDateString(dateFormat),
       reproduction.phase,
       reproduction.notes || '-'
     ]);
 
-    this.doc.autoTable({
+    autoTable(this.doc, {
       startY: this.currentY,
       head: [[
         this.translations.animalHistoryExport.reproductionTable.date,
@@ -372,7 +375,7 @@ export class AnimalHistoryPDFGenerator {
       margin: { left: this.margin, right: this.margin }
     });
 
-    this.currentY = this.doc.lastAutoTable.finalY + 15;
+    this.currentY = (this.doc as any).lastAutoTable.finalY + 15;
   }
 
   private addFooter() {
@@ -391,8 +394,9 @@ export class AnimalHistoryPDFGenerator {
         { align: 'center' }
       );
       
+      const dateFormat = this.translations.animalHistoryExport.dateFormat || 'pt-BR';
       this.doc.text(
-        new Date().toLocaleDateString('pt-BR'),
+        new Date().toLocaleDateString(dateFormat),
         this.pageWidth - this.margin,
         this.doc.internal.pageSize.getHeight() - 10,
         { align: 'right' }
@@ -409,7 +413,8 @@ export class AnimalHistoryPDFGenerator {
   }
 
   private savePDF(animal: Animal) {
-    const fileName = `${animal.animal_name}_historico_completo_${new Date().toISOString().split('T')[0]}.pdf`;
+    const fileNameKey = this.translations.animalHistoryExport.fileName || 'historico_completo';
+    const fileName = `${animal.animal_name}_${fileNameKey}_${new Date().toISOString().split('T')[0]}.pdf`;
     this.doc.save(fileName);
   }
 

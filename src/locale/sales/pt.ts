@@ -124,6 +124,14 @@ export const translations = {
       page: "Página",
       of: "de"
     },
+    units: {
+      kg: "kg",
+      liters: "L",
+      litersPerDay: "L/dia",
+      currency: "R$"
+    },
+    dateFormat: "pt-BR",
+    fileName: "historico_completo",
     success: "PDF gerado com sucesso!",
     error: "Erro ao gerar PDF"
   },
