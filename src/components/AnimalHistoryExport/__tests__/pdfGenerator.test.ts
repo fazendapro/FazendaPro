@@ -20,11 +20,17 @@ const mockDoc = {
   setPage: vi.fn(),
   addPage: vi.fn(),
   save: vi.fn(),
+  getTextColor: vi.fn(() => [0, 0, 0]),
   internal: {
     pageSize: {
       getWidth: vi.fn(() => 210),
       getHeight: vi.fn(() => 297),
     },
+    getFontSize: vi.fn(() => 12),
+    getFont: vi.fn(() => ({
+      fontName: 'helvetica',
+      fontStyle: 'normal'
+    })),
   },
   lastAutoTable: {
     finalY: 100,
@@ -34,6 +40,17 @@ const mockDoc = {
 vi.mock('jspdf', () => {
   return {
     default: vi.fn(() => mockDoc),
+  };
+});
+
+vi.mock('jspdf-autotable', () => {
+  return {
+    default: vi.fn((doc: typeof mockDoc, options: unknown) => {
+      // Simular o comportamento do autoTable
+      if (mockDoc.lastAutoTable) {
+        mockDoc.lastAutoTable.finalY = 150;
+      }
+    }),
   };
 });
 
