@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Button, Image, Tag, Space, Spin, Avatar, Row, Col, Typography, Divider } from 'antd';
 import { EditOutlined, CameraOutlined, UserOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useAnimalDetailContext } from '../hooks';
 import { SEX_OPTIONS } from '../types';
 import { AnimalHistoryExport } from '../../../../components/AnimalHistoryExport/AnimalHistoryExport';
+import { saleService } from '../../../../components/services/saleService';
+import { milkCollectionService } from '../../../../components/services/milkCollectionService';
+import { reproductionService } from '../../../../components/services/reproductionService';
+import { Sale } from '../../../../types/sale';
+import { MilkCollection } from '../../../../types/milk-collection';
+import { Reproduction } from '../../../../types/reproduction';
 
 const { Title, Text } = Typography;
 
@@ -15,6 +21,36 @@ interface AnimalDetailDisplayProps {
 export const AnimalDetailDisplay: React.FC<AnimalDetailDisplayProps> = ({ onEdit }) => {
   const { t } = useTranslation();
   const { animal, loading } = useAnimalDetailContext();
+  const [sales, setSales] = useState<Sale[]>([]);
+  const [milkCollections, setMilkCollections] = useState<MilkCollection[]>([]);
+  const [reproductions, setReproductions] = useState<Reproduction[]>([]);
+
+  useEffect(() => {
+    const loadAnimalHistory = async () => {
+      if (!animal?.id) return;
+
+      try {
+        const animalId = typeof animal.id === 'string' ? parseInt(animal.id, 10) : animal.id;
+        
+        const [salesData, milkData, reproductionData] = await Promise.all([
+          saleService.getSalesByAnimal(animalId).catch(() => []),
+          milkCollectionService.getMilkCollectionsByAnimal(animalId).catch(() => []),
+          reproductionService.getReproductionsByAnimal(animalId).catch(() => [])
+        ]);
+
+        setSales(salesData || []);
+        setMilkCollections(milkData || []);
+        setReproductions(reproductionData || []);
+      } catch (error) {
+        console.error('Erro ao carregar histórico do animal:', error);
+        setSales([]);
+        setMilkCollections([]);
+        setReproductions([]);
+      }
+    };
+
+    loadAnimalHistory();
+  }, [animal?.id]);
 
   if (loading) {
     return (
@@ -75,9 +111,9 @@ export const AnimalDetailDisplay: React.FC<AnimalDetailDisplayProps> = ({ onEdit
               createdAt: animal.created_at,
               updatedAt: animal.updated_at
             }}
-            sales={[]}
-            milkCollections={[]}
-            reproductions={[]}
+            sales={sales}
+            milkCollections={milkCollections}
+            reproductions={reproductions}
           />
         </Space>
       </div>
