@@ -16,16 +16,16 @@ import { translations as salesTranslationsPt } from "./sales/pt";
 import { translations as salesTranslationsEn } from "./sales/en";
 import { translations as salesTranslationsEs } from "./sales/es";
 
-const mergeTranslations = (base: any, ...overrides: any[]) => {
+const mergeTranslations = (base: Record<string, unknown>, ...overrides: Record<string, unknown>[]): Record<string, unknown> => {
   const merged = { ...base };
   overrides.forEach(override => {
     Object.keys(override).forEach(key => {
       if (key === 'common' && typeof override[key] === 'object' && override[key] !== null && 
           typeof merged[key] === 'object' && merged[key] !== null) {
-        merged[key] = { ...override[key], ...merged[key] };
+        merged[key] = { ...(override[key] as Record<string, unknown>), ...(merged[key] as Record<string, unknown>) };
       } else if (typeof override[key] === 'object' && override[key] !== null && !Array.isArray(override[key]) && 
           typeof merged[key] === 'object' && merged[key] !== null && !Array.isArray(merged[key])) {
-        merged[key] = mergeTranslations(merged[key], override[key]);
+        merged[key] = mergeTranslations(merged[key] as Record<string, unknown>, override[key] as Record<string, unknown>);
       } else {
         merged[key] = override[key];
       }

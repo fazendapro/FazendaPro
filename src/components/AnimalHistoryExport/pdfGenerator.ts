@@ -284,7 +284,7 @@ export class AnimalHistoryPDFGenerator {
       margin: { left: this.margin, right: this.margin }
     });
 
-    this.currentY = (this.doc as any).lastAutoTable.finalY + 15;
+    this.currentY = this.doc.lastAutoTable.finalY + 15;
   }
 
   private addMilkHistory(milkCollections: MilkCollection[]) {
@@ -331,7 +331,7 @@ export class AnimalHistoryPDFGenerator {
       margin: { left: this.margin, right: this.margin }
     });
 
-    this.currentY = (this.doc as any).lastAutoTable.finalY + 15;
+    this.currentY = this.doc.lastAutoTable.finalY + 15;
   }
 
   private addReproductionHistory(reproductions: Reproduction[]) {
@@ -375,7 +375,7 @@ export class AnimalHistoryPDFGenerator {
       margin: { left: this.margin, right: this.margin }
     });
 
-    this.currentY = (this.doc as any).lastAutoTable.finalY + 15;
+    this.currentY = this.doc.lastAutoTable.finalY + 15;
   }
 
   private addFooter() {
