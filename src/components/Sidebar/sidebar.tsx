@@ -1,10 +1,11 @@
-import { Menu, Layout, Grid, Button, Avatar, Card, Typography } from "antd";
+import { Menu, Layout, Grid, Button, Avatar, Card, Typography, Select } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { HomeOutlined, UserOutlined, MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined, SettingOutlined, DollarOutlined } from "@ant-design/icons";
 import { useAuth } from "../../contexts/AuthContext";
 import { useSelectedFarm } from "../../hooks/useSelectedFarm";
+import { useFarmSwitcher } from "../../hooks/useFarmSwitcher";
 
 const { Sider } = Layout;
 const { useBreakpoint } = Grid;
@@ -17,8 +18,15 @@ export const Sidebar = () => {
   const screens = useBreakpoint();
   const [collapsed, setCollapsed] = useState(screens.xs);
   const { logout, user } = useAuth();
-  const { farmName, farmLogo } = useSelectedFarm();
+  const { farmName, farmLogo, selectedFarm } = useSelectedFarm();
+  const { farms, loading: farmsLoading, switchFarm, loadFarms } = useFarmSwitcher();
   const isAuthenticated = true;
+
+  useEffect(() => {
+    if (!collapsed && farms.length === 0) {
+      loadFarms();
+    }
+  }, [collapsed, farms.length, loadFarms]);
 
   const handleMenuClick = (key: string) => {
     if (key === '/sair') {
@@ -83,28 +91,93 @@ export const Sidebar = () => {
           style={{ 
             margin: '16px', 
             marginTop: '24px',
-            textAlign: 'center'
+            textAlign: 'center',
+            border: 'none'
           }}
           styles={{ body: { padding: '16px' } }}
         >
           {farmLogo && 
            farmLogo.trim() !== '' && 
            (farmLogo.startsWith('data:') || farmLogo.startsWith('http')) ? (
-            <Avatar
-              size={100}
-              src={farmLogo}
-              shape="square"
-              style={{ marginBottom: 8 }}
-            />
+            <>
+              <Avatar
+                size={100}
+                src={farmLogo}
+                shape="square"
+                style={{ marginBottom: farms.length > 1 ? 12 : 0 }}
+              />
+              {farms.length > 1 && (
+                <div>
+                  <Select
+                    value={selectedFarm?.ID}
+                    onChange={(farmId: number) => switchFarm(farmId)}
+                    loading={farmsLoading}
+                    style={{ 
+                      width: '100%',
+                      fontSize: '15px',
+                      fontWeight: 'bold'
+                    }}
+                    placeholder={t('navigation.selectFarm') || 'Selecionar Fazenda'}
+                    size="small"
+                    showSearch
+                    optionFilterProp="children"
+                    filterOption={(input: string, option?: { children?: React.ReactNode }) =>
+                      (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
+                    }
+                    styles={{
+                      selector: {
+                        fontSize: '15px',
+                        fontWeight: 'bold',
+                      }
+                    }}
+                  >
+                    {farms.map((farm) => (
+                      <Select.Option key={farm.ID} value={farm.ID} style={{ fontSize: '15px', fontWeight: 'bold' }}>
+                        {farm.Company?.CompanyName || `Fazenda ${farm.ID}`}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </div>
+              )}
+            </>
+          ) : farms.length > 1 ? (
+            <Select
+              value={selectedFarm?.ID}
+              onChange={(farmId: number) => switchFarm(farmId)}
+              loading={farmsLoading}
+              style={{ 
+                width: '100%',
+                fontSize: '15px',
+                fontWeight: 'bold'
+              }}
+              placeholder={t('navigation.selectFarm') || 'Selecionar Fazenda'}
+              size="small"
+              showSearch
+              optionFilterProp="children"
+              filterOption={(input: string, option?: { children?: React.ReactNode }) =>
+                (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
+              }
+              styles={{
+                selector: {
+                  fontSize: '15px',
+                  fontWeight: 'bold',
+                }
+              }}
+            >
+              {farms.map((farm) => (
+                <Select.Option key={farm.ID} value={farm.ID}>
+                  {farm.Company?.CompanyName || `Fazenda ${farm.ID}`}
+                </Select.Option>
+              ))}
+            </Select>
           ) : (
             <Text
               strong
-              style={{ fontSize: farmLogo ? '12px' : '14px' }}
+              style={{ fontSize: '14px' }}
             >
               {farmName || 'FAZENDA'}
             </Text>
           )}
-
         </Card>
       )}
 

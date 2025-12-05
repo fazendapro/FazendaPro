@@ -22,7 +22,9 @@
       "cattle": "Vacas",
       "sales": "Vendas",
       "settings": "Configurações",
-      "logout": "Sair"
+      "logout": "Sair",
+      "switchFarm": "Trocar Fazenda",
+      "selectFarm": "Selecionar Fazenda"
     }
   }
 }

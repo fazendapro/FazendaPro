@@ -20,7 +20,9 @@
       "cattle": "Ganado",
       "sales": "Ventas",
       "settings": "Configuración",
-      "logout": "Salir"
+      "logout": "Salir",
+      "switchFarm": "Cambiar Finca",
+      "selectFarm": "Seleccionar Finca"
     }
   }
 }

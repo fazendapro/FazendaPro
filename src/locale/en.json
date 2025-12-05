@@ -20,7 +20,9 @@
       "cattle": "Cattle",
       "sales": "Sales",
       "settings": "Settings",
-      "logout": "Logout"
+      "logout": "Logout",
+      "switchFarm": "Switch Farm",
+      "selectFarm": "Select Farm"
     }
   }
 }
