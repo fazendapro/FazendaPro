@@ -105,12 +105,6 @@ export const AnimalDetailForm: React.FC<AnimalDetailFormProps> = ({ onSave, onCa
     return false;
   };
 
-  const uploadProps = {
-    beforeUpload: handlePhotoUpload,
-    showUploadList: false,
-    accept: 'image/*',
-  };
-
   if (loadingParents) {
     return (
       <div style={{ textAlign: 'center', padding: '50px' }}>
