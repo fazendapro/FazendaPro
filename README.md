@@ -4,6 +4,8 @@
 > ***Quais são as branches princais?*** Frontend: `front/release`; Backend: `back/release`.
 > 
 > **Informações de acesso:** **login:** professores@email.com **senha:** 123456
+>
+> [Quem desenvolveu o FazendaPro?](https://www.linkedin.com/in/gustavo-dias-218a38220/)
 > 
 > [O que é o software e para que serve?](https://github.com/fazendapro/cowtech/wiki/Introduction-&-Description)
 >
