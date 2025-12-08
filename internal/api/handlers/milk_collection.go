@@ -33,17 +33,17 @@ type MilkCollectionData struct {
 // CreateMilkCollectionRequest representa a requisição de criação de coleta de leite
 // @Description Dados necessários para criar uma nova coleta de leite
 type CreateMilkCollectionRequest struct {
-	AnimalID uint    `json:"animal_id" validate:"required" example:"1"`        // ID do animal
-	Liters   float64 `json:"liters" validate:"required,min=0" example:"25.5"`   // Quantidade de litros
-	Date     string  `json:"date" validate:"required" example:"2024-01-15"`     // Data da coleta (YYYY-MM-DD)
+	AnimalID uint    `json:"animal_id" validate:"required" example:"1"`       // ID do animal
+	Liters   float64 `json:"liters" validate:"required,min=0" example:"25.5"` // Quantidade de litros
+	Date     string  `json:"date" validate:"required" example:"2024-01-15"`   // Data da coleta (YYYY-MM-DD)
 }
 
 // MilkCollectionResponse representa a resposta de coleta de leite
 // @Description Resposta com dados de uma coleta de leite
 type MilkCollectionResponse struct {
 	Success bool               `json:"success" example:"true"` // Indica sucesso
-	Data    MilkCollectionData `json:"data,omitempty"`        // Dados da coleta
-	Message string             `json:"message,omitempty"`     // Mensagem de resposta
+	Data    MilkCollectionData `json:"data,omitempty"`         // Dados da coleta
+	Message string             `json:"message,omitempty"`      // Mensagem de resposta
 }
 
 // MilkCollectionsResponse representa a resposta com múltiplas coletas
@@ -51,16 +51,16 @@ type MilkCollectionResponse struct {
 type MilkCollectionsResponse struct {
 	Success bool                 `json:"success" example:"true"` // Indica sucesso
 	Data    []MilkCollectionData `json:"data,omitempty"`         // Lista de coletas
-	Message string               `json:"message,omitempty"`    // Mensagem de resposta
+	Message string               `json:"message,omitempty"`      // Mensagem de resposta
 }
 
 // PaginatedMilkCollectionsResponse representa a resposta paginada de coletas
 // @Description Resposta com lista paginada de coletas de leite e metadados
 type PaginatedMilkCollectionsResponse struct {
 	MilkCollections []MilkCollectionData `json:"milk_collections"` // Lista de coletas
-	Total            int64                `json:"total"`            // Total de registros
-	Page             int                  `json:"page"`             // Página atual
-	Limit            int                  `json:"limit"`            // Limite por página
+	Total           int64                `json:"total"`            // Total de registros
+	Page            int                  `json:"page"`             // Página atual
+	Limit           int                  `json:"limit"`            // Limite por página
 }
 
 // CreateMilkCollection cria uma nova coleta de leite
@@ -224,7 +224,6 @@ func (h *MilkCollectionHandler) GetMilkCollectionsByFarmID(w http.ResponseWriter
 	var milkCollections []models.MilkCollection
 	var total int64
 
-	// Use paginated methods if page/limit are provided, otherwise use non-paginated
 	if pageStr != "" || limitStr != "" {
 		if startDate != nil || endDate != nil {
 			milkCollections, total, err = h.service.GetMilkCollectionsByFarmIDWithDateRangePaginated(uint(farmID), startDate, endDate, page, limit)
@@ -232,7 +231,6 @@ func (h *MilkCollectionHandler) GetMilkCollectionsByFarmID(w http.ResponseWriter
 			milkCollections, total, err = h.service.GetMilkCollectionsByFarmIDWithPagination(uint(farmID), page, limit)
 		}
 	} else {
-		// Backward compatibility: if no pagination params, return all
 		if startDate != nil || endDate != nil {
 			milkCollections, err = h.service.GetMilkCollectionsByFarmIDWithDateRange(uint(farmID), startDate, endDate)
 			if err == nil {
@@ -256,19 +254,18 @@ func (h *MilkCollectionHandler) GetMilkCollectionsByFarmID(w http.ResponseWriter
 		milkCollectionData[i] = h.mapToMilkCollectionData(&mc)
 	}
 
-	// If pagination was used, return paginated response
 	if pageStr != "" || limitStr != "" {
 		paginatedData := PaginatedMilkCollectionsResponse{
 			MilkCollections: milkCollectionData,
-			Total:            total,
-			Page:             page,
-			Limit:            limit,
+			Total:           total,
+			Page:            page,
+			Limit:           limit,
 		}
 
 		response := struct {
-			Success bool                            `json:"success"`
+			Success bool                             `json:"success"`
 			Data    PaginatedMilkCollectionsResponse `json:"data"`
-			Message string                          `json:"message"`
+			Message string                           `json:"message"`
 		}{
 			Success: true,
 			Data:    paginatedData,

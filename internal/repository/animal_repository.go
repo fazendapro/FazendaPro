@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/fazendapro/FazendaPro-api/internal/models"
 	"gorm.io/gorm"
@@ -94,6 +95,37 @@ func (r *AnimalRepository) FindByFarmIDWithPagination(farmID uint, page, limit i
 
 	offset := (page - 1) * limit
 	if err := query.Order("created_at DESC").Offset(offset).Limit(limit).Find(&animals).Error; err != nil {
+		return nil, 0, fmt.Errorf("erro ao buscar animais da fazenda: %w", err)
+	}
+
+	return animals, total, nil
+}
+
+func (r *AnimalRepository) FindByFarmIDWithPaginationAndSearch(farmID uint, page, limit int, search string) ([]models.Animal, int64, error) {
+	var animals []models.Animal
+	var total int64
+
+	query := r.db.DB.Model(&models.Animal{}).Where(SQLWhereFarmID, farmID)
+
+	if search != "" {
+		term := strings.ToLower(search)
+		like := "%" + term + "%"
+		query = query.Where(
+			"LOWER(animal_name) LIKE ? OR LOWER(breed) LIKE ? OR LOWER(type) LIKE ? OR CAST(ear_tag_number_local AS TEXT) LIKE ? OR CAST(ear_tag_number_register AS TEXT) LIKE ?",
+			like, like, like, like, like,
+		)
+	}
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, fmt.Errorf("erro ao contar animais da fazenda: %w", err)
+	}
+
+	if page > 0 && limit > 0 {
+		offset := (page - 1) * limit
+		query = query.Offset(offset).Limit(limit)
+	}
+
+	if err := query.Order("created_at DESC").Find(&animals).Error; err != nil {
 		return nil, 0, fmt.Errorf("erro ao buscar animais da fazenda: %w", err)
 	}
 

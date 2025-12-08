@@ -235,7 +235,7 @@ func TestAnimalHandler_GetAnimalsByFarm_Success(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/animals/farm?farmId=1&page=1&limit=10", nil)
 	w := httptest.NewRecorder()
 
-	mockRepo.On("FindByFarmIDWithPagination", uint(1), 1, 10).Return(expectedAnimals, int64(2), nil)
+	mockRepo.On("FindByFarmIDWithPaginationAndSearch", uint(1), 1, 10, "").Return(expectedAnimals, int64(2), nil)
 
 	router.ServeHTTP(w, req)
 
@@ -243,12 +243,12 @@ func TestAnimalHandler_GetAnimalsByFarm_Success(t *testing.T) {
 	var response map[string]interface{}
 	json.Unmarshal(w.Body.Bytes(), &response)
 	assert.True(t, response["success"].(bool))
-	
+
 	data := response["data"].(map[string]interface{})
 	assert.Equal(t, float64(2), data["total"])
 	assert.Equal(t, float64(1), data["page"])
 	assert.Equal(t, float64(10), data["limit"])
-	
+
 	mockRepo.AssertExpectations(t)
 }
 
@@ -456,7 +456,7 @@ func TestAnimalHandler_GetAnimalsByFarm_ServiceError(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/animals/farm?farmId=1&page=1&limit=10", nil)
 	w := httptest.NewRecorder()
 
-	mockRepo.On("FindByFarmIDWithPagination", uint(1), 1, 10).Return(nil, int64(0), errors.New("erro ao buscar"))
+	mockRepo.On("FindByFarmIDWithPaginationAndSearch", uint(1), 1, 10, "").Return(nil, int64(0), errors.New("erro ao buscar"))
 
 	router.ServeHTTP(w, req)
 

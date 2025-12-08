@@ -191,12 +191,13 @@ func (s *AnimalService) GetAnimalsByFarmIDAndSex(farmID uint, sex int) ([]models
 }
 
 func (s *AnimalService) GetAnimalsByFarmIDWithPagination(farmID uint, page, limit int) ([]models.Animal, int64, error) {
-	if page <= 0 {
-		page = 1
-	}
-	if limit <= 0 {
-		limit = 10
+	return s.GetAnimalsByFarmIDWithPaginationAndSearch(farmID, page, limit, "")
+}
+
+func (s *AnimalService) GetAnimalsByFarmIDWithPaginationAndSearch(farmID uint, page, limit int, search string) ([]models.Animal, int64, error) {
+	if page <= 0 || limit <= 0 {
+		return s.repository.FindByFarmIDWithPaginationAndSearch(farmID, 0, 0, search)
 	}
 
-	return s.repository.FindByFarmIDWithPagination(farmID, page, limit)
+	return s.repository.FindByFarmIDWithPaginationAndSearch(farmID, page, limit, search)
 }
