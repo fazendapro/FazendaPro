@@ -45,7 +45,7 @@ vi.mock('jspdf', () => {
 
 vi.mock('jspdf-autotable', () => {
   return {
-    default: vi.fn((doc: typeof mockDoc, options: unknown) => {
+    default: vi.fn(() => {
       // Simular o comportamento do autoTable
       if (mockDoc.lastAutoTable) {
         mockDoc.lastAutoTable.finalY = 150;

@@ -36,8 +36,7 @@ const AnimalDashboard: React.FC<AnimalDashboardProps> = ({
       'ear_tag_number_register',
       'type',
       'sex',
-      'breed',
-      'birth_date'
+      'breed'
     ]
   );
 
