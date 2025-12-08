@@ -59,6 +59,14 @@ export const useInfiniteAnimals = (options: UseInfiniteAnimalsOptions = {}) => {
         idsRecebidos: animalsData.map(a => a.id)
       });
 
+      if (animalsData.length === 0 && !resetList && pageToLoad > 1) {
+        console.warn('[useInfiniteAnimals] ⚠️ Página vazia recebida, definindo hasMore=false');
+        setHasMore(false);
+        setLoading(false);
+        loadingRef.current = false;
+        return;
+      }
+
       setTotal(totalCount);
 
       const normalizeId = (id: string | number): string => {
@@ -140,6 +148,10 @@ export const useInfiniteAnimals = (options: UseInfiniteAnimalsOptions = {}) => {
 
   useEffect(() => {
     if (previousSearchTerm.current !== searchTerm) {
+      console.log('[useInfiniteAnimals] 🔄 SearchTerm mudou, resetando:', {
+        anterior: previousSearchTerm.current,
+        novo: searchTerm
+      });
       previousSearchTerm.current = searchTerm;
       setAnimals([]);
       setPage(1);
@@ -156,11 +168,26 @@ export const useInfiniteAnimals = (options: UseInfiniteAnimalsOptions = {}) => {
       hasMore,
       pageAtual: page,
       proximaPage: page + 1,
-      animaisAtuais: uniqueAnimalsCountRef.current
+      animaisAtuais: uniqueAnimalsCountRef.current,
+      total
     });
     
     if (!loading && hasMore) {
       const nextPage = page + 1;
+      
+      // Verificar se a próxima página faz sentido
+      const expectedMaxPage = Math.ceil(total / pageSize);
+      if (nextPage > expectedMaxPage) {
+        console.warn('[useInfiniteAnimals] ⚠️ Tentando carregar página além do esperado:', {
+          nextPage,
+          expectedMaxPage,
+          total,
+          pageSize
+        });
+        setHasMore(false);
+        return;
+      }
+      
       setPage(nextPage);
       loadAnimals(nextPage);
     } else {
@@ -169,7 +196,7 @@ export const useInfiniteAnimals = (options: UseInfiniteAnimalsOptions = {}) => {
         hasMore
       });
     }
-  }, [loading, hasMore, page, loadAnimals]);
+  }, [loading, hasMore, page, loadAnimals, total, pageSize]);
 
   const reset = useCallback(() => {
     setAnimals([]);

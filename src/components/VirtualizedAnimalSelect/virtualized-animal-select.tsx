@@ -84,24 +84,6 @@ export const VirtualizedAnimalSelect: React.FC<VirtualizedAnimalSelectProps> = (
     }
   }, [animals, onAnimalLoad]);
 
-  useEffect(() => {
-    if (open && hasMore && !loading) {
-      console.log('[VirtualizedAnimalSelect] 🔄 Dropdown aberto, carregando mais automaticamente:', {
-        animaisAtuais: animals.length,
-        hasMore,
-        loading
-      });
-
-      const timer = setTimeout(() => {
-        if (hasMore && !loading) {
-          loadMore();
-        }
-      }, 100);
-
-      return () => clearTimeout(timer);
-    }
-  }, [open, hasMore, loading, animals.length, loadMore]);
-
   const handleSearch = useCallback((value: string) => {
     if (debounceTimer.current) {
       clearTimeout(debounceTimer.current);
@@ -136,6 +118,7 @@ export const VirtualizedAnimalSelect: React.FC<VirtualizedAnimalSelectProps> = (
   }, [hasMore, loading, loadMore, itemHeight]);
 
   const handleOpenChange = useCallback((visible: boolean) => {
+    console.log('[VirtualizedAnimalSelect] 🔄 Dropdown', visible ? 'aberto' : 'fechado');
     setOpen(visible);
     if (!visible) {
       setSearchTerm('');
