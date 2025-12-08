@@ -60,7 +60,15 @@ func main() {
 
 	if cfg.SentryDSN != "" {
 		if err := sentry.Init(sentry.ClientOptions{
-			Dsn: cfg.SentryDSN,
+			Dsn:              cfg.SentryDSN,
+			EnableTracing:    true,
+			TracesSampleRate: 1.0,
+			TracesSampler: sentry.TracesSampler(func(ctx sentry.SamplingContext) float64 {
+				if ctx.Span.Name == "GET /health" {
+					return 0.0
+				}
+				return 1.0
+			}),
 		}); err != nil {
 			app.Logger.Printf("Sentry initialization failed: %v\n", err)
 		} else {
