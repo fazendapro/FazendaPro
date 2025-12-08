@@ -4,7 +4,6 @@ import { InfoCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useNextToCalve } from '../hooks/useNextToCalve';
 import { NextToCalveAnimal } from '../types/dashboard.types';
-import { CowOutlined } from '@ant-design/icons';
 
 const NextToCalve: React.FC = () => {
   const { t } = useTranslation();
