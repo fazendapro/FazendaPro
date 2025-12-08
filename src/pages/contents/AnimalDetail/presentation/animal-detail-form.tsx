@@ -13,6 +13,7 @@ interface AnimalFormValues {
   type: string;
   sex: number;
   breed: string;
+  photo?: string;
   birth_date?: dayjs.Dayjs | null;
   animal_type: number;
   status: number;
@@ -37,34 +38,35 @@ export const AnimalDetailForm: React.FC<AnimalDetailFormProps> = ({ onSave, onCa
   const { animal, fathers, mothers, loadingParents, uploadPhoto } = useAnimalDetailContext();
   const [form] = Form.useForm();
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    if (animal) {
-
-      form.setFieldsValue({
-        animal_name: animal.animal_name,
-        ear_tag_number_local: animal.ear_tag_number_local,
-        ear_tag_number_register: animal.ear_tag_number_register,
-        type: animal.type,
-        sex: animal.sex,
-        breed: animal.breed,
-        birth_date: animal.birth_date ? dayjs(animal.birth_date) : null,
-        animal_type: animal.animal_type,
-        status: animal.status,
-        confinement: Boolean(animal.confinement),
-        fertilization: Boolean(animal.fertilization),
-        castrated: Boolean(animal.castrated),
-        purpose: animal.purpose,
-        current_batch: animal.current_batch,
-        father_id: animal.father_id,
-        mother_id: animal.mother_id
-      });
-      
-    }
+    if (!animal) return;
+    setPhotoPreviewUrl(animal.photo || null);
+    form.resetFields();
+    form.setFieldsValue({
+      animal_name: animal.animal_name,
+      ear_tag_number_local: animal.ear_tag_number_local,
+      ear_tag_number_register: animal.ear_tag_number_register,
+      type: animal.type,
+      sex: animal.sex,
+      breed: animal.breed,
+      birth_date: animal.birth_date ? dayjs(animal.birth_date) : null,
+      animal_type: animal.animal_type,
+      status: animal.status,
+      confinement: Boolean(animal.confinement),
+      fertilization: Boolean(animal.fertilization),
+      castrated: Boolean(animal.castrated),
+      purpose: animal.purpose,
+      current_batch: animal.current_batch,
+      father_id: animal.father_id,
+      mother_id: animal.mother_id
+    });
   }, [animal, form]);
 
   const handleSave = () => {
     form.validateFields().then((values: AnimalFormValues) => {
+      const photoUrl = photoFile ? URL.createObjectURL(photoFile) : photoPreviewUrl;
       const formData: AnimalDetailFormData = {
         animal_name: values.animal_name,
         ear_tag_number_local: values.ear_tag_number_local,
@@ -76,14 +78,14 @@ export const AnimalDetailForm: React.FC<AnimalDetailFormProps> = ({ onSave, onCa
         animal_type: values.animal_type,
         status: values.status,
         confinement: values.confinement,
+        photo: photoUrl ? photoUrl : photoPreviewUrl ? photoPreviewUrl : undefined,
         fertilization: values.fertilization,
         castrated: values.castrated,
         purpose: values.purpose,
         current_batch: values.current_batch,
         father_id: values.father_id,
         mother_id: values.mother_id
-      };
-      
+      }
       onSave(formData, photoFile);
     });
   };
@@ -255,65 +257,56 @@ export const AnimalDetailForm: React.FC<AnimalDetailFormProps> = ({ onSave, onCa
           </Select>
         </Form.Item>
 
-        <Form.Item
-          label={t('animalDetail.photo')}
-          name="photoUpload"
-          valuePropName="file"
-          getValueFromEvent={() => undefined}
-        >
+        <Form.Item label={t('animalDetail.photo')} name="photoUpload" valuePropName="file">
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            {photoFile && (
-              <div style={{ width: '80px', height: '80px', border: '1px solid #d9d9d9', borderRadius: '4px', overflow: 'hidden' }}>
-                <img 
-                  src={URL.createObjectURL(photoFile)} 
-                  alt="Preview" 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            {(photoFile || photoPreviewUrl) && (
+              <div style={{
+                width: "80px",
+                height: "80px",
+                border: "1px solid #d9d9d9",
+                borderRadius: "4px",
+                overflow: "hidden"
+              }}>
+                <img
+                  src={photoFile ? URL.createObjectURL(photoFile) : photoPreviewUrl!}
+                  alt="Preview"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
               </div>
             )}
-            <Upload {...uploadProps}>
+
+            <Upload beforeUpload={handlePhotoUpload} showUploadList={false} accept="image/*">
               <Button icon={<UploadOutlined />}>
-                {photoFile ? t('animalDetail.changePhoto') : t('animalDetail.selectPhoto')}
+                {photoFile || photoPreviewUrl
+                  ? t('animalDetail.changePhoto')
+                  : t('animalDetail.selectPhoto')}
               </Button>
             </Upload>
           </div>
         </Form.Item>
       </div>
 
-      <div style={{ display: 'flex', gap: '16px', marginTop: '24px' }}>
-        <Form.Item name="confinement" valuePropName="checked">
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <Switch 
-              key={`confinement-${animal?.id}-${animal?.confinement}`}
-              checked={Boolean(animal?.confinement)}
-              onChange={(checked: boolean) => form.setFieldValue('confinement', checked)} 
-            />
-            <span style={{ marginLeft: '8px' }}>{t('animalDetail.confinement')}</span>
-          </div>
-        </Form.Item>
+      <Form.Item name="confinement" valuePropName="checked">
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Switch onChange={(checked: boolean) => form.setFieldValue('confinement', checked)} />
+          <span style={{ marginLeft: '8px' }}>{t('animalDetail.confinement')}</span>
+        </div>
+      </Form.Item>
 
-        <Form.Item name="fertilization" valuePropName="checked">
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <Switch 
-              key={`fertilization-${animal?.id}-${animal?.fertilization}`}
-              checked={Boolean(animal?.fertilization)}
-              onChange={(checked: boolean) => form.setFieldValue('fertilization', checked)} 
-            />
-            <span style={{ marginLeft: '8px' }}>{t('animalDetail.fertilization')}</span>
-          </div>
-        </Form.Item>
+      <Form.Item name="fertilization" valuePropName="checked">
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Switch onChange={(checked: boolean) => form.setFieldValue('fertilization', checked)} />
+          <span style={{ marginLeft: '8px' }}>{t('animalDetail.fertilization')}</span>
+        </div>
+      </Form.Item>
 
-        <Form.Item name="castrated" valuePropName="checked">
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <Switch 
-              key={`castrated-${animal?.id}-${animal?.castrated}`}
-              checked={Boolean(animal?.castrated)}
-              onChange={(checked: boolean) => form.setFieldValue('castrated', checked)} 
-            />
-            <span style={{ marginLeft: '8px' }}>{t('animalDetail.castrated')}</span>
-          </div>
-        </Form.Item>
-      </div>
+      <Form.Item name="castrated" valuePropName="checked">
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Switch onChange={(checked: boolean) => form.setFieldValue('castrated', checked)} />
+          <span style={{ marginLeft: '8px' }}>{t('animalDetail.castrated')}</span>
+        </div>
+      </Form.Item>
+
 
       <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-end', marginTop: '24px' }}>
         <Button onClick={onCancel} icon={<CloseOutlined />}>
