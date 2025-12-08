@@ -82,6 +82,8 @@ export const useInfiniteAnimals = (options: UseInfiniteAnimalsOptions = {}) => {
         setAnimals(uniqueAnimals);
         setHasMore(uniqueAnimals.length < totalCount);
       } else {
+        let finalAnimalsCount = 0;
+        
         setAnimals(prev => {
           const animalsMap = new Map<string, Animal>();
           const prevIds = prev.map(a => normalizeId(a.id));
@@ -100,6 +102,7 @@ export const useInfiniteAnimals = (options: UseInfiniteAnimalsOptions = {}) => {
           });
 
           const finalAnimals = Array.from(animalsMap.values());
+          finalAnimalsCount = finalAnimals.length;
           uniqueAnimalsCountRef.current = finalAnimals.length;
           
           console.log('[useInfiniteAnimals] ➕ Acumulando página:', {
@@ -113,9 +116,11 @@ export const useInfiniteAnimals = (options: UseInfiniteAnimalsOptions = {}) => {
             hasMore: finalAnimals.length < totalCount
           });
           
-          setHasMore(finalAnimals.length < totalCount);
           return finalAnimals;
         });
+        
+        // Atualizar hasMore fora do setState para evitar problemas de sincronização
+        setHasMore(finalAnimalsCount < totalCount);
       }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao buscar animais';
@@ -181,9 +186,15 @@ export const useInfiniteAnimals = (options: UseInfiniteAnimalsOptions = {}) => {
       loading,
       hasMore,
       total,
+      page,
+      faltam: total - animals.length,
       ids: animals.slice(0, 10).map(a => a.id)
     });
-  }, [animals, loading, hasMore, total]);
+    
+    if (animals.length < total && hasMore && !loading) {
+      console.warn('[useInfiniteAnimals] ⚠️ ATENÇÃO: Temos menos animais que o total e hasMore=true, mas loadMore não foi chamado!');
+    }
+  }, [animals, loading, hasMore, total, page]);
 
   return {
     animals,
