@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { Table, Spin, Alert } from 'antd';
 import { useAnimals } from '../../hooks/useAnimals';
 import { useFarm } from '../../../../../hooks/useFarm';
@@ -24,9 +24,9 @@ const AnimalTable = forwardRef<AnimalTableRef, AnimalTableProps>((props, ref) =>
   const [pageSize, setPageSize] = useState(10);
   
   const { animals, total, loading, error, refetch } = useAnimals(farm?.id, {
-    
     page: currentPage,
-    limit: pageSize
+    limit: pageSize,
+    searchTerm
   });
 
   useImperativeHandle(ref, () => ({
@@ -47,6 +47,16 @@ const AnimalTable = forwardRef<AnimalTableRef, AnimalTableProps>((props, ref) =>
       animal.type?.toLowerCase().includes(searchLower)
     );
   });
+
+  const paginatedAnimals = searchTerm.trim()
+    ? filteredAnimals.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+    : filteredAnimals;
+
+  const totalForPagination = searchTerm.trim() ? filteredAnimals.length : total;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const handlePageChange = (page: number, size: number) => {
     setCurrentPage(page);
@@ -82,7 +92,7 @@ const AnimalTable = forwardRef<AnimalTableRef, AnimalTableProps>((props, ref) =>
     <>
       <Table 
         columns={filteredColumns} 
-        dataSource={filteredAnimals} 
+        dataSource={paginatedAnimals} 
         pagination={false}
         rowKey="id"
         scroll={{ 
@@ -97,7 +107,7 @@ const AnimalTable = forwardRef<AnimalTableRef, AnimalTableProps>((props, ref) =>
       
       <CustomPagination
         current={currentPage}
-        total={total}
+        total={totalForPagination}
         pageSize={pageSize}
         onChange={handlePageChange}
         onShowSizeChange={handleShowSizeChange}

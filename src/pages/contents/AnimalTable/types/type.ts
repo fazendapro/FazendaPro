@@ -42,6 +42,7 @@ export interface GetAnimalsByFarmParams {
   farm_id: number;
   page?: number;
   limit?: number;
+  searchTerm?: string;
 }
 
 export interface GetAnimalsByFarmPaginatedResponse {

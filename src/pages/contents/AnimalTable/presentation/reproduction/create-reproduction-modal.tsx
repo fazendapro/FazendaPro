@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Modal, Form, Select, DatePicker, Input, Switch, message } from 'antd';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
@@ -153,9 +153,12 @@ export const CreateReproductionModal = ({
           showSearch
           loading={animalsLoading}
           optionFilterProp="children"
-          filterOption={(input: string, option?: { children?: React.ReactNode }) =>
-            (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
-          }
+          filterOption={(input: string, option?: { children?: React.ReactNode }) => {
+            const label = option?.children
+              ? React.Children.toArray(option.children).join('').toLowerCase()
+              : '';
+            return label.includes(input.toLowerCase());
+          }}
         >
           {animals.map((animal) => (
             <Select.Option key={animal.id} value={parseInt(animal.id)}>

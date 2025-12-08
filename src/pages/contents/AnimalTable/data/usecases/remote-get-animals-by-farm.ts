@@ -20,6 +20,10 @@ export class RemoteGetAnimalsByFarm implements GetAnimalsByFarmDomain {
         requestParams.limit = params.limit;
       }
 
+      if (params.searchTerm) {
+        requestParams.search = params.searchTerm;
+      }
+
       const { data, status } = await api().get(
         '/animals/farm',
         {

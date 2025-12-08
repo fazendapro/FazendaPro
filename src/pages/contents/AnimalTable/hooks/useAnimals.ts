@@ -6,6 +6,7 @@ import { Animal } from '../types/type';
 interface UseAnimalsOptions {
   page?: number;
   limit?: number;
+  searchTerm?: string;
 }
 
 export const useAnimals = (farmId?: number, options?: UseAnimalsOptions) => {
@@ -15,8 +16,10 @@ export const useAnimals = (farmId?: number, options?: UseAnimalsOptions) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const page = options?.page ?? 1;
-  const limit = options?.limit ?? 10;
+  const shouldPaginate = !options?.searchTerm?.trim();
+  const page = shouldPaginate ? options?.page ?? 1 : undefined;
+  const limit = shouldPaginate ? options?.limit ?? 10 : undefined;
+  const searchTerm = options?.searchTerm ?? '';
 
   const getAnimalsByFarm = useCallback(async (): Promise<Animal[]> => {
     const targetFarmId = farmId || farm?.id;
@@ -33,7 +36,8 @@ export const useAnimals = (farmId?: number, options?: UseAnimalsOptions) => {
       const result = await getAnimalsByFarmUseCase.getAnimalsByFarm({ 
         farm_id: targetFarmId,
         page,
-        limit
+        limit,
+        searchTerm: searchTerm.trim() || undefined
       });
       
       const paginatedData = result.data;
@@ -50,13 +54,13 @@ export const useAnimals = (farmId?: number, options?: UseAnimalsOptions) => {
     } finally {
       setLoading(false);
     }
-  }, [farmId, farm?.id, page, limit]);
+  }, [farmId, farm?.id, page, limit, searchTerm]);
 
   useEffect(() => {
     if (farmId || farm?.id) {
       getAnimalsByFarm();
     }
-  }, [farmId, farm?.id, page, limit, getAnimalsByFarm]);
+  }, [farmId, farm?.id, page, limit, searchTerm, getAnimalsByFarm]);
 
   return {
     animals,
