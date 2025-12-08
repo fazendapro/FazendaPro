@@ -16,6 +16,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/go-chi/chi/v5"
+	"github.com/newrelic/go-agent/v3/newrelic"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
@@ -29,6 +30,10 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 		r.Use(func(next http.Handler) http.Handler {
 			return sentryHandler.Handle(next)
 		})
+	}
+
+	if app.NewRelicApp != nil {
+		r.Use(newRelicMiddleware(app.NewRelicApp))
 	}
 
 	r.Use(middleware.CORSMiddleware(cfg))
@@ -288,4 +293,46 @@ func SetupRoutes(app *app.Application, db *repository.Database, cfg *config.Conf
 
 	fmt.Println("Todas as rotas configuradas com sucesso")
 	return r
+}
+
+func newRelicMiddleware(nrApp *newrelic.Application) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == "/health" {
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			txnName := fmt.Sprintf("%s %s", r.Method, r.URL.Path)
+			txn := nrApp.StartTransaction(txnName)
+			defer txn.End()
+
+			txn.SetWebRequestHTTP(r)
+
+			wrappedWriter := newRelicResponseWriter{
+				ResponseWriter: w,
+				statusCode:     http.StatusOK,
+			}
+
+			r = r.WithContext(newrelic.NewContext(r.Context(), txn))
+
+			next.ServeHTTP(&wrappedWriter, r)
+
+			txn.SetWebResponse(&wrappedWriter)
+		})
+	}
+}
+
+type newRelicResponseWriter struct {
+	http.ResponseWriter
+	statusCode int
+}
+
+func (w *newRelicResponseWriter) WriteHeader(statusCode int) {
+	w.statusCode = statusCode
+	w.ResponseWriter.WriteHeader(statusCode)
+}
+
+func (w *newRelicResponseWriter) StatusCode() int {
+	return w.statusCode
 }

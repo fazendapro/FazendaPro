@@ -5,10 +5,13 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/newrelic/go-agent/v3/newrelic"
 )
 
 type Application struct {
-	Logger *log.Logger
+	Logger      *log.Logger
+	NewRelicApp *newrelic.Application
 }
 
 func NewApplication() (*Application, error) {

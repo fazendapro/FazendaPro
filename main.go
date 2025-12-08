@@ -15,6 +15,7 @@ import (
 	"github.com/fazendapro/FazendaPro-api/internal/repository"
 	"github.com/fazendapro/FazendaPro-api/internal/routes"
 	"github.com/getsentry/sentry-go"
+	"github.com/newrelic/go-agent/v3/newrelic"
 )
 
 // @title           FazendaPro API
@@ -56,6 +57,29 @@ func main() {
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatal("Erro ao carregar configuração:", err)
+	}
+
+	if cfg.NewRelicEnabled && cfg.NewRelicLicenseKey != "" {
+		nrApp, err := newrelic.NewApplication(
+			newrelic.ConfigAppName(cfg.NewRelicAppName),
+			newrelic.ConfigLicense(cfg.NewRelicLicenseKey),
+			newrelic.ConfigAppLogForwardingEnabled(true),
+			newrelic.ConfigDistributedTracerEnabled(true),
+		)
+		if err != nil {
+			app.Logger.Printf("New Relic initialization failed: %v\n", err)
+		} else {
+			app.NewRelicApp = nrApp
+			app.Logger.Println("New Relic inicializado com sucesso")
+
+			if err := nrApp.WaitForConnection(5 * time.Second); err != nil {
+				app.Logger.Printf("New Relic connection timeout: %v\n", err)
+			}
+
+			defer nrApp.Shutdown(5 * time.Second)
+		}
+	} else {
+		app.Logger.Println("New Relic não configurado ou desabilitado, continuando sem New Relic")
 	}
 
 	if cfg.SentryDSN != "" {
