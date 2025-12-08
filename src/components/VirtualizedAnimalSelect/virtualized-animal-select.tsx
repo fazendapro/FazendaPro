@@ -46,13 +46,36 @@ export const VirtualizedAnimalSelect: React.FC<VirtualizedAnimalSelectProps> = (
   });
 
   const animals = useMemo(() => {
+    console.log('[VirtualizedAnimalSelect] 🎯 Processando animais:', {
+      animaisDoHook: allAnimals.length,
+      temFiltro: !!filterAnimals,
+      idsDoHook: allAnimals.slice(0, 10).map(a => a.id)
+    });
+
     const filtered = filterAnimals ? allAnimals.filter(filterAnimals) : allAnimals;
+    
+    console.log('[VirtualizedAnimalSelect] 🔍 Após filtro:', {
+      animaisFiltrados: filtered.length,
+      animaisRemovidos: allAnimals.length - filtered.length,
+      idsFiltrados: filtered.slice(0, 10).map(a => a.id)
+    });
+
     const normalizeId = (id: string | number): string => String(id);
     const uniqueAnimalsMap = new Map<string, Animal>();
     filtered.forEach(animal => {
       uniqueAnimalsMap.set(normalizeId(animal.id), animal);
     });
-    return Array.from(uniqueAnimalsMap.values());
+    
+    const finalAnimals = Array.from(uniqueAnimalsMap.values());
+    
+    console.log('[VirtualizedAnimalSelect] ✅ Animais finais:', {
+      animaisFinais: finalAnimals.length,
+      duplicatasRemovidas: filtered.length - finalAnimals.length,
+      idsFinais: finalAnimals.slice(0, 10).map(a => a.id),
+      totalIds: finalAnimals.map(a => a.id)
+    });
+    
+    return finalAnimals;
   }, [allAnimals, filterAnimals]);
 
   useEffect(() => {
@@ -81,6 +104,15 @@ export const VirtualizedAnimalSelect: React.FC<VirtualizedAnimalSelectProps> = (
     const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
 
     if (distanceFromBottom < threshold && hasMore && !loading) {
+      console.log('[VirtualizedAnimalSelect] 📜 Scroll próximo ao fim, carregando mais:', {
+        scrollTop,
+        scrollHeight,
+        clientHeight,
+        distanceFromBottom,
+        threshold,
+        hasMore,
+        loading
+      });
       loadMore();
     }
   }, [hasMore, loading, loadMore, itemHeight]);
@@ -96,6 +128,13 @@ export const VirtualizedAnimalSelect: React.FC<VirtualizedAnimalSelectProps> = (
   }, []);
 
   const dropdownRender = useCallback(() => {
+    console.log('[VirtualizedAnimalSelect] 🎨 Renderizando dropdown:', {
+      animaisParaRenderizar: animals.length,
+      loading,
+      hasMore,
+      idsParaRenderizar: animals.map(a => a.id)
+    });
+
     if (animals.length === 0 && !loading) {
       return <div style={{ padding: '8px 12px', textAlign: 'center', color: '#999' }}>Nenhum animal encontrado</div>;
     }

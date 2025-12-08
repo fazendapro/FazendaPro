@@ -51,6 +51,14 @@ export const useInfiniteAnimals = (options: UseInfiniteAnimalsOptions = {}) => {
       const animalsData = paginatedData?.animals || [];
       const totalCount = paginatedData?.total || 0;
 
+      console.log('[useInfiniteAnimals] 📥 Requisição recebida:', {
+        page: pageToLoad,
+        resetList,
+        animaisRecebidos: animalsData.length,
+        totalEsperado: totalCount,
+        idsRecebidos: animalsData.map(a => a.id)
+      });
+
       setTotal(totalCount);
 
       const normalizeId = (id: string | number): string => {
@@ -62,22 +70,49 @@ export const useInfiniteAnimals = (options: UseInfiniteAnimalsOptions = {}) => {
           new Map(animalsData.map(animal => [normalizeId(animal.id), animal])).values()
         );
         uniqueAnimalsCountRef.current = uniqueAnimals.length;
+        
+        console.log('[useInfiniteAnimals] 🔄 Página 1/Reset:', {
+          animaisRecebidos: animalsData.length,
+          animaisUnicos: uniqueAnimals.length,
+          duplicatasRemovidas: animalsData.length - uniqueAnimals.length,
+          idsUnicos: uniqueAnimals.map(a => a.id),
+          hasMore: uniqueAnimals.length < totalCount
+        });
+        
         setAnimals(uniqueAnimals);
         setHasMore(uniqueAnimals.length < totalCount);
       } else {
         setAnimals(prev => {
           const animalsMap = new Map<string, Animal>();
+          const prevIds = prev.map(a => normalizeId(a.id));
 
           prev.forEach(animal => {
             animalsMap.set(normalizeId(animal.id), animal);
           });
 
+          const novosIds: string[] = [];
           animalsData.forEach(animal => {
-            animalsMap.set(normalizeId(animal.id), animal);
+            const normalizedId = normalizeId(animal.id);
+            if (!animalsMap.has(normalizedId)) {
+              novosIds.push(normalizedId);
+            }
+            animalsMap.set(normalizedId, animal);
           });
 
           const finalAnimals = Array.from(animalsMap.values());
           uniqueAnimalsCountRef.current = finalAnimals.length;
+          
+          console.log('[useInfiniteAnimals] ➕ Acumulando página:', {
+            page: pageToLoad,
+            animaisAnteriores: prev.length,
+            animaisRecebidos: animalsData.length,
+            animaisNovos: novosIds.length,
+            animaisUnicosFinais: finalAnimals.length,
+            idsNovos: novosIds,
+            idsAnteriores: prevIds.slice(0, 5),
+            hasMore: finalAnimals.length < totalCount
+          });
+          
           setHasMore(finalAnimals.length < totalCount);
           return finalAnimals;
         });
@@ -111,10 +146,23 @@ export const useInfiniteAnimals = (options: UseInfiniteAnimalsOptions = {}) => {
   }, [searchTerm, loadAnimals]);
 
   const loadMore = useCallback(() => {
+    console.log('[useInfiniteAnimals] 🔽 loadMore chamado:', {
+      loading,
+      hasMore,
+      pageAtual: page,
+      proximaPage: page + 1,
+      animaisAtuais: uniqueAnimalsCountRef.current
+    });
+    
     if (!loading && hasMore) {
       const nextPage = page + 1;
       setPage(nextPage);
       loadAnimals(nextPage);
+    } else {
+      console.log('[useInfiniteAnimals] ⛔ loadMore bloqueado:', {
+        loading,
+        hasMore
+      });
     }
   }, [loading, hasMore, page, loadAnimals]);
 
@@ -126,6 +174,16 @@ export const useInfiniteAnimals = (options: UseInfiniteAnimalsOptions = {}) => {
     setError(null);
     loadAnimals(1);
   }, [loadAnimals]);
+
+  useEffect(() => {
+    console.log('[useInfiniteAnimals] 📊 Estado atualizado:', {
+      animais: animals.length,
+      loading,
+      hasMore,
+      total,
+      ids: animals.slice(0, 10).map(a => a.id)
+    });
+  }, [animals, loading, hasMore, total]);
 
   return {
     animals,
