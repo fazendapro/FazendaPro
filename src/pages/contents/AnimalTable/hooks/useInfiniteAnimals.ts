@@ -23,6 +23,7 @@ export const useInfiniteAnimals = (options: UseInfiniteAnimalsOptions = {}) => {
   const previousSearchTerm = useRef(searchTerm);
   const isInitialMount = useRef(true);
   const loadingRef = useRef(false);
+  const uniqueAnimalsCountRef = useRef(0);
 
   const loadAnimals = useCallback(async (pageToLoad: number, resetList = false) => {
     const targetFarmId = farmId || farm?.id;
@@ -52,29 +53,35 @@ export const useInfiniteAnimals = (options: UseInfiniteAnimalsOptions = {}) => {
 
       setTotal(totalCount);
 
+      const normalizeId = (id: string | number): string => {
+        return String(id);
+      };
+
       if (resetList || pageToLoad === 1) {
         const uniqueAnimals = Array.from(
-          new Map(animalsData.map(animal => [animal.id, animal])).values()
+          new Map(animalsData.map(animal => [normalizeId(animal.id), animal])).values()
         );
+        uniqueAnimalsCountRef.current = uniqueAnimals.length;
         setAnimals(uniqueAnimals);
+        setHasMore(uniqueAnimals.length < totalCount);
       } else {
         setAnimals(prev => {
           const animalsMap = new Map<string, Animal>();
 
           prev.forEach(animal => {
-            animalsMap.set(animal.id, animal);
+            animalsMap.set(normalizeId(animal.id), animal);
           });
 
           animalsData.forEach(animal => {
-            animalsMap.set(animal.id, animal);
+            animalsMap.set(normalizeId(animal.id), animal);
           });
 
-          return Array.from(animalsMap.values());
+          const finalAnimals = Array.from(animalsMap.values());
+          uniqueAnimalsCountRef.current = finalAnimals.length;
+          setHasMore(finalAnimals.length < totalCount);
+          return finalAnimals;
         });
       }
-
-      const loadedCount = pageToLoad * pageSize;
-      setHasMore(loadedCount < totalCount);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao buscar animais';
       setError(errorMessage);
@@ -98,6 +105,7 @@ export const useInfiniteAnimals = (options: UseInfiniteAnimalsOptions = {}) => {
       setPage(1);
       setHasMore(true);
       setTotal(0);
+      uniqueAnimalsCountRef.current = 0;
       loadAnimals(1, true);
     }
   }, [searchTerm, loadAnimals]);

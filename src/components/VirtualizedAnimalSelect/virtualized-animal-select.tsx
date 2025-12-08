@@ -47,9 +47,10 @@ export const VirtualizedAnimalSelect: React.FC<VirtualizedAnimalSelectProps> = (
 
   const animals = useMemo(() => {
     const filtered = filterAnimals ? allAnimals.filter(filterAnimals) : allAnimals;
+    const normalizeId = (id: string | number): string => String(id);
     const uniqueAnimalsMap = new Map<string, Animal>();
     filtered.forEach(animal => {
-      uniqueAnimalsMap.set(animal.id, animal);
+      uniqueAnimalsMap.set(normalizeId(animal.id), animal);
     });
     return Array.from(uniqueAnimalsMap.values());
   }, [allAnimals, filterAnimals]);
@@ -105,7 +106,7 @@ export const VirtualizedAnimalSelect: React.FC<VirtualizedAnimalSelectProps> = (
           data={animals}
           height={dropdownHeight}
           itemHeight={itemHeight}
-          itemKey={(animal: Animal) => animal.id}
+          itemKey={(animal: Animal) => String(animal.id)}
           onScroll={handleScroll}
         >
           {(animal: Animal) => {
