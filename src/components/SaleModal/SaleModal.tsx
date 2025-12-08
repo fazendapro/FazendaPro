@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
-import { Modal, Form, Input, InputNumber, DatePicker, Button, message, Select } from 'antd';
+import { Modal, Form, Input, InputNumber, DatePicker, Button, message } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useSaleForm } from '../../hooks/useSale';
 import { CreateSaleRequest, UpdateSaleRequest, Sale } from '../../types/sale';
-import { useAnimals } from '../../pages/contents/AnimalTable/hooks/useAnimals';
+import { VirtualizedAnimalSelect } from '../VirtualizedAnimalSelect';
 import { useFarm } from '../../hooks/useFarm';
 import dayjs from 'dayjs';
 
@@ -25,7 +25,6 @@ export const SaleModal: React.FC<SaleModalProps> = ({
   const { t } = useTranslation();
   const { createSale, updateSale, loading } = useSaleForm();
   const { farm } = useFarm();
-  const { animals, loading: animalsLoading } = useAnimals(farm?.id);
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -82,8 +81,19 @@ export const SaleModal: React.FC<SaleModalProps> = ({
       );
       form.resetFields();
       onSuccess();
-    } catch {
-      void 0;
+    } catch (error: unknown) {
+      let errorMessage = mode === 'create' 
+        ? t('saleModal.error.createFailed') 
+        : t('saleModal.error.updateFailed');
+
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { data?: { error?: string } } };
+        if (axiosError.response?.data?.error) {
+          errorMessage = axiosError.response.data.error;
+        }
+      }
+      
+      message.error(errorMessage);
     }
   };
 
@@ -120,25 +130,13 @@ export const SaleModal: React.FC<SaleModalProps> = ({
             { required: true, message: t('saleModal.validation.animalRequired') }
           ]}
         >
-          <Select
+          <VirtualizedAnimalSelect
+            farmId={farm?.id}
             placeholder={t('saleModal.placeholders.animal')}
-            loading={animalsLoading}
             disabled={mode === 'edit'}
-            showSearch
-            optionFilterProp="children"
-            filterOption={(input: string, option?: { children?: React.ReactNode }) =>
-              (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
-            }
-          >
-            {animals
-              .filter(animal => animal.status === 0)
-              .map(animal => (
-                <Select.Option key={animal.id} value={animal.id}>
-                  {animal.animal_name} - Brinco: {animal.ear_tag_number_local}
-                </Select.Option>
-              ))
-            }
-          </Select>
+            filterAnimals={(animal) => animal.status === 0}
+            getPopupContainer={(trigger) => trigger.parentElement || document.body}
+          />
         </Form.Item>
 
         <Form.Item

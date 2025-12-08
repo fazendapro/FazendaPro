@@ -4,6 +4,8 @@ import { UploadOutlined, SaveOutlined, CloseOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useAnimalDetailContext } from '../hooks';
 import { AnimalDetailFormData, SEX_OPTIONS, ANIMAL_TYPE_OPTIONS, STATUS_OPTIONS, PURPOSE_OPTIONS } from '../types';
+import { VirtualizedAnimalSelect } from '../../../../components/VirtualizedAnimalSelect';
+import { useFarm } from '../../../../hooks/useFarm';
 import dayjs from 'dayjs';
 
 interface AnimalFormValues {
@@ -35,7 +37,8 @@ interface AnimalDetailFormProps {
 
 export const AnimalDetailForm: React.FC<AnimalDetailFormProps> = ({ onSave, onCancel }) => {
   const { t } = useTranslation();
-  const { animal, fathers, mothers, loadingParents, uploadPhoto } = useAnimalDetailContext();
+  const { farm } = useFarm();
+  const { animal, loadingParents, uploadPhoto } = useAnimalDetailContext();
   const [form] = Form.useForm();
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
@@ -229,26 +232,22 @@ export const AnimalDetailForm: React.FC<AnimalDetailFormProps> = ({ onSave, onCa
           label={t('animalDetail.father')}
           name="father_id"
         >
-          <Select placeholder={t('animalDetail.selectFather')} allowClear>
-            {fathers.map(father => (
-              <Option key={father.id} value={father.id}>
-                {father.animal_name} - {t('animalDetail.localEarTag')}: {father.ear_tag_number_local}
-              </Option>
-            ))}
-          </Select>
+          <VirtualizedAnimalSelect
+            farmId={farm?.id}
+            placeholder={t('animalDetail.selectFather')}
+            allowClear
+          />
         </Form.Item>
 
         <Form.Item
           label={t('animalDetail.mother')}
           name="mother_id"
         >
-          <Select placeholder={t('animalDetail.selectMother')} allowClear>
-            {mothers.map(mother => (
-              <Option key={mother.id} value={mother.id}>
-                {mother.animal_name} - {t('animalDetail.localEarTag')}: {mother.ear_tag_number_local}
-              </Option>
-            ))}
-          </Select>
+          <VirtualizedAnimalSelect
+            farmId={farm?.id}
+            placeholder={t('animalDetail.selectMother')}
+            allowClear
+          />
         </Form.Item>
 
         <Form.Item label={t('animalDetail.photo')} name="photoUpload" valuePropName="file">

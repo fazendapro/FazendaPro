@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Modal, Form, Select, DatePicker, Input, Switch, message } from 'antd';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { useReproduction } from '../../hooks/useReproduction';
-import { useAnimals } from '../../hooks/useAnimals';
 import { useResponsive } from '../../../../../hooks';
+import { useFarm } from '../../../../../hooks/useFarm';
 import { CreateReproductionRequest, Reproduction, ReproductionPhase } from '../../domain/model/reproduction';
+import { VirtualizedAnimalSelect } from '../../../../../components/VirtualizedAnimalSelect';
 
 const { TextArea } = Input;
 
@@ -25,8 +26,8 @@ export const CreateReproductionModal = ({
   editingReproduction
 }: CreateReproductionModalProps) => {
   const { t } = useTranslation();
+  const { farm } = useFarm();
   const { createReproduction, updateReproduction, loading } = useReproduction();
-  const { animals = [], loading: animalsLoading } = useAnimals();
   const { isMobile, isTablet } = useResponsive();
   const [form] = Form.useForm();
 
@@ -148,24 +149,10 @@ export const CreateReproductionModal = ({
           label={t('animalTable.reproduction.selectAnimal')}
           rules={[{ required: true, message: t('animalTable.reproduction.animalRequired') }]}
         >
-        <Select
+          <VirtualizedAnimalSelect
+            farmId={farm?.id}
           placeholder={t('animalTable.reproduction.selectAnimalPlaceholder')}
-          showSearch
-          loading={animalsLoading}
-          optionFilterProp="children"
-          filterOption={(input: string, option?: { children?: React.ReactNode }) => {
-            const label = option?.children
-              ? React.Children.toArray(option.children).join('').toLowerCase()
-              : '';
-            return label.includes(input.toLowerCase());
-          }}
-        >
-          {animals.map((animal) => (
-            <Select.Option key={animal.id} value={parseInt(animal.id)}>
-              {animal.animal_name} - {animal.ear_tag_number_local}
-            </Select.Option>
-          ))}
-        </Select>
+          />
         </Form.Item>
 
         <Form.Item

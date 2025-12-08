@@ -1,12 +1,13 @@
 import { useEffect } from 'react';
-import { Modal, Form, Select, DatePicker, InputNumber, Tooltip, Space, message } from 'antd';
+import { Modal, Form, DatePicker, InputNumber, Tooltip, Space, message } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { useWeight } from '../../hooks/useWeight';
-import { useAnimals } from '../../hooks/useAnimals';
 import { useResponsive } from '../../../../../hooks';
+import { useFarm } from '../../../../../hooks/useFarm';
 import { CreateOrUpdateWeightRequest } from '../../domain/model/weight';
+import { VirtualizedAnimalSelect } from '../../../../../components/VirtualizedAnimalSelect';
 
 interface CreateWeightModalProps {
   visible: boolean;
@@ -22,8 +23,8 @@ export const CreateWeightModal = ({
   preselectedAnimalId
 }: CreateWeightModalProps) => {
   const { t } = useTranslation();
+  const { farm } = useFarm();
   const { createOrUpdateWeight, loading } = useWeight();
-  const { animals = [], loading: animalsLoading } = useAnimals();
   const { isMobile, isTablet } = useResponsive();
   const [form] = Form.useForm();
 
@@ -115,21 +116,10 @@ export const CreateWeightModal = ({
           label={t('animalTable.weight.selectAnimal') || 'Selecionar Animal'}
           rules={[{ required: true, message: t('animalTable.weight.animalRequired') || 'Animal é obrigatório' }]}
         >
-          <Select
+          <VirtualizedAnimalSelect
+            farmId={farm?.id}
             placeholder={t('animalTable.weight.selectAnimalPlaceholder') || 'Selecione um animal'}
-            showSearch
-            loading={animalsLoading}
-            optionFilterProp="children"
-            filterOption={(input: string, option?: { children: unknown }) =>
-              (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
-            }
-          >
-            {animals.map((animal) => (
-              <Select.Option key={animal.id} value={parseInt(animal.id)}>
-                {animal.animal_name} - {animal.ear_tag_number_local}
-              </Select.Option>
-            ))}
-          </Select>
+          />
         </Form.Item>
 
         <Form.Item

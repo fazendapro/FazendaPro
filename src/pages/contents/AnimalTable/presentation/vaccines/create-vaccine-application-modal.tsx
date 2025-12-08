@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Modal, Form, Input, DatePicker, Select, Button, message, Space } from 'antd'
 import { useTranslation } from 'react-i18next'
-import { useAnimals } from '../../hooks/useAnimals'
 import { useVaccine } from '../../hooks/useVaccine'
 import { useVaccineApplication } from '../../hooks/useVaccineApplication'
 import { useFarm } from '../../../../../hooks/useFarm'
 import { useResponsive } from '../../../../../hooks'
 import { CreateVaccineApplicationRequest, VaccineApplication, UpdateVaccineApplicationRequest } from '../../domain/model/vaccine-application'
+import { VirtualizedAnimalSelect } from '../../../../../components/VirtualizedAnimalSelect'
 import dayjs from 'dayjs'
 
 const { Option } = Select
@@ -32,7 +32,6 @@ export const CreateVaccineApplicationModal: React.FC<CreateVaccineApplicationMod
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
   
-  const { animals = [], loading: animalsLoading } = useAnimals(farm?.id || 0)
   const { vaccines = [], loading: vaccinesLoading } = useVaccine(farm?.id || 0)
   const { createVaccineApplication, updateVaccineApplication } = useVaccineApplication(farm?.id || 0)
   
@@ -150,22 +149,10 @@ export const CreateVaccineApplicationModal: React.FC<CreateVaccineApplicationMod
             { required: true, message: t('animalTable.vaccines.animalRequired') }
           ]}
         >
-          <Select
+          <VirtualizedAnimalSelect
+            farmId={farm?.id}
             placeholder={t('animalTable.vaccines.selectAnimalPlaceholder')}
-            loading={animalsLoading}
-            showSearch
-            optionFilterProp="children"
-            filterOption={(input: string, option?: { children?: React.ReactNode }) => {
-              const children = String(option?.children || '')
-              return children.toLowerCase().includes(input.toLowerCase())
-            }}
-          >
-            {animals.map(animal => (
-              <Option key={animal.id} value={animal.id}>
-                {animal.animal_name} - {animal.ear_tag_number_local}
-              </Option>
-            ))}
-          </Select>
+          />
         </Form.Item>
 
         <Form.Item

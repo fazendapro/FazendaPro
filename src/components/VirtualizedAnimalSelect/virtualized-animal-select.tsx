@@ -1,0 +1,163 @@
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { Select, Spin } from 'antd';
+import VirtualList from 'rc-virtual-list';
+import { useInfiniteAnimals } from '../../pages/contents/AnimalTable/hooks/useInfiniteAnimals';
+import { Animal } from '../../pages/contents/AnimalTable/types/type';
+
+interface VirtualizedAnimalSelectProps {
+  farmId?: number;
+  onAnimalLoad?: (animals: Animal[]) => void;
+  itemHeight?: number;
+  dropdownHeight?: number;
+  pageSize?: number;
+  placeholder?: string;
+  loading?: boolean;
+  disabled?: boolean;
+  allowClear?: boolean;
+  value?: number;
+  onChange?: (value: number) => void;
+  filterAnimals?: (animal: Animal) => boolean;
+  getPopupContainer?: (triggerNode: HTMLElement) => HTMLElement;
+}
+
+export const VirtualizedAnimalSelect: React.FC<VirtualizedAnimalSelectProps> = ({
+  farmId,
+  onAnimalLoad,
+  itemHeight = 32,
+  dropdownHeight = 256,
+  pageSize = 20,
+  placeholder = 'Selecione um animal',
+  loading: externalLoading,
+  disabled,
+  allowClear,
+  value,
+  onChange,
+  filterAnimals,
+  getPopupContainer
+}) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [open, setOpen] = useState(false);
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+
+  const { animals: allAnimals, loading, hasMore, loadMore } = useInfiniteAnimals({
+    farmId,
+    searchTerm,
+    pageSize
+  });
+
+  const animals = filterAnimals ? allAnimals.filter(filterAnimals) : allAnimals;
+
+  useEffect(() => {
+    if (onAnimalLoad && animals.length > 0) {
+      onAnimalLoad(animals);
+    }
+  }, [animals, onAnimalLoad]);
+
+  const handleSearch = useCallback((value: string) => {
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+
+    debounceTimer.current = setTimeout(() => {
+      setSearchTerm(value);
+    }, 300);
+  }, []);
+
+  const handleScroll = useCallback((e: React.UIEvent<HTMLElement>) => {
+    const target = e.currentTarget;
+    const scrollTop = target.scrollTop;
+    const scrollHeight = target.scrollHeight;
+    const clientHeight = target.clientHeight;
+
+    const threshold = itemHeight * 3;
+    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+
+    if (distanceFromBottom < threshold && hasMore && !loading) {
+      loadMore();
+    }
+  }, [hasMore, loading, loadMore, itemHeight]);
+
+  const handleOpenChange = useCallback((visible: boolean) => {
+    setOpen(visible);
+    if (!visible) {
+      setSearchTerm('');
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+    }
+  }, []);
+
+  const dropdownRender = useCallback(() => {
+    if (animals.length === 0 && !loading) {
+      return <div style={{ padding: '8px 12px', textAlign: 'center', color: '#999' }}>Nenhum animal encontrado</div>;
+    }
+
+    return (
+      <div>
+        <VirtualList
+          data={animals}
+          height={dropdownHeight}
+          itemHeight={itemHeight}
+          itemKey="id"
+          onScroll={handleScroll}
+        >
+          {(animal: Animal) => {
+            const animalId = typeof animal.id === 'string' ? parseInt(animal.id) : animal.id;
+            return (
+              <div
+                key={animal.id}
+                className="ant-select-item ant-select-item-option"
+                style={{
+                  padding: '5px 12px',
+                  cursor: 'pointer',
+                  height: itemHeight,
+                  display: 'flex',
+                  alignItems: 'center'
+                }}
+                onClick={() => {
+                  if (onChange) {
+                    onChange(animalId);
+                  }
+                  setOpen(false);
+                }}
+              >
+                {animal.animal_name} - {animal.ear_tag_number_local}
+              </div>
+            );
+          }}
+        </VirtualList>
+        {loading && (
+          <div style={{ padding: '8px', textAlign: 'center', borderTop: '1px solid #f0f0f0' }}>
+            <Spin size="small" />
+          </div>
+        )}
+      </div>
+    );
+  }, [animals, dropdownHeight, itemHeight, handleScroll, loading, onChange]);
+
+  return (
+    <Select
+      open={open}
+      onOpenChange={handleOpenChange}
+      placeholder={placeholder}
+      showSearch
+      filterOption={false}
+      onSearch={handleSearch}
+      notFoundContent={loading ? <Spin size="small" /> : 'Nenhum animal encontrado'}
+      dropdownRender={dropdownRender}
+      loading={externalLoading || loading}
+      disabled={disabled}
+      allowClear={allowClear}
+      value={value}
+      onChange={onChange}
+      getPopupContainer={getPopupContainer}
+      options={animals.map(animal => {
+        const animalId = typeof animal.id === 'string' ? parseInt(animal.id) : animal.id;
+        return {
+          label: `${animal.animal_name} - ${animal.ear_tag_number_local}`,
+          value: animalId
+        };
+      })}
+    />
+  );
+};
