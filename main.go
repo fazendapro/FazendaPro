@@ -61,6 +61,7 @@ func main() {
 	if cfg.SentryDSN != "" {
 		if err := sentry.Init(sentry.ClientOptions{
 			Dsn:              cfg.SentryDSN,
+			EnableLogs:       true,
 			EnableTracing:    true,
 			TracesSampleRate: 1.0,
 			TracesSampler: sentry.TracesSampler(func(ctx sentry.SamplingContext) float64 {
