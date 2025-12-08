@@ -4,6 +4,7 @@ import { InfoCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useNextToCalve } from '../hooks/useNextToCalve';
 import { NextToCalveAnimal } from '../types/dashboard.types';
+import { CowOutlined } from '@ant-design/icons';
 
 const NextToCalve: React.FC = () => {
   const { t } = useTranslation();
@@ -89,6 +90,7 @@ const NextToCalve: React.FC = () => {
           >
             <List.Item.Meta
               avatar={
+                item.photo ? ( 
                 <Avatar 
                   src={item.photo} 
                   shape="square" 
@@ -98,6 +100,17 @@ const NextToCalve: React.FC = () => {
                     minHeight: '60px'
                   }}
                 />
+              ) : (
+                <Avatar 
+                  shape="square" 
+                  size={{ xs: 60, sm: 80, md: 100 }}
+                  style={{ 
+                    minWidth: '60px',
+                    minHeight: '60px'
+                  }}
+                  src={<>🐮</>}
+                />
+              )
               }
               title={
                 <div style={{ 

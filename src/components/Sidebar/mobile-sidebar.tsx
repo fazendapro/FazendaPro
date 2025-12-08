@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Button, Dropdown } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { HomeOutlined, UserOutlined, LogoutOutlined, SettingOutlined, DollarOutlined, SwapOutlined } from "@ant-design/icons";
+import { HomeOutlined, LogoutOutlined, SettingOutlined, DollarOutlined, SwapOutlined } from "@ant-design/icons";
 import { useAuth } from "../../contexts/AuthContext";
 import { useSelectedFarm } from "../../hooks/useSelectedFarm";
 import { useFarmSwitcher } from "../../hooks/useFarmSwitcher";
+import { CowIcon } from '../../../public/CowIcon';
 
 interface MenuItem {
   key: string;
@@ -54,7 +55,7 @@ export const MobileSidebar = () => {
 
   const menuItems: MenuItem[] = [
     { key: '/', icon: <HomeOutlined />, label: t('navigation.dashboard') },
-    { key: '/vacas', icon: <UserOutlined />, label: t('navigation.cattle') },
+    { key: '/vacas', icon: <CowIcon />, label: t('navigation.cattle') },
     { key: '/vendas', icon: <DollarOutlined />, label: t('navigation.sales') },
     { key: '/configuracoes', icon: <SettingOutlined />, label: t('navigation.settings') },
     ...(farms.length > 1 ? [{ key: '/trocar-fazenda', icon: <SwapOutlined />, label: t('navigation.switchFarm') || 'Trocar Fazenda' }] : []),

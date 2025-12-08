@@ -2,10 +2,11 @@ import { Menu, Layout, Grid, Button, Avatar, Card, Typography, Select } from "an
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { HomeOutlined, UserOutlined, MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined, SettingOutlined, DollarOutlined } from "@ant-design/icons";
+import { HomeOutlined, MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined, SettingOutlined, DollarOutlined } from "@ant-design/icons";
 import { useAuth } from "../../contexts/AuthContext";
 import { useSelectedFarm } from "../../hooks/useSelectedFarm";
 import { useFarmSwitcher } from "../../hooks/useFarmSwitcher";
+import { CowIcon } from '../../../public/CowIcon';
 
 const { Sider } = Layout;
 const { useBreakpoint } = Grid;
@@ -41,7 +42,7 @@ export const Sidebar = () => {
 
   const menuItems = [
     { key: '/', icon: <HomeOutlined />, label: t('navigation.dashboard') },
-    { key: '/vacas', icon: <UserOutlined />, label: t('navigation.cattle') },
+    { key: '/vacas', icon: <CowIcon />, label: t('navigation.cattle') },
     { key: '/vendas', icon: <DollarOutlined />, label: t('navigation.sales') },
     { key: '/configuracoes', icon: <SettingOutlined />, label: t('navigation.settings') },
     { key: '/sair', icon: <LogoutOutlined />, label: t('navigation.logout') },
