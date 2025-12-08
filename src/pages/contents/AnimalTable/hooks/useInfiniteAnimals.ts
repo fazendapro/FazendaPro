@@ -53,9 +53,24 @@ export const useInfiniteAnimals = (options: UseInfiniteAnimalsOptions = {}) => {
       setTotal(totalCount);
 
       if (resetList || pageToLoad === 1) {
-        setAnimals(animalsData);
+        const uniqueAnimals = Array.from(
+          new Map(animalsData.map(animal => [animal.id, animal])).values()
+        );
+        setAnimals(uniqueAnimals);
       } else {
-        setAnimals(prev => [...prev, ...animalsData]);
+        setAnimals(prev => {
+          const animalsMap = new Map<string, Animal>();
+
+          prev.forEach(animal => {
+            animalsMap.set(animal.id, animal);
+          });
+
+          animalsData.forEach(animal => {
+            animalsMap.set(animal.id, animal);
+          });
+
+          return Array.from(animalsMap.values());
+        });
       }
 
       const loadedCount = pageToLoad * pageSize;
@@ -69,7 +84,6 @@ export const useInfiniteAnimals = (options: UseInfiniteAnimalsOptions = {}) => {
     }
   }, [farmId, farm?.id, pageSize, searchTerm]);
 
-  // Carrega primeira página no mount
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
@@ -77,7 +91,6 @@ export const useInfiniteAnimals = (options: UseInfiniteAnimalsOptions = {}) => {
     }
   }, [loadAnimals]);
 
-  // Reset quando searchTerm muda
   useEffect(() => {
     if (previousSearchTerm.current !== searchTerm) {
       previousSearchTerm.current = searchTerm;

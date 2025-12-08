@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { Select, Spin } from 'antd';
 import VirtualList from 'rc-virtual-list';
 import { useInfiniteAnimals } from '../../pages/contents/AnimalTable/hooks/useInfiniteAnimals';
@@ -45,7 +45,14 @@ export const VirtualizedAnimalSelect: React.FC<VirtualizedAnimalSelectProps> = (
     pageSize
   });
 
-  const animals = filterAnimals ? allAnimals.filter(filterAnimals) : allAnimals;
+  const animals = useMemo(() => {
+    const filtered = filterAnimals ? allAnimals.filter(filterAnimals) : allAnimals;
+    const uniqueAnimalsMap = new Map<string, Animal>();
+    filtered.forEach(animal => {
+      uniqueAnimalsMap.set(animal.id, animal);
+    });
+    return Array.from(uniqueAnimalsMap.values());
+  }, [allAnimals, filterAnimals]);
 
   useEffect(() => {
     if (onAnimalLoad && animals.length > 0) {
@@ -98,7 +105,7 @@ export const VirtualizedAnimalSelect: React.FC<VirtualizedAnimalSelectProps> = (
           data={animals}
           height={dropdownHeight}
           itemHeight={itemHeight}
-          itemKey="id"
+          itemKey={(animal: Animal) => animal.id}
           onScroll={handleScroll}
         >
           {(animal: Animal) => {
@@ -135,6 +142,20 @@ export const VirtualizedAnimalSelect: React.FC<VirtualizedAnimalSelectProps> = (
     );
   }, [animals, dropdownHeight, itemHeight, handleScroll, loading, onChange]);
 
+  const selectOptions = useMemo(() => {
+    const optionsMap = new Map<number, { label: string; value: number }>();
+    animals.forEach(animal => {
+      const animalId = typeof animal.id === 'string' ? parseInt(animal.id) : animal.id;
+      if (!optionsMap.has(animalId)) {
+        optionsMap.set(animalId, {
+          label: `${animal.animal_name} - ${animal.ear_tag_number_local}`,
+          value: animalId
+        });
+      }
+    });
+    return Array.from(optionsMap.values());
+  }, [animals]);
+
   return (
     <Select
       open={open}
@@ -151,13 +172,7 @@ export const VirtualizedAnimalSelect: React.FC<VirtualizedAnimalSelectProps> = (
       value={value}
       onChange={onChange}
       getPopupContainer={getPopupContainer}
-      options={animals.map(animal => {
-        const animalId = typeof animal.id === 'string' ? parseInt(animal.id) : animal.id;
-        return {
-          label: `${animal.animal_name} - ${animal.ear_tag_number_local}`,
-          value: animalId
-        };
-      })}
+      options={selectOptions}
     />
   );
 };
