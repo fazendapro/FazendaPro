@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/fazendapro/FazendaPro-api/internal/models"
@@ -254,9 +255,11 @@ func (h *AnimalHandler) GetAnimal(w http.ResponseWriter, r *http.Request) {
 }
 
 type animalQueryParams struct {
-	page   int
-	limit  int
-	farmID uint
+	page      int
+	limit     int
+	farmID    uint
+	search    string
+	paginated bool
 }
 
 func parseAnimalQueryParams(r *http.Request) (animalQueryParams, error) {
@@ -272,11 +275,14 @@ func parseAnimalQueryParams(r *http.Request) (animalQueryParams, error) {
 
 	pageStr := r.URL.Query().Get("page")
 	limitStr := r.URL.Query().Get("limit")
+	search := strings.TrimSpace(r.URL.Query().Get("search"))
 
 	params := animalQueryParams{
-		page:   1,
-		limit:  10,
-		farmID: uint(farmID),
+		page:      1,
+		limit:     10,
+		farmID:    uint(farmID),
+		search:    search,
+		paginated: true,
 	}
 
 	if pageStr != "" {
@@ -289,6 +295,12 @@ func parseAnimalQueryParams(r *http.Request) (animalQueryParams, error) {
 		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
 			params.limit = l
 		}
+	}
+
+	if search != "" && pageStr == "" && limitStr == "" {
+		params.paginated = false
+		params.page = 0
+		params.limit = 0
 	}
 
 	return params, nil
@@ -316,9 +328,9 @@ func (h *AnimalHandler) GetAnimalsByFarm(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	fmt.Printf("FarmID: %d, Page: %d, Limit: %d\n", params.farmID, params.page, params.limit)
+	fmt.Printf("FarmID: %d, Page: %d, Limit: %d, Search: %s, Paginated: %v\n", params.farmID, params.page, params.limit, params.search, params.paginated)
 
-	animals, total, err := h.service.GetAnimalsByFarmIDWithPagination(params.farmID, params.page, params.limit)
+	animals, total, err := h.service.GetAnimalsByFarmIDWithPaginationAndSearch(params.farmID, params.page, params.limit, params.search)
 	if err != nil {
 		fmt.Printf("Erro ao buscar animais: %v\n", err)
 		SendErrorResponse(w, err.Error(), http.StatusInternalServerError)
@@ -349,11 +361,18 @@ func (h *AnimalHandler) GetAnimalsByFarm(w http.ResponseWriter, r *http.Request)
 
 	fmt.Printf("FarmID: %d, Animais encontrados: %d de %d total\n", params.farmID, len(animals), total)
 
+	page := params.page
+	limit := params.limit
+	if !params.paginated {
+		page = 1
+		limit = len(responses)
+	}
+
 	response := AnimalListResponse{
 		Animals: responses,
 		Total:   total,
-		Page:    params.page,
-		Limit:   params.limit,
+		Page:    page,
+		Limit:   limit,
 	}
 
 	SendSuccessResponse(w, response, fmt.Sprintf("Animais encontrados com sucesso (%d de %d animais)", len(animals), total), http.StatusOK)
