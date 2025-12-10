@@ -29,4 +29,4 @@
 >
 > [Onde vejo o design da interface?](<http://figma.com/proto/ZoKjm0cUGoA5tQncXZeGtb/Inventory-Management-Dashboard-(Community)?node-id=459-576>)
 
-Feito com muito, muito amor por [Gugu](https://www.instagram.com/gvstavu/) 🐮❤️
+Feito com muito, muito amor por [Gustavo](https://www.instagram.com/gvstavu/) 🐮❤️
